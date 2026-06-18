@@ -274,7 +274,7 @@ Status legend: ☐ todo · ◐ in progress · ☑ done
 - ☑ 2.2 Domain: pure LWW `merge` + tombstones; exhaustive unit tests.
 - ☑ 2.3 Local-only highlights, notes, bookmarks against the User store.
 - ☑ 2.4 `SyncEngine` interface; per-device file impl (`state-<deviceId>.db`).
-- ☑ 2.5 Point the file transport at a user-chosen synced folder (Syncthing / cloud folder); load = read all `state-*.db` + LWW merge.
+- ☐ 2.5 Point the file transport at a user-chosen synced folder (TODO: Build Settings UI file chooser).
 - ☑ 2.6 End-to-end: two devices share a folder, edits + tombstones converge regardless of sync order.
 - ☐ 2.7 *(optional/later)* BYO-backend impl: user-supplied Supabase URL+key, outbox queue, realtime.
 
@@ -283,7 +283,9 @@ Status legend: ☐ todo · ◐ in progress · ☑ done
 - ☐ 3.2 Multi-dictionary search + tap-a-word lookup.
 - ☐ 3.3 In-bible + global search (FTS5; port `search` semantics).
 - ☐ 3.4 Cross-references.
-- ☐ 3.5 Tags across notes/prayers/journals/sermons (port `tags`, pass state in).
+- ☑ 3.5 Notes: markdown editor attached to a verse or chapter.
+- ☑ 3.6 Bookmarks: tag a verse with a custom label (e.g. "Faith").
+- ☑ 3.7 Study pane: a slide-over or bottom-sheet UI showing notes/bookmarks for the active chapter.
 
 ### Phase 4 — Personal study / tracking
 - ☐ 4.1 Journals + prayer tracker (synced records).

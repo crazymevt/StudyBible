@@ -5,12 +5,14 @@ import '../../data/content_store.dart';
 class FlowingParagraphView extends StatefulWidget {
   final List<Verse> verses;
   final Set<int> selectedVerses;
+  final Map<int, String> savedHighlights;
   final ValueChanged<int> onVerseTap;
 
   const FlowingParagraphView({
     super.key,
     required this.verses,
     required this.selectedVerses,
+    required this.savedHighlights,
     required this.onVerseTap,
   });
 
@@ -64,9 +66,14 @@ class _FlowingParagraphViewState extends State<FlowingParagraphView> {
             final index = entry.key;
             final verse = entry.value;
             final isSelected = widget.selectedVerses.contains(verse.verse);
-            final bgColor = isSelected 
-                ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4)
+            final highlightHex = widget.savedHighlights[verse.verse];
+            final highlightColor = highlightHex != null 
+                ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF'))) 
                 : null;
+            
+            final bgColor = isSelected 
+                ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6)
+                : highlightColor?.withValues(alpha: 0.4);
             final recognizer = _recognizers[index];
 
             return TextSpan(

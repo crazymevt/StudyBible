@@ -8,12 +8,28 @@ import 'tables/user_tables.dart';
 
 part 'user_store.g.dart';
 
-@DriftDatabase(tables: [Highlights])
+@DriftDatabase(tables: [Highlights, Notes, Bookmarks])
 class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        await m.createAll();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        // Destructive upgrade: drop all tables and recreate them
+        for (final table in allTables) {
+          await m.drop(table);
+        }
+        await m.createAll();
+      },
+    );
+  }
 }
 
 LazyDatabase _openConnection() {

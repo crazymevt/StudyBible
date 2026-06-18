@@ -7,6 +7,8 @@ import '../../app/sync_service.dart';
 import 'verse_list_view.dart';
 import 'flowing_paragraph_view.dart';
 import 'parallel_view.dart';
+import 'verse_action_bar.dart';
+import 'study_pane.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({super.key});
@@ -51,8 +53,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final parallelVersesAsync = ref.watch(parallelVersesProvider);
     final bookName = ref.watch(selectedBookNameProvider);
     final chapter = ref.watch(selectedChapterProvider);
-    final selectedVersesAsync = ref.watch(chapterHighlightsProvider);
-    final selectedVerses = selectedVersesAsync.value ?? <int>{};
+    final savedHighlightsAsync = ref.watch(chapterHighlightsProvider);
+    final savedHighlights = savedHighlightsAsync.value ?? <int, String>{};
+    final selectedVerses = ref.watch(selectedVersesProvider);
     final activeVersions = ref.watch(activeVersionsProvider);
 
     return Scaffold(
@@ -93,8 +96,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               });
             },
           ),
+          Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.menu_book),
+                tooltip: 'Study Pane',
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+              );
+            }
+          ),
         ],
       ),
+      endDrawer: const StudyPane(),
       body: parallelVersesAsync.when(
         data: (versesMap) {
           if (versesMap.isEmpty) {
@@ -108,25 +121,29 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 ? FlowingParagraphView(
                     verses: verses,
                     selectedVerses: selectedVerses,
-                    onVerseTap: (verseId) => ref.read(highlightActionProvider).toggleHighlight(verseId),
+                    savedHighlights: savedHighlights,
+                    onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
                   )
                 : VerseListView(
                     verses: verses,
                     selectedVerses: selectedVerses,
-                    onVerseTap: (verseId) => ref.read(highlightActionProvider).toggleHighlight(verseId),
+                    savedHighlights: savedHighlights,
+                    onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
                   );
           } else {
             return ParallelView(
               versesMap: versesMap,
               isFlowing: _isFlowing,
               selectedVerses: selectedVerses,
-              onVerseTap: (verseId) => ref.read(highlightActionProvider).toggleHighlight(verseId),
+              savedHighlights: savedHighlights,
+              onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
             );
           }
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
+      bottomNavigationBar: selectedVerses.isNotEmpty ? const VerseActionBar() : null,
     );
   }
 }

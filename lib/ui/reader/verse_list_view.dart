@@ -4,12 +4,14 @@ import '../../data/content_store.dart';
 class VerseListView extends StatelessWidget {
   final List<Verse> verses;
   final Set<int> selectedVerses;
+  final Map<int, String> savedHighlights;
   final ValueChanged<int> onVerseTap;
 
   const VerseListView({
     super.key,
     required this.verses,
     required this.selectedVerses,
+    required this.savedHighlights,
     required this.onVerseTap,
   });
 
@@ -21,11 +23,17 @@ class VerseListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final verse = verses[index];
         final isSelected = selectedVerses.contains(verse.verse);
+        final highlightHex = savedHighlights[verse.verse];
+        final highlightColor = highlightHex != null 
+            ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF'))) 
+            : Colors.transparent;
 
         return InkWell(
           onTap: () => onVerseTap(verse.verse),
           child: Container(
-            color: isSelected ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4) : Colors.transparent,
+            color: isSelected 
+                ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6) 
+                : highlightColor.withValues(alpha: 0.4),
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
             margin: const EdgeInsets.only(bottom: 4.0),
             child: Row(

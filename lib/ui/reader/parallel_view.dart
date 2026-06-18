@@ -8,6 +8,7 @@ class ParallelView extends ConsumerWidget {
   final Map<String, List<Verse>> versesMap;
   final bool isFlowing;
   final Set<int> selectedVerses;
+  final Map<int, String> savedHighlights;
   final ValueChanged<int> onVerseTap;
 
   const ParallelView({
@@ -15,6 +16,7 @@ class ParallelView extends ConsumerWidget {
     required this.versesMap,
     required this.isFlowing,
     required this.selectedVerses,
+    required this.savedHighlights,
     required this.onVerseTap,
   });
 
@@ -48,11 +50,13 @@ class ParallelView extends ConsumerWidget {
                     ? FlowingParagraphView(
                         verses: verses,
                         selectedVerses: selectedVerses,
+                        savedHighlights: savedHighlights,
                         onVerseTap: onVerseTap,
                       )
                     : VerseListView(
                         verses: verses,
                         selectedVerses: selectedVerses,
+                        savedHighlights: savedHighlights,
                         onVerseTap: onVerseTap,
                       ),
               ),
