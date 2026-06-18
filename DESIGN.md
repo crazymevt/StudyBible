@@ -275,7 +275,7 @@ Status legend: ☐ todo · ◐ in progress · ☑ done
 - ☑ 2.3 Local-only highlights, notes, bookmarks against the User store.
 - ☑ 2.4 `SyncEngine` interface; per-device file impl (`state-<deviceId>.db`).
 - ☑ 2.5 Point the file transport at a user-chosen synced folder (Syncthing / cloud folder); load = read all `state-*.db` + LWW merge.
-- ☐ 2.6 End-to-end: two devices share a folder, edits + tombstones converge regardless of sync order.
+- ☑ 2.6 End-to-end: two devices share a folder, edits + tombstones converge regardless of sync order.
 - ☐ 2.7 *(optional/later)* BYO-backend impl: user-supplied Supabase URL+key, outbox queue, realtime.
 
 ### Phase 3 — Study features

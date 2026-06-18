@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart';
 import '../data/user_store.dart';
 import 'reader_state.dart';
+import 'sync_service.dart';
 
 final userStoreProvider = Provider<UserStore>((ref) {
   return UserStore();
@@ -45,10 +46,11 @@ class HighlightAction {
         mode: InsertMode.replace,
       );
     } else {
+      final deviceId = await ref.read(deviceIdProvider.future);
       final newHighlight = Highlight(
         id: const Uuid().v4(),
         updatedAt: DateTime.now().millisecondsSinceEpoch,
-        deviceId: 'local-device',
+        deviceId: deviceId,
         deleted: false,
         bookName: bookName,
         chapter: chapter,
