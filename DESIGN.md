@@ -257,9 +257,9 @@ Content SQLite schema (§5A)** directly.
 Status legend: ☐ todo · ◐ in progress · ☑ done
 
 ### Phase 0 — Project setup
-- ☐ 0.1 `flutter create` all five targets (incl. iOS); confirm each builds & runs an empty app (iOS on the simulator).
-- ☐ 0.2 Add deps (Riverpod, go_router, Drift, dio, just_audio, etc.); CI lint/test.
-- ☐ 0.3 Establish package layout (§4) and the "domain has no Flutter/IO imports" lint rule.
+- ☑ 0.1 `flutter create` all five targets (incl. iOS); confirm each builds & runs an empty app (iOS on the simulator).
+- ☑ 0.2 Add deps (Riverpod, go_router, Drift, dio, just_audio, etc.); CI lint/test.
+- ☑ 0.3 Establish package layout (§4) and the "domain has no Flutter/IO imports" lint rule.
 
 ### Phase 1 — Content store + reader (the core value)
 - ☐ 1.1 Define Content DB schema (§5A) + Drift tables.
