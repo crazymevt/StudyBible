@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'ui/main_shell.dart';
 import 'app/shared_prefs.dart';
+import 'app/app_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,23 +99,34 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp> with WindowListen
 
   @override
   Widget build(BuildContext context) {
+    final fontFamily = ref.watch(appFontFamilyProvider);
+    final fontSizeDelta = ref.watch(appFontSizeDeltaProvider);
+
+    final String? actualFontFamily = fontFamily == 'System Default' ? null : fontFamily;
+
+    ThemeData buildTheme(Brightness brightness, Color seedColor) {
+      final baseTheme = ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: seedColor,
+          brightness: brightness,
+        ),
+        useMaterial3: true,
+        fontFamily: actualFontFamily,
+      );
+
+      return baseTheme.copyWith(
+        textTheme: baseTheme.textTheme.apply(
+          fontFamily: actualFontFamily,
+          fontSizeDelta: fontSizeDelta,
+        ),
+      );
+    }
+
     return MaterialApp(
       title: 'Study Bible',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6750A4),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFD0BCFF),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
+      theme: buildTheme(Brightness.light, const Color(0xFF6750A4)),
+      darkTheme: buildTheme(Brightness.dark, const Color(0xFFD0BCFF)),
       themeMode: ThemeMode.system,
       home: const MainShell(),
     );

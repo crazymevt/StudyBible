@@ -57,6 +57,36 @@ class ShowDashboardOnStartNotifier extends Notifier<bool> {
 
 final showDashboardOnStartProvider = NotifierProvider<ShowDashboardOnStartNotifier, bool>(() => ShowDashboardOnStartNotifier());
 
+class AppFontFamilyNotifier extends Notifier<String> {
+  @override
+  String build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('appFontFamily') ?? 'System Default';
+  }
+
+  void set(String value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setString('appFontFamily', value);
+  }
+}
+
+final appFontFamilyProvider = NotifierProvider<AppFontFamilyNotifier, String>(() => AppFontFamilyNotifier());
+
+class AppFontSizeDeltaNotifier extends Notifier<double> {
+  @override
+  double build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getDouble('appFontSizeDelta') ?? 0.0;
+  }
+
+  void set(double value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setDouble('appFontSizeDelta', value);
+  }
+}
+
+final appFontSizeDeltaProvider = NotifierProvider<AppFontSizeDeltaNotifier, double>(() => AppFontSizeDeltaNotifier());
+
 class AppModuleNotifier extends Notifier<AppModule> {
   AppModule build() {
     final showDashboard = ref.watch(showDashboardOnStartProvider);
