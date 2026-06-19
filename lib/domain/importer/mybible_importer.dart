@@ -37,7 +37,7 @@ class MyBibleImporter {
       if (hasInfo) {
         final infoRows = db.select("SELECT value FROM info WHERE name='language'");
         if (infoRows.isNotEmpty) {
-          language = infoRows.first['value'] as String;
+          language = infoRows.first['value']?.toString() ?? 'en';
         }
       }
 
@@ -53,7 +53,8 @@ class MyBibleImporter {
       final booksQuery = db.select('SELECT book_number, short_name, long_name FROM books ORDER BY book_number');
       
       for (final row in booksQuery) {
-        final bookNumber = row['book_number'] as int;
+        if (row['book_number'] == null) continue;
+        final bookNumber = num.parse(row['book_number'].toString()).toInt();
         
         final isNT = bookNumber >= 470;
 
@@ -73,10 +74,11 @@ class MyBibleImporter {
       
       await store.batch((batch) {
         for (final row in versesQuery) {
-          final bookNumber = row['book_number'] as int;
-          final chapter = row['chapter'] as int;
-          final verse = row['verse'] as int;
-          final text = row['text'] as String;
+          if (row['book_number'] == null || row['chapter'] == null || row['verse'] == null) continue;
+          final bookNumber = num.parse(row['book_number'].toString()).toInt();
+          final chapter = num.parse(row['chapter'].toString()).toInt();
+          final verse = num.parse(row['verse'].toString()).toInt();
+          final text = row['text']?.toString() ?? '';
 
           final bookId = bookIdMap[bookNumber];
           if (bookId == null) continue;
@@ -108,25 +110,29 @@ class MyBibleImporter {
         name: module.title,
       ));
 
-      final entriesQuery = db.select('SELECT book_number, chapter_number_from, verse_number_from, text FROM commentaries');
+      final booksQuery = db.select('SELECT book_number FROM books');
+      final Set<int> availableBooks = {};
+      for (final row in booksQuery) {
+        if (row['book_number'] != null) {
+          availableBooks.add(num.parse(row['book_number'].toString()).toInt());
+        }
+      }
+
+      final entriesQuery = db.select('SELECT book_number, chapter_number_from, verse_number_from, text FROM commentaries ORDER BY book_number, chapter_number_from, verse_number_from');
       
       await store.batch((batch) {
         for (final row in entriesQuery) {
-          // In mybible commentaries, book_number maps to book name typically, we'll need to resolve it 
-          // but for now let's just insert 'Unknown' if we don't have a mapping, or query it.
-          // Since mybible commentary has book_number, we can map it to standard names.
-          final bookNumber = row['book_number'] as int;
-          final chapter = row['chapter_number_from'] as int?;
-          final verse = row['verse_number_from'] as int?;
-          final text = row['text'] as String;
-          
-          final bookName = _bookNumberToName(bookNumber);
+          if (row['book_number'] == null) continue;
+          final bookNumber = num.parse(row['book_number'].toString()).toInt();
+          final chapter = row['chapter_number_from'] != null ? num.parse(row['chapter_number_from'].toString()).toInt() : null;
+          final verse = row['verse_number_from'] != null ? num.parse(row['verse_number_from'].toString()).toInt() : null;
+          final text = row['text']?.toString() ?? '';
 
           batch.insert(store.commentaryEntries, CommentaryEntriesCompanion.insert(
             commentaryId: commentaryId,
-            bookName: bookName,
-            chapter: Value(chapter == 0 ? null : chapter),
-            verse: Value(verse == 0 ? null : verse),
+            bookName: _bookNumberToName(bookNumber),
+            chapter: Value(chapter),
+            verse: Value(verse),
             textContent: text,
           ));
         }
@@ -145,12 +151,12 @@ class MyBibleImporter {
         name: module.title,
       ));
 
-      final entriesQuery = db.select('SELECT topic, definition FROM dictionary');
+      final entriesQuery = db.select('SELECT topic, definition FROM dictionary ORDER BY topic');
       
       await store.batch((batch) {
         for (final row in entriesQuery) {
-          final word = row['topic'] as String;
-          final definition = row['definition'] as String;
+          final word = row['topic']?.toString() ?? '';
+          final definition = row['definition']?.toString() ?? '';
 
           batch.insert(store.dictionaryEntries, DictionaryEntriesCompanion.insert(
             dictionaryId: dictionaryId,

@@ -150,7 +150,7 @@ class ContentManagerApi {
 
   String _osisEdnBasename(String filename) {
     return filename
-        .replaceAll(RegExp(r'(?i)\.xml$'), '')
+        .replaceAll(RegExp(r'\.xml$', caseSensitive: false), '')
         .replaceAll(RegExp(r'[^A-Za-z0-9._ -]'), '_')
         .trim();
   }
@@ -168,7 +168,7 @@ class ContentManagerApi {
       for (final item in data) {
         final name = item['name'] as String;
         if (item['type'] == 'file' && name.toLowerCase().endsWith('.xml')) {
-          final title = name.replaceAll(RegExp(r'(?i)\.xml$'), '');
+          final title = name.replaceAll(RegExp(r'\.xml$', caseSensitive: false), '');
           translations.add(OsisTranslation(
             name: name,
             title: title,
