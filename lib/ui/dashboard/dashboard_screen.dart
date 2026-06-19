@@ -6,6 +6,8 @@ import 'reading_progress_dialog.dart';
 import 'time_analytics_dialog.dart';
 import 'achievements_dialog.dart';
 import '../../data/models/achievement_def.dart';
+import '../../app/reading_plan_providers.dart';
+import '../../app/app_state.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -46,6 +48,7 @@ class DashboardScreen extends ConsumerWidget {
           children: [
             _buildReadingProgressCard(context, percent, chaptersRead, coverage),
             _buildTimeAnalyticsCard(context, timeData, ref),
+            _buildReadingPlansSection(context, ref),
             _buildPaceCard(context, 'Day Streak', pace['currentStreak'].toString(), Icons.local_fire_department, Colors.orange),
             _buildPaceCard(context, 'Longest Streak', pace['longestStreak'].toString(), Icons.emoji_events, Colors.yellow),
             _buildPaceCard(context, 'Days Active', pace['daysActive'].toString(), Icons.calendar_today, Colors.blue),
@@ -259,6 +262,108 @@ class DashboardScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+  Widget _buildReadingPlansSection(BuildContext context, WidgetRef ref) {
+    final activePlansAsync = ref.watch(activeReadingPlansProvider);
+
+    return Card(
+      child: Container(
+        width: 300,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Reading Plans', style: Theme.of(context).textTheme.titleLarge),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward),
+                  tooltip: 'Go to Reading Plans',
+                  onPressed: () {
+                    ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                    ref.read(activeToolProvider.notifier).setTool(ActiveTool.readingPlans);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            activePlansAsync.when(
+              data: (plans) {
+                if (plans.isEmpty) {
+                  return const Text('No active reading plans. Create one in the Reader sidebar!', style: TextStyle(color: Colors.grey));
+                }
+                return Column(
+                  children: plans.map((plan) => _ReadingPlanProgressItem(plan: plan)).toList(),
+                );
+              },
+              loading: () => const CircularProgressIndicator(),
+              error: (err, st) => Text('Error: $err'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReadingPlanProgressItem extends ConsumerWidget {
+  final dynamic plan; // ReadingPlan
+
+  const _ReadingPlanProgressItem({required this.plan});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final daysAsync = ref.watch(readingPlanDaysProvider(plan.id));
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: daysAsync.when(
+        data: (days) {
+          if (days.isEmpty) return const SizedBox.shrink();
+          
+          final totalDays = days.length;
+          final completedDays = days.where((d) => d.completed).length;
+          final percent = totalDays > 0 ? completedDays / totalDays : 0.0;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      plan.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text('${(percent * 100).toInt()}%'),
+                ],
+              ),
+              const SizedBox(height: 4),
+              LinearProgressIndicator(
+                value: percent,
+                backgroundColor: Colors.grey.withAlpha(50),
+                minHeight: 6,
+                borderRadius: BorderRadius.circular(3),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '$completedDays / $totalDays days',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          );
+        },
+        loading: () => const LinearProgressIndicator(),
+        error: (err, _) => const SizedBox.shrink(),
       ),
     );
   }
