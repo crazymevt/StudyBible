@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide Column;
 import '../data/user_store.dart';
+import '../data/models/achievement_def.dart';
+import '../main.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
 
@@ -254,6 +257,8 @@ class DashboardAction {
     final now = DateTime.now().millisecondsSinceEpoch;
 
     final existing = await (store.select(store.achievements)..where((a) => a.id.equals(id))).getSingleOrNull();
+    bool newlyUnlocked = false;
+
     if (existing == null) {
       final achievement = Achievement(
         id: id,
@@ -263,11 +268,41 @@ class DashboardAction {
         unlockedAt: now,
       );
       await store.into(store.achievements).insert(achievement);
+      newlyUnlocked = true;
     } else if (existing.deleted) {
       await store.into(store.achievements).insert(
         existing.copyWith(deleted: false, updatedAt: now),
         mode: InsertMode.replace,
       );
+      newlyUnlocked = true;
+    }
+
+    if (newlyUnlocked) {
+      final def = allAchievements.where((a) => a.id == id).firstOrNull;
+      if (def != null && scaffoldMessengerKey.currentState != null) {
+        scaffoldMessengerKey.currentState!.showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.emoji_events, color: Colors.amber),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('Achievement Unlocked!', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(def.name),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            duration: const Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 }

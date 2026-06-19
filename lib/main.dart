@@ -10,6 +10,8 @@ import 'app/app_state.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -131,6 +133,7 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp> with WindowListen
     return MaterialApp(
       title: 'Study Bible',
       debugShowCheckedModeBanner: false,
+      scaffoldMessengerKey: scaffoldMessengerKey,
       theme: buildTheme(Brightness.light, const Color(0xFF6750A4)),
       darkTheme: buildTheme(Brightness.dark, const Color(0xFFD0BCFF)),
       themeMode: ThemeMode.system,
