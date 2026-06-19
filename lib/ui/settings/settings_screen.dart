@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../app_drawer.dart';
 
 import '../../app/app_state.dart';
 
@@ -15,7 +14,6 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      drawer: const AppDrawer(),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
