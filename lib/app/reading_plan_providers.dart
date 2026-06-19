@@ -62,9 +62,9 @@ class ReadingPlanController {
   Future<void> toggleDayComplete(ReadingPlanDay day, bool complete) async {
     final now = DateTime.now().millisecondsSinceEpoch;
 
-    await _userStore.batch((batch) {
-      batch.update(_userStore.readingPlanDays, day.copyWith(completed: complete, updatedAt: now));
-    });
+    await _userStore.update(_userStore.readingPlanDays).replace(
+      day.copyWith(completed: complete, updatedAt: now)
+    );
 
     final items = await (_userStore.select(_userStore.readingPlanItems)
           ..where((t) => t.dayId.equals(day.id) & t.deleted.equals(false)))
@@ -72,7 +72,7 @@ class ReadingPlanController {
 
     await _userStore.batch((batch) {
       for (final item in items) {
-        batch.update(_userStore.readingPlanItems, item.copyWith(completed: complete, updatedAt: now));
+        batch.replace(_userStore.readingPlanItems, item.copyWith(completed: complete, updatedAt: now));
       }
     });
   }

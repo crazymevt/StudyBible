@@ -42,6 +42,16 @@ class SelectedBookNameNotifier extends Notifier<String> {
 }
 final selectedBookNameProvider = NotifierProvider<SelectedBookNameNotifier, String>(() => SelectedBookNameNotifier());
 
+enum RightPanelModule {
+  commentaries,
+  dictionary,
+  crossReferences,
+  notes,
+  search,
+  media,
+  readingPlans,
+}
+
 class SelectedChapterNotifier extends Notifier<int> {
   @override
   int build() {

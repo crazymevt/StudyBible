@@ -10,6 +10,7 @@ enum ActiveTool {
   commentaries,
   history,
   media,
+  readingPlans,
 }
 
 class ActiveToolNotifier extends Notifier<ActiveTool> {

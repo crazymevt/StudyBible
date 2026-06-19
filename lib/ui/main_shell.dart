@@ -14,7 +14,7 @@ import 'journals/journals_prayers_screen.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'content_manager/content_manager_screen.dart';
 import 'settings/backup_restore_screen.dart';
-import 'reading_plans/reading_plans_screen.dart';
+import 'reader/reading_plan_panel.dart';
 
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
@@ -30,8 +30,6 @@ class MainShell extends ConsumerWidget {
       return const ContentManagerScreen();
     } else if (currentModule == AppModule.backupRestore) {
       return const BackupRestoreScreen();
-    } else if (currentModule == AppModule.readingPlans) {
-      return const ReadingPlansScreen();
     }
 
     return LayoutBuilder(
@@ -66,46 +64,33 @@ class _DesktopLayout extends ConsumerWidget {
                 ),
                 if (activeTool != ActiveTool.none)
                   const VerticalDivider(width: 1, thickness: 1),
-                if (activeTool == ActiveTool.crossReference)
-                  const Expanded(
-                    flex: 4,
-                    child: CrossReferencePanel(),
-                  ),
-                if (activeTool == ActiveTool.commentaries)
-                  const Expanded(
-                    flex: 4,
-                    child: CommentaryPanel(),
-                  ),
-                if (activeTool == ActiveTool.notes)
-                  const Expanded(
-                    flex: 4,
-                    child: NotesPanel(),
-                  ),
-                if (activeTool == ActiveTool.dictionary)
-                  const Expanded(
-                    flex: 4,
-                    child: DictionaryPanel(),
-                  ),
-                if (activeTool == ActiveTool.search)
-                  const Expanded(
-                    flex: 4,
-                    child: SearchPanel(),
-                  ),
-                if (activeTool == ActiveTool.history)
-                  const Expanded(
-                    flex: 4,
-                    child: HistoryPanel(),
-                  ),
-                if (activeTool == ActiveTool.media)
+                if (activeTool != ActiveTool.none)
                   Expanded(
                     flex: 4,
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final bookName = ref.watch(selectedBookNameProvider);
-                        final chapter = ref.watch(selectedChapterProvider);
-                        return MediaPanel(bookName: bookName, chapter: chapter);
-                      },
-                    ),
+                    child: Builder(builder: (context) {
+                      if (activeTool == ActiveTool.crossReference)
+                        return const CrossReferencePanel();
+                      if (activeTool == ActiveTool.library)
+                        return const Drawer(); // placeholder
+                      if (activeTool == ActiveTool.commentaries)
+                        return const CommentaryPanel();
+                      if (activeTool == ActiveTool.notes)
+                        return const NotesPanel();
+                      if (activeTool == ActiveTool.dictionary)
+                        return const DictionaryPanel();
+                      if (activeTool == ActiveTool.search)
+                        return const SearchPanel();
+                      if (activeTool == ActiveTool.history)
+                        return const HistoryPanel();
+                      if (activeTool == ActiveTool.media) {
+                        final book = ref.watch(selectedBookNameProvider);
+                        final chap = ref.watch(selectedChapterProvider);
+                        return MediaPanel(bookName: book, chapter: chap);
+                      }
+                      if (activeTool == ActiveTool.readingPlans)
+                        return const ReadingPlanPanel();
+                      return const SizedBox.shrink();
+                    }),
                   ),
               ],
             ),
@@ -150,6 +135,10 @@ class _DesktopLayout extends ConsumerWidget {
                 icon: Tooltip(message: 'Media', child: Icon(Icons.video_library)),
                 label: Text('Media'),
               ),
+              NavigationRailDestination(
+                icon: Tooltip(message: 'Reading Plans', child: Icon(Icons.menu_book)),
+                label: Text('Plans'),
+              ),
             ],
             selectedIndex: _getSelectedIndex(activeTool),
             onDestinationSelected: (index) {
@@ -172,6 +161,7 @@ class _DesktopLayout extends ConsumerWidget {
       case ActiveTool.commentaries: return 5;
       case ActiveTool.history: return 6;
       case ActiveTool.media: return 7;
+      case ActiveTool.readingPlans: return 8;
       case ActiveTool.none: return null;
     }
   }
@@ -186,6 +176,7 @@ class _DesktopLayout extends ConsumerWidget {
       case 5: return ActiveTool.commentaries;
       case 6: return ActiveTool.history;
       case 7: return ActiveTool.media;
+      case 8: return ActiveTool.readingPlans;
       default: return ActiveTool.none;
     }
   }
