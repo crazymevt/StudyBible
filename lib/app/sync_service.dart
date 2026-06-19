@@ -10,6 +10,7 @@ import '../data/user_store.dart';
 import '../data/sync/file_sync_engine.dart';
 import '../domain/sync/lww_merge.dart';
 import 'user_providers.dart';
+import 'app_state.dart';
 
 final deviceIdProvider = FutureProvider<String>((ref) async {
   final docs = await getApplicationDocumentsDirectory();
@@ -40,10 +41,19 @@ class SyncService {
 
     final deviceId = await _ref.read(deviceIdProvider.future);
 
-    // We place the sync folder inside Documents/StudyBibleSync for easy user access.
-    // In production, the user would select an external sync folder (like a Syncthing folder).
-    final docs = await getApplicationDocumentsDirectory();
-    final syncDir = Directory(p.join(docs.path, 'StudyBibleSync'));
+    final customPath = _ref.read(syncFolderPathProvider);
+    Directory syncDir;
+    if (customPath != null && customPath.isNotEmpty) {
+      syncDir = Directory(customPath);
+    } else {
+      final docs = await getApplicationDocumentsDirectory();
+      syncDir = Directory(p.join(docs.path, 'StudyBibleSync'));
+    }
+
+    // Only re-initialize if the path changed
+    if (_engine != null && _engine!.syncFolder.path == syncDir.path) {
+      return;
+    }
 
     _engine = FileSyncEngine(syncFolder: syncDir, localDeviceId: deviceId);
   }

@@ -198,3 +198,24 @@ class SubheadingsSourceNotifier extends Notifier<String?> {
 final subheadingsSourceProvider = NotifierProvider<SubheadingsSourceNotifier, String?>(
   () => SubheadingsSourceNotifier(),
 );
+
+class SyncFolderPathNotifier extends Notifier<String?> {
+  @override
+  String? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('syncFolderPath');
+  }
+
+  void setPath(String? path) {
+    state = path;
+    if (path == null) {
+      ref.read(sharedPreferencesProvider).remove('syncFolderPath');
+    } else {
+      ref.read(sharedPreferencesProvider).setString('syncFolderPath', path);
+    }
+  }
+}
+
+final syncFolderPathProvider = NotifierProvider<SyncFolderPathNotifier, String?>(
+  () => SyncFolderPathNotifier(),
+);

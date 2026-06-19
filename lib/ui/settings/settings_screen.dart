@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
+import '../../app/sync_service.dart';
+import 'package:file_picker/file_picker.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -233,6 +235,78 @@ class SettingsScreen extends ConsumerWidget {
                 const Icon(Icons.format_line_spacing, size: 28),
               ],
             ),
+          ),
+          const Divider(),
+
+          // ── Sync ──
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Sync',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          _buildSyncFolderSelector(context, ref),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSyncFolderSelector(BuildContext context, WidgetRef ref) {
+    final syncFolderPath = ref.watch(syncFolderPathProvider);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Sync Folder', style: TextStyle(fontSize: 16)),
+          const SizedBox(height: 8),
+          Text(
+            syncFolderPath != null && syncFolderPath.isNotEmpty
+                ? syncFolderPath
+                : 'Default (StudyBibleSync in Documents)',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+
+                  if (selectedDirectory != null) {
+                    ref.read(syncFolderPathProvider.notifier).setPath(selectedDirectory);
+                    
+                    try {
+                      await ref.read(syncServiceProvider).sync();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sync folder updated and synced successfully!')),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to sync to new folder: $e')),
+                        );
+                      }
+                    }
+                  }
+                },
+                icon: const Icon(Icons.folder_open),
+                label: const Text('Choose Folder'),
+              ),
+              if (syncFolderPath != null && syncFolderPath.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    ref.read(syncFolderPathProvider.notifier).setPath(null);
+                  },
+                  child: const Text('Reset'),
+                ),
+              ],
+            ],
           ),
         ],
       ),
