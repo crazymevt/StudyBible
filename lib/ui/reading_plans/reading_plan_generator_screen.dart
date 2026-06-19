@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/reading_plan_providers.dart';
 import '../../app/sync_service.dart';
+import '../../app/achievement_service.dart';
 
 class ReadingPlanGeneratorScreen extends ConsumerStatefulWidget {
   const ReadingPlanGeneratorScreen({super.key});
@@ -168,6 +169,7 @@ class _ReadingPlanGeneratorScreenState
           deviceId: deviceId,
         );
       }
+      ref.read(achievementServiceProvider).evaluateAchievements();
 
       if (mounted) {
         Navigator.of(context).pop(); // Go back to list

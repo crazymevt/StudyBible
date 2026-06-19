@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
 import '../data/user_store.dart';
-import '../data/models/achievement_def.dart';
-import '../main.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
+import 'achievement_service.dart';
 
 // --- DATA STREAMS ---
 
@@ -191,25 +189,7 @@ class DashboardAction {
       await store.into(store.readingProgresses).insert(newProgress);
 
       // Evaluate achievements
-      final allRead = await (store.select(
-        store.readingProgresses,
-      )..where((r) => r.deleted.equals(false))).get();
-
-      final count = allRead.length;
-      if (count >= 1) await unlockAchievement('first_chapter');
-      if (count >= 5) await unlockAchievement('5_chapters');
-      if (count >= 10) await unlockAchievement('10_chapters');
-
-      // Group by book to check for whole-book achievements
-      final byBook = <String, Set<int>>{};
-      for (final r in allRead) {
-        byBook.putIfAbsent(r.bookName, () => {}).add(r.chapter);
-      }
-
-      // (Simplification) We assume we know the chapter counts. In a real app we'd query the content DB.
-      // For now, if they read 1 chapter in a book, maybe we don't know if it's finished without chapter counts.
-      // E.g. Jude has 1, Genesis 50.
-      // For now, let's just do the ones we can easily track or mock.
+      ref.read(achievementServiceProvider).evaluateAchievements();
     }
   }
 
@@ -231,6 +211,8 @@ class DashboardAction {
       activityType: activityType,
     );
     await store.into(store.timeTrackers).insert(tracker);
+
+    ref.read(achievementServiceProvider).evaluateAchievements();
   }
 
   Future<void> generateDummyTimeData() async {
@@ -255,68 +237,6 @@ class DashboardAction {
         activityType: 'reading',
       );
       await store.into(store.timeTrackers).insert(tracker);
-    }
-  }
-
-  Future<void> unlockAchievement(String id) async {
-    final store = ref.read(userStoreProvider);
-    final deviceId = await ref.read(deviceIdProvider.future);
-    final now = DateTime.now().millisecondsSinceEpoch;
-
-    final existing = await (store.select(
-      store.achievements,
-    )..where((a) => a.id.equals(id))).getSingleOrNull();
-    bool newlyUnlocked = false;
-
-    if (existing == null) {
-      final achievement = Achievement(
-        id: id,
-        updatedAt: now,
-        deviceId: deviceId,
-        deleted: false,
-        unlockedAt: now,
-      );
-      await store.into(store.achievements).insert(achievement);
-      newlyUnlocked = true;
-    } else if (existing.deleted) {
-      await store
-          .into(store.achievements)
-          .insert(
-            existing.copyWith(deleted: false, updatedAt: now),
-            mode: InsertMode.replace,
-          );
-      newlyUnlocked = true;
-    }
-
-    if (newlyUnlocked) {
-      final def = allAchievements.where((a) => a.id == id).firstOrNull;
-      if (def != null && scaffoldMessengerKey.currentState != null) {
-        scaffoldMessengerKey.currentState!.showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.emoji_events, color: Colors.amber),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Achievement Unlocked!',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(def.name),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            duration: const Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
     }
   }
 }

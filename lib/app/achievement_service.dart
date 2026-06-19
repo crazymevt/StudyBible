@@ -1,0 +1,378 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' hide Column;
+import '../data/user_store.dart';
+import '../data/models/achievement_def.dart';
+import '../main.dart';
+import 'user_providers.dart';
+import 'sync_service.dart';
+
+final achievementServiceProvider = Provider((ref) => AchievementService(ref));
+
+class AchievementService {
+  final Ref ref;
+
+  AchievementService(this.ref);
+
+  Future<void> evaluateAchievements() async {
+    final store = ref.read(userStoreProvider);
+    final deviceId = await ref.read(deviceIdProvider.future);
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    // 1. Fetch current user data
+    final notes = await (store.select(store.notes)..where((n) => n.deleted.equals(false))).get();
+    final highlights = await (store.select(store.highlights)..where((h) => h.deleted.equals(false))).get();
+    final prayers = await (store.select(store.prayers)..where((p) => p.deleted.equals(false))).get();
+    final sermons = await (store.select(store.sermons)..where((s) => s.deleted.equals(false))).get();
+    final readingProgress = await (store.select(store.readingProgresses)..where((r) => r.deleted.equals(false))).get();
+    final timeTrackers = await (store.select(store.timeTrackers)..where((t) => t.deleted.equals(false))).get();
+    final plans = await (store.select(store.readingPlans)..where((p) => p.deleted.equals(false))).get();
+    
+    // Derived stats
+    final notesCount = notes.length;
+    final highlightsCount = highlights.length;
+    final highlightColors = highlights.map((h) => h.colorHex).toSet();
+    final prayersCount = prayers.length;
+    final answeredPrayersCount = prayers.where((p) => p.answeredAt != null).length;
+    final sermonsCount = sermons.length;
+    
+    final plansStarted = plans.isNotEmpty;
+    // We assume a plan is finished if we can find any ReadingPlanDay for it that is fully complete.
+    // To be precise, we query days and see if they are completed, but since we didn't query days, we can do a quick check:
+    final planDays = await (store.select(store.readingPlanDays)..where((d) => d.deleted.equals(false))).get();
+    // A better approach is: if there's any plan that has days, and all its days are complete.
+    bool plansFinished = false;
+    for (final plan in plans) {
+      final daysForPlan = planDays.where((d) => d.planId == plan.id).toList();
+      if (daysForPlan.isNotEmpty && daysForPlan.every((d) => d.completed)) {
+        plansFinished = true;
+        break;
+      }
+    }
+
+    // Time tracking
+    int totalTimeMs = 0;
+    final daysActive = <DateTime>{};
+    for (final t in timeTrackers) {
+      totalTimeMs += t.durationMs;
+      final d = DateTime.fromMillisecondsSinceEpoch(t.endTime).toLocal();
+      daysActive.add(DateTime(d.year, d.month, d.day));
+    }
+    final totalHours = totalTimeMs / (1000 * 60 * 60);
+
+    // Streaks
+    int longestStreak = 0;
+    int currentRun = 0;
+    DateTime? prevDate;
+    final ascDays = daysActive.toList()..sort((a, b) => a.compareTo(b));
+    for (final d in ascDays) {
+      if (prevDate == null) {
+        currentRun = 1;
+      } else {
+        final diff = d.difference(prevDate).inDays;
+        if (diff == 1) {
+          currentRun++;
+        } else if (diff > 1) {
+          currentRun = 1;
+        }
+      }
+      if (currentRun > longestStreak) longestStreak = currentRun;
+      prevDate = d;
+    }
+
+    // Reading Progress
+    final readSet = <String>{};
+    final chaptersByDay = <DateTime, int>{};
+    for (final r in readingProgress) {
+      if (r.iteration == 1) {
+        readSet.add('${r.bookName}|${r.chapter}');
+        final d = DateTime.fromMillisecondsSinceEpoch(r.readAt).toLocal();
+        final day = DateTime(d.year, d.month, d.day);
+        chaptersByDay[day] = (chaptersByDay[day] ?? 0) + 1;
+      }
+    }
+
+    final maxChaptersInDay = chaptersByDay.values.fold(0, (max, count) => count > max ? count : max);
+    final anyRead = readSet.isNotEmpty;
+
+    int booksCompletedCount = 0;
+    bool otCompleted = true;
+    bool ntCompleted = true;
+    bool pentateuchCompleted = true;
+    bool wisdomCompleted = true;
+    bool majorProphetsCompleted = true;
+    bool minorProphetsCompleted = true;
+    bool paulineCompleted = true;
+    bool fourfoldCompleted = true;
+    bool goodNewsCompleted = false;
+    
+    bool bookInADay = false;
+
+    // Evaluate Book Groups
+    void evaluateGroup(List<String> bookNames, void Function(bool) setGroup) {
+      bool allFinished = true;
+      for (final book in bookNames) {
+        if (!checkBookFinished(book, readSet)) {
+          allFinished = false;
+        } else {
+          booksCompletedCount++;
+          // Check if finished in a single day
+          if (!bookInADay && _bookChapters[book]! >= 3) {
+            if (_checkBookFinishedInOneDay(book, readingProgress)) {
+              bookInADay = true;
+            }
+          }
+        }
+      }
+      setGroup(allFinished);
+    }
+
+    evaluateGroup(_pentateuch, (v) => pentateuchCompleted = v);
+    evaluateGroup(_history, (v) {});
+    evaluateGroup(_wisdom, (v) => wisdomCompleted = v);
+    evaluateGroup(_majorProphets, (v) => majorProphetsCompleted = v);
+    evaluateGroup(_minorProphets, (v) => minorProphetsCompleted = v);
+    
+    evaluateGroup(_gospels, (v) {
+      fourfoldCompleted = v;
+    });
+    for (final g in _gospels) {
+      if (checkBookFinished(g, readSet)) goodNewsCompleted = true;
+    }
+
+    evaluateGroup(_historyNt, (v) {});
+    evaluateGroup(_pauline, (v) => paulineCompleted = v);
+    evaluateGroup(_generalEpistles, (v) {});
+    evaluateGroup(_prophecyNt, (v) {});
+
+    otCompleted = pentateuchCompleted && wisdomCompleted && majorProphetsCompleted && minorProphetsCompleted && _history.every((b) => checkBookFinished(b, readSet));
+    ntCompleted = fourfoldCompleted && paulineCompleted && _historyNt.every((b) => checkBookFinished(b, readSet)) && _generalEpistles.every((b) => checkBookFinished(b, readSet)) && _prophecyNt.every((b) => checkBookFinished(b, readSet));
+
+    final wholeStory = otCompleted && ntCompleted;
+
+    // Check earned conditions
+    final earnedIds = <String>{};
+
+    // Reading
+    if (anyRead) earnedIds.add('first_steps');
+    if (maxChaptersInDay >= 10) earnedIds.add('marathon');
+    if (bookInADay) earnedIds.add('one_sitting');
+    if (booksCompletedCount >= 1) earnedIds.add('bookworm');
+    if (booksCompletedCount >= 5) earnedIds.add('five_books');
+    if (booksCompletedCount >= 25) earnedIds.add('many_books');
+    if (wholeStory) earnedIds.add('whole_story');
+    // For thrice and well_worn, we need to check multiple iterations. Currently we only look at iteration 1. 
+    // We can infer iterations by dividing total reads by 1189 if we assume they read exactly the Bible, but let's just use the store logic if we implement iteration.
+    // For now, if iteration counts are available:
+    final biblesCompleted = _computeBiblesCompleted(readingProgress);
+    if (biblesCompleted >= 3) earnedIds.add('thrice');
+    if (biblesCompleted >= 5) earnedIds.add('well_worn');
+
+    // Scripture
+    if (pentateuchCompleted) earnedIds.add('pentateuch');
+    if (wisdomCompleted) earnedIds.add('wisdom');
+    if (majorProphetsCompleted) earnedIds.add('major_prophets');
+    if (minorProphetsCompleted) earnedIds.add('minor_prophets');
+    if (goodNewsCompleted) earnedIds.add('good_news');
+    if (fourfoldCompleted) earnedIds.add('fourfold');
+    if (paulineCompleted) earnedIds.add('pauline');
+    if (otCompleted) earnedIds.add('law_prophets');
+    if (ntCompleted) earnedIds.add('new_covenant');
+
+    // Habits
+    if (longestStreak >= 7) earnedIds.add('consistent');
+    if (longestStreak >= 30) earnedIds.add('devoted');
+    if (longestStreak >= 100) earnedIds.add('centurion');
+    if (longestStreak >= 365) earnedIds.add('year');
+    if (totalHours >= 10) earnedIds.add('diligent');
+    if (totalHours >= 50) earnedIds.add('devout');
+    if (totalHours >= 100) earnedIds.add('steadfast');
+
+    // Study
+    if (notesCount >= 1) earnedIds.add('scribe');
+    if (notesCount >= 25) earnedIds.add('note_taker');
+    if (notesCount >= 100) earnedIds.add('commentator');
+    if (highlightsCount >= 1) earnedIds.add('illuminator');
+    if (highlightsCount >= 25) earnedIds.add('highlighter');
+    if (highlightsCount >= 100) earnedIds.add('luminary');
+    if (highlightColors.length >= 5) earnedIds.add('rainbow'); // Simplified check for "all colors"
+    if (answeredPrayersCount >= 1) earnedIds.add('answered');
+    if (prayersCount >= 10) earnedIds.add('prayerful');
+    if (sermonsCount >= 1) earnedIds.add('expositor');
+    if (sermonsCount >= 5) earnedIds.add('homilist');
+
+    // Plans
+    if (plansStarted) earnedIds.add('plan_starter');
+    if (plansFinished) earnedIds.add('plan_finisher');
+
+    // Fetch existing unlocked achievements
+    final existingAchievements = await store.select(store.achievements).get();
+    final existingIds = existingAchievements.where((a) => !a.deleted).map((a) => a.id).toSet();
+
+    for (final id in earnedIds) {
+      if (!existingIds.contains(id)) {
+        await _unlockAchievement(id, store, deviceId, now);
+      }
+    }
+  }
+
+  Future<void> _unlockAchievement(String id, UserStore store, String deviceId, int now) async {
+    final existing = await (store.select(store.achievements)..where((a) => a.id.equals(id))).getSingleOrNull();
+    
+    if (existing == null) {
+      final achievement = Achievement(
+        id: id,
+        updatedAt: now,
+        deviceId: deviceId,
+        deleted: false,
+        unlockedAt: now,
+      );
+      await store.into(store.achievements).insert(achievement);
+    } else if (existing.deleted) {
+      await store.into(store.achievements).insert(
+        existing.copyWith(deleted: false, updatedAt: now),
+        mode: InsertMode.replace,
+      );
+    }
+
+    final def = allAchievements.where((a) => a.id == id).firstOrNull;
+    if (def != null && scaffoldMessengerKey.currentState != null) {
+      scaffoldMessengerKey.currentState!.showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.emoji_events, color: Colors.amber),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Achievement Unlocked!',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(def.name),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  int _computeBiblesCompleted(List<ReadingProgress> progress) {
+    // A simple heuristic: max iteration that has all 1189 chapters.
+    // In our app, we might just track the iteration field. 
+    int maxIteration = 0;
+    for (final p in progress) {
+      if (p.iteration > maxIteration) maxIteration = p.iteration;
+    }
+    return maxIteration - 1; // Basic heuristic: if we are on iteration 3, we've finished 2.
+  }
+
+  bool _checkBookFinishedInOneDay(String bookName, List<ReadingProgress> progress) {
+    final chapters = progress.where((r) => r.bookName == bookName && r.iteration == 1).toList();
+    if (chapters.length < _bookChapters[bookName]!) return false;
+    
+    final days = chapters.map((r) {
+      final d = DateTime.fromMillisecondsSinceEpoch(r.readAt).toLocal();
+      return DateTime(d.year, d.month, d.day);
+    }).toSet();
+    
+    return days.length == 1;
+  }
+
+  bool checkBookFinished(String bookName, Set<String> readSet) {
+    final count = _bookChapters[bookName];
+    if (count == null) return false;
+    for (int i = 1; i <= count; i++) {
+      if (!readSet.contains('$bookName|$i')) return false;
+    }
+    return true;
+  }
+}
+
+const _pentateuch = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy'];
+const _history = ['Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther'];
+const _wisdom = ['Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon'];
+const _majorProphets = ['Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel'];
+const _minorProphets = ['Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi'];
+const _gospels = ['Matthew', 'Mark', 'Luke', 'John'];
+const _historyNt = ['Acts'];
+const _pauline = ['Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy', '2 Timothy', 'Titus', 'Philemon'];
+const _generalEpistles = ['Hebrews', 'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude'];
+const _prophecyNt = ['Revelation'];
+
+const _bookChapters = {
+  'Genesis': 50,
+  'Exodus': 40,
+  'Leviticus': 27,
+  'Numbers': 36,
+  'Deuteronomy': 34,
+  'Joshua': 24,
+  'Judges': 21,
+  'Ruth': 4,
+  '1 Samuel': 31,
+  '2 Samuel': 24,
+  '1 Kings': 22,
+  '2 Kings': 25,
+  '1 Chronicles': 29,
+  '2 Chronicles': 36,
+  'Ezra': 10,
+  'Nehemiah': 13,
+  'Esther': 10,
+  'Job': 42,
+  'Psalms': 150,
+  'Proverbs': 31,
+  'Ecclesiastes': 12,
+  'Song of Solomon': 8,
+  'Isaiah': 66,
+  'Jeremiah': 52,
+  'Lamentations': 5,
+  'Ezekiel': 48,
+  'Daniel': 12,
+  'Hosea': 14,
+  'Joel': 3,
+  'Amos': 9,
+  'Obadiah': 1,
+  'Jonah': 4,
+  'Micah': 7,
+  'Nahum': 3,
+  'Habakkuk': 3,
+  'Zephaniah': 3,
+  'Haggai': 2,
+  'Zechariah': 14,
+  'Malachi': 4,
+  'Matthew': 28,
+  'Mark': 16,
+  'Luke': 24,
+  'John': 21,
+  'Acts': 28,
+  'Romans': 16,
+  '1 Corinthians': 16,
+  '2 Corinthians': 13,
+  'Galatians': 6,
+  'Ephesians': 6,
+  'Philippians': 4,
+  'Colossians': 4,
+  '1 Thessalonians': 5,
+  '2 Thessalonians': 3,
+  '1 Timothy': 6,
+  '2 Timothy': 4,
+  'Titus': 3,
+  'Philemon': 1,
+  'Hebrews': 13,
+  'James': 5,
+  '1 Peter': 5,
+  '2 Peter': 3,
+  '1 John': 5,
+  '2 John': 1,
+  '3 John': 1,
+  'Jude': 1,
+  'Revelation': 22,
+};

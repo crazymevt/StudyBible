@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' as drift;
 import '../data/user_store.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
+import 'achievement_service.dart';
 
 final allSermonsProvider = StreamProvider<List<Sermon>>((ref) {
   final store = ref.watch(userStoreProvider);
@@ -45,6 +46,7 @@ class SermonActionNotifier {
       content: content ?? '[{"insert":"\\n"}]',
     );
     await _store.into(_store.sermons).insert(sermon);
+    _ref.read(achievementServiceProvider).evaluateAchievements();
     return (await (_store.select(_store.sermons)..where((t) => t.id.equals(sermon.id.value))).getSingle());
   }
 

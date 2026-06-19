@@ -524,6 +524,7 @@ class DashboardScreen extends ConsumerWidget {
                             final def = allAchievements.firstWhere(
                               (d) => d.id == a.id,
                               orElse: () => AchievementDef(
+                                category: '',
                                 id: a.id,
                                 name: a.id,
                                 description: '',

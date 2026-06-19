@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/user_store.dart';
 import 'user_providers.dart';
 import '../domain/reading_plan/reading_plan_generator.dart';
+import 'achievement_service.dart';
 
 final readingPlanGeneratorProvider = Provider<ReadingPlanGenerator>((ref) {
   final userStore = ref.watch(userStoreProvider);
@@ -65,6 +66,7 @@ class ReadingPlanController {
 
     // Re-check parent day status
     await _updateDayCompletionStatus(item.dayId);
+    _ref.read(achievementServiceProvider).evaluateAchievements();
   }
 
   /// Mark all items in a day as complete or incomplete.
@@ -87,6 +89,7 @@ class ReadingPlanController {
         );
       }
     });
+    _ref.read(achievementServiceProvider).evaluateAchievements();
   }
 
   Future<void> deletePlan(String planId) async {

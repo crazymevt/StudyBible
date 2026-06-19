@@ -2,8 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart';
 import '../data/user_store.dart';
+import 'app_state.dart';
 import 'reader_state.dart';
 import 'sync_service.dart';
+import 'achievement_service.dart';
 
 final userStoreProvider = Provider<UserStore>((ref) {
   return UserStore();
@@ -86,6 +88,7 @@ class HighlightAction {
       );
       await store.into(store.highlights).insert(newHighlight);
     }
+    ref.read(achievementServiceProvider).evaluateAchievements();
   }
 }
 
@@ -185,6 +188,7 @@ class NoteAction {
       );
       await store.into(store.notes).insert(newNote);
     }
+    ref.read(achievementServiceProvider).evaluateAchievements();
   }
 
   Future<void> deleteNote(String id) async {

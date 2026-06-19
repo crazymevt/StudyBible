@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import '../data/user_store.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
+import 'achievement_service.dart';
 
 // JOURNALS
 final journalsProvider = StreamProvider<List<Journal>>((ref) {
@@ -145,6 +146,7 @@ class PrayerAction {
       );
       await store.into(store.prayers).insert(newPrayer);
     }
+    ref.read(achievementServiceProvider).evaluateAchievements();
     return prayerId;
   }
 
@@ -166,6 +168,7 @@ class PrayerAction {
             mode: InsertMode.replace,
           );
     }
+    ref.read(achievementServiceProvider).evaluateAchievements();
   }
 
   Future<void> deletePrayer(String id) async {
