@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../app/shared_prefs.dart';
 import '../app_drawer.dart';
+
+import '../../app/app_state.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final prefs = ref.watch(sharedPreferencesProvider);
-    final showDashboardOnStart = prefs.getBool('showDashboardOnStart') ?? false;
+    final showDashboardOnStart = ref.watch(showDashboardOnStartProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -24,14 +24,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('Launch directly to the dashboard instead of the reader'),
             value: showDashboardOnStart,
             onChanged: (value) {
-              ref.read(sharedPreferencesProvider).setBool('showDashboardOnStart', value);
-              // Force rebuild to reflect the new setting
-              // Actually, sharedPreferencesProvider doesn't notify on its own when values change
-              // unless we use a provider for the specific setting.
-              // For a simple settings page, forcing a rebuild of the consumer by invalidating the provider is an option,
-              // or using a Stateful widget to update local state.
-              // Let's invalidate sharedPreferencesProvider to trigger a rebuild.
-              ref.invalidate(sharedPreferencesProvider);
+              ref.read(showDashboardOnStartProvider.notifier).set(value);
             },
           ),
         ],

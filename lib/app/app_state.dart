@@ -43,10 +43,24 @@ enum AppModule {
   settings,
 }
 
+class ShowDashboardOnStartNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool('showDashboardOnStart') ?? false;
+  }
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool('showDashboardOnStart', value);
+  }
+}
+
+final showDashboardOnStartProvider = NotifierProvider<ShowDashboardOnStartNotifier, bool>(() => ShowDashboardOnStartNotifier());
+
 class AppModuleNotifier extends Notifier<AppModule> {
   AppModule build() {
-    final prefs = ref.watch(sharedPreferencesProvider);
-    final showDashboard = prefs.getBool('showDashboardOnStart') ?? false;
+    final showDashboard = ref.watch(showDashboardOnStartProvider);
     return showDashboard ? AppModule.dashboard : AppModule.reader;
   }
 
