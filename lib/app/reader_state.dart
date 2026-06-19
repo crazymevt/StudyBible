@@ -38,6 +38,7 @@ class SelectedBookNameNotifier extends Notifier<String> {
   void set(String name) {
     state = name;
     ref.read(sharedPreferencesProvider).setString('selectedBookName', name);
+    ref.read(selectedVersesProvider.notifier).clear();
   }
 }
 final selectedBookNameProvider = NotifierProvider<SelectedBookNameNotifier, String>(() => SelectedBookNameNotifier());
@@ -61,6 +62,7 @@ class SelectedChapterNotifier extends Notifier<int> {
   void set(int chapter) {
     state = chapter;
     ref.read(sharedPreferencesProvider).setInt('selectedChapter', chapter);
+    ref.read(selectedVersesProvider.notifier).clear();
   }
 }
 final selectedChapterProvider = NotifierProvider<SelectedChapterNotifier, int>(() => SelectedChapterNotifier());
