@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../app/media_providers.dart';
 import '../../app/app_state.dart';
 import 'media_player_dialog.dart';
+import 'web_player_dialog.dart';
 
 class MediaPanel extends ConsumerWidget {
   final String bookName;
@@ -186,21 +187,11 @@ class MediaPanel extends ConsumerWidget {
                                         MediaPlayerDialog(videoId: item.id!),
                                   );
                                 } else if (item.url != null) {
-                                  final uri = Uri.parse(item.url!);
-                                  launchUrl(
-                                    uri,
-                                    mode: LaunchMode.externalApplication,
-                                  ).then((success) {
-                                    if (!success && context.mounted) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Could not open link'),
-                                        ),
-                                      );
-                                    }
-                                  });
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) =>
+                                        WebPlayerDialog(url: item.url!),
+                                  );
                                 }
                               },
                             );
