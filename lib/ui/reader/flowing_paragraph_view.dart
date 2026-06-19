@@ -20,6 +20,7 @@ class FlowingParagraphView extends ConsumerStatefulWidget {
   final bool showFooter;
   final Map<int, List<String>> subheadings;
   final String? searchQuery;
+  final Widget? headerWidget;
 
   const FlowingParagraphView({
     super.key,
@@ -33,6 +34,7 @@ class FlowingParagraphView extends ConsumerStatefulWidget {
     this.showFooter = true,
     this.subheadings = const {},
     this.searchQuery,
+    this.headerWidget,
   });
 
   @override
@@ -219,6 +221,7 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (widget.headerWidget != null) widget.headerWidget!,
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 20.0,

@@ -256,49 +256,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       child: Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
-          title: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                tooltip: 'Previous Chapter',
-                onPressed: () =>
-                    ref.read(navigationControllerProvider).previousChapter(),
-              ),
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (_) => const BookChooserSheet(),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 4.0,
-                  vertical: 4.0,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('$bookName $chapter'),
-                    const Icon(Icons.arrow_drop_down),
-                  ],
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right),
-              tooltip: 'Next Chapter',
-              onPressed: () =>
-                  ref.read(navigationControllerProvider).nextChapter(),
-            ),
-            if (MediaQuery.sizeOf(context).width > 800)
-              const Expanded(child: AudioPlayerWidget()),
-          ],
-        ),
-        actions: [
+          title: MediaQuery.sizeOf(context).width > 800
+              ? const AudioPlayerWidget()
+              : null,
+          actions: [
           IconButton(
             icon: const Icon(Icons.sync),
             tooltip: 'Sync Data',
@@ -451,6 +412,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             return const Center(child: Text('No verses found.'));
           }
 
+          final headerWidget = Padding(
+            padding: const EdgeInsets.only(top: 24.0, bottom: 8.0),
+            child: Text(
+              '$bookName $chapter',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          );
+
           Widget content;
           final trueActiveVersions = versesMap.keys.toList();
           if (trueActiveVersions.length == 1) {
@@ -469,6 +442,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         .toggle(verseId),
                     onFootnoteTap: (verseId) => _openCommentaryPanel(),
                     searchQuery: _searchQuery,
+                    headerWidget: headerWidget,
                   )
                 : VerseListView(
                     verses: verses,
@@ -482,6 +456,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         .toggle(verseId),
                     onFootnoteTap: (verseId) => _openCommentaryPanel(),
                     searchQuery: _searchQuery,
+                    headerWidget: headerWidget,
                   );
           } else {
             content = ParallelView(
@@ -496,6 +471,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   ref.read(selectedVersesProvider.notifier).toggle(verseId),
               onFootnoteTap: (verseId) => _openCommentaryPanel(),
               searchQuery: _searchQuery,
+              headerWidget: headerWidget,
             );
           }
 
@@ -649,6 +625,15 @@ class _BreadcrumbBar extends ConsumerWidget {
       ),
       child: Row(
         children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            tooltip: 'Previous Chapter',
+            iconSize: 20,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
+          ),
+          const SizedBox(width: 8),
           InkWell(
             borderRadius: BorderRadius.circular(4),
             onTap: onVersionTap,
@@ -699,6 +684,15 @@ class _BreadcrumbBar extends ConsumerWidget {
                 ],
               ),
             ),
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            tooltip: 'Next Chapter',
+            iconSize: 20,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
           ),
         ],
       ),

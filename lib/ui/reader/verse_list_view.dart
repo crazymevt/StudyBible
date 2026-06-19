@@ -22,6 +22,7 @@ class VerseListView extends ConsumerStatefulWidget {
   final bool showFooter;
   final Map<int, List<String>> subheadings;
   final String? searchQuery;
+  final Widget? headerWidget;
 
   const VerseListView({
     super.key,
@@ -37,6 +38,7 @@ class VerseListView extends ConsumerStatefulWidget {
     this.showFooter = true,
     this.subheadings = const {},
     this.searchQuery,
+    this.headerWidget,
   });
 
   @override
@@ -68,11 +70,10 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
           _checkScrollTarget();
           return;
         }
-        final targetIndex = widget.verses.indexWhere(
-          (v) => v.verse == targetVerse,
-        );
+        final targetIndex = widget.verses.indexWhere((v) => v.verse == targetVerse);
         if (targetIndex != -1) {
-          itemScrollController.jumpTo(index: targetIndex);
+          final offset = widget.headerWidget != null ? 1 : 0;
+          itemScrollController.jumpTo(index: targetIndex + offset);
           ref.read(targetVerseToScrollProvider.notifier).set(null);
         }
       }
@@ -135,11 +136,17 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
   @override
   Widget build(BuildContext context) {
     return ScrollablePositionedList.builder(
-      itemScrollController: itemScrollController,
-      itemPositionsListener: itemPositionsListener,
+      itemScrollController: widget.externalScrollController ?? itemScrollController,
+      itemPositionsListener: widget.externalPositionsListener ?? itemPositionsListener,
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-      itemCount: widget.verses.length + (widget.showFooter ? 1 : 0),
-      itemBuilder: (context, index) {
+      itemCount: widget.verses.length + (widget.showFooter ? 1 : 0) + (widget.headerWidget != null ? 1 : 0),
+      itemBuilder: (context, rawIndex) {
+        final offset = widget.headerWidget != null ? 1 : 0;
+        if (rawIndex == 0 && widget.headerWidget != null) {
+          return widget.headerWidget!;
+        }
+        final index = rawIndex - offset;
+
         if (widget.showFooter && index == widget.verses.length) {
           return const ChapterNavigationFooter();
         }

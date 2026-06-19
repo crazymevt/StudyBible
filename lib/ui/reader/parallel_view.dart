@@ -24,6 +24,7 @@ class ParallelView extends ConsumerStatefulWidget {
   final String? searchQuery;
   final ItemScrollController? externalScrollController;
   final ItemPositionsListener? externalPositionsListener;
+  final Widget? headerWidget;
 
   const ParallelView({
     super.key,
@@ -40,6 +41,7 @@ class ParallelView extends ConsumerStatefulWidget {
     this.searchQuery,
     this.externalScrollController,
     this.externalPositionsListener,
+    this.headerWidget,
   });
 
   @override
@@ -78,7 +80,8 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
         final verseNumbers = allVerseNumbers.toList()..sort();
         final targetIndex = verseNumbers.indexOf(targetVerse);
         if (targetIndex != -1) {
-          itemScrollController.jumpTo(index: targetIndex);
+          final offset = widget.headerWidget != null ? 1 : 0;
+          itemScrollController.jumpTo(index: targetIndex + offset);
           // Clear it so we don't jump again on rebuild
           ref.read(targetVerseToScrollProvider.notifier).set(null);
         }
@@ -169,6 +172,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                     onFootnoteTap: widget.onFootnoteTap,
                     showFooter: false,
                     searchQuery: widget.searchQuery,
+                    headerWidget: widget.headerWidget,
                   ),
                 ),
               ],
@@ -196,8 +200,14 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
           child: ScrollablePositionedList.builder(
             itemScrollController: widget.externalScrollController ?? itemScrollController,
             itemPositionsListener: widget.externalPositionsListener ?? itemPositionsListener,
-            itemCount: verseNumbers.length + (widget.showFooter ? 1 : 0),
-            itemBuilder: (context, index) {
+            itemCount: verseNumbers.length + (widget.showFooter ? 1 : 0) + (widget.headerWidget != null ? 1 : 0),
+            itemBuilder: (context, rawIndex) {
+              final offset = widget.headerWidget != null ? 1 : 0;
+              if (rawIndex == 0 && widget.headerWidget != null) {
+                return widget.headerWidget!;
+              }
+              final index = rawIndex - offset;
+
               if (index == verseNumbers.length) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 24.0),
