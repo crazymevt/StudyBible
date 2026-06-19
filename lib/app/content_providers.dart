@@ -6,6 +6,8 @@ import '../data/user_store.dart';
 import 'reader_state.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
+import 'dart:async';
+import 'package:collection/collection.dart';
 
 final contentStoreProvider = Provider<ContentStore>((ref) {
   return ContentStore();
@@ -52,6 +54,7 @@ final bookByNameProvider = FutureProvider.family<Book?, ({String versionId, Stri
   }).firstOrNull;
 });
 
+
 final validActiveVersionsProvider = FutureProvider<List<String>>((ref) async {
   final activeVersions = ref.watch(activeVersionsProvider);
   final installedVersions = await ref.watch(versionsProvider.future);
@@ -59,10 +62,21 @@ final validActiveVersionsProvider = FutureProvider<List<String>>((ref) async {
   if (installedVersions.isEmpty) return [];
   
   final valid = activeVersions.where((av) => installedVersions.any((iv) => iv.id == av)).toList();
+  
+  List<String> finalVersions = valid;
   if (valid.isEmpty) {
-    return [installedVersions.first.id];
+    finalVersions = [installedVersions.first.id];
   }
-  return valid;
+
+  if (finalVersions.length != activeVersions.length || !const IterableEquality().equals(finalVersions, activeVersions)) {
+    Future.microtask(() {
+      if (ref.exists(activeVersionsProvider)) {
+        ref.read(activeVersionsProvider.notifier).set(finalVersions);
+      }
+    });
+  }
+  
+  return finalVersions;
 });
 
 final parallelVersesProvider = FutureProvider<Map<String, List<Verse>>>((ref) async {
