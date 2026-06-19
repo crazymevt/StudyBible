@@ -13,6 +13,7 @@ enum ActiveTool {
   media,
   readingPlans,
   compare,
+  sermons,
 }
 
 class ActiveToolNotifier extends Notifier<ActiveTool> {

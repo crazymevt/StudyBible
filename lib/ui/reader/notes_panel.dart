@@ -57,9 +57,17 @@ class NotesPanel extends ConsumerWidget {
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (context, index) {
                     final note = notes[index];
-                    final title = note.verse != null
-                        ? 'Verse ${note.verse}'
-                        : 'Chapter Note';
+                    String title;
+                    if (note.selectedVerses != null) {
+                      title = note.selectedVerses!.contains(',')
+                          ? 'Verses ${note.selectedVerses}'
+                          : 'Verse ${note.selectedVerses}';
+                    } else if (note.verse != null) {
+                      title = 'Verse ${note.verse}';
+                    } else {
+                      title = 'Chapter Note';
+                    }
+
                     return ListTile(
                       title: Text(
                         title,
@@ -67,7 +75,16 @@ class NotesPanel extends ConsumerWidget {
                       ),
                       subtitle: Text(note.content),
                       onTap: () {
-                        if (note.verse != null) {
+                        if (note.selectedVerses != null) {
+                          ref.read(selectedVersesProvider.notifier).clear();
+                          final versesToSelect = note.selectedVerses!
+                              .split(',')
+                              .map((e) => int.tryParse(e.trim()) ?? 0)
+                              .where((e) => e > 0);
+                          for (final v in versesToSelect) {
+                            ref.read(selectedVersesProvider.notifier).toggle(v);
+                          }
+                        } else if (note.verse != null) {
                           ref.read(selectedVersesProvider.notifier).clear();
                           ref
                               .read(selectedVersesProvider.notifier)

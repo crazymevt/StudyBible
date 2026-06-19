@@ -26,6 +26,7 @@ class Notes extends Table {
   TextColumn get bookName => text()();
   IntColumn get chapter => integer()();
   IntColumn get verse => integer().nullable()();
+  TextColumn get selectedVerses => text().nullable()();
   TextColumn get content => text()();
 
   @override
@@ -58,6 +59,22 @@ class Journals extends Table {
   TextColumn get title => text()();
   TextColumn get content => text()();
   TextColumn get tags => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('Sermon')
+class Sermons extends Table {
+  TextColumn get id => text()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get title => text()();
+  TextColumn get series => text().nullable()();
+  TextColumn get content => text()(); // Stores delta JSON string
 
   @override
   Set<Column> get primaryKey => {id};

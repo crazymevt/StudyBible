@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart' show FlutterQuillLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -147,6 +149,12 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
       theme: buildTheme(Brightness.light, const Color(0xFF6750A4)),
       darkTheme: buildTheme(Brightness.dark, const Color(0xFFD0BCFF)),
       themeMode: ThemeMode.system,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
       home: const MainShell(),
     );
   }

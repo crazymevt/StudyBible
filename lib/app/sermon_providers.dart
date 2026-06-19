@@ -1,0 +1,64 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+import 'package:drift/drift.dart' as drift;
+import '../data/user_store.dart';
+import 'user_providers.dart';
+import 'sync_service.dart';
+
+final allSermonsProvider = StreamProvider<List<Sermon>>((ref) {
+  final store = ref.watch(userStoreProvider);
+  return (store.select(store.sermons)
+        ..where((t) => t.deleted.equals(false))
+        ..orderBy([(t) => drift.OrderingTerm.desc(t.updatedAt)]))
+      .watch();
+});
+
+class SermonActionNotifier {
+  final Ref _ref;
+  final UserStore _store;
+
+  SermonActionNotifier(this._ref, this._store);
+
+  Future<Sermon> createSermon(String title, {String? series, String? content}) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final deviceId = await _ref.read(deviceIdProvider.future);
+    final sermon = SermonsCompanion.insert(
+      id: const Uuid().v4(),
+      createdAt: now,
+      updatedAt: now,
+      deviceId: deviceId,
+      title: title,
+      series: drift.Value(series),
+      content: content ?? '[{"insert":"\\n"}]',
+    );
+    await _store.into(_store.sermons).insert(sermon);
+    return (await (_store.select(_store.sermons)..where((t) => t.id.equals(sermon.id.value))).getSingle());
+  }
+
+  Future<void> updateSermon(String id, {String? title, String? series, String? content}) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_store.update(_store.sermons)..where((t) => t.id.equals(id))).write(
+      SermonsCompanion(
+        updatedAt: drift.Value(now),
+        title: title != null ? drift.Value(title) : const drift.Value.absent(),
+        series: series != null ? drift.Value(series) : const drift.Value.absent(),
+        content: content != null ? drift.Value(content) : const drift.Value.absent(),
+      ),
+    );
+  }
+
+  Future<void> deleteSermon(String id) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_store.update(_store.sermons)..where((t) => t.id.equals(id))).write(
+      SermonsCompanion(
+        deleted: const drift.Value(true),
+        updatedAt: drift.Value(now),
+      ),
+    );
+  }
+}
+
+final sermonActionProvider = Provider<SermonActionNotifier>((ref) {
+  final store = ref.watch(userStoreProvider);
+  return SermonActionNotifier(ref, store);
+});

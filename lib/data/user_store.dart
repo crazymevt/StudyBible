@@ -22,13 +22,14 @@ part 'user_store.g.dart';
     ReadingPlans,
     ReadingPlanDays,
     ReadingPlanItems,
+    Sermons,
   ],
 )
 class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration {
@@ -51,6 +52,21 @@ class UserStore extends _$UserStore {
         await customStatement('''
           CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
             DELETE FROM user_search WHERE type = 'note' AND reference_id = old.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS sermons_ai AFTER INSERT ON sermons BEGIN
+            INSERT INTO user_search(type, reference_id, text_content) VALUES ('sermon', new.id, new.title || ' ' || new.series || ' ' || new.content);
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS sermons_au AFTER UPDATE ON sermons BEGIN
+            UPDATE user_search SET text_content = new.title || ' ' || new.series || ' ' || new.content WHERE type = 'sermon' AND reference_id = new.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS sermons_ad AFTER DELETE ON sermons BEGIN
+            DELETE FROM user_search WHERE type = 'sermon' AND reference_id = old.id;
           END;
         ''');
       },
@@ -106,6 +122,24 @@ class UserStore extends _$UserStore {
           await customStatement('''
             CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
               INSERT INTO user_search(type, reference_id, text_content) VALUES ('note', new.id, new.content);
+            END;
+          ''');
+        }
+        if (from < 9) {
+          await m.createTable(sermons);
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS sermons_ai AFTER INSERT ON sermons BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('sermon', new.id, new.title || ' ' || COALESCE(new.series, '') || ' ' || new.content);
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS sermons_au AFTER UPDATE ON sermons BEGIN
+              UPDATE user_search SET text_content = new.title || ' ' || COALESCE(new.series, '') || ' ' || new.content WHERE type = 'sermon' AND reference_id = new.id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS sermons_ad AFTER DELETE ON sermons BEGIN
+              DELETE FROM user_search WHERE type = 'sermon' AND reference_id = old.id;
             END;
           ''');
         }

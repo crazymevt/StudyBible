@@ -1,0 +1,199 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app/sermon_providers.dart';
+import '../../app/user_providers.dart';
+
+
+class SermonEditorScreen extends ConsumerStatefulWidget {
+  final String sermonId;
+  const SermonEditorScreen({super.key, required this.sermonId});
+
+  @override
+  ConsumerState<SermonEditorScreen> createState() => _SermonEditorScreenState();
+}
+
+class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
+  late QuillController _controller;
+  bool _isInitialized = false;
+  final _titleController = TextEditingController();
+  final _seriesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSermon();
+  }
+
+  Future<void> _loadSermon() async {
+    final store = ref.read(userStoreProvider);
+    final sermon = await (store.select(store.sermons)..where((t) => t.id.equals(widget.sermonId))).getSingleOrNull();
+    if (sermon != null) {
+      _titleController.text = sermon.title;
+      _seriesController.text = sermon.series ?? '';
+      
+      List<dynamic> jsonData;
+      try {
+        jsonData = jsonDecode(sermon.content);
+      } catch (e) {
+        jsonData = [{'insert': '\\n'}];
+      }
+      
+      _controller = QuillController(
+        document: Document.fromJson(jsonData),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+      
+      _controller.addListener(_saveSermonContent);
+      _titleController.addListener(_saveSermonMetadata);
+      _seriesController.addListener(_saveSermonMetadata);
+      
+      setState(() {
+        _isInitialized = true;
+      });
+    }
+  }
+
+  void _saveSermonContent() {
+    final content = jsonEncode(_controller.document.toDelta().toJson());
+    ref.read(sermonActionProvider).updateSermon(widget.sermonId, content: content);
+  }
+
+  void _saveSermonMetadata() {
+    ref.read(sermonActionProvider).updateSermon(
+      widget.sermonId,
+      title: _titleController.text,
+      series: _seriesController.text.isNotEmpty ? _seriesController.text : null,
+    );
+  }
+
+  @override
+  void dispose() {
+    if (_isInitialized) {
+      _controller.removeListener(_saveSermonContent);
+      _controller.dispose();
+      _titleController.dispose();
+      _seriesController.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Edit Sermon'),
+        actions: [
+          TextButton.icon(
+            icon: const Icon(Icons.list_alt),
+            label: const Text('Outline'),
+            onPressed: () => _showOutlineGeneratorDialog(context),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _titleController,
+                    decoration: const InputDecoration(labelText: 'Title'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextField(
+                    controller: _seriesController,
+                    decoration: const InputDecoration(labelText: 'Series'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          QuillSimpleToolbar(
+            controller: _controller,
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: QuillEditor.basic(
+                  controller: _controller,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showOutlineGeneratorDialog(BuildContext context) async {
+    final pointsController = TextEditingController(text: '3');
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Generate Outline'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('How many points should the outline have?'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: pointsController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Number of Points'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final points = int.tryParse(pointsController.text) ?? 3;
+              _generateOutline(points);
+              Navigator.pop(context);
+            },
+            child: const Text('Generate'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _generateOutline(int numPoints) {
+    // Generate text template
+    final buffer = StringBuffer();
+    buffer.writeln('Introduction');
+    buffer.writeln();
+    for (int i = 1; i <= numPoints; i++) {
+      buffer.writeln('Point $i: ');
+      buffer.writeln(' - Reference: ');
+      buffer.writeln(' - Application: ');
+      buffer.writeln();
+    }
+    buffer.writeln('Conclusion');
+    buffer.writeln();
+
+    // Convert string to a delta so we can insert it
+    final currentLength = _controller.document.length;
+    _controller.document.insert(currentLength - 1, '\\n' + buffer.toString());
+  }
+}

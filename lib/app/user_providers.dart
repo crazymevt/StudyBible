@@ -110,13 +110,21 @@ class NoteAction {
   final Ref ref;
   NoteAction(this.ref);
 
-  Future<void> saveNote(int? verse, String content) async {
+  Future<void> saveNote(Set<int> verses, String content) async {
     final store = ref.read(userStoreProvider);
     final bookName = ref.read(selectedBookNameProvider);
     final chapter = ref.read(selectedChapterProvider);
     final deviceId = await ref.read(deviceIdProvider.future);
 
-    // Simplification: one note per verse or one general chapter note
+    String? versesString;
+    int? primaryVerse;
+    if (verses.isNotEmpty) {
+      final sortedVerses = verses.toList()..sort();
+      versesString = sortedVerses.join(', ');
+      primaryVerse = sortedVerses.first;
+    }
+
+    // Simplification: match exactly on the selected verses string
     final query = store.select(store.notes)
       ..where(
         (n) =>
@@ -125,10 +133,14 @@ class NoteAction {
             (n.deleted.equals(false)),
       );
 
-    if (verse != null) {
-      query.where((n) => n.verse.equals(verse));
+    if (verses.isNotEmpty) {
+      if (verses.length == 1) {
+        query.where((n) => n.selectedVerses.equals(versesString!) | (n.selectedVerses.isNull() & n.verse.equals(primaryVerse!)));
+      } else {
+        query.where((n) => n.selectedVerses.equals(versesString!));
+      }
     } else {
-      query.where((n) => n.verse.isNull());
+      query.where((n) => n.verse.isNull() & n.selectedVerses.isNull());
     }
 
     final existing = await query.getSingleOrNull();
@@ -139,6 +151,7 @@ class NoteAction {
           .insert(
             existing.copyWith(
               content: content,
+              selectedVerses: Value(versesString),
               updatedAt: DateTime.now().millisecondsSinceEpoch,
             ),
             mode: InsertMode.replace,
@@ -151,7 +164,8 @@ class NoteAction {
         deleted: false,
         bookName: bookName,
         chapter: chapter,
-        verse: verse,
+        verse: primaryVerse,
+        selectedVerses: versesString,
         content: content,
       );
       await store.into(store.notes).insert(newNote);

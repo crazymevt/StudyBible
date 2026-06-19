@@ -10,6 +10,7 @@ import 'commentary_panel.dart';
 import 'history_panel.dart';
 import 'media_panel.dart';
 import 'reading_plan_panel.dart';
+import '../sermons/sermons_panel.dart';
 import '../../app/reader_state.dart';
 
 class MobileToolsDrawer extends ConsumerWidget {
@@ -121,6 +122,14 @@ class MobileToolsDrawer extends ConsumerWidget {
               ),
               title: const Text('Reading Plans'),
               onTap: () => _openTool(context, const ReadingPlanPanel()),
+            ),
+            ListTile(
+              leading: const Tooltip(
+                message: 'Sermons',
+                child: Icon(Icons.co_present),
+              ),
+              title: const Text('Sermons'),
+              onTap: () => _openTool(context, const SermonsPanel()),
             ),
           ],
         ),

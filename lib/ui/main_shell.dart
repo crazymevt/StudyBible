@@ -10,6 +10,7 @@ import 'reader/search_panel.dart';
 import 'reader/history_panel.dart';
 import 'reader/media_panel.dart';
 import 'reader/compare_panel.dart';
+import '../ui/sermons/sermons_panel.dart';
 import '../app/reader_state.dart';
 import 'journals/journals_prayers_screen.dart';
 import 'dashboard/dashboard_screen.dart';
@@ -70,6 +71,8 @@ class _DesktopLayout extends ConsumerWidget {
                       builder: (context) {
                         if (activeTool == ActiveTool.compare)
                           return const ComparePanel();
+                        if (activeTool == ActiveTool.sermons)
+                          return const SermonsPanel();
                         if (activeTool == ActiveTool.crossReference)
                           return const CrossReferencePanel();
                         if (activeTool == ActiveTool.library)
@@ -160,6 +163,13 @@ class _DesktopLayout extends ConsumerWidget {
                 ),
                 label: Text('Plans'),
               ),
+              NavigationRailDestination(
+                icon: Tooltip(
+                  message: 'Sermons',
+                  child: Icon(Icons.co_present),
+                ),
+                label: Text('Sermons'),
+              ),
             ],
             selectedIndex: _getSelectedIndex(activeTool),
             onDestinationSelected: (index) {
@@ -192,6 +202,8 @@ class _DesktopLayout extends ConsumerWidget {
         return 7;
       case ActiveTool.readingPlans:
         return 8;
+      case ActiveTool.sermons:
+        return 9;
       case ActiveTool.none:
       case ActiveTool.compare:
         return null;
@@ -218,6 +230,8 @@ class _DesktopLayout extends ConsumerWidget {
         return ActiveTool.media;
       case 8:
         return ActiveTool.readingPlans;
+      case 9:
+        return ActiveTool.sermons;
       default:
         return ActiveTool.none;
     }

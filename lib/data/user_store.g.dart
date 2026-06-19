@@ -596,6 +596,17 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _selectedVersesMeta = const VerificationMeta(
+    'selectedVerses',
+  );
+  @override
+  late final GeneratedColumn<String> selectedVerses = GeneratedColumn<String>(
+    'selected_verses',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _contentMeta = const VerificationMeta(
     'content',
   );
@@ -616,6 +627,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     bookName,
     chapter,
     verse,
+    selectedVerses,
     content,
   ];
   @override
@@ -679,6 +691,15 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         verse.isAcceptableOrUnknown(data['verse']!, _verseMeta),
       );
     }
+    if (data.containsKey('selected_verses')) {
+      context.handle(
+        _selectedVersesMeta,
+        selectedVerses.isAcceptableOrUnknown(
+          data['selected_verses']!,
+          _selectedVersesMeta,
+        ),
+      );
+    }
     if (data.containsKey('content')) {
       context.handle(
         _contentMeta,
@@ -724,6 +745,10 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         DriftSqlType.int,
         data['${effectivePrefix}verse'],
       ),
+      selectedVerses: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_verses'],
+      ),
       content: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}content'],
@@ -745,6 +770,7 @@ class Note extends DataClass implements Insertable<Note> {
   final String bookName;
   final int chapter;
   final int? verse;
+  final String? selectedVerses;
   final String content;
   const Note({
     required this.id,
@@ -754,6 +780,7 @@ class Note extends DataClass implements Insertable<Note> {
     required this.bookName,
     required this.chapter,
     this.verse,
+    this.selectedVerses,
     required this.content,
   });
   @override
@@ -767,6 +794,9 @@ class Note extends DataClass implements Insertable<Note> {
     map['chapter'] = Variable<int>(chapter);
     if (!nullToAbsent || verse != null) {
       map['verse'] = Variable<int>(verse);
+    }
+    if (!nullToAbsent || selectedVerses != null) {
+      map['selected_verses'] = Variable<String>(selectedVerses);
     }
     map['content'] = Variable<String>(content);
     return map;
@@ -783,6 +813,9 @@ class Note extends DataClass implements Insertable<Note> {
       verse: verse == null && nullToAbsent
           ? const Value.absent()
           : Value(verse),
+      selectedVerses: selectedVerses == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedVerses),
       content: Value(content),
     );
   }
@@ -800,6 +833,7 @@ class Note extends DataClass implements Insertable<Note> {
       bookName: serializer.fromJson<String>(json['bookName']),
       chapter: serializer.fromJson<int>(json['chapter']),
       verse: serializer.fromJson<int?>(json['verse']),
+      selectedVerses: serializer.fromJson<String?>(json['selectedVerses']),
       content: serializer.fromJson<String>(json['content']),
     );
   }
@@ -814,6 +848,7 @@ class Note extends DataClass implements Insertable<Note> {
       'bookName': serializer.toJson<String>(bookName),
       'chapter': serializer.toJson<int>(chapter),
       'verse': serializer.toJson<int?>(verse),
+      'selectedVerses': serializer.toJson<String?>(selectedVerses),
       'content': serializer.toJson<String>(content),
     };
   }
@@ -826,6 +861,7 @@ class Note extends DataClass implements Insertable<Note> {
     String? bookName,
     int? chapter,
     Value<int?> verse = const Value.absent(),
+    Value<String?> selectedVerses = const Value.absent(),
     String? content,
   }) => Note(
     id: id ?? this.id,
@@ -835,6 +871,9 @@ class Note extends DataClass implements Insertable<Note> {
     bookName: bookName ?? this.bookName,
     chapter: chapter ?? this.chapter,
     verse: verse.present ? verse.value : this.verse,
+    selectedVerses: selectedVerses.present
+        ? selectedVerses.value
+        : this.selectedVerses,
     content: content ?? this.content,
   );
   Note copyWithCompanion(NotesCompanion data) {
@@ -846,6 +885,9 @@ class Note extends DataClass implements Insertable<Note> {
       bookName: data.bookName.present ? data.bookName.value : this.bookName,
       chapter: data.chapter.present ? data.chapter.value : this.chapter,
       verse: data.verse.present ? data.verse.value : this.verse,
+      selectedVerses: data.selectedVerses.present
+          ? data.selectedVerses.value
+          : this.selectedVerses,
       content: data.content.present ? data.content.value : this.content,
     );
   }
@@ -860,6 +902,7 @@ class Note extends DataClass implements Insertable<Note> {
           ..write('bookName: $bookName, ')
           ..write('chapter: $chapter, ')
           ..write('verse: $verse, ')
+          ..write('selectedVerses: $selectedVerses, ')
           ..write('content: $content')
           ..write(')'))
         .toString();
@@ -874,6 +917,7 @@ class Note extends DataClass implements Insertable<Note> {
     bookName,
     chapter,
     verse,
+    selectedVerses,
     content,
   );
   @override
@@ -887,6 +931,7 @@ class Note extends DataClass implements Insertable<Note> {
           other.bookName == this.bookName &&
           other.chapter == this.chapter &&
           other.verse == this.verse &&
+          other.selectedVerses == this.selectedVerses &&
           other.content == this.content);
 }
 
@@ -898,6 +943,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
   final Value<String> bookName;
   final Value<int> chapter;
   final Value<int?> verse;
+  final Value<String?> selectedVerses;
   final Value<String> content;
   final Value<int> rowid;
   const NotesCompanion({
@@ -908,6 +954,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
     this.bookName = const Value.absent(),
     this.chapter = const Value.absent(),
     this.verse = const Value.absent(),
+    this.selectedVerses = const Value.absent(),
     this.content = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -919,6 +966,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
     required String bookName,
     required int chapter,
     this.verse = const Value.absent(),
+    this.selectedVerses = const Value.absent(),
     required String content,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -935,6 +983,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
     Expression<String>? bookName,
     Expression<int>? chapter,
     Expression<int>? verse,
+    Expression<String>? selectedVerses,
     Expression<String>? content,
     Expression<int>? rowid,
   }) {
@@ -946,6 +995,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
       if (bookName != null) 'book_name': bookName,
       if (chapter != null) 'chapter': chapter,
       if (verse != null) 'verse': verse,
+      if (selectedVerses != null) 'selected_verses': selectedVerses,
       if (content != null) 'content': content,
       if (rowid != null) 'rowid': rowid,
     });
@@ -959,6 +1009,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
     Value<String>? bookName,
     Value<int>? chapter,
     Value<int?>? verse,
+    Value<String?>? selectedVerses,
     Value<String>? content,
     Value<int>? rowid,
   }) {
@@ -970,6 +1021,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
       bookName: bookName ?? this.bookName,
       chapter: chapter ?? this.chapter,
       verse: verse ?? this.verse,
+      selectedVerses: selectedVerses ?? this.selectedVerses,
       content: content ?? this.content,
       rowid: rowid ?? this.rowid,
     );
@@ -999,6 +1051,9 @@ class NotesCompanion extends UpdateCompanion<Note> {
     if (verse.present) {
       map['verse'] = Variable<int>(verse.value);
     }
+    if (selectedVerses.present) {
+      map['selected_verses'] = Variable<String>(selectedVerses.value);
+    }
     if (content.present) {
       map['content'] = Variable<String>(content.value);
     }
@@ -1018,6 +1073,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
           ..write('bookName: $bookName, ')
           ..write('chapter: $chapter, ')
           ..write('verse: $verse, ')
+          ..write('selectedVerses: $selectedVerses, ')
           ..write('content: $content, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -6113,6 +6169,515 @@ class ReadingPlanItemsCompanion extends UpdateCompanion<ReadingPlanItem> {
   }
 }
 
+class $SermonsTable extends Sermons with TableInfo<$SermonsTable, Sermon> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SermonsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta(
+    'deleted',
+  );
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _seriesMeta = const VerificationMeta('series');
+  @override
+  late final GeneratedColumn<String> series = GeneratedColumn<String>(
+    'series',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    deviceId,
+    deleted,
+    title,
+    series,
+    content,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sermons';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Sermon> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(
+        _deletedMeta,
+        deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('series')) {
+      context.handle(
+        _seriesMeta,
+        series.isAcceptableOrUnknown(data['series']!, _seriesMeta),
+      );
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Sermon map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Sermon(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      deleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deleted'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      series: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}series'],
+      ),
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+    );
+  }
+
+  @override
+  $SermonsTable createAlias(String alias) {
+    return $SermonsTable(attachedDatabase, alias);
+  }
+}
+
+class Sermon extends DataClass implements Insertable<Sermon> {
+  final String id;
+  final int createdAt;
+  final int updatedAt;
+  final String deviceId;
+  final bool deleted;
+  final String title;
+  final String? series;
+  final String content;
+  const Sermon({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.deviceId,
+    required this.deleted,
+    required this.title,
+    this.series,
+    required this.content,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['device_id'] = Variable<String>(deviceId);
+    map['deleted'] = Variable<bool>(deleted);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || series != null) {
+      map['series'] = Variable<String>(series);
+    }
+    map['content'] = Variable<String>(content);
+    return map;
+  }
+
+  SermonsCompanion toCompanion(bool nullToAbsent) {
+    return SermonsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deviceId: Value(deviceId),
+      deleted: Value(deleted),
+      title: Value(title),
+      series: series == null && nullToAbsent
+          ? const Value.absent()
+          : Value(series),
+      content: Value(content),
+    );
+  }
+
+  factory Sermon.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Sermon(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      deleted: serializer.fromJson<bool>(json['deleted']),
+      title: serializer.fromJson<String>(json['title']),
+      series: serializer.fromJson<String?>(json['series']),
+      content: serializer.fromJson<String>(json['content']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'deleted': serializer.toJson<bool>(deleted),
+      'title': serializer.toJson<String>(title),
+      'series': serializer.toJson<String?>(series),
+      'content': serializer.toJson<String>(content),
+    };
+  }
+
+  Sermon copyWith({
+    String? id,
+    int? createdAt,
+    int? updatedAt,
+    String? deviceId,
+    bool? deleted,
+    String? title,
+    Value<String?> series = const Value.absent(),
+    String? content,
+  }) => Sermon(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deviceId: deviceId ?? this.deviceId,
+    deleted: deleted ?? this.deleted,
+    title: title ?? this.title,
+    series: series.present ? series.value : this.series,
+    content: content ?? this.content,
+  );
+  Sermon copyWithCompanion(SermonsCompanion data) {
+    return Sermon(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      title: data.title.present ? data.title.value : this.title,
+      series: data.series.present ? data.series.value : this.series,
+      content: data.content.present ? data.content.value : this.content,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Sermon(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('title: $title, ')
+          ..write('series: $series, ')
+          ..write('content: $content')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    deviceId,
+    deleted,
+    title,
+    series,
+    content,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Sermon &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deviceId == this.deviceId &&
+          other.deleted == this.deleted &&
+          other.title == this.title &&
+          other.series == this.series &&
+          other.content == this.content);
+}
+
+class SermonsCompanion extends UpdateCompanion<Sermon> {
+  final Value<String> id;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<String> deviceId;
+  final Value<bool> deleted;
+  final Value<String> title;
+  final Value<String?> series;
+  final Value<String> content;
+  final Value<int> rowid;
+  const SermonsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.title = const Value.absent(),
+    this.series = const Value.absent(),
+    this.content = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SermonsCompanion.insert({
+    required String id,
+    required int createdAt,
+    required int updatedAt,
+    required String deviceId,
+    this.deleted = const Value.absent(),
+    required String title,
+    this.series = const Value.absent(),
+    required String content,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId),
+       title = Value(title),
+       content = Value(content);
+  static Insertable<Sermon> custom({
+    Expression<String>? id,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<String>? deviceId,
+    Expression<bool>? deleted,
+    Expression<String>? title,
+    Expression<String>? series,
+    Expression<String>? content,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (deleted != null) 'deleted': deleted,
+      if (title != null) 'title': title,
+      if (series != null) 'series': series,
+      if (content != null) 'content': content,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SermonsCompanion copyWith({
+    Value<String>? id,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<String>? deviceId,
+    Value<bool>? deleted,
+    Value<String>? title,
+    Value<String?>? series,
+    Value<String>? content,
+    Value<int>? rowid,
+  }) {
+    return SermonsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deviceId: deviceId ?? this.deviceId,
+      deleted: deleted ?? this.deleted,
+      title: title ?? this.title,
+      series: series ?? this.series,
+      content: content ?? this.content,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (series.present) {
+      map['series'] = Variable<String>(series.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SermonsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('title: $title, ')
+          ..write('series: $series, ')
+          ..write('content: $content, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$UserStore extends GeneratedDatabase {
   _$UserStore(QueryExecutor e) : super(e);
   $UserStoreManager get managers => $UserStoreManager(this);
@@ -6134,6 +6699,7 @@ abstract class _$UserStore extends GeneratedDatabase {
   late final $ReadingPlanItemsTable readingPlanItems = $ReadingPlanItemsTable(
     this,
   );
+  late final $SermonsTable sermons = $SermonsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6151,6 +6717,7 @@ abstract class _$UserStore extends GeneratedDatabase {
     readingPlans,
     readingPlanDays,
     readingPlanItems,
+    sermons,
   ];
 }
 
@@ -6414,6 +6981,7 @@ typedef $$NotesTableCreateCompanionBuilder =
       required String bookName,
       required int chapter,
       Value<int?> verse,
+      Value<String?> selectedVerses,
       required String content,
       Value<int> rowid,
     });
@@ -6426,6 +6994,7 @@ typedef $$NotesTableUpdateCompanionBuilder =
       Value<String> bookName,
       Value<int> chapter,
       Value<int?> verse,
+      Value<String?> selectedVerses,
       Value<String> content,
       Value<int> rowid,
     });
@@ -6470,6 +7039,11 @@ class $$NotesTableFilterComposer extends Composer<_$UserStore, $NotesTable> {
 
   ColumnFilters<int> get verse => $composableBuilder(
     column: $table.verse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedVerses => $composableBuilder(
+    column: $table.selectedVerses,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6522,6 +7096,11 @@ class $$NotesTableOrderingComposer extends Composer<_$UserStore, $NotesTable> {
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get selectedVerses => $composableBuilder(
+    column: $table.selectedVerses,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get content => $composableBuilder(
     column: $table.content,
     builder: (column) => ColumnOrderings(column),
@@ -6557,6 +7136,11 @@ class $$NotesTableAnnotationComposer
 
   GeneratedColumn<int> get verse =>
       $composableBuilder(column: $table.verse, builder: (column) => column);
+
+  GeneratedColumn<String> get selectedVerses => $composableBuilder(
+    column: $table.selectedVerses,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get content =>
       $composableBuilder(column: $table.content, builder: (column) => column);
@@ -6597,6 +7181,7 @@ class $$NotesTableTableManager
                 Value<String> bookName = const Value.absent(),
                 Value<int> chapter = const Value.absent(),
                 Value<int?> verse = const Value.absent(),
+                Value<String?> selectedVerses = const Value.absent(),
                 Value<String> content = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => NotesCompanion(
@@ -6607,6 +7192,7 @@ class $$NotesTableTableManager
                 bookName: bookName,
                 chapter: chapter,
                 verse: verse,
+                selectedVerses: selectedVerses,
                 content: content,
                 rowid: rowid,
               ),
@@ -6619,6 +7205,7 @@ class $$NotesTableTableManager
                 required String bookName,
                 required int chapter,
                 Value<int?> verse = const Value.absent(),
+                Value<String?> selectedVerses = const Value.absent(),
                 required String content,
                 Value<int> rowid = const Value.absent(),
               }) => NotesCompanion.insert(
@@ -6629,6 +7216,7 @@ class $$NotesTableTableManager
                 bookName: bookName,
                 chapter: chapter,
                 verse: verse,
+                selectedVerses: selectedVerses,
                 content: content,
                 rowid: rowid,
               ),
@@ -9240,6 +9828,257 @@ typedef $$ReadingPlanItemsTableProcessedTableManager =
       ReadingPlanItem,
       PrefetchHooks Function()
     >;
+typedef $$SermonsTableCreateCompanionBuilder =
+    SermonsCompanion Function({
+      required String id,
+      required int createdAt,
+      required int updatedAt,
+      required String deviceId,
+      Value<bool> deleted,
+      required String title,
+      Value<String?> series,
+      required String content,
+      Value<int> rowid,
+    });
+typedef $$SermonsTableUpdateCompanionBuilder =
+    SermonsCompanion Function({
+      Value<String> id,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<String> deviceId,
+      Value<bool> deleted,
+      Value<String> title,
+      Value<String?> series,
+      Value<String> content,
+      Value<int> rowid,
+    });
+
+class $$SermonsTableFilterComposer
+    extends Composer<_$UserStore, $SermonsTable> {
+  $$SermonsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get series => $composableBuilder(
+    column: $table.series,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SermonsTableOrderingComposer
+    extends Composer<_$UserStore, $SermonsTable> {
+  $$SermonsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get series => $composableBuilder(
+    column: $table.series,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SermonsTableAnnotationComposer
+    extends Composer<_$UserStore, $SermonsTable> {
+  $$SermonsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get series =>
+      $composableBuilder(column: $table.series, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+}
+
+class $$SermonsTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $SermonsTable,
+          Sermon,
+          $$SermonsTableFilterComposer,
+          $$SermonsTableOrderingComposer,
+          $$SermonsTableAnnotationComposer,
+          $$SermonsTableCreateCompanionBuilder,
+          $$SermonsTableUpdateCompanionBuilder,
+          (Sermon, BaseReferences<_$UserStore, $SermonsTable, Sermon>),
+          Sermon,
+          PrefetchHooks Function()
+        > {
+  $$SermonsTableTableManager(_$UserStore db, $SermonsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SermonsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SermonsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SermonsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> series = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SermonsCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                title: title,
+                series: series,
+                content: content,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int createdAt,
+                required int updatedAt,
+                required String deviceId,
+                Value<bool> deleted = const Value.absent(),
+                required String title,
+                Value<String?> series = const Value.absent(),
+                required String content,
+                Value<int> rowid = const Value.absent(),
+              }) => SermonsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                title: title,
+                series: series,
+                content: content,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SermonsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $SermonsTable,
+      Sermon,
+      $$SermonsTableFilterComposer,
+      $$SermonsTableOrderingComposer,
+      $$SermonsTableAnnotationComposer,
+      $$SermonsTableCreateCompanionBuilder,
+      $$SermonsTableUpdateCompanionBuilder,
+      (Sermon, BaseReferences<_$UserStore, $SermonsTable, Sermon>),
+      Sermon,
+      PrefetchHooks Function()
+    >;
 
 class $UserStoreManager {
   final _$UserStore _db;
@@ -9268,4 +10107,6 @@ class $UserStoreManager {
       $$ReadingPlanDaysTableTableManager(_db, _db.readingPlanDays);
   $$ReadingPlanItemsTableTableManager get readingPlanItems =>
       $$ReadingPlanItemsTableTableManager(_db, _db.readingPlanItems);
+  $$SermonsTableTableManager get sermons =>
+      $$SermonsTableTableManager(_db, _db.sermons);
 }

@@ -152,9 +152,11 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       f.type, 
       f.reference_id, 
       f.text_content,
-      n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses
+      n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses,
+      s.title as sermon_title, s.series as sermon_series
     FROM user_search f
     LEFT JOIN notes n ON f.type = 'note' AND f.reference_id = n.id
+    LEFT JOIN sermons s ON f.type = 'sermon' AND f.reference_id = s.id
     WHERE user_search MATCH ?
     ORDER BY rank
     LIMIT 100
@@ -196,6 +198,22 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
             chapter: cNum,
             verse: vNum,
             selectedVerses: sVerses,
+          ),
+        );
+      } else if (type == 'sermon') {
+        final sTitle = row.readNullable<String>('sermon_title') ?? 'Sermon';
+        final sSeries = row.readNullable<String>('sermon_series');
+        final displayTitle = sSeries != null ? '$sTitle ($sSeries)' : sTitle;
+        
+        // Clean up delta JSON tags for textContent snippet
+        final cleanText = text.replaceAll(RegExp(r'\{[^\}]+\}'), '').replaceAll(RegExp(r'[\[\]\\n"insert:]'), '').trim();
+
+        results.add(
+          SearchResult(
+            type: type,
+            referenceId: refId,
+            textContent: cleanText.isEmpty ? text : cleanText,
+            title: 'Sermon: $displayTitle',
           ),
         );
       }

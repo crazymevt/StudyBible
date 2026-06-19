@@ -8,6 +8,7 @@ import '../../app/reader_state.dart';
 import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
 import 'notes_panel.dart';
+import '../sermons/sermon_editor_screen.dart';
 
 class SearchPanel extends ConsumerStatefulWidget {
   const SearchPanel({super.key});
@@ -96,6 +97,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
 
                 final verses = results.where((r) => r.type == 'verse').toList();
                 final notes = results.where((r) => r.type == 'note').toList();
+                final sermons = results.where((r) => r.type == 'sermon').toList();
                 final commentaries = results
                     .where((r) => r.type == 'commentary')
                     .toList();
@@ -104,7 +106,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                     .toList();
 
                 return DefaultTabController(
-                  length: 4,
+                  length: 5,
                   child: Column(
                     children: [
                       TabBar(
@@ -112,6 +114,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                         tabs: [
                           Tab(text: 'Verses (${verses.length})'),
                           Tab(text: 'Notes (${notes.length})'),
+                          Tab(text: 'Sermons (${sermons.length})'),
                           Tab(text: 'Comm. (${commentaries.length})'),
                           Tab(text: 'Dict. (${dictionaries.length})'),
                         ],
@@ -121,6 +124,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                           children: [
                             _ResultsList(results: verses),
                             _ResultsList(results: notes),
+                            _ResultsList(results: sermons),
                             _GroupedResultsList(results: commentaries),
                             _GroupedResultsList(results: dictionaries),
                           ],
@@ -220,6 +224,13 @@ class _ResultsList extends ConsumerWidget {
                   }
                 }
               }
+            } else if (item.type == 'sermon') {
+              if (MediaQuery.sizeOf(context).width <= 800) {
+                Navigator.of(context).pop();
+              }
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => SermonEditorScreen(sermonId: item.referenceId),
+              ));
             } else if (item.type == 'dictionary') {
               ref
                   .read(dictionarySearchQueryProvider.notifier)
