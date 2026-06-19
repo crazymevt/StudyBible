@@ -8,7 +8,9 @@ import '../../app/user_providers.dart';
 
 class SermonEditorScreen extends ConsumerStatefulWidget {
   final String sermonId;
-  const SermonEditorScreen({super.key, required this.sermonId});
+  final bool isFullScreen;
+
+  const SermonEditorScreen({super.key, required this.sermonId, this.isFullScreen = true});
 
   @override
   ConsumerState<SermonEditorScreen> createState() => _SermonEditorScreenState();
@@ -82,60 +84,126 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      if (widget.isFullScreen) {
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      } else {
+        return const Center(child: CircularProgressIndicator());
+      }
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Sermon'),
-        actions: [
-          TextButton.icon(
-            icon: const Icon(Icons.list_alt),
-            label: const Text('Outline'),
-            onPressed: () => _showOutlineGeneratorDialog(context),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(labelText: 'Title'),
-                  ),
+    final editorBody = Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(labelText: 'Title'),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _seriesController,
-                    decoration: const InputDecoration(labelText: 'Series'),
-                  ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextField(
+                  controller: _seriesController,
+                  decoration: const InputDecoration(labelText: 'Series'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        QuillSimpleToolbar(
+          controller: _controller,
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: QuillEditor.basic(
+                controller: _controller,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    if (widget.isFullScreen) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Edit Sermon'),
+          actions: [
+            TextButton.icon(
+              icon: const Icon(Icons.list_alt),
+              label: const Text('Outline'),
+              onPressed: () => _showOutlineGeneratorDialog(context),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: editorBody,
+      );
+    }
+
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        ref.read(selectedSermonIdProvider.notifier).set(null);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Edit Sermon',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.list_alt),
+                      tooltip: 'Outline',
+                      onPressed: () => _showOutlineGeneratorDialog(context),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.open_in_new),
+                      tooltip: 'Full Screen',
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => SermonEditorScreen(sermonId: widget.sermonId, isFullScreen: true),
+                        ));
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          QuillSimpleToolbar(
-            controller: _controller,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: QuillEditor.basic(
-                  controller: _controller,
-                ),
-              ),
-            ),
-          ),
+          const Divider(height: 1),
+          Expanded(child: editorBody),
         ],
       ),
     );

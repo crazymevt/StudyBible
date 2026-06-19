@@ -13,6 +13,19 @@ final allSermonsProvider = StreamProvider<List<Sermon>>((ref) {
       .watch();
 });
 
+class SelectedSermonIdNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? id) {
+    state = id;
+  }
+}
+
+final selectedSermonIdProvider = NotifierProvider<SelectedSermonIdNotifier, String?>(
+  () => SelectedSermonIdNotifier(),
+);
+
 class SermonActionNotifier {
   final Ref _ref;
   final UserStore _store;

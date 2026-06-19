@@ -5,6 +5,7 @@ import '../../app/search_providers.dart';
 import '../../app/content_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
+import '../../app/sermon_providers.dart';
 import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
 import 'notes_panel.dart';
@@ -227,10 +228,13 @@ class _ResultsList extends ConsumerWidget {
             } else if (item.type == 'sermon') {
               if (MediaQuery.sizeOf(context).width <= 800) {
                 Navigator.of(context).pop();
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => SermonEditorScreen(sermonId: item.referenceId, isFullScreen: true),
+                ));
+              } else {
+                ref.read(selectedSermonIdProvider.notifier).set(item.referenceId);
+                ref.read(activeToolProvider.notifier).setTool(ActiveTool.sermons);
               }
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => SermonEditorScreen(sermonId: item.referenceId),
-              ));
             } else if (item.type == 'dictionary') {
               ref
                   .read(dictionarySearchQueryProvider.notifier)

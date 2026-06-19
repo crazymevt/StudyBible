@@ -9,6 +9,11 @@ class SermonsPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final activeSermonId = ref.watch(selectedSermonIdProvider);
+    if (activeSermonId != null) {
+      return SermonEditorScreen(sermonId: activeSermonId, isFullScreen: false);
+    }
+
     final sermonsAsync = ref.watch(allSermonsProvider);
 
     return Material(
@@ -71,10 +76,13 @@ class SermonsPanel extends ConsumerWidget {
                         onPressed: () => ref.read(sermonActionProvider).deleteSermon(sermon.id),
                       ),
                       onTap: () {
-                        // Push full screen editor
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => SermonEditorScreen(sermonId: sermon.id),
-                        ));
+                        if (MediaQuery.sizeOf(context).width > 800) {
+                          ref.read(selectedSermonIdProvider.notifier).set(sermon.id);
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => SermonEditorScreen(sermonId: sermon.id, isFullScreen: true),
+                          ));
+                        }
                       },
                     );
                   },
@@ -123,9 +131,13 @@ class SermonsPanel extends ConsumerWidget {
               );
               if (context.mounted) {
                 Navigator.pop(context);
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => SermonEditorScreen(sermonId: sermon.id),
-                ));
+                if (MediaQuery.sizeOf(context).width > 800) {
+                  ref.read(selectedSermonIdProvider.notifier).set(sermon.id);
+                } else {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => SermonEditorScreen(sermonId: sermon.id, isFullScreen: true),
+                  ));
+                }
               }
             },
             child: const Text('Create'),
