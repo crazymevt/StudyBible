@@ -147,22 +147,6 @@ class JournalsListPanel extends ConsumerWidget {
                         }
                       },
                     ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {
-                      ref.read(selectedJournalIdProvider.notifier).setId(null);
-                      if (!isDesktop) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => Scaffold(
-                              appBar: AppBar(title: const Text('New Journal')),
-                              body: const JournalEditorPanel(),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
                 ],
               ),
             ],

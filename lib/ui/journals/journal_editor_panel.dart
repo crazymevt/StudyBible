@@ -139,6 +139,10 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                           .read(journalActionProvider)
                           .deleteJournal(_currentId!);
                       ref.read(selectedJournalIdProvider.notifier).setId(null);
+                      final isDesktop = MediaQuery.sizeOf(context).width > 900;
+                      if (!isDesktop && mounted) {
+                        Navigator.of(context).pop();
+                      }
                     }
                   },
                 ),

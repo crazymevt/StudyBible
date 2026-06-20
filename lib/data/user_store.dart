@@ -31,7 +31,7 @@ class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration {
@@ -69,6 +69,36 @@ class UserStore extends _$UserStore {
         await customStatement('''
           CREATE TRIGGER IF NOT EXISTS sermons_ad AFTER DELETE ON sermons BEGIN
             DELETE FROM user_search WHERE type = 'sermon' AND reference_id = old.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS journals_ai AFTER INSERT ON journals BEGIN
+            INSERT INTO user_search(type, reference_id, text_content) VALUES ('journal', new.id, new.title || ' ' || new.content);
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS journals_au AFTER UPDATE ON journals BEGIN
+            UPDATE user_search SET text_content = new.title || ' ' || new.content WHERE type = 'journal' AND reference_id = new.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS journals_ad AFTER DELETE ON journals BEGIN
+            DELETE FROM user_search WHERE type = 'journal' AND reference_id = old.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS prayers_ai AFTER INSERT ON prayers BEGIN
+            INSERT INTO user_search(type, reference_id, text_content) VALUES ('prayer', new.id, new.name || ' ' || new.description);
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS prayers_au AFTER UPDATE ON prayers BEGIN
+            UPDATE user_search SET text_content = new.name || ' ' || new.description WHERE type = 'prayer' AND reference_id = new.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS prayers_ad AFTER DELETE ON prayers BEGIN
+            DELETE FROM user_search WHERE type = 'prayer' AND reference_id = old.id;
           END;
         ''');
       },
@@ -182,6 +212,49 @@ class UserStore extends _$UserStore {
               JOIN tags t ON et.tag_id = t.id
               WHERE et.deleted = 1 AND us.text_content = '#' || t.name
             );
+          ''');
+        }
+        if (from < 12) {
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS journals_ai AFTER INSERT ON journals BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('journal', new.id, new.title || ' ' || new.content);
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS journals_au AFTER UPDATE ON journals BEGIN
+              UPDATE user_search SET text_content = new.title || ' ' || new.content WHERE type = 'journal' AND reference_id = new.id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS journals_ad AFTER DELETE ON journals BEGIN
+              DELETE FROM user_search WHERE type = 'journal' AND reference_id = old.id;
+            END;
+          ''');
+
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS prayers_ai AFTER INSERT ON prayers BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('prayer', new.id, new.name || ' ' || new.description);
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS prayers_au AFTER UPDATE ON prayers BEGIN
+              UPDATE user_search SET text_content = new.name || ' ' || new.description WHERE type = 'prayer' AND reference_id = new.id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS prayers_ad AFTER DELETE ON prayers BEGIN
+              DELETE FROM user_search WHERE type = 'prayer' AND reference_id = old.id;
+            END;
+          ''');
+
+          // Seed existing journals and prayers into the search index
+          await customStatement('''
+            INSERT INTO user_search(type, reference_id, text_content)
+            SELECT 'journal', id, title || ' ' || content FROM journals WHERE deleted = 0;
+          ''');
+          await customStatement('''
+            INSERT INTO user_search(type, reference_id, text_content)
+            SELECT 'prayer', id, name || ' ' || description FROM prayers WHERE deleted = 0;
           ''');
         }
       },
