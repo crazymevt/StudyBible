@@ -26,8 +26,9 @@ List<InlineSpan> buildVerseSpans({
   
   if (verse.segments.isEmpty || verse.segments == '[]') {
     if (verseNumberSpan != null) spans.add(verseNumberSpan);
+    final text = ignoreLeadingBreaks ? '${verse.textContent.trimLeft()} ' : '${verse.textContent} ';
     spans.addAll(_buildHighlightedSpans(
-      '${verse.textContent} ',
+      text,
       bodyStyle,
       onVerseTap: () => onVerseTap(verse.verse),
       onWordRightClick: onWordRightClick,
@@ -140,8 +141,9 @@ List<InlineSpan> buildVerseSpans({
     return spans;
   } catch (e) {
     if (verseNumberSpan != null) spans.add(verseNumberSpan);
+    final text = ignoreLeadingBreaks ? '${verse.textContent.trimLeft()} ' : '${verse.textContent} ';
     spans.addAll(_buildHighlightedSpans(
-      '${verse.textContent} ',
+      text,
       bodyStyle,
       onVerseTap: () => onVerseTap(verse.verse),
       onWordRightClick: onWordRightClick,

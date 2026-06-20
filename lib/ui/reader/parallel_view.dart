@@ -315,6 +315,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                                                 showStrongNumbers: widget.showStrongNumbers,
                                                 onWordRightClick: _openDictionary,
                                                 searchQuery: widget.searchQuery,
+                                                ignoreLeadingBreaks: true,
                                               ),
                                             ],
                                           ),
