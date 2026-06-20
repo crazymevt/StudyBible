@@ -7,8 +7,6 @@ import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../domain/importer/mybible_verse_parser.dart';
 import 'note_editor.dart';
-import 'cross_reference_panel.dart';
-import 'commentary_panel.dart';
 import 'compare_panel.dart';
 import '../tags/tag_editor_dialog.dart';
 
@@ -78,64 +76,7 @@ class VerseActionBar extends ConsumerWidget {
                   ref.read(selectedVersesProvider.notifier).clear();
                 },
               ),
-              const SizedBox(width: 12),
-              _ActionIcon(
-                icon: Icons.compare_arrows,
-                label: 'Cross-Reference',
-                onTap: () {
-                  if (MediaQuery.sizeOf(context).width > 800) {
-                    ref
-                        .read(activeToolProvider.notifier)
-                        .setTool(ActiveTool.crossReference);
-                  } else {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (_) => Container(
-                        height: MediaQuery.sizeOf(context).height * 0.8,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                        ),
-                        child: const CrossReferencePanel(),
-                      ),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(width: 12),
-              _ActionIcon(
-                icon: Icons.menu_book,
-                label: 'Commentary',
-                onTap: () {
-                  if (MediaQuery.sizeOf(context).width > 800) {
-                    ref
-                        .read(activeToolProvider.notifier)
-                        .setTool(ActiveTool.commentaries);
-                  } else {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (_) => Container(
-                        height: MediaQuery.sizeOf(context).height * 0.8,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                        ),
-                        child: const CommentaryPanel(),
-                      ),
-                    );
-                  }
-                },
-              ),
+
               const SizedBox(width: 12),
               _ActionIcon(
                 icon: Icons.difference,
