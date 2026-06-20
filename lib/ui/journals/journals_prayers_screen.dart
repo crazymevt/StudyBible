@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app_drawer.dart';
+import '../../app/search_providers.dart';
+import '../../app/app_state.dart';
 import 'journals_list_panel.dart';
 import 'journal_editor_panel.dart';
 import 'prayer_tracker_panel.dart';
@@ -21,7 +23,46 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
     if (isDesktop) {
       return Scaffold(
         drawer: const AppDrawer(),
-        appBar: AppBar(title: const Text('Journals & Prayers')),
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          centerTitle: true,
+          title: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        hintText: 'Search entire library...',
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      onSubmitted: (value) {
+                        if (value.isNotEmpty) {
+                          ref.read(globalSearchQueryProvider.notifier).setQuery(value);
+                          ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
+                          ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         body: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -62,7 +103,44 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
       child: Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
-          title: const Text('Journals & Prayers'),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          centerTitle: true,
+          title: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        hintText: 'Search entire library...',
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      onSubmitted: (value) {
+                        if (value.isNotEmpty) {
+                          ref.read(globalSearchQueryProvider.notifier).setQuery(value);
+                          ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
+                          ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Journals'),

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/content_manager_providers.dart';
 import '../../app/content_providers.dart';
+import '../../app/search_providers.dart';
+import '../../app/app_state.dart';
 import '../app_drawer.dart';
 
 class ContentManagerScreen extends ConsumerStatefulWidget {
@@ -36,7 +38,44 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Content Manager'),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        centerTitle: true,
+        title: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Search entire library...',
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    onSubmitted: (value) {
+                      if (value.isNotEmpty) {
+                        ref.read(globalSearchQueryProvider.notifier).setQuery(value);
+                        ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
+                        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

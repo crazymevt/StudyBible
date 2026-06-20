@@ -5,6 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
 
 import '../../app/backup_providers.dart';
+import '../../app/search_providers.dart';
+import '../../app/app_state.dart';
 import '../../domain/backup/backup_restore_service.dart';
 import '../app_drawer.dart';
 
@@ -173,7 +175,46 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Backup & Restore')),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        centerTitle: true,
+        title: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Search entire library...',
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    onSubmitted: (value) {
+                      if (value.isNotEmpty) {
+                        ref.read(globalSearchQueryProvider.notifier).setQuery(value);
+                        ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
+                        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
       drawer: const AppDrawer(),
       body: Center(
         child: ConstrainedBox(
