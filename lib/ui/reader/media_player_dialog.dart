@@ -54,63 +54,68 @@ class _MediaPlayerDialogState extends State<MediaPlayerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.black,
-      insetPadding: _isFullscreen ? EdgeInsets.zero : const EdgeInsets.all(24),
-      shape: _isFullscreen
-          ? const RoundedRectangleBorder()
-          : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(_isFullscreen ? 0 : 12),
-        child: SizedBox(
-          width: _isFullscreen ? MediaQuery.of(context).size.width : null,
-          height: _isFullscreen ? MediaQuery.of(context).size.height : null,
-          child: _isFullscreen
-              ? _buildContent()
-              : AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: _buildContent(),
-                ),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: _isFullscreen ? EdgeInsets.zero : const EdgeInsets.all(24),
+        shape: _isFullscreen
+            ? const RoundedRectangleBorder()
+            : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_isFullscreen ? 0 : 12),
+          child: SizedBox(
+            width: _isFullscreen ? MediaQuery.of(context).size.width : null,
+            height: _isFullscreen ? MediaQuery.of(context).size.height : null,
+            child: _isFullscreen
+                ? _buildContent()
+                : AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: _buildContent(),
+                  ),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildContent() {
-    return Stack(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        YoutubePlayer(
-          controller: _controller,
-          backgroundColor: Colors.black,
+        Expanded(
+          child: YoutubePlayer(
+            controller: _controller,
+            backgroundColor: Colors.black,
+          ),
         ),
-        Positioned(
-          top: 8,
-          right: 8,
-          child: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.all(Radius.circular(24)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-                    IconButton(
-                      icon: Icon(
-                        _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      onPressed: _toggleFullscreen,
-                    ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 24),
-                    onPressed: () => Navigator.of(context).pop(),
+        Container(
+          color: Colors.black,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                IconButton(
+                  icon: Icon(
+                    _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                    color: Colors.white,
+                    size: 24,
                   ),
-                ],
+                  onPressed: _toggleFullscreen,
+                ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 24),
+                onPressed: () => Navigator.of(context).pop(),
               ),
-            ),
+            ],
           ),
         ),
       ],
