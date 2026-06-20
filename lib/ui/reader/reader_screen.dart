@@ -11,7 +11,7 @@ import 'flowing_paragraph_view.dart';
 import 'parallel_view.dart';
 import 'verse_action_bar.dart';
 import 'book_chooser_sheet.dart';
-import 'study_pane.dart';
+
 import 'mobile_tools_drawer.dart';
 import 'audio_player_widget.dart';
 import 'commentary_panel.dart';
@@ -421,22 +421,12 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 tooltip: 'Tools',
                 onPressed: () => Scaffold.of(context).openEndDrawer(),
               ),
-            )
-          else
-            Builder(
-              builder: (context) {
-                return IconButton(
-                  icon: const Icon(Icons.menu_book),
-                  tooltip: 'Study Pane',
-                  onPressed: () => Scaffold.of(context).openEndDrawer(),
-                );
-              },
             ),
         ],
       ),
       endDrawer: MediaQuery.sizeOf(context).width <= 800
           ? const MobileToolsDrawer()
-          : const StudyPane(),
+          : null,
       body: Column(
         children: [
           // Breadcrumb navigation bar

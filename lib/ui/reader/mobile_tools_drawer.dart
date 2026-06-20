@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'study_pane.dart';
+
 import 'cross_reference_panel.dart';
 import 'notes_panel.dart';
 import 'search_panel.dart';
@@ -48,14 +48,7 @@ class MobileToolsDrawer extends ConsumerWidget {
               ),
             ),
             const Divider(),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Library',
-                child: Icon(Icons.library_books),
-              ),
-              title: const Text('Library'),
-              onTap: () => _openTool(context, const StudyPane()),
-            ),
+
             ListTile(
               leading: const Tooltip(
                 message: 'Cross-References',
