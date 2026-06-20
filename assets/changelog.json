@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.20+9",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Enable SQLite WAL mode to prevent 'database is locked' errors on Android restores",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+8",
     "date": "2026-06-20",
     "features": [
