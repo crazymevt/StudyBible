@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.20+11",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "feat(search): add global autocomplete search bar to app headers with reference quick navigation",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+10",
     "date": "2026-06-20",
     "features": [
