@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' as drift;
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 import 'package:study_bible/data/content_store.dart';
@@ -250,12 +251,17 @@ final crossReferencesProvider =
       final bookName = ref.watch(selectedBookNameProvider);
       final chapter = ref.watch(selectedChapterProvider);
 
-      return (store.select(store.crossReferences)..where(
-            (c) =>
-                (c.sourceBookName.equals(bookName)) &
-                (c.sourceChapter.equals(chapter)) &
-                (c.sourceVerse.equals(verse)),
-          ))
+      return (store.select(store.crossReferences)
+            ..where(
+              (c) =>
+                  (c.sourceBookName.equals(bookName)) &
+                  (c.sourceChapter.equals(chapter)) &
+                  (c.sourceVerse.equals(verse)),
+            )
+            ..orderBy([
+              (c) =>
+                  drift.OrderingTerm(expression: c.votes, mode: drift.OrderingMode.desc)
+            ]))
           .get();
     });
 
