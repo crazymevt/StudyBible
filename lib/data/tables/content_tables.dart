@@ -40,6 +40,7 @@ class CrossReferences extends Table {
   TextColumn get targetBookName => text()();
   IntColumn get targetChapter => integer()();
   IntColumn get targetVerse => integer()();
+  IntColumn get votes => integer().nullable()();
 }
 
 @DataClassName('Commentary')

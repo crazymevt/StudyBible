@@ -1153,6 +1153,15 @@ class $CrossReferencesTable extends CrossReferences
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _votesMeta = const VerificationMeta('votes');
+  @override
+  late final GeneratedColumn<int> votes = GeneratedColumn<int>(
+    'votes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1162,6 +1171,7 @@ class $CrossReferencesTable extends CrossReferences
     targetBookName,
     targetChapter,
     targetVerse,
+    votes,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1244,6 +1254,12 @@ class $CrossReferencesTable extends CrossReferences
     } else if (isInserting) {
       context.missing(_targetVerseMeta);
     }
+    if (data.containsKey('votes')) {
+      context.handle(
+        _votesMeta,
+        votes.isAcceptableOrUnknown(data['votes']!, _votesMeta),
+      );
+    }
     return context;
   }
 
@@ -1281,6 +1297,10 @@ class $CrossReferencesTable extends CrossReferences
         DriftSqlType.int,
         data['${effectivePrefix}target_verse'],
       )!,
+      votes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}votes'],
+      ),
     );
   }
 
@@ -1298,6 +1318,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
   final String targetBookName;
   final int targetChapter;
   final int targetVerse;
+  final int? votes;
   const CrossReference({
     required this.id,
     required this.sourceBookName,
@@ -1306,6 +1327,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
     required this.targetBookName,
     required this.targetChapter,
     required this.targetVerse,
+    this.votes,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1317,6 +1339,9 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
     map['target_book_name'] = Variable<String>(targetBookName);
     map['target_chapter'] = Variable<int>(targetChapter);
     map['target_verse'] = Variable<int>(targetVerse);
+    if (!nullToAbsent || votes != null) {
+      map['votes'] = Variable<int>(votes);
+    }
     return map;
   }
 
@@ -1329,6 +1354,9 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
       targetBookName: Value(targetBookName),
       targetChapter: Value(targetChapter),
       targetVerse: Value(targetVerse),
+      votes: votes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(votes),
     );
   }
 
@@ -1345,6 +1373,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
       targetBookName: serializer.fromJson<String>(json['targetBookName']),
       targetChapter: serializer.fromJson<int>(json['targetChapter']),
       targetVerse: serializer.fromJson<int>(json['targetVerse']),
+      votes: serializer.fromJson<int?>(json['votes']),
     );
   }
   @override
@@ -1358,6 +1387,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
       'targetBookName': serializer.toJson<String>(targetBookName),
       'targetChapter': serializer.toJson<int>(targetChapter),
       'targetVerse': serializer.toJson<int>(targetVerse),
+      'votes': serializer.toJson<int?>(votes),
     };
   }
 
@@ -1369,6 +1399,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
     String? targetBookName,
     int? targetChapter,
     int? targetVerse,
+    Value<int?> votes = const Value.absent(),
   }) => CrossReference(
     id: id ?? this.id,
     sourceBookName: sourceBookName ?? this.sourceBookName,
@@ -1377,6 +1408,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
     targetBookName: targetBookName ?? this.targetBookName,
     targetChapter: targetChapter ?? this.targetChapter,
     targetVerse: targetVerse ?? this.targetVerse,
+    votes: votes.present ? votes.value : this.votes,
   );
   CrossReference copyWithCompanion(CrossReferencesCompanion data) {
     return CrossReference(
@@ -1399,6 +1431,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
       targetVerse: data.targetVerse.present
           ? data.targetVerse.value
           : this.targetVerse,
+      votes: data.votes.present ? data.votes.value : this.votes,
     );
   }
 
@@ -1411,7 +1444,8 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
           ..write('sourceVerse: $sourceVerse, ')
           ..write('targetBookName: $targetBookName, ')
           ..write('targetChapter: $targetChapter, ')
-          ..write('targetVerse: $targetVerse')
+          ..write('targetVerse: $targetVerse, ')
+          ..write('votes: $votes')
           ..write(')'))
         .toString();
   }
@@ -1425,6 +1459,7 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
     targetBookName,
     targetChapter,
     targetVerse,
+    votes,
   );
   @override
   bool operator ==(Object other) =>
@@ -1436,7 +1471,8 @@ class CrossReference extends DataClass implements Insertable<CrossReference> {
           other.sourceVerse == this.sourceVerse &&
           other.targetBookName == this.targetBookName &&
           other.targetChapter == this.targetChapter &&
-          other.targetVerse == this.targetVerse);
+          other.targetVerse == this.targetVerse &&
+          other.votes == this.votes);
 }
 
 class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
@@ -1447,6 +1483,7 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
   final Value<String> targetBookName;
   final Value<int> targetChapter;
   final Value<int> targetVerse;
+  final Value<int?> votes;
   const CrossReferencesCompanion({
     this.id = const Value.absent(),
     this.sourceBookName = const Value.absent(),
@@ -1455,6 +1492,7 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
     this.targetBookName = const Value.absent(),
     this.targetChapter = const Value.absent(),
     this.targetVerse = const Value.absent(),
+    this.votes = const Value.absent(),
   });
   CrossReferencesCompanion.insert({
     this.id = const Value.absent(),
@@ -1464,6 +1502,7 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
     required String targetBookName,
     required int targetChapter,
     required int targetVerse,
+    this.votes = const Value.absent(),
   }) : sourceBookName = Value(sourceBookName),
        sourceChapter = Value(sourceChapter),
        sourceVerse = Value(sourceVerse),
@@ -1478,6 +1517,7 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
     Expression<String>? targetBookName,
     Expression<int>? targetChapter,
     Expression<int>? targetVerse,
+    Expression<int>? votes,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1487,6 +1527,7 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
       if (targetBookName != null) 'target_book_name': targetBookName,
       if (targetChapter != null) 'target_chapter': targetChapter,
       if (targetVerse != null) 'target_verse': targetVerse,
+      if (votes != null) 'votes': votes,
     });
   }
 
@@ -1498,6 +1539,7 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
     Value<String>? targetBookName,
     Value<int>? targetChapter,
     Value<int>? targetVerse,
+    Value<int?>? votes,
   }) {
     return CrossReferencesCompanion(
       id: id ?? this.id,
@@ -1507,6 +1549,7 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
       targetBookName: targetBookName ?? this.targetBookName,
       targetChapter: targetChapter ?? this.targetChapter,
       targetVerse: targetVerse ?? this.targetVerse,
+      votes: votes ?? this.votes,
     );
   }
 
@@ -1534,6 +1577,9 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
     if (targetVerse.present) {
       map['target_verse'] = Variable<int>(targetVerse.value);
     }
+    if (votes.present) {
+      map['votes'] = Variable<int>(votes.value);
+    }
     return map;
   }
 
@@ -1546,7 +1592,8 @@ class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
           ..write('sourceVerse: $sourceVerse, ')
           ..write('targetBookName: $targetBookName, ')
           ..write('targetChapter: $targetChapter, ')
-          ..write('targetVerse: $targetVerse')
+          ..write('targetVerse: $targetVerse, ')
+          ..write('votes: $votes')
           ..write(')'))
         .toString();
   }
@@ -4956,6 +5003,7 @@ typedef $$CrossReferencesTableCreateCompanionBuilder =
       required String targetBookName,
       required int targetChapter,
       required int targetVerse,
+      Value<int?> votes,
     });
 typedef $$CrossReferencesTableUpdateCompanionBuilder =
     CrossReferencesCompanion Function({
@@ -4966,6 +5014,7 @@ typedef $$CrossReferencesTableUpdateCompanionBuilder =
       Value<String> targetBookName,
       Value<int> targetChapter,
       Value<int> targetVerse,
+      Value<int?> votes,
     });
 
 class $$CrossReferencesTableFilterComposer
@@ -5009,6 +5058,11 @@ class $$CrossReferencesTableFilterComposer
 
   ColumnFilters<int> get targetVerse => $composableBuilder(
     column: $table.targetVerse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get votes => $composableBuilder(
+    column: $table.votes,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5056,6 +5110,11 @@ class $$CrossReferencesTableOrderingComposer
     column: $table.targetVerse,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get votes => $composableBuilder(
+    column: $table.votes,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CrossReferencesTableAnnotationComposer
@@ -5099,6 +5158,9 @@ class $$CrossReferencesTableAnnotationComposer
     column: $table.targetVerse,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get votes =>
+      $composableBuilder(column: $table.votes, builder: (column) => column);
 }
 
 class $$CrossReferencesTableTableManager
@@ -5145,6 +5207,7 @@ class $$CrossReferencesTableTableManager
                 Value<String> targetBookName = const Value.absent(),
                 Value<int> targetChapter = const Value.absent(),
                 Value<int> targetVerse = const Value.absent(),
+                Value<int?> votes = const Value.absent(),
               }) => CrossReferencesCompanion(
                 id: id,
                 sourceBookName: sourceBookName,
@@ -5153,6 +5216,7 @@ class $$CrossReferencesTableTableManager
                 targetBookName: targetBookName,
                 targetChapter: targetChapter,
                 targetVerse: targetVerse,
+                votes: votes,
               ),
           createCompanionCallback:
               ({
@@ -5163,6 +5227,7 @@ class $$CrossReferencesTableTableManager
                 required String targetBookName,
                 required int targetChapter,
                 required int targetVerse,
+                Value<int?> votes = const Value.absent(),
               }) => CrossReferencesCompanion.insert(
                 id: id,
                 sourceBookName: sourceBookName,
@@ -5171,6 +5236,7 @@ class $$CrossReferencesTableTableManager
                 targetBookName: targetBookName,
                 targetChapter: targetChapter,
                 targetVerse: targetVerse,
+                votes: votes,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

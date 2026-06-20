@@ -207,6 +207,32 @@ class _CrossReferenceItem extends ConsumerWidget {
                                       fontWeight: FontWeight.bold,
                                     ),
                               ),
+                              if (xref.votes != null && xref.votes! > 0)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.secondaryContainer,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.thumb_up_alt_outlined, 
+                                        size: 12, 
+                                        color: Theme.of(context).colorScheme.onSecondaryContainer
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${xref.votes}',
+                                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                             ],
                           ),
                           const SizedBox(height: 8),

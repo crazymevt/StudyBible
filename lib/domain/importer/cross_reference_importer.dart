@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 import 'package:study_bible/data/content_store.dart';
-
+import 'package:drift/drift.dart' as drift;
 
 class CrossReferenceImporter {
   final ContentStore store;
@@ -33,11 +33,12 @@ class CrossReferenceImporter {
           store.crossReferences,
           CrossReferencesCompanion.insert(
             sourceBookName: row['sourceBookName'] as String,
-            sourceChapter: row['sourceChapter'] as int,
-            sourceVerse: row['sourceVerse'] as int,
+            sourceChapter: int.tryParse(row['sourceChapter'].toString()) ?? 0,
+            sourceVerse: int.tryParse(row['sourceVerse'].toString()) ?? 0,
             targetBookName: row['targetBookName'] as String,
-            targetChapter: row['targetChapter'] as int,
-            targetVerse: row['targetVerse'] as int,
+            targetChapter: int.tryParse(row['targetChapter'].toString()) ?? 0,
+            targetVerse: int.tryParse(row['targetVerse'].toString()) ?? 0,
+            votes: drift.Value(int.tryParse(row['votes']?.toString() ?? '')),
           ),
         );
       }
