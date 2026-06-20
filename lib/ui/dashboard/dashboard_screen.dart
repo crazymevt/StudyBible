@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/dashboard_providers.dart';
+import '../../app/search_providers.dart';
 import '../app_drawer.dart';
 import 'reading_progress_dialog.dart';
 import 'time_analytics_dialog.dart';
@@ -29,7 +30,44 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        centerTitle: true,
+        title: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Search entire library...',
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    onSubmitted: (value) {
+                      if (value.isNotEmpty) {
+                        ref.read(globalSearchQueryProvider.notifier).setQuery(value);
+                        ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
+                        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
