@@ -654,62 +654,16 @@ class _BreadcrumbBar extends ConsumerWidget {
     if (books.isEmpty) return;
     final bookId = books.first.id;
 
-    // Get chapter count via the existing provider
-    final chapterCount = await ref.read(chapterCountProvider(bookId).future);
-
     if (!context.mounted) return;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) {
-        final theme = Theme.of(ctx);
-        return AlertDialog(
-          title: Text('$bookName — Select Chapter'),
-          content: SizedBox(
-            width: 320,
-            child: GridView.builder(
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 64,
-                childAspectRatio: 1,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: chapterCount,
-              itemBuilder: (context, index) {
-                final ch = index + 1;
-                final isSelected = ch == ref.read(selectedChapterProvider);
-                return InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () {
-                    ref.read(selectedChapterProvider.notifier).set(ch);
-                    ref.read(navigationControllerProvider).recordHistory();
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '$ch',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: isSelected
-                            ? theme.colorScheme.onPrimary
-                            : theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      },
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BookChooserSheet(
+        initialBookId: bookId,
+        initialBookName: bookName,
+      ),
     );
   }
 

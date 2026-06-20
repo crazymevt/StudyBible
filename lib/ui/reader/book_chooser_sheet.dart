@@ -4,7 +4,14 @@ import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 
 class BookChooserSheet extends ConsumerStatefulWidget {
-  const BookChooserSheet({super.key});
+  final int? initialBookId;
+  final String? initialBookName;
+
+  const BookChooserSheet({
+    super.key,
+    this.initialBookId,
+    this.initialBookName,
+  });
 
   @override
   ConsumerState<BookChooserSheet> createState() => _BookChooserSheetState();
@@ -13,6 +20,13 @@ class BookChooserSheet extends ConsumerStatefulWidget {
 class _BookChooserSheetState extends ConsumerState<BookChooserSheet> {
   int? selectedBookId;
   String? selectedBookName;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedBookId = widget.initialBookId;
+    selectedBookName = widget.initialBookName;
+  }
 
   @override
   Widget build(BuildContext context) {
