@@ -1,5 +1,209 @@
 [
   {
+    "version": "26.6.20+10",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "resolve journal search, unmounted ref, and tag cascade bugs",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add journals and prayers to global search, improve journal editor UI",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add delete button to journal list items",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "UI: move go to today icon to calendar header in journal list panel",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "UI: reduce vertical padding on sidebar panel headers to match main reading panel",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "restore right-alignment for breadcrumb navigation buttons",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "UI: increase mobile breakpoint to 900 and add flexible breadcrumbs to prevent collision",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "prevent renderflex overflow in commentary panel header",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "UI: remove cross-reference and commentary from verse action bar to save space",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "New Features",
+        "title": "add tooltip to clear highlight button",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add clear highlight button to verse action bar",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "remove leading linebreaks in parallel view mode",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "remove ActiveTool.library to fix compile errors after StudyPane deletion",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "remove redundant Study Pane feature",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "style: make voice actor dropdown more visible in audio player",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "Improve version picker UX to support single tap swapping and parallel checkbox",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "New Features",
+        "title": "sort cross references by votes descending",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Always show votes badge even if 0 to avoid appearing hidden",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "bump schema version to add votes column and trigger re-import",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "Add votes to cross-references",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "Use BookChooserSheet for chapter dropdown in reader",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "Standardize chapter selectors sizing and styling",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "Add color pop to full screen sermon editor header",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "Add color pop to settings screen header",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "Add global search bar to all remaining fullscreen panels",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "New Features",
+        "title": "Add global search bar to dashboard header",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Remove inline audio player from mobile view",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "Add primary color to AppBar in reader screen",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "New Features",
+        "title": "Add persistent global search bar and modal audio player",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Match panel headers styling across all panels",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "Add devotionals and subheadings support",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "Show all commentaries when verse is selected",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Fix RangeError when clearing search query in ReaderScreen",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+9",
     "date": "2026-06-20",
     "features": [
