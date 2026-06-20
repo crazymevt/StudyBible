@@ -39,6 +39,8 @@ class VerseActionBar extends ConsumerWidget {
               const _ColorSwatch(color: Color(0xFFB5E2FA), hex: '#B5E2FA'),
               const SizedBox(width: 8),
               const _ColorSwatch(color: Color(0xFFF4A8C4), hex: '#F4A8C4'),
+              const SizedBox(width: 8),
+              const _ClearHighlightSwatch(),
               const SizedBox(width: 16),
               Container(width: 1, height: 24, color: Colors.white24),
               const SizedBox(width: 16),
@@ -287,6 +289,32 @@ class _ColorSwatch extends ConsumerWidget {
         width: 24,
         height: 24,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+    );
+  }
+}
+
+class _ClearHighlightSwatch extends ConsumerWidget {
+  const _ClearHighlightSwatch();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      onTap: () async {
+        final selected = ref.read(selectedVersesProvider);
+        for (final verse in selected) {
+          await ref.read(highlightActionProvider).clearHighlight(verse);
+        }
+        ref.read(selectedVersesProvider.notifier).clear();
+      },
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: const BoxDecoration(
+          color: Colors.white24,
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(Icons.format_color_reset, size: 14, color: Colors.white),
       ),
     );
   }

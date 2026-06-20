@@ -90,6 +90,34 @@ class HighlightAction {
     }
     ref.read(achievementServiceProvider).evaluateAchievements();
   }
+
+  Future<void> clearHighlight(int verse) async {
+    final store = ref.read(userStoreProvider);
+    final bookName = ref.read(selectedBookNameProvider);
+    final chapter = ref.read(selectedChapterProvider);
+
+    final existing =
+        await (store.select(store.highlights)..where(
+              (h) =>
+                  (h.bookName.equals(bookName)) &
+                  (h.chapter.equals(chapter)) &
+                  (h.verse.equals(verse)) &
+                  (h.deleted.equals(false)),
+            ))
+            .getSingleOrNull();
+
+    if (existing != null) {
+      await store
+          .into(store.highlights)
+          .insert(
+            existing.copyWith(
+              deleted: true,
+              updatedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+            mode: InsertMode.replace,
+          );
+    }
+  }
 }
 
 // NOTES
