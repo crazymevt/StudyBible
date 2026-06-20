@@ -1,0 +1,484 @@
+[
+  {
+    "version": "26.6.20+1",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "title": "Add automated release scripts and dynamic changelog parsing",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add Support Developer section with Ko-fi link to Settings",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement What's New dialog with automatic startup trigger and manual buttons",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Create global version tracker and show in AppDrawer",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add theme switcher to AppDrawer",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix day streak calculation to include time tracker logs",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "fix android build issues",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Hide broken images from rendering in HtmlWidget",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Hide book intro button if commentary has no intro",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Make book/chapter label scroll with verse text instead of being static",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix Cmd+F global interception in ReaderScreen and finalize search implementation",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Custom sync folder selection",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix verse rendering spacing issues",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement missing achievements from bible2",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: add long press dictionary lookup for mobile",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "fix: use context menu for right click dictionary lookup and fix toggle bug",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: implement right-click dictionary lookup for words",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "fix: use MyBibleVerseParser to sanitize cross reference verses",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Add full support for ph4 subheadings modules",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "breadcrumbs",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "refactor: consolidate settings into single unified screen, remove sidebar settings panel",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: verse note/tag indicators, direct tag search across all entity types, journals/prayers search tabs",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: complete global tag system and UI search integration",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Phase 6.5: Fix autofocus for Dictionary and Search panels",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Phase 6.4: Implement Onboarding System for new users with 1-click KJV install",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Phase 6.3: Improve visual separation and layout of Journals and Prayers panels",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Phase 6.2: Implement custom fullscreen button for MediaPlayerDialog on desktop",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Phase 6.1: Add webview_flutter and WebPlayerDialog as fallback for URLs",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Phase 6: Theme engine, Settings panel, and Media panel exception fix",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: complete phase 5, add presentation mode for sermons",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: complete phase 4, add sermon export with pdf, html, text, zip, save to folder",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: complete phase 3, add styled delta output for outline generator",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: complete phase 2, add panel and fullscreen editing modes for sermons",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: complete phase 1 of sermons feature with bug fixes",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add Compare verses feature and UI",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement verse copy functionality with clean text and range formatting",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix search mismatch, strip tags, and add esc key shortcut",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement clickable footnotes that open the commentary panel",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Auto-cleanup ghost active versions from SharedPreferences",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix weird reader state when selected active version is not installed",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Ensure temp directory exists before downloading modules and sanitize filenames",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Create content_search FTS table on content database creation",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Remove dummy database from assets and stop loading it on startup",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add global scaffold messenger and achievement unlock snackbar notifications",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix library active tool returning a blank placeholder drawer",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix media player overflow on mobile by moving it out of the app bar",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Remove duplicate tools icon in reader screen app bar",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix horizontal and vertical overflow in reading plans on mobile devices",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix endDrawer logic for tools drawer on mobile and study pane on desktop",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add MobileToolsDrawer to ReaderScreen for mobile width",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Remove redundant Reading Plans from AppDrawer",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add verse spacing preference and apply to Reader views",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add google_fonts package and expand font options",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix text scale assertion by building base text theme from Typography directly",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add app-wide font family and size settings",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Remove drawer from SettingsScreen to enable native back button",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Refactor Settings to be pushed onto navigation stack instead of replacing root module",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix settings toggle state not updating by using a NotifierProvider",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add settings page with show dashboard on startup setting",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add easy top navigation to the reader app bar",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Clear selected verses when navigating to a new chapter or book",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Convert VerseListView to ConsumerStatefulWidget to support auto-scrolling",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix auto-scroll missing itemScrollController attachment",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement auto-scroll across search, cross references, and history",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Make Verse of the Day clickable with auto-scroll and fix book matching",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Redesign dashboard layout",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add reading plans section to dashboard",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix batch update bug and add delete button to reading plan panel",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement reading plans generator and basic UI",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement backup and restore functionality",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "miner fix to media panel and history",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "implemented osis imports",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix commentary book intros not displaying by correctly checking for chapter 0 or null",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Implement synchronized row-by-row parallel scrolling for verse-by-verse mode",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix NLT'15 sqlite import by removing unused booksQuery for commentaries, and fix FTS search by adding virtual table synchronization on import and delete",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Fix BSB bible importer type casts and OSIS regex bug",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Update AudioPlayer widget design and add autoplay and shared preferences",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add BSB and KJV Audio Bibles with mini-player",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Add Media integration (Phase 5.2)",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Add interactive Achievements dialog and progress tracking UI",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Save and restore app window size/position using window_manager",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Add Navigation History feature and fix URL parsing for verses",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Add Dashboard with Time Tracker, Reading Progress, and Achievements",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Desktop UI Overhaul and Cross-References",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: Add notes, bookmarks, study pane, and verse action bar",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: e2e file sync with manual trigger and device id",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: user store, lww merge, and file sync foundation",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: phase 1 completion with parallel panels and verse selection",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "feat: complete phase 1 content store and reader UI",
+        "description": "",
+        "icon": "new_releases"
+      },
+      {
+        "title": "Initial commit",
+        "description": "",
+        "icon": "new_releases"
+      }
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "title": "Support the Developer",
+        "description": "Added a Ko-fi link in Settings to support development.",
+        "icon": "favorite"
+      },
+      {
+        "title": "Global Version Tracking",
+        "description": "App version is now prominently tracked and displayed in the drawer.",
+        "icon": "track_changes"
+      },
+      {
+        "title": "Theme Switcher",
+        "description": "Easily toggle between light, dark, and system default themes straight from the App Drawer.",
+        "icon": "brightness_6"
+      },
+      {
+        "title": "Fixed Streak Calculations",
+        "description": "Reading verses with the time tracker now correctly contributes to your daily streaks!",
+        "icon": "local_fire_department"
+      }
+    ]
+  }
+]
