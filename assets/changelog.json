@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.6.20+8",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Resolve Android YouTube overlay, back button handling, and stabilize release signature",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Update cross-reference cards to support dark mode themes",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+7",
     "date": "2026-06-20",
     "features": [
