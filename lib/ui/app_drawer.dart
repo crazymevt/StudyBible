@@ -23,11 +23,48 @@ class AppDrawer extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  'Study Bible',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Study Bible',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final themeMode = ref.watch(themeModeProvider);
+                        IconData icon;
+                        switch (themeMode) {
+                          case ThemeMode.light:
+                            icon = Icons.light_mode;
+                            break;
+                          case ThemeMode.dark:
+                            icon = Icons.dark_mode;
+                            break;
+                          case ThemeMode.system:
+                            icon = Icons.brightness_auto;
+                            break;
+                        }
+                        return IconButton(
+                          icon: Icon(icon, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                          tooltip: 'Toggle Theme',
+                          onPressed: () {
+                            final notifier = ref.read(themeModeProvider.notifier);
+                            if (themeMode == ThemeMode.light) {
+                              notifier.setMode(ThemeMode.dark);
+                            } else if (themeMode == ThemeMode.dark) {
+                              notifier.setMode(ThemeMode.system);
+                            } else {
+                              notifier.setMode(ThemeMode.light);
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
