@@ -669,10 +669,11 @@ class _BreadcrumbBar extends ConsumerWidget {
             width: 320,
             child: GridView.builder(
               shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 6,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 64,
+                childAspectRatio: 1,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemCount: chapterCount,
               itemBuilder: (context, index) {
@@ -695,11 +696,11 @@ class _BreadcrumbBar extends ConsumerWidget {
                     alignment: Alignment.center,
                     child: Text(
                       '$ch',
-                      style: TextStyle(
+                      style: theme.textTheme.titleMedium?.copyWith(
                         color: isSelected
                             ? theme.colorScheme.onPrimary
                             : theme.colorScheme.onSurface,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),

@@ -99,8 +99,8 @@ class _BookChooserSheetState extends ConsumerState<BookChooserSheet> {
     return chaptersAsync.when(
       data: (count) {
         return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 64,
             childAspectRatio: 1,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
@@ -108,7 +108,9 @@ class _BookChooserSheetState extends ConsumerState<BookChooserSheet> {
           itemCount: count,
           itemBuilder: (context, index) {
             final chapter = index + 1;
+            final isSelected = chapter == ref.read(selectedChapterProvider);
             return InkWell(
+              borderRadius: BorderRadius.circular(8),
               onTap: () {
                 ref
                     .read(selectedBookNameProvider.notifier)
@@ -119,16 +121,19 @@ class _BookChooserSheetState extends ConsumerState<BookChooserSheet> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   '$chapter',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
