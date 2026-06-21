@@ -115,6 +115,10 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       ref.invalidate(versionsProvider);
       ref.invalidate(bibleVersionsProvider);
       ref.invalidate(subheadingSourcesProvider);
+      ref.invalidate(commentariesProvider);
+      ref.invalidate(dictionariesProvider);
+      ref.invalidate(devotionalsProvider);
+      ref.invalidate(installedModuleIdsProvider);
     } catch (e) {
       state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
     }
@@ -168,6 +172,10 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       ref.invalidate(versionsProvider);
       ref.invalidate(bibleVersionsProvider);
       ref.invalidate(subheadingSourcesProvider);
+      ref.invalidate(commentariesProvider);
+      ref.invalidate(dictionariesProvider);
+      ref.invalidate(devotionalsProvider);
+      ref.invalidate(installedModuleIdsProvider);
     } catch (e) {
       state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
     }
