@@ -6,6 +6,7 @@ class Versions extends Table {
   TextColumn get abbreviation => text()();
   TextColumn get name => text()();
   TextColumn get language => text().withDefault(const Constant('en'))();
+  TextColumn get about => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -48,6 +49,7 @@ class Commentaries extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get abbreviation => text()();
   TextColumn get name => text()();
+  TextColumn get about => text().nullable()();
 }
 
 @DataClassName('CommentaryEntry')
@@ -65,6 +67,7 @@ class Dictionaries extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get abbreviation => text()();
   TextColumn get name => text()();
+  TextColumn get about => text().nullable()();
 }
 
 @DataClassName('DictionaryEntry')
@@ -84,6 +87,7 @@ class Subheadings extends Table {
   IntColumn get verse => integer()();
   IntColumn get orderIfSeveral => integer().withDefault(const Constant(0))();
   TextColumn get textContent => text()();
+  TextColumn get about => text().nullable()();
 }
 
 @DataClassName('Devotional')
@@ -91,6 +95,7 @@ class Devotionals extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get abbreviation => text()();
   TextColumn get name => text()();
+  TextColumn get about => text().nullable()();
 }
 
 @DataClassName('DevotionalEntry')

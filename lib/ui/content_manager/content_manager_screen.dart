@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/content_manager_providers.dart';
 import '../../app/content_providers.dart';
@@ -110,6 +111,41 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
       return const Center(child: Text('No content installed.'));
     }
 
+    Widget buildInstalledTrailing(String id, String name, String? about, VoidCallback onDelete) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (about != null && about.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.info_outline),
+              tooltip: 'About $name',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(name),
+                    content: SingleChildScrollView(
+                      child: Text(about),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            tooltip: 'Delete $name',
+            onPressed: onDelete,
+          ),
+        ],
+      );
+    }
+
     return ListView(
       children: [
         if (bibles.isNotEmpty) ...[
@@ -120,20 +156,16 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...bibles.map((v) => ListTile(
             title: Text(v.name),
             subtitle: Text(v.id),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              tooltip: 'Delete ${v.name}',
-              onPressed: () async {
-                await ref.read(contentStoreProvider).deleteVersion(v.id);
-                ref.invalidate(versionsProvider);
-                ref.invalidate(bibleVersionsProvider);
-                ref.invalidate(subheadingSourcesProvider);
-                ref.invalidate(installedModuleIdsProvider);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${v.name}')));
-                }
-              },
-            ),
+            trailing: buildInstalledTrailing(v.id, v.name, v.about, () async {
+              await ref.read(contentStoreProvider).deleteVersion(v.id);
+              ref.invalidate(versionsProvider);
+              ref.invalidate(bibleVersionsProvider);
+              ref.invalidate(subheadingSourcesProvider);
+              ref.invalidate(installedModuleIdsProvider);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${v.name}')));
+              }
+            }),
           )),
         ],
         if (subheadings.isNotEmpty) ...[
@@ -144,19 +176,15 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...subheadings.map((v) => ListTile(
             title: Text(v.name),
             subtitle: Text(v.id),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              tooltip: 'Delete ${v.name}',
-              onPressed: () async {
-                await ref.read(contentStoreProvider).deleteVersion(v.id);
-                ref.invalidate(versionsProvider);
-                ref.invalidate(subheadingSourcesProvider);
-                ref.invalidate(installedModuleIdsProvider);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${v.name}')));
-                }
-              },
-            ),
+            trailing: buildInstalledTrailing(v.id, v.name, v.about, () async {
+              await ref.read(contentStoreProvider).deleteVersion(v.id);
+              ref.invalidate(versionsProvider);
+              ref.invalidate(subheadingSourcesProvider);
+              ref.invalidate(installedModuleIdsProvider);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${v.name}')));
+              }
+            }),
           )),
         ],
         if (commentaries.isNotEmpty) ...[
@@ -167,18 +195,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...commentaries.map((c) => ListTile(
             title: Text(c.abbreviation),
             subtitle: const Text('Commentary'),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              tooltip: 'Delete ${c.abbreviation}',
-              onPressed: () async {
-                await ref.read(contentStoreProvider).deleteCommentary(c.id);
-                ref.invalidate(commentariesProvider);
-                ref.invalidate(installedModuleIdsProvider);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${c.abbreviation}')));
-                }
-              },
-            ),
+            trailing: buildInstalledTrailing(c.abbreviation, c.name, c.about, () async {
+              await ref.read(contentStoreProvider).deleteCommentary(c.id);
+              ref.invalidate(commentariesProvider);
+              ref.invalidate(installedModuleIdsProvider);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${c.abbreviation}')));
+              }
+            }),
           )),
         ],
         if (dictionaries.isNotEmpty) ...[
@@ -189,18 +213,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...dictionaries.map((d) => ListTile(
             title: Text(d.abbreviation),
             subtitle: const Text('Dictionary'),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              tooltip: 'Delete ${d.abbreviation}',
-              onPressed: () async {
-                await ref.read(contentStoreProvider).deleteDictionary(d.id);
-                ref.invalidate(dictionariesProvider);
-                ref.invalidate(installedModuleIdsProvider);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${d.abbreviation}')));
-                }
-              },
-            ),
+            trailing: buildInstalledTrailing(d.abbreviation, d.name, d.about, () async {
+              await ref.read(contentStoreProvider).deleteDictionary(d.id);
+              ref.invalidate(dictionariesProvider);
+              ref.invalidate(installedModuleIdsProvider);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${d.abbreviation}')));
+              }
+            }),
           )),
         ],
         if (devotionals.isNotEmpty) ...[
@@ -211,18 +231,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...devotionals.map((d) => ListTile(
             title: Text(d.name),
             subtitle: Text(d.abbreviation),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              tooltip: 'Delete ${d.abbreviation}',
-              onPressed: () async {
-                await ref.read(contentStoreProvider).deleteDevotional(d.id);
-                ref.invalidate(devotionalsProvider);
-                ref.invalidate(installedModuleIdsProvider);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${d.abbreviation}')));
-                }
-              },
-            ),
+            trailing: buildInstalledTrailing(d.abbreviation, d.name, d.about, () async {
+              await ref.read(contentStoreProvider).deleteDevotional(d.id);
+              ref.invalidate(devotionalsProvider);
+              ref.invalidate(installedModuleIdsProvider);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${d.abbreviation}')));
+              }
+            }),
           )),
         ],
       ],
@@ -269,20 +285,20 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                   final m = filtered[index];
                   final dlState = downloadStates[m.abbr];
 
-                  Widget trailing;
+                  Widget downloadWidget;
                   final isInstalled = installedIds.contains(m.abbr.toUpperCase());
 
                   if (dlState != null) {
                     if (dlState.status == 'Done') {
-                      trailing = const Icon(Icons.check, color: Colors.green);
+                      downloadWidget = const Icon(Icons.check, color: Colors.green);
                     } else if (dlState.status.startsWith('Error')) {
-                      trailing = IconButton(
+                      downloadWidget = IconButton(
                         icon: const Icon(Icons.error, color: Colors.red),
                         tooltip: dlState.status,
                         onPressed: () {},
                       );
                     } else {
-                      trailing = SizedBox(
+                      downloadWidget = SizedBox(
                         width: 100,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -298,7 +314,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                       );
                     }
                   } else if (isInstalled) {
-                    trailing = Row(
+                    downloadWidget = Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.check_circle, color: Colors.green),
@@ -314,7 +330,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                       ],
                     );
                   } else {
-                    trailing = IconButton(
+                    downloadWidget = IconButton(
                       icon: const Icon(Icons.download),
                       tooltip: 'Download',
                       onPressed: () {
@@ -324,6 +340,24 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                       },
                     );
                   }
+                  
+                  Widget trailing = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (m.infoUrl.isNotEmpty)
+                        IconButton(
+                          icon: const Icon(Icons.info_outline),
+                          tooltip: 'Info',
+                          onPressed: () async {
+                            final uri = Uri.parse(m.infoUrl);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            }
+                          },
+                        ),
+                      downloadWidget,
+                    ],
+                  );
 
                   return ListTile(
                     title: Row(
@@ -433,19 +467,19 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                     final stateKey = 'osis_${t.basename}';
                                     final dlState = downloadStates[stateKey];
 
-                                    Widget trailing;
+                                    Widget downloadWidget;
                                     final isInstalled = installedIds.contains(t.basename.toUpperCase());
 
                                     if (dlState != null) {
                                       if (dlState.status == 'Done') {
-                                        trailing = const Icon(
+                                        downloadWidget = const Icon(
                                           Icons.check,
                                           color: Colors.green,
                                         );
                                       } else if (dlState.status.startsWith(
                                         'Error',
                                       )) {
-                                        trailing = IconButton(
+                                        downloadWidget = IconButton(
                                           icon: const Icon(
                                             Icons.error,
                                             color: Colors.red,
@@ -454,7 +488,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                           onPressed: () {},
                                         );
                                       } else {
-                                        trailing = SizedBox(
+                                        downloadWidget = SizedBox(
                                           width: 100,
                                           child: Column(
                                             mainAxisAlignment:
@@ -475,7 +509,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                         );
                                       }
                                     } else if (isInstalled) {
-                                      trailing = Row(
+                                      downloadWidget = Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           const Icon(Icons.check_circle, color: Colors.green),
@@ -494,7 +528,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                         ],
                                       );
                                     } else {
-                                      trailing = IconButton(
+                                      downloadWidget = IconButton(
                                         icon: const Icon(Icons.download),
                                         tooltip: 'Download',
                                         onPressed: () {
@@ -507,6 +541,24 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                         },
                                       );
                                     }
+                                    
+                                    Widget trailing = Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (t.infoUrl.isNotEmpty)
+                                          IconButton(
+                                            icon: const Icon(Icons.info_outline),
+                                            tooltip: 'Info',
+                                            onPressed: () async {
+                                              final uri = Uri.parse(t.infoUrl);
+                                              if (await canLaunchUrl(uri)) {
+                                                await launchUrl(uri);
+                                              }
+                                            },
+                                          ),
+                                        downloadWidget,
+                                      ],
+                                    );
 
                                     return ListTile(
                                       title: Text(t.title),

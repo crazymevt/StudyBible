@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:html/parser.dart' as html_parser;
 import 'package:sqlite3/sqlite3.dart';
 import 'package:drift/drift.dart';
 import '../../data/content_store.dart';
@@ -11,6 +12,53 @@ class MyBibleImporter {
   final ContentStore store;
 
   MyBibleImporter(this.store);
+
+  String? _extractAbout(Database db) {
+    final hasInfo = db.select("SELECT name FROM sqlite_master WHERE type='table' AND name='info'").isNotEmpty;
+    if (!hasInfo) return null;
+    
+    final infoRows = db.select("SELECT name, value FROM info");
+    if (infoRows.isEmpty) return null;
+    
+    String? detailedInfo;
+    String? origin;
+    String? description;
+    
+    for (final row in infoRows) {
+      final name = row['name']?.toString() ?? '';
+      final valueRaw = row['value']?.toString() ?? '';
+      if (name.isEmpty || valueRaw.isEmpty) continue;
+      
+      final nameLower = name.toLowerCase();
+      
+      if (nameLower == 'detailed_info' || nameLower == 'origin' || nameLower == 'description') {
+        // Strip HTML using html parser
+        final document = html_parser.parse(valueRaw);
+        final value = document.body?.text ?? valueRaw.replaceAll(RegExp(r'<[^>]*>'), '');
+        
+        if (nameLower == 'detailed_info') {
+          detailedInfo = value;
+        } else if (nameLower == 'origin') {
+          origin = value;
+        } else if (nameLower == 'description') {
+          description = value;
+        }
+      }
+    }
+    
+    final buffer = StringBuffer();
+    if (detailedInfo != null) {
+      buffer.writeln('detailed_info:\n$detailedInfo\n');
+    } else if (description != null) {
+      buffer.writeln('description:\n$description\n');
+    }
+    
+    if (origin != null) {
+      buffer.writeln('origin:\n$origin\n');
+    }
+    
+    return buffer.isEmpty ? null : buffer.toString().trim();
+  }
 
   Future<void> importModuleFile(
     File sqliteFile,
@@ -55,6 +103,8 @@ class MyBibleImporter {
         }
       }
 
+      String? about = _extractAbout(db);
+
       final versionId = module.abbr.toUpperCase();
       await store.deleteVersion(versionId);
 
@@ -66,6 +116,7 @@ class MyBibleImporter {
               abbreviation: module.abbr,
               name: module.title,
               language: Value(language),
+              about: Value(about),
             ),
             mode: InsertMode.insertOrReplace,
           );
@@ -201,6 +252,8 @@ class MyBibleImporter {
     try {
       final versionId = module.abbr.toUpperCase();
       await store.deleteVersion(versionId);
+      
+      String? about = _extractAbout(db);
 
       await store
           .into(store.versions)
@@ -210,6 +263,7 @@ class MyBibleImporter {
               abbreviation: module.abbr,
               name: module.title,
               language: const Value('en'),
+              about: Value(about),
             ),
             mode: InsertMode.insertOrReplace,
           );
@@ -309,6 +363,8 @@ class MyBibleImporter {
       for (final e in existing) {
         await store.deleteCommentary(e.id);
       }
+      
+      String? about = _extractAbout(db);
 
       final commentaryId = await store
           .into(store.commentaries)
@@ -316,6 +372,7 @@ class MyBibleImporter {
             CommentariesCompanion.insert(
               abbreviation: module.abbr,
               name: module.title,
+              about: Value(about),
             ),
           );
 
@@ -371,6 +428,8 @@ class MyBibleImporter {
       for (final e in existing) {
         await store.deleteDictionary(e.id);
       }
+      
+      String? about = _extractAbout(db);
 
       final dictionaryId = await store
           .into(store.dictionaries)
@@ -378,6 +437,7 @@ class MyBibleImporter {
             DictionariesCompanion.insert(
               abbreviation: module.abbr,
               name: module.title,
+              about: Value(about),
             ),
           );
 
@@ -424,6 +484,8 @@ class MyBibleImporter {
       for (final e in existing) {
         await store.deleteDevotional(e.id);
       }
+      
+      String? about = _extractAbout(db);
 
       final devotionalId = await store
           .into(store.devotionals)
@@ -431,6 +493,7 @@ class MyBibleImporter {
             DevotionalsCompanion.insert(
               abbreviation: module.abbr,
               name: module.title,
+              about: Value(about),
             ),
           );
 

@@ -27,7 +27,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration {
@@ -77,6 +77,13 @@ class ContentStore extends _$ContentStore {
           } catch (e) {
             // Ignore
           }
+        }
+        if (from < 8) {
+          await m.addColumn(versions, versions.about);
+          await m.addColumn(commentaries, commentaries.about);
+          await m.addColumn(dictionaries, dictionaries.about);
+          await m.addColumn(subheadings, subheadings.about);
+          await m.addColumn(devotionals, devotionals.about);
         }
       },
     );

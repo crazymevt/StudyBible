@@ -49,8 +49,23 @@ class $VersionsTable extends Versions with TableInfo<$VersionsTable, Version> {
     requiredDuringInsert: false,
     defaultValue: const Constant('en'),
   );
+  static const VerificationMeta _aboutMeta = const VerificationMeta('about');
   @override
-  List<GeneratedColumn> get $columns => [id, abbreviation, name, language];
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+    'about',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    abbreviation,
+    name,
+    language,
+    about,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -93,6 +108,12 @@ class $VersionsTable extends Versions with TableInfo<$VersionsTable, Version> {
         language.isAcceptableOrUnknown(data['language']!, _languageMeta),
       );
     }
+    if (data.containsKey('about')) {
+      context.handle(
+        _aboutMeta,
+        about.isAcceptableOrUnknown(data['about']!, _aboutMeta),
+      );
+    }
     return context;
   }
 
@@ -118,6 +139,10 @@ class $VersionsTable extends Versions with TableInfo<$VersionsTable, Version> {
         DriftSqlType.string,
         data['${effectivePrefix}language'],
       )!,
+      about: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      ),
     );
   }
 
@@ -132,11 +157,13 @@ class Version extends DataClass implements Insertable<Version> {
   final String abbreviation;
   final String name;
   final String language;
+  final String? about;
   const Version({
     required this.id,
     required this.abbreviation,
     required this.name,
     required this.language,
+    this.about,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -145,6 +172,9 @@ class Version extends DataClass implements Insertable<Version> {
     map['abbreviation'] = Variable<String>(abbreviation);
     map['name'] = Variable<String>(name);
     map['language'] = Variable<String>(language);
+    if (!nullToAbsent || about != null) {
+      map['about'] = Variable<String>(about);
+    }
     return map;
   }
 
@@ -154,6 +184,9 @@ class Version extends DataClass implements Insertable<Version> {
       abbreviation: Value(abbreviation),
       name: Value(name),
       language: Value(language),
+      about: about == null && nullToAbsent
+          ? const Value.absent()
+          : Value(about),
     );
   }
 
@@ -167,6 +200,7 @@ class Version extends DataClass implements Insertable<Version> {
       abbreviation: serializer.fromJson<String>(json['abbreviation']),
       name: serializer.fromJson<String>(json['name']),
       language: serializer.fromJson<String>(json['language']),
+      about: serializer.fromJson<String?>(json['about']),
     );
   }
   @override
@@ -177,6 +211,7 @@ class Version extends DataClass implements Insertable<Version> {
       'abbreviation': serializer.toJson<String>(abbreviation),
       'name': serializer.toJson<String>(name),
       'language': serializer.toJson<String>(language),
+      'about': serializer.toJson<String?>(about),
     };
   }
 
@@ -185,11 +220,13 @@ class Version extends DataClass implements Insertable<Version> {
     String? abbreviation,
     String? name,
     String? language,
+    Value<String?> about = const Value.absent(),
   }) => Version(
     id: id ?? this.id,
     abbreviation: abbreviation ?? this.abbreviation,
     name: name ?? this.name,
     language: language ?? this.language,
+    about: about.present ? about.value : this.about,
   );
   Version copyWithCompanion(VersionsCompanion data) {
     return Version(
@@ -199,6 +236,7 @@ class Version extends DataClass implements Insertable<Version> {
           : this.abbreviation,
       name: data.name.present ? data.name.value : this.name,
       language: data.language.present ? data.language.value : this.language,
+      about: data.about.present ? data.about.value : this.about,
     );
   }
 
@@ -208,13 +246,14 @@ class Version extends DataClass implements Insertable<Version> {
           ..write('id: $id, ')
           ..write('abbreviation: $abbreviation, ')
           ..write('name: $name, ')
-          ..write('language: $language')
+          ..write('language: $language, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, abbreviation, name, language);
+  int get hashCode => Object.hash(id, abbreviation, name, language, about);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -222,7 +261,8 @@ class Version extends DataClass implements Insertable<Version> {
           other.id == this.id &&
           other.abbreviation == this.abbreviation &&
           other.name == this.name &&
-          other.language == this.language);
+          other.language == this.language &&
+          other.about == this.about);
 }
 
 class VersionsCompanion extends UpdateCompanion<Version> {
@@ -230,12 +270,14 @@ class VersionsCompanion extends UpdateCompanion<Version> {
   final Value<String> abbreviation;
   final Value<String> name;
   final Value<String> language;
+  final Value<String?> about;
   final Value<int> rowid;
   const VersionsCompanion({
     this.id = const Value.absent(),
     this.abbreviation = const Value.absent(),
     this.name = const Value.absent(),
     this.language = const Value.absent(),
+    this.about = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   VersionsCompanion.insert({
@@ -243,6 +285,7 @@ class VersionsCompanion extends UpdateCompanion<Version> {
     required String abbreviation,
     required String name,
     this.language = const Value.absent(),
+    this.about = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        abbreviation = Value(abbreviation),
@@ -252,6 +295,7 @@ class VersionsCompanion extends UpdateCompanion<Version> {
     Expression<String>? abbreviation,
     Expression<String>? name,
     Expression<String>? language,
+    Expression<String>? about,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -259,6 +303,7 @@ class VersionsCompanion extends UpdateCompanion<Version> {
       if (abbreviation != null) 'abbreviation': abbreviation,
       if (name != null) 'name': name,
       if (language != null) 'language': language,
+      if (about != null) 'about': about,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -268,6 +313,7 @@ class VersionsCompanion extends UpdateCompanion<Version> {
     Value<String>? abbreviation,
     Value<String>? name,
     Value<String>? language,
+    Value<String?>? about,
     Value<int>? rowid,
   }) {
     return VersionsCompanion(
@@ -275,6 +321,7 @@ class VersionsCompanion extends UpdateCompanion<Version> {
       abbreviation: abbreviation ?? this.abbreviation,
       name: name ?? this.name,
       language: language ?? this.language,
+      about: about ?? this.about,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -294,6 +341,9 @@ class VersionsCompanion extends UpdateCompanion<Version> {
     if (language.present) {
       map['language'] = Variable<String>(language.value);
     }
+    if (about.present) {
+      map['about'] = Variable<String>(about.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -307,6 +357,7 @@ class VersionsCompanion extends UpdateCompanion<Version> {
           ..write('abbreviation: $abbreviation, ')
           ..write('name: $name, ')
           ..write('language: $language, ')
+          ..write('about: $about, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1638,8 +1689,17 @@ class $CommentariesTable extends Commentaries
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _aboutMeta = const VerificationMeta('about');
   @override
-  List<GeneratedColumn> get $columns => [id, abbreviation, name];
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+    'about',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, abbreviation, name, about];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1674,6 +1734,12 @@ class $CommentariesTable extends Commentaries
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('about')) {
+      context.handle(
+        _aboutMeta,
+        about.isAcceptableOrUnknown(data['about']!, _aboutMeta),
+      );
+    }
     return context;
   }
 
@@ -1695,6 +1761,10 @@ class $CommentariesTable extends Commentaries
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      about: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      ),
     );
   }
 
@@ -1708,10 +1778,12 @@ class Commentary extends DataClass implements Insertable<Commentary> {
   final int id;
   final String abbreviation;
   final String name;
+  final String? about;
   const Commentary({
     required this.id,
     required this.abbreviation,
     required this.name,
+    this.about,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1719,6 +1791,9 @@ class Commentary extends DataClass implements Insertable<Commentary> {
     map['id'] = Variable<int>(id);
     map['abbreviation'] = Variable<String>(abbreviation);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || about != null) {
+      map['about'] = Variable<String>(about);
+    }
     return map;
   }
 
@@ -1727,6 +1802,9 @@ class Commentary extends DataClass implements Insertable<Commentary> {
       id: Value(id),
       abbreviation: Value(abbreviation),
       name: Value(name),
+      about: about == null && nullToAbsent
+          ? const Value.absent()
+          : Value(about),
     );
   }
 
@@ -1739,6 +1817,7 @@ class Commentary extends DataClass implements Insertable<Commentary> {
       id: serializer.fromJson<int>(json['id']),
       abbreviation: serializer.fromJson<String>(json['abbreviation']),
       name: serializer.fromJson<String>(json['name']),
+      about: serializer.fromJson<String?>(json['about']),
     );
   }
   @override
@@ -1748,15 +1827,21 @@ class Commentary extends DataClass implements Insertable<Commentary> {
       'id': serializer.toJson<int>(id),
       'abbreviation': serializer.toJson<String>(abbreviation),
       'name': serializer.toJson<String>(name),
+      'about': serializer.toJson<String?>(about),
     };
   }
 
-  Commentary copyWith({int? id, String? abbreviation, String? name}) =>
-      Commentary(
-        id: id ?? this.id,
-        abbreviation: abbreviation ?? this.abbreviation,
-        name: name ?? this.name,
-      );
+  Commentary copyWith({
+    int? id,
+    String? abbreviation,
+    String? name,
+    Value<String?> about = const Value.absent(),
+  }) => Commentary(
+    id: id ?? this.id,
+    abbreviation: abbreviation ?? this.abbreviation,
+    name: name ?? this.name,
+    about: about.present ? about.value : this.about,
+  );
   Commentary copyWithCompanion(CommentariesCompanion data) {
     return Commentary(
       id: data.id.present ? data.id.value : this.id,
@@ -1764,6 +1849,7 @@ class Commentary extends DataClass implements Insertable<Commentary> {
           ? data.abbreviation.value
           : this.abbreviation,
       name: data.name.present ? data.name.value : this.name,
+      about: data.about.present ? data.about.value : this.about,
     );
   }
 
@@ -1772,46 +1858,53 @@ class Commentary extends DataClass implements Insertable<Commentary> {
     return (StringBuffer('Commentary(')
           ..write('id: $id, ')
           ..write('abbreviation: $abbreviation, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, abbreviation, name);
+  int get hashCode => Object.hash(id, abbreviation, name, about);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Commentary &&
           other.id == this.id &&
           other.abbreviation == this.abbreviation &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.about == this.about);
 }
 
 class CommentariesCompanion extends UpdateCompanion<Commentary> {
   final Value<int> id;
   final Value<String> abbreviation;
   final Value<String> name;
+  final Value<String?> about;
   const CommentariesCompanion({
     this.id = const Value.absent(),
     this.abbreviation = const Value.absent(),
     this.name = const Value.absent(),
+    this.about = const Value.absent(),
   });
   CommentariesCompanion.insert({
     this.id = const Value.absent(),
     required String abbreviation,
     required String name,
+    this.about = const Value.absent(),
   }) : abbreviation = Value(abbreviation),
        name = Value(name);
   static Insertable<Commentary> custom({
     Expression<int>? id,
     Expression<String>? abbreviation,
     Expression<String>? name,
+    Expression<String>? about,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (abbreviation != null) 'abbreviation': abbreviation,
       if (name != null) 'name': name,
+      if (about != null) 'about': about,
     });
   }
 
@@ -1819,11 +1912,13 @@ class CommentariesCompanion extends UpdateCompanion<Commentary> {
     Value<int>? id,
     Value<String>? abbreviation,
     Value<String>? name,
+    Value<String?>? about,
   }) {
     return CommentariesCompanion(
       id: id ?? this.id,
       abbreviation: abbreviation ?? this.abbreviation,
       name: name ?? this.name,
+      about: about ?? this.about,
     );
   }
 
@@ -1839,6 +1934,9 @@ class CommentariesCompanion extends UpdateCompanion<Commentary> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (about.present) {
+      map['about'] = Variable<String>(about.value);
+    }
     return map;
   }
 
@@ -1847,7 +1945,8 @@ class CommentariesCompanion extends UpdateCompanion<Commentary> {
     return (StringBuffer('CommentariesCompanion(')
           ..write('id: $id, ')
           ..write('abbreviation: $abbreviation, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
@@ -2305,8 +2404,17 @@ class $DictionariesTable extends Dictionaries
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _aboutMeta = const VerificationMeta('about');
   @override
-  List<GeneratedColumn> get $columns => [id, abbreviation, name];
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+    'about',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, abbreviation, name, about];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2341,6 +2449,12 @@ class $DictionariesTable extends Dictionaries
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('about')) {
+      context.handle(
+        _aboutMeta,
+        about.isAcceptableOrUnknown(data['about']!, _aboutMeta),
+      );
+    }
     return context;
   }
 
@@ -2362,6 +2476,10 @@ class $DictionariesTable extends Dictionaries
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      about: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      ),
     );
   }
 
@@ -2375,10 +2493,12 @@ class Dictionary extends DataClass implements Insertable<Dictionary> {
   final int id;
   final String abbreviation;
   final String name;
+  final String? about;
   const Dictionary({
     required this.id,
     required this.abbreviation,
     required this.name,
+    this.about,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2386,6 +2506,9 @@ class Dictionary extends DataClass implements Insertable<Dictionary> {
     map['id'] = Variable<int>(id);
     map['abbreviation'] = Variable<String>(abbreviation);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || about != null) {
+      map['about'] = Variable<String>(about);
+    }
     return map;
   }
 
@@ -2394,6 +2517,9 @@ class Dictionary extends DataClass implements Insertable<Dictionary> {
       id: Value(id),
       abbreviation: Value(abbreviation),
       name: Value(name),
+      about: about == null && nullToAbsent
+          ? const Value.absent()
+          : Value(about),
     );
   }
 
@@ -2406,6 +2532,7 @@ class Dictionary extends DataClass implements Insertable<Dictionary> {
       id: serializer.fromJson<int>(json['id']),
       abbreviation: serializer.fromJson<String>(json['abbreviation']),
       name: serializer.fromJson<String>(json['name']),
+      about: serializer.fromJson<String?>(json['about']),
     );
   }
   @override
@@ -2415,15 +2542,21 @@ class Dictionary extends DataClass implements Insertable<Dictionary> {
       'id': serializer.toJson<int>(id),
       'abbreviation': serializer.toJson<String>(abbreviation),
       'name': serializer.toJson<String>(name),
+      'about': serializer.toJson<String?>(about),
     };
   }
 
-  Dictionary copyWith({int? id, String? abbreviation, String? name}) =>
-      Dictionary(
-        id: id ?? this.id,
-        abbreviation: abbreviation ?? this.abbreviation,
-        name: name ?? this.name,
-      );
+  Dictionary copyWith({
+    int? id,
+    String? abbreviation,
+    String? name,
+    Value<String?> about = const Value.absent(),
+  }) => Dictionary(
+    id: id ?? this.id,
+    abbreviation: abbreviation ?? this.abbreviation,
+    name: name ?? this.name,
+    about: about.present ? about.value : this.about,
+  );
   Dictionary copyWithCompanion(DictionariesCompanion data) {
     return Dictionary(
       id: data.id.present ? data.id.value : this.id,
@@ -2431,6 +2564,7 @@ class Dictionary extends DataClass implements Insertable<Dictionary> {
           ? data.abbreviation.value
           : this.abbreviation,
       name: data.name.present ? data.name.value : this.name,
+      about: data.about.present ? data.about.value : this.about,
     );
   }
 
@@ -2439,46 +2573,53 @@ class Dictionary extends DataClass implements Insertable<Dictionary> {
     return (StringBuffer('Dictionary(')
           ..write('id: $id, ')
           ..write('abbreviation: $abbreviation, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, abbreviation, name);
+  int get hashCode => Object.hash(id, abbreviation, name, about);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Dictionary &&
           other.id == this.id &&
           other.abbreviation == this.abbreviation &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.about == this.about);
 }
 
 class DictionariesCompanion extends UpdateCompanion<Dictionary> {
   final Value<int> id;
   final Value<String> abbreviation;
   final Value<String> name;
+  final Value<String?> about;
   const DictionariesCompanion({
     this.id = const Value.absent(),
     this.abbreviation = const Value.absent(),
     this.name = const Value.absent(),
+    this.about = const Value.absent(),
   });
   DictionariesCompanion.insert({
     this.id = const Value.absent(),
     required String abbreviation,
     required String name,
+    this.about = const Value.absent(),
   }) : abbreviation = Value(abbreviation),
        name = Value(name);
   static Insertable<Dictionary> custom({
     Expression<int>? id,
     Expression<String>? abbreviation,
     Expression<String>? name,
+    Expression<String>? about,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (abbreviation != null) 'abbreviation': abbreviation,
       if (name != null) 'name': name,
+      if (about != null) 'about': about,
     });
   }
 
@@ -2486,11 +2627,13 @@ class DictionariesCompanion extends UpdateCompanion<Dictionary> {
     Value<int>? id,
     Value<String>? abbreviation,
     Value<String>? name,
+    Value<String?>? about,
   }) {
     return DictionariesCompanion(
       id: id ?? this.id,
       abbreviation: abbreviation ?? this.abbreviation,
       name: name ?? this.name,
+      about: about ?? this.about,
     );
   }
 
@@ -2506,6 +2649,9 @@ class DictionariesCompanion extends UpdateCompanion<Dictionary> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (about.present) {
+      map['about'] = Variable<String>(about.value);
+    }
     return map;
   }
 
@@ -2514,7 +2660,8 @@ class DictionariesCompanion extends UpdateCompanion<Dictionary> {
     return (StringBuffer('DictionariesCompanion(')
           ..write('id: $id, ')
           ..write('abbreviation: $abbreviation, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
@@ -2915,6 +3062,15 @@ class $SubheadingsTable extends Subheadings
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _aboutMeta = const VerificationMeta('about');
+  @override
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+    'about',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2924,6 +3080,7 @@ class $SubheadingsTable extends Subheadings
     verse,
     orderIfSeveral,
     textContent,
+    about,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2992,6 +3149,12 @@ class $SubheadingsTable extends Subheadings
     } else if (isInserting) {
       context.missing(_textContentMeta);
     }
+    if (data.containsKey('about')) {
+      context.handle(
+        _aboutMeta,
+        about.isAcceptableOrUnknown(data['about']!, _aboutMeta),
+      );
+    }
     return context;
   }
 
@@ -3029,6 +3192,10 @@ class $SubheadingsTable extends Subheadings
         DriftSqlType.string,
         data['${effectivePrefix}text_content'],
       )!,
+      about: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      ),
     );
   }
 
@@ -3046,6 +3213,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
   final int verse;
   final int orderIfSeveral;
   final String textContent;
+  final String? about;
   const Subheading({
     required this.id,
     required this.versionId,
@@ -3054,6 +3222,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
     required this.verse,
     required this.orderIfSeveral,
     required this.textContent,
+    this.about,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3065,6 +3234,9 @@ class Subheading extends DataClass implements Insertable<Subheading> {
     map['verse'] = Variable<int>(verse);
     map['order_if_several'] = Variable<int>(orderIfSeveral);
     map['text_content'] = Variable<String>(textContent);
+    if (!nullToAbsent || about != null) {
+      map['about'] = Variable<String>(about);
+    }
     return map;
   }
 
@@ -3077,6 +3249,9 @@ class Subheading extends DataClass implements Insertable<Subheading> {
       verse: Value(verse),
       orderIfSeveral: Value(orderIfSeveral),
       textContent: Value(textContent),
+      about: about == null && nullToAbsent
+          ? const Value.absent()
+          : Value(about),
     );
   }
 
@@ -3093,6 +3268,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
       verse: serializer.fromJson<int>(json['verse']),
       orderIfSeveral: serializer.fromJson<int>(json['orderIfSeveral']),
       textContent: serializer.fromJson<String>(json['textContent']),
+      about: serializer.fromJson<String?>(json['about']),
     );
   }
   @override
@@ -3106,6 +3282,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
       'verse': serializer.toJson<int>(verse),
       'orderIfSeveral': serializer.toJson<int>(orderIfSeveral),
       'textContent': serializer.toJson<String>(textContent),
+      'about': serializer.toJson<String?>(about),
     };
   }
 
@@ -3117,6 +3294,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
     int? verse,
     int? orderIfSeveral,
     String? textContent,
+    Value<String?> about = const Value.absent(),
   }) => Subheading(
     id: id ?? this.id,
     versionId: versionId ?? this.versionId,
@@ -3125,6 +3303,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
     verse: verse ?? this.verse,
     orderIfSeveral: orderIfSeveral ?? this.orderIfSeveral,
     textContent: textContent ?? this.textContent,
+    about: about.present ? about.value : this.about,
   );
   Subheading copyWithCompanion(SubheadingsCompanion data) {
     return Subheading(
@@ -3139,6 +3318,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
       textContent: data.textContent.present
           ? data.textContent.value
           : this.textContent,
+      about: data.about.present ? data.about.value : this.about,
     );
   }
 
@@ -3151,7 +3331,8 @@ class Subheading extends DataClass implements Insertable<Subheading> {
           ..write('chapter: $chapter, ')
           ..write('verse: $verse, ')
           ..write('orderIfSeveral: $orderIfSeveral, ')
-          ..write('textContent: $textContent')
+          ..write('textContent: $textContent, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
@@ -3165,6 +3346,7 @@ class Subheading extends DataClass implements Insertable<Subheading> {
     verse,
     orderIfSeveral,
     textContent,
+    about,
   );
   @override
   bool operator ==(Object other) =>
@@ -3176,7 +3358,8 @@ class Subheading extends DataClass implements Insertable<Subheading> {
           other.chapter == this.chapter &&
           other.verse == this.verse &&
           other.orderIfSeveral == this.orderIfSeveral &&
-          other.textContent == this.textContent);
+          other.textContent == this.textContent &&
+          other.about == this.about);
 }
 
 class SubheadingsCompanion extends UpdateCompanion<Subheading> {
@@ -3187,6 +3370,7 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
   final Value<int> verse;
   final Value<int> orderIfSeveral;
   final Value<String> textContent;
+  final Value<String?> about;
   const SubheadingsCompanion({
     this.id = const Value.absent(),
     this.versionId = const Value.absent(),
@@ -3195,6 +3379,7 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
     this.verse = const Value.absent(),
     this.orderIfSeveral = const Value.absent(),
     this.textContent = const Value.absent(),
+    this.about = const Value.absent(),
   });
   SubheadingsCompanion.insert({
     this.id = const Value.absent(),
@@ -3204,6 +3389,7 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
     required int verse,
     this.orderIfSeveral = const Value.absent(),
     required String textContent,
+    this.about = const Value.absent(),
   }) : versionId = Value(versionId),
        bookOrder = Value(bookOrder),
        chapter = Value(chapter),
@@ -3217,6 +3403,7 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
     Expression<int>? verse,
     Expression<int>? orderIfSeveral,
     Expression<String>? textContent,
+    Expression<String>? about,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3226,6 +3413,7 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
       if (verse != null) 'verse': verse,
       if (orderIfSeveral != null) 'order_if_several': orderIfSeveral,
       if (textContent != null) 'text_content': textContent,
+      if (about != null) 'about': about,
     });
   }
 
@@ -3237,6 +3425,7 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
     Value<int>? verse,
     Value<int>? orderIfSeveral,
     Value<String>? textContent,
+    Value<String?>? about,
   }) {
     return SubheadingsCompanion(
       id: id ?? this.id,
@@ -3246,6 +3435,7 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
       verse: verse ?? this.verse,
       orderIfSeveral: orderIfSeveral ?? this.orderIfSeveral,
       textContent: textContent ?? this.textContent,
+      about: about ?? this.about,
     );
   }
 
@@ -3273,6 +3463,9 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
     if (textContent.present) {
       map['text_content'] = Variable<String>(textContent.value);
     }
+    if (about.present) {
+      map['about'] = Variable<String>(about.value);
+    }
     return map;
   }
 
@@ -3285,7 +3478,8 @@ class SubheadingsCompanion extends UpdateCompanion<Subheading> {
           ..write('chapter: $chapter, ')
           ..write('verse: $verse, ')
           ..write('orderIfSeveral: $orderIfSeveral, ')
-          ..write('textContent: $textContent')
+          ..write('textContent: $textContent, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
@@ -3330,8 +3524,17 @@ class $DevotionalsTable extends Devotionals
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _aboutMeta = const VerificationMeta('about');
   @override
-  List<GeneratedColumn> get $columns => [id, abbreviation, name];
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+    'about',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, abbreviation, name, about];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3366,6 +3569,12 @@ class $DevotionalsTable extends Devotionals
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('about')) {
+      context.handle(
+        _aboutMeta,
+        about.isAcceptableOrUnknown(data['about']!, _aboutMeta),
+      );
+    }
     return context;
   }
 
@@ -3387,6 +3596,10 @@ class $DevotionalsTable extends Devotionals
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      about: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      ),
     );
   }
 
@@ -3400,10 +3613,12 @@ class Devotional extends DataClass implements Insertable<Devotional> {
   final int id;
   final String abbreviation;
   final String name;
+  final String? about;
   const Devotional({
     required this.id,
     required this.abbreviation,
     required this.name,
+    this.about,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3411,6 +3626,9 @@ class Devotional extends DataClass implements Insertable<Devotional> {
     map['id'] = Variable<int>(id);
     map['abbreviation'] = Variable<String>(abbreviation);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || about != null) {
+      map['about'] = Variable<String>(about);
+    }
     return map;
   }
 
@@ -3419,6 +3637,9 @@ class Devotional extends DataClass implements Insertable<Devotional> {
       id: Value(id),
       abbreviation: Value(abbreviation),
       name: Value(name),
+      about: about == null && nullToAbsent
+          ? const Value.absent()
+          : Value(about),
     );
   }
 
@@ -3431,6 +3652,7 @@ class Devotional extends DataClass implements Insertable<Devotional> {
       id: serializer.fromJson<int>(json['id']),
       abbreviation: serializer.fromJson<String>(json['abbreviation']),
       name: serializer.fromJson<String>(json['name']),
+      about: serializer.fromJson<String?>(json['about']),
     );
   }
   @override
@@ -3440,15 +3662,21 @@ class Devotional extends DataClass implements Insertable<Devotional> {
       'id': serializer.toJson<int>(id),
       'abbreviation': serializer.toJson<String>(abbreviation),
       'name': serializer.toJson<String>(name),
+      'about': serializer.toJson<String?>(about),
     };
   }
 
-  Devotional copyWith({int? id, String? abbreviation, String? name}) =>
-      Devotional(
-        id: id ?? this.id,
-        abbreviation: abbreviation ?? this.abbreviation,
-        name: name ?? this.name,
-      );
+  Devotional copyWith({
+    int? id,
+    String? abbreviation,
+    String? name,
+    Value<String?> about = const Value.absent(),
+  }) => Devotional(
+    id: id ?? this.id,
+    abbreviation: abbreviation ?? this.abbreviation,
+    name: name ?? this.name,
+    about: about.present ? about.value : this.about,
+  );
   Devotional copyWithCompanion(DevotionalsCompanion data) {
     return Devotional(
       id: data.id.present ? data.id.value : this.id,
@@ -3456,6 +3684,7 @@ class Devotional extends DataClass implements Insertable<Devotional> {
           ? data.abbreviation.value
           : this.abbreviation,
       name: data.name.present ? data.name.value : this.name,
+      about: data.about.present ? data.about.value : this.about,
     );
   }
 
@@ -3464,46 +3693,53 @@ class Devotional extends DataClass implements Insertable<Devotional> {
     return (StringBuffer('Devotional(')
           ..write('id: $id, ')
           ..write('abbreviation: $abbreviation, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, abbreviation, name);
+  int get hashCode => Object.hash(id, abbreviation, name, about);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Devotional &&
           other.id == this.id &&
           other.abbreviation == this.abbreviation &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.about == this.about);
 }
 
 class DevotionalsCompanion extends UpdateCompanion<Devotional> {
   final Value<int> id;
   final Value<String> abbreviation;
   final Value<String> name;
+  final Value<String?> about;
   const DevotionalsCompanion({
     this.id = const Value.absent(),
     this.abbreviation = const Value.absent(),
     this.name = const Value.absent(),
+    this.about = const Value.absent(),
   });
   DevotionalsCompanion.insert({
     this.id = const Value.absent(),
     required String abbreviation,
     required String name,
+    this.about = const Value.absent(),
   }) : abbreviation = Value(abbreviation),
        name = Value(name);
   static Insertable<Devotional> custom({
     Expression<int>? id,
     Expression<String>? abbreviation,
     Expression<String>? name,
+    Expression<String>? about,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (abbreviation != null) 'abbreviation': abbreviation,
       if (name != null) 'name': name,
+      if (about != null) 'about': about,
     });
   }
 
@@ -3511,11 +3747,13 @@ class DevotionalsCompanion extends UpdateCompanion<Devotional> {
     Value<int>? id,
     Value<String>? abbreviation,
     Value<String>? name,
+    Value<String?>? about,
   }) {
     return DevotionalsCompanion(
       id: id ?? this.id,
       abbreviation: abbreviation ?? this.abbreviation,
       name: name ?? this.name,
+      about: about ?? this.about,
     );
   }
 
@@ -3531,6 +3769,9 @@ class DevotionalsCompanion extends UpdateCompanion<Devotional> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (about.present) {
+      map['about'] = Variable<String>(about.value);
+    }
     return map;
   }
 
@@ -3539,7 +3780,8 @@ class DevotionalsCompanion extends UpdateCompanion<Devotional> {
     return (StringBuffer('DevotionalsCompanion(')
           ..write('id: $id, ')
           ..write('abbreviation: $abbreviation, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('about: $about')
           ..write(')'))
         .toString();
   }
@@ -3900,6 +4142,7 @@ typedef $$VersionsTableCreateCompanionBuilder =
       required String abbreviation,
       required String name,
       Value<String> language,
+      Value<String?> about,
       Value<int> rowid,
     });
 typedef $$VersionsTableUpdateCompanionBuilder =
@@ -3908,6 +4151,7 @@ typedef $$VersionsTableUpdateCompanionBuilder =
       Value<String> abbreviation,
       Value<String> name,
       Value<String> language,
+      Value<String?> about,
       Value<int> rowid,
     });
 
@@ -3979,6 +4223,11 @@ class $$VersionsTableFilterComposer
 
   ColumnFilters<String> get language => $composableBuilder(
     column: $table.language,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get about => $composableBuilder(
+    column: $table.about,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4061,6 +4310,11 @@ class $$VersionsTableOrderingComposer
     column: $table.language,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$VersionsTableAnnotationComposer
@@ -4085,6 +4339,9 @@ class $$VersionsTableAnnotationComposer
 
   GeneratedColumn<String> get language =>
       $composableBuilder(column: $table.language, builder: (column) => column);
+
+  GeneratedColumn<String> get about =>
+      $composableBuilder(column: $table.about, builder: (column) => column);
 
   Expression<T> booksRefs<T extends Object>(
     Expression<T> Function($$BooksTableAnnotationComposer a) f,
@@ -4169,12 +4426,14 @@ class $$VersionsTableTableManager
                 Value<String> abbreviation = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> language = const Value.absent(),
+                Value<String?> about = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => VersionsCompanion(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
                 language: language,
+                about: about,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4183,12 +4442,14 @@ class $$VersionsTableTableManager
                 required String abbreviation,
                 required String name,
                 Value<String> language = const Value.absent(),
+                Value<String?> about = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => VersionsCompanion.insert(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
                 language: language,
+                about: about,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -5268,12 +5529,14 @@ typedef $$CommentariesTableCreateCompanionBuilder =
       Value<int> id,
       required String abbreviation,
       required String name,
+      Value<String?> about,
     });
 typedef $$CommentariesTableUpdateCompanionBuilder =
     CommentariesCompanion Function({
       Value<int> id,
       Value<String> abbreviation,
       Value<String> name,
+      Value<String?> about,
     });
 
 final class $$CommentariesTableReferences
@@ -5326,6 +5589,11 @@ class $$CommentariesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> commentaryEntriesRefs(
     Expression<bool> Function($$CommentaryEntriesTableFilterComposer f) f,
   ) {
@@ -5375,6 +5643,11 @@ class $$CommentariesTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CommentariesTableAnnotationComposer
@@ -5396,6 +5669,9 @@ class $$CommentariesTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get about =>
+      $composableBuilder(column: $table.about, builder: (column) => column);
 
   Expression<T> commentaryEntriesRefs<T extends Object>(
     Expression<T> Function($$CommentaryEntriesTableAnnotationComposer a) f,
@@ -5455,20 +5731,24 @@ class $$CommentariesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> abbreviation = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<String?> about = const Value.absent(),
               }) => CommentariesCompanion(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
+                about: about,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String abbreviation,
                 required String name,
+                Value<String?> about = const Value.absent(),
               }) => CommentariesCompanion.insert(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
+                about: about,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -5884,12 +6164,14 @@ typedef $$DictionariesTableCreateCompanionBuilder =
       Value<int> id,
       required String abbreviation,
       required String name,
+      Value<String?> about,
     });
 typedef $$DictionariesTableUpdateCompanionBuilder =
     DictionariesCompanion Function({
       Value<int> id,
       Value<String> abbreviation,
       Value<String> name,
+      Value<String?> about,
     });
 
 final class $$DictionariesTableReferences
@@ -5942,6 +6224,11 @@ class $$DictionariesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> dictionaryEntriesRefs(
     Expression<bool> Function($$DictionaryEntriesTableFilterComposer f) f,
   ) {
@@ -5991,6 +6278,11 @@ class $$DictionariesTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$DictionariesTableAnnotationComposer
@@ -6012,6 +6304,9 @@ class $$DictionariesTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get about =>
+      $composableBuilder(column: $table.about, builder: (column) => column);
 
   Expression<T> dictionaryEntriesRefs<T extends Object>(
     Expression<T> Function($$DictionaryEntriesTableAnnotationComposer a) f,
@@ -6071,20 +6366,24 @@ class $$DictionariesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> abbreviation = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<String?> about = const Value.absent(),
               }) => DictionariesCompanion(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
+                about: about,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String abbreviation,
                 required String name,
+                Value<String?> about = const Value.absent(),
               }) => DictionariesCompanion.insert(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
+                about: about,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -6466,6 +6765,7 @@ typedef $$SubheadingsTableCreateCompanionBuilder =
       required int verse,
       Value<int> orderIfSeveral,
       required String textContent,
+      Value<String?> about,
     });
 typedef $$SubheadingsTableUpdateCompanionBuilder =
     SubheadingsCompanion Function({
@@ -6476,6 +6776,7 @@ typedef $$SubheadingsTableUpdateCompanionBuilder =
       Value<int> verse,
       Value<int> orderIfSeveral,
       Value<String> textContent,
+      Value<String?> about,
     });
 
 final class $$SubheadingsTableReferences
@@ -6536,6 +6837,11 @@ class $$SubheadingsTableFilterComposer
 
   ColumnFilters<String> get textContent => $composableBuilder(
     column: $table.textContent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get about => $composableBuilder(
+    column: $table.about,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6602,6 +6908,11 @@ class $$SubheadingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$VersionsTableOrderingComposer get versionId {
     final $$VersionsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -6656,6 +6967,9 @@ class $$SubheadingsTableAnnotationComposer
     column: $table.textContent,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get about =>
+      $composableBuilder(column: $table.about, builder: (column) => column);
 
   $$VersionsTableAnnotationComposer get versionId {
     final $$VersionsTableAnnotationComposer composer = $composerBuilder(
@@ -6716,6 +7030,7 @@ class $$SubheadingsTableTableManager
                 Value<int> verse = const Value.absent(),
                 Value<int> orderIfSeveral = const Value.absent(),
                 Value<String> textContent = const Value.absent(),
+                Value<String?> about = const Value.absent(),
               }) => SubheadingsCompanion(
                 id: id,
                 versionId: versionId,
@@ -6724,6 +7039,7 @@ class $$SubheadingsTableTableManager
                 verse: verse,
                 orderIfSeveral: orderIfSeveral,
                 textContent: textContent,
+                about: about,
               ),
           createCompanionCallback:
               ({
@@ -6734,6 +7050,7 @@ class $$SubheadingsTableTableManager
                 required int verse,
                 Value<int> orderIfSeveral = const Value.absent(),
                 required String textContent,
+                Value<String?> about = const Value.absent(),
               }) => SubheadingsCompanion.insert(
                 id: id,
                 versionId: versionId,
@@ -6742,6 +7059,7 @@ class $$SubheadingsTableTableManager
                 verse: verse,
                 orderIfSeveral: orderIfSeveral,
                 textContent: textContent,
+                about: about,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -6815,12 +7133,14 @@ typedef $$DevotionalsTableCreateCompanionBuilder =
       Value<int> id,
       required String abbreviation,
       required String name,
+      Value<String?> about,
     });
 typedef $$DevotionalsTableUpdateCompanionBuilder =
     DevotionalsCompanion Function({
       Value<int> id,
       Value<String> abbreviation,
       Value<String> name,
+      Value<String?> about,
     });
 
 final class $$DevotionalsTableReferences
@@ -6873,6 +7193,11 @@ class $$DevotionalsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> devotionalEntriesRefs(
     Expression<bool> Function($$DevotionalEntriesTableFilterComposer f) f,
   ) {
@@ -6922,6 +7247,11 @@ class $$DevotionalsTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get about => $composableBuilder(
+    column: $table.about,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$DevotionalsTableAnnotationComposer
@@ -6943,6 +7273,9 @@ class $$DevotionalsTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get about =>
+      $composableBuilder(column: $table.about, builder: (column) => column);
 
   Expression<T> devotionalEntriesRefs<T extends Object>(
     Expression<T> Function($$DevotionalEntriesTableAnnotationComposer a) f,
@@ -7002,20 +7335,24 @@ class $$DevotionalsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> abbreviation = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<String?> about = const Value.absent(),
               }) => DevotionalsCompanion(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
+                about: about,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String abbreviation,
                 required String name,
+                Value<String?> about = const Value.absent(),
               }) => DevotionalsCompanion.insert(
                 id: id,
                 abbreviation: abbreviation,
                 name: name,
+                about: about,
               ),
           withReferenceMapper: (p0) => p0
               .map(

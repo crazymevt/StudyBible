@@ -10,6 +10,7 @@ class Ph4Module {
   final String abbr;
   final String title;
   final String author;
+  final String infoUrl;
   final bool isPartial;
   final ModuleType type;
 
@@ -18,6 +19,7 @@ class Ph4Module {
     required this.abbr,
     required this.title,
     required this.author,
+    required this.infoUrl,
     required this.isPartial,
     required this.type,
   });
@@ -34,6 +36,7 @@ class OsisTranslation {
   final String name;
   final String title;
   final String downloadUrl;
+  final String infoUrl;
   final int size;
   final String basename;
 
@@ -41,6 +44,7 @@ class OsisTranslation {
     required this.name,
     required this.title,
     required this.downloadUrl,
+    required this.infoUrl,
     required this.size,
     required this.basename,
   });
@@ -124,6 +128,8 @@ class ContentManagerApi {
           final fullUrl = url.startsWith('http')
               ? url
               : 'https://www.ph4.org/$url';
+          
+          final infoUrl = 'https://www.ph4.org/b4_1.php?l=en';
 
           final lowerAbbr = abbr.toLowerCase();
           ModuleType type = ModuleType.bible;
@@ -147,6 +153,7 @@ class ContentManagerApi {
               abbr: abbr,
               title: title,
               author: author,
+              infoUrl: infoUrl,
               isPartial: isPartial,
               type: type,
             ),
@@ -214,6 +221,7 @@ class ContentManagerApi {
               name: name,
               title: title,
               downloadUrl: item['download_url'] as String,
+              infoUrl: item['html_url'] as String,
               size: item['size'] as int,
               basename: _osisEdnBasename(name),
             ),
