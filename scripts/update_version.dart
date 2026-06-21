@@ -10,10 +10,21 @@ void main() async {
     commitsStr += '${line!}\n';
   }
   
+  // Commit prefixes that are internal-only and must never appear in the
+  // user-facing changelog (releases, tooling, tests, documentation, etc.).
+  // Matched as a real prefix (followed by ':' or a space) so words like
+  // "develop" or "document" aren't accidentally filtered.
+  const hiddenPrefixes = ['chore', 'dev', 'doc', 'docs'];
+  bool isHidden(String commit) {
+    final lower = commit.toLowerCase();
+    return hiddenPrefixes
+        .any((p) => lower.startsWith('$p:') || lower.startsWith('$p '));
+  }
+
   final List<String> commits = commitsStr
       .split('\n')
       .map((s) => s.trim())
-      .where((s) => s.isNotEmpty && !s.toLowerCase().startsWith('chore')) // filter out chore commits like releases
+      .where((s) => s.isNotEmpty && !isHidden(s))
       .toList();
 
   final now = DateTime.now();

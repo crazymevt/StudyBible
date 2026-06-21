@@ -19,14 +19,24 @@ We use specific prefixes in our commit messages. Our automated release script (`
   - *Changelog Category:* **Bugfixes**
 
 - `update:`, `refactor:`, `perf:`
-  - Use this for general improvements, UI tweaks, performance enhancements, or code refactoring that aren't strictly new features or bug fixes.
+  - Use this for **user-noticeable** general improvements, UI tweaks, performance enhancements, or refactors that aren't strictly new features or bug fixes.
+  - For purely internal refactors with no user impact, prefer `dev:` so they stay out of the changelog.
   - *Example:* `update: Reorganize settings screen layout`
   - *Changelog Category:* **Updates**
 
+The following prefixes are for changes with **no user-facing impact**. They are intentionally filtered out and will *not* appear in the public changelog:
+
 - `chore:`
-  - Use this for routine tasks, script updates, or release bumps. 
-  - **Note:** Commits prefixed with `chore:` are intentionally filtered out and will *not* appear in the public changelog.
+  - Use this for routine tasks, dependency bumps, or release bumps.
   - *Example:* `chore: Release version 26.6.20+1`
+
+- `dev:`
+  - Use this for developer-facing changes that don't affect the shipped app behavior: tests, CI, build tooling, and internal refactors not worth surfacing to users.
+  - *Example:* `dev: Add unit tests for the verse parser`
+
+- `doc:`
+  - Use this for documentation-only changes (README, DESIGN, CONTRIBUTING, code comments). `docs:` is also accepted.
+  - *Example:* `doc: Clarify the sync architecture in DESIGN.md`
 
 ## Release Process
 
