@@ -50,3 +50,6 @@ app.*.map.json
 
 # Scratch files
 scratch/
+
+# Generated analyzer output
+analyze.txt
