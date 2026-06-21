@@ -11,6 +11,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../whats_new_dialog.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 import 'acknowledgments_screen.dart';
@@ -66,6 +67,79 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() {
       _initDraftState();
     });
+  }
+
+  Future<void> _exportTheme() async {
+    final Map<String, int?> themeData = {
+      'lightSeed': draftLightSeed,
+      'lightSurface': draftLightSurface,
+      'lightText': draftLightText,
+      'lightJesus': draftLightJesus,
+      'lightAppBar': draftLightAppBar,
+      'darkSeed': draftDarkSeed,
+      'darkSurface': draftDarkSurface,
+      'darkText': draftDarkText,
+      'darkJesus': draftDarkJesus,
+      'darkAppBar': draftDarkAppBar,
+    };
+    final jsonStr = jsonEncode(themeData);
+    
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Export Theme',
+      fileName: 'custom_theme.json',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    
+    if (outputFile != null) {
+      await File(outputFile).writeAsString(jsonStr);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Theme exported successfully.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _importTheme() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Import Theme',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    
+    if (result != null && result.files.single.path != null) {
+      try {
+        final file = File(result.files.single.path!);
+        final jsonStr = await file.readAsString();
+        final Map<String, dynamic> themeData = jsonDecode(jsonStr);
+        
+        setState(() {
+          draftLightSeed = themeData['lightSeed'] as int?;
+          draftLightSurface = themeData['lightSurface'] as int?;
+          draftLightText = themeData['lightText'] as int?;
+          draftLightJesus = themeData['lightJesus'] as int?;
+          draftLightAppBar = themeData['lightAppBar'] as int?;
+          draftDarkSeed = themeData['darkSeed'] as int?;
+          draftDarkSurface = themeData['darkSurface'] as int?;
+          draftDarkText = themeData['darkText'] as int?;
+          draftDarkJesus = themeData['darkJesus'] as int?;
+          draftDarkAppBar = themeData['darkAppBar'] as int?;
+        });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Theme imported to draft! Click Apply to save.')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to import theme. Invalid format.')),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -337,21 +411,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextButton(
-                          onPressed: _revertDraftState,
-                          child: const Text('Revert'),
+                        Row(
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: _importTheme,
+                              icon: const Icon(Icons.upload, size: 16),
+                              label: const Text('Import'),
+                            ),
+                            const SizedBox(width: 8),
+                            OutlinedButton.icon(
+                              onPressed: _exportTheme,
+                              icon: const Icon(Icons.download, size: 16),
+                              label: const Text('Export'),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            _applyDraftState();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Custom theme applied!')),
-                            );
-                          },
-                          child: const Text('Apply Theme'),
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: _revertDraftState,
+                              child: const Text('Revert'),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                _applyDraftState();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Custom theme applied!')),
+                                );
+                              },
+                              child: const Text('Apply Theme'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
