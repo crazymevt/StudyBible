@@ -53,6 +53,16 @@ class AcknowledgmentsScreen extends StatelessWidget {
             url: 'https://www.jesusfilm.org/',
           ),
           _buildCredit(
+            title: 'OpenBible.info',
+            subtitle: 'Crowdsourced cross-reference dataset (CC-BY).',
+            url: 'https://www.openbible.info/',
+          ),
+          _buildCredit(
+            title: 'Berean Study Bible',
+            subtitle: 'Public domain Bible text and audio resources.',
+            url: 'https://berean.bible/',
+          ),
+          _buildCredit(
             title: 'Clojure/JavaFX Study Bible',
             subtitle: 'The original desktop application that inspired this project.',
             url: null, // No URL known for this

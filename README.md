@@ -40,6 +40,11 @@ This project is made possible thanks to several upstream resources and formats:
 - **[ph4.org](https://ph4.org/)**: For providing the extensive catalog of Bible modules, commentaries, and dictionaries.
 - **[MyBible](https://mybible.zone/)**: For their excellent SQLite-based module format which this app imports and utilizes.
 - **OSIS (Open Scriptural Information Standard)**: For the standard XML schema used in representing scriptural texts.
+- **[BibleProject](https://bibleproject.com/)**: Incredible animated videos and resources for exploring the Bible.
+- **[Lumo Project](https://lumoproject.com/)**: Visual translations of the four Gospels.
+- **[Jesus Film Project](https://www.jesusfilm.org/)**: Sharing the story of Jesus through film.
+- **[OpenBible.info](https://www.openbible.info/)**: Crowdsourced cross-reference dataset (licensed under CC-BY).
+- **[Berean Study Bible](https://berean.bible/)**: Public domain Bible text and audio resources.
 - **Clojure/JavaFX Study Bible**: The original desktop application that inspired and provided the feature foundation for this Flutter reimplementation.
 
 ## Getting Started
