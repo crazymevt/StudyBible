@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,43 +26,67 @@ class AppScrollBehavior extends MaterialScrollBehavior {
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  // Run the whole app inside a guarded zone so uncaught async errors (and the
+  // async startup work below, which runs before any Flutter error handler is
+  // installed) are reported rather than silently lost.
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
-    await windowManager.ensureInitialized();
-  }
+    // Errors caught by the Flutter framework (build/layout/paint, gestures).
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      _reportError(details.exception, details.stack, context: 'FlutterError');
+    };
 
-  final prefs = await SharedPreferences.getInstance();
+    if (!kIsWeb &&
+        (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
+      await windowManager.ensureInitialized();
+    }
 
-  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
-    final width = prefs.getDouble('window_width') ?? 1200;
-    final height = prefs.getDouble('window_height') ?? 800;
-    final x = prefs.getDouble('window_x');
-    final y = prefs.getDouble('window_y');
+    final prefs = await SharedPreferences.getInstance();
 
-    WindowOptions windowOptions = WindowOptions(
-      size: Size(width, height),
-      center: x == null || y == null,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.normal,
+    if (!kIsWeb &&
+        (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
+      final width = prefs.getDouble('window_width') ?? 1200;
+      final height = prefs.getDouble('window_height') ?? 800;
+      final x = prefs.getDouble('window_x');
+      final y = prefs.getDouble('window_y');
+
+      WindowOptions windowOptions = WindowOptions(
+        size: Size(width, height),
+        center: x == null || y == null,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.normal,
+      );
+
+      await windowManager.waitUntilReadyToShow(windowOptions, () async {
+        if (x != null && y != null) {
+          await windowManager.setPosition(Offset(x, y));
+        }
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    }
+
+    runApp(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: const StudyBibleApp(),
+      ),
     );
+  }, (Object error, StackTrace stack) {
+    _reportError(error, stack, context: 'Uncaught');
+  });
+}
 
-    await windowManager.waitUntilReadyToShow(windowOptions, () async {
-      if (x != null && y != null) {
-        await windowManager.setPosition(Offset(x, y));
-      }
-      await windowManager.show();
-      await windowManager.focus();
-    });
+/// Central place to record uncaught and framework errors. Currently logs to the
+/// console; this is the single hook to wire in a crash-reporting service later.
+void _reportError(Object error, StackTrace? stack, {required String context}) {
+  debugPrint('[$context] $error');
+  if (stack != null) {
+    debugPrint(stack.toString());
   }
-
-  runApp(
-    ProviderScope(
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-      child: const StudyBibleApp(),
-    ),
-  );
 }
 
 class StudyBibleApp extends ConsumerStatefulWidget {
