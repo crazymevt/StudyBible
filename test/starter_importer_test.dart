@@ -7,6 +7,13 @@ import 'package:drift/native.dart';
 import 'package:study_bible/data/content_store.dart';
 
 void main() {
+  // This is a seed-data generator, not an assertion test: it (re)creates the
+  // local sample `assets/content.db` used during development. It is skipped in
+  // the normal suite (and CI) because it has filesystem side effects and would
+  // overwrite a developer's content.db. Run it on demand with:
+  //   STUDYBIBLE_GEN_DB=1 flutter test test/starter_importer_test.dart
+  final generateDb = Platform.environment['STUDYBIBLE_GEN_DB'] == '1';
+
   test('Generate sample DB', () async {
     final dbFile = File('assets/content.db');
     if (dbFile.existsSync()) {
@@ -246,7 +253,7 @@ void main() {
 
     // Setup FTS5 for Content Search
     await db.customStatement('''
-      CREATE VIRTUAL TABLE content_search USING fts5(type UNINDEXED, reference_id UNINDEXED, text_content);
+      CREATE VIRTUAL TABLE IF NOT EXISTS content_search USING fts5(type UNINDEXED, reference_id UNINDEXED, text_content);
     ''');
     await db.customStatement('''
       INSERT INTO content_search(type, reference_id, text_content) SELECT 'verse', id, text_content FROM verses;
@@ -260,5 +267,5 @@ void main() {
 
     await db.close();
     print("✅ Generated sample assets/content.db");
-  });
+  }, skip: generateDb ? false : 'Seed-DB generator; run with STUDYBIBLE_GEN_DB=1');
 }

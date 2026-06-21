@@ -11,5 +11,9 @@ void main() {
         ),
       ),
     );
-  });
+  },
+      // WebPlayerDialog embeds a webview_flutter WebViewWidget, whose platform
+      // implementation is not registered in the headless flutter_test VM. This
+      // needs an integration_test (real device/emulator) to run.
+      skip: true);
 }
