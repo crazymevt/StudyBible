@@ -2,29 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/reader_state.dart';
 import '../../app/app_state.dart';
+import '../../app/achievement_service.dart';
 
 class ReadingProgressDialog extends ConsumerWidget {
   final Map<String, List<int>> coverage;
 
   const ReadingProgressDialog({super.key, required this.coverage});
 
-  // Example list of books for demonstration. In a full app, this comes from content_providers.
-  static const _books = [
-    'Genesis',
-    'Exodus',
-    'Leviticus',
-    'Numbers',
-    'Deuteronomy',
-    'Joshua',
-    'Judges',
-    'Ruth',
-    'Matthew',
-    'Mark',
-    'Luke',
-    'John',
-    'Acts',
-    'Romans',
-  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,9 +37,9 @@ class ReadingProgressDialog extends ConsumerWidget {
             const Divider(height: 1),
             Expanded(
               child: ListView.builder(
-                itemCount: _books.length,
+                itemCount: bibleChapters.length,
                 itemBuilder: (context, index) {
-                  final book = _books[index];
+                  final book = bibleChapters.keys.elementAt(index);
                   final readChapters = coverage[book] ?? [];
 
                   return ExpansionTile(
@@ -65,8 +49,7 @@ class ReadingProgressDialog extends ConsumerWidget {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: List.generate(10, (idx) {
-                          // Mocking 10 chapters per book for now
+                        children: List.generate(bibleChapters[book]!, (idx) {
                           final chapter = idx + 1;
                           final isRead = readChapters.contains(chapter);
                           return InkWell(

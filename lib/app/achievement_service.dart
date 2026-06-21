@@ -117,7 +117,7 @@ class AchievementService {
         } else {
           booksCompletedCount++;
           // Check if finished in a single day
-          if (!bookInADay && _bookChapters[book]! >= 3) {
+          if (!bookInADay && bibleChapters[book]! >= 3) {
             if (_checkBookFinishedInOneDay(book, readingProgress)) {
               bookInADay = true;
             }
@@ -277,7 +277,7 @@ class AchievementService {
 
   bool _checkBookFinishedInOneDay(String bookName, List<ReadingProgress> progress) {
     final chapters = progress.where((r) => r.bookName == bookName && r.iteration == 1).toList();
-    if (chapters.length < _bookChapters[bookName]!) return false;
+    if (chapters.length < bibleChapters[bookName]!) return false;
     
     final days = chapters.map((r) {
       final d = DateTime.fromMillisecondsSinceEpoch(r.readAt).toLocal();
@@ -288,7 +288,7 @@ class AchievementService {
   }
 
   bool checkBookFinished(String bookName, Set<String> readSet) {
-    final count = _bookChapters[bookName];
+    final count = bibleChapters[bookName];
     if (count == null) return false;
     for (int i = 1; i <= count; i++) {
       if (!readSet.contains('$bookName|$i')) return false;
@@ -308,7 +308,7 @@ const _pauline = ['Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephe
 const _generalEpistles = ['Hebrews', 'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude'];
 const _prophecyNt = ['Revelation'];
 
-const _bookChapters = {
+const bibleChapters = {
   'Genesis': 50,
   'Exodus': 40,
   'Leviticus': 27,
