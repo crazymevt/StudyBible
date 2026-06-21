@@ -23,6 +23,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Check domain layer purity
+        run: bash tool/lint_domain.sh
+
       - name: Analyze
         run: flutter analyze
 
