@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.21+4",
+    "date": "2026-06-21",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "remove obsolete sqlite3_flutter_libs dependency breaking FTS5 vocab on Android",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.21+3",
     "date": "2026-06-21",
     "features": [
