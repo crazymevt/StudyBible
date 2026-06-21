@@ -57,3 +57,15 @@ This project is made possible thanks to several upstream resources and formats:
    ```bash
    flutter run
    ```
+
+
+
+## ❤️ Support
+
+This is a free app, built as a labor of love. If it's been a blessing to your study and you'd like to support its continued development, you can leave a gift on Ko-fi:
+
+**[☕ Support on Ko-fi → ko-fi.com/jessiehughart](https://ko-fi.com/jessiehughart)**
+
+Every gift is appreciated and helps keep the project going. Thank you!
+
+---
