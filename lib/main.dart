@@ -124,6 +124,19 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
     final themeMode = ref.watch(themeModeProvider);
     final appColorTheme = ref.watch(appColorThemeProvider);
 
+    final lightTextColor = ref.watch(customLightTextColorProvider);
+    final darkTextColor = ref.watch(customDarkTextColorProvider);
+    final lightJesusWordsColor = ref.watch(customLightJesusWordsColorProvider);
+    final darkJesusWordsColor = ref.watch(customDarkJesusWordsColorProvider);
+    
+    final lightSeedColor = ref.watch(customLightSeedColorProvider);
+    final darkSeedColor = ref.watch(customDarkSeedColorProvider);
+    final lightSurfaceColor = ref.watch(customLightSurfaceColorProvider);
+    final darkSurfaceColor = ref.watch(customDarkSurfaceColorProvider);
+    
+    final lightAppBarColor = ref.watch(customLightAppBarColorProvider);
+    final darkAppBarColor = ref.watch(customDarkAppBarColorProvider);
+
     return MaterialApp(
       title: 'Study Bible',
       debugShowCheckedModeBanner: false,
@@ -133,12 +146,22 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
         themeScheme: appColorTheme,
         fontFamily: fontFamily,
         fontSizeDelta: fontSizeDelta,
+        customTextColor: lightTextColor != null ? Color(lightTextColor) : null,
+        customJesusWordsColor: lightJesusWordsColor != null ? Color(lightJesusWordsColor) : null,
+        customSeedColor: lightSeedColor != null ? Color(lightSeedColor) : null,
+        customSurfaceColor: lightSurfaceColor != null ? Color(lightSurfaceColor) : null,
+        customAppBarColor: lightAppBarColor != null ? Color(lightAppBarColor) : null,
       ),
       darkTheme: AppThemes.buildTheme(
         brightness: Brightness.dark,
         themeScheme: appColorTheme,
         fontFamily: fontFamily,
         fontSizeDelta: fontSizeDelta,
+        customTextColor: darkTextColor != null ? Color(darkTextColor) : null,
+        customJesusWordsColor: darkJesusWordsColor != null ? Color(darkJesusWordsColor) : null,
+        customSeedColor: darkSeedColor != null ? Color(darkSeedColor) : null,
+        customSurfaceColor: darkSurfaceColor != null ? Color(darkSurfaceColor) : null,
+        customAppBarColor: darkAppBarColor != null ? Color(darkAppBarColor) : null,
       ),
       themeMode: themeMode,
       scrollBehavior: AppScrollBehavior(),

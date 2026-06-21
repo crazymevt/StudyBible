@@ -5,6 +5,7 @@ import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 import '../../app/app_state.dart';
 import '../../domain/importer/mybible_verse_parser.dart';
+import '../../theme/app_themes.dart';
 
 class ComparePanel extends ConsumerWidget {
   const ComparePanel({super.key});
@@ -183,7 +184,8 @@ class _CompareResultCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final jesusWordsColor = isDark ? Colors.red.shade300 : Colors.red.shade700;
+    final customColors = Theme.of(context).extension<CustomAppColors>();
+    final jesusWordsColor = customColors?.jesusWordsColor ?? (isDark ? Colors.red.shade300 : Colors.red.shade700);
     final parser = MyBibleVerseParser();
     
     // Build text spans for the verses

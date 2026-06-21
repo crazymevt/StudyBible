@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../data/content_store.dart';
+import '../../theme/app_themes.dart';
 import '../../data/models/verse_segment.dart';
 
 List<InlineSpan> buildVerseSpans({
@@ -20,7 +21,8 @@ List<InlineSpan> buildVerseSpans({
 }) {
   final spans = <InlineSpan>[];
   final isDark = Theme.of(context).brightness == Brightness.dark;
-  final jesusWordsColor = isDark ? Colors.red.shade300 : Colors.red.shade700;
+  final customColors = Theme.of(context).extension<CustomAppColors>();
+  final jesusWordsColor = customColors?.jesusWordsColor ?? (isDark ? Colors.red.shade300 : Colors.red.shade700);
   final bodyStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
     height: 1.8,
     backgroundColor: bgColor,

@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/sync_service.dart';
+import '../../theme/app_themes.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../whats_new_dialog.dart';
 import 'dart:io';
@@ -13,11 +15,65 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 import 'acknowledgments_screen.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  int? draftLightSeed;
+  int? draftLightSurface;
+  int? draftLightText;
+  int? draftLightJesus;
+  int? draftLightAppBar;
+  int? draftDarkSeed;
+  int? draftDarkSurface;
+  int? draftDarkText;
+  int? draftDarkJesus;
+  int? draftDarkAppBar;
+  bool _isDraftInitialized = false;
+
+  void _initDraftState() {
+    draftLightSeed = ref.read(customLightSeedColorProvider);
+    draftLightSurface = ref.read(customLightSurfaceColorProvider);
+    draftLightText = ref.read(customLightTextColorProvider);
+    draftLightJesus = ref.read(customLightJesusWordsColorProvider);
+    draftLightAppBar = ref.read(customLightAppBarColorProvider);
+    draftDarkSeed = ref.read(customDarkSeedColorProvider);
+    draftDarkSurface = ref.read(customDarkSurfaceColorProvider);
+    draftDarkText = ref.read(customDarkTextColorProvider);
+    draftDarkJesus = ref.read(customDarkJesusWordsColorProvider);
+    draftDarkAppBar = ref.read(customDarkAppBarColorProvider);
+    _isDraftInitialized = true;
+  }
+
+  void _applyDraftState() {
+    ref.read(customLightSeedColorProvider.notifier).setColor(draftLightSeed);
+    ref.read(customLightSurfaceColorProvider.notifier).setColor(draftLightSurface);
+    ref.read(customLightTextColorProvider.notifier).setColor(draftLightText);
+    ref.read(customLightJesusWordsColorProvider.notifier).setColor(draftLightJesus);
+    ref.read(customLightAppBarColorProvider.notifier).setColor(draftLightAppBar);
+    ref.read(customDarkSeedColorProvider.notifier).setColor(draftDarkSeed);
+    ref.read(customDarkSurfaceColorProvider.notifier).setColor(draftDarkSurface);
+    ref.read(customDarkTextColorProvider.notifier).setColor(draftDarkText);
+    ref.read(customDarkJesusWordsColorProvider.notifier).setColor(draftDarkJesus);
+    ref.read(customDarkAppBarColorProvider.notifier).setColor(draftDarkAppBar);
+  }
+
+  void _revertDraftState() {
+    setState(() {
+      _initDraftState();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isDraftInitialized) {
+      _initDraftState();
+    }
+
     final showDashboardOnStart = ref.watch(showDashboardOnStartProvider);
     final fontFamily = ref.watch(appFontFamilyProvider);
     final fontSizeDelta = ref.watch(appFontSizeDeltaProvider);
@@ -34,11 +90,11 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16.0),
         children: [
           // ── General ──
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'General',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
             ),
           ),
           SwitchListTile(
@@ -77,11 +133,11 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
 
           // ── Theme ──
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Theme',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
             ),
           ),
           ListTile(
@@ -143,14 +199,174 @@ class SettingsScreen extends ConsumerWidget {
               value: 'ocean',
               title: 'Ocean',
               subtitle: 'Deep sea blue and sky accent'),
+          _buildColorThemeOption(context, ref, appColorTheme,
+              value: 'custom',
+              title: 'Custom',
+              subtitle: 'Build your own fully custom theme'),
+          if (appColorTheme == 'custom')
+            Padding(
+              padding: const EdgeInsets.only(left: 32.0, right: 16.0, bottom: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildThemePreview(
+                    context, 
+                    lightSeed: draftLightSeed, lightSurface: draftLightSurface, lightText: draftLightText, lightJesus: draftLightJesus, lightAppBar: draftLightAppBar,
+                    darkSeed: draftDarkSeed, darkSurface: draftDarkSurface, darkText: draftDarkText, darkJesus: draftDarkJesus, darkAppBar: draftDarkAppBar,
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'App Bar (Light)',
+                    subtitle: 'Default is light purple',
+                    currentColor: draftLightAppBar,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftLightAppBar = c?.toARGB32(); }
+                        catch (e) { draftLightAppBar = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Primary Accent (Light)',
+                    subtitle: 'Default is purple',
+                    currentColor: draftLightSeed,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftLightSeed = c?.toARGB32(); }
+                        catch (e) { draftLightSeed = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Background (Light)',
+                    subtitle: 'Default is light gray',
+                    currentColor: draftLightSurface,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftLightSurface = c?.toARGB32(); }
+                        catch (e) { draftLightSurface = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Text Color (Light)',
+                    subtitle: 'Default is black',
+                    currentColor: draftLightText,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftLightText = c?.toARGB32(); }
+                        catch (e) { draftLightText = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Jesus Words (Light)',
+                    subtitle: 'Default is red',
+                    currentColor: draftLightJesus,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftLightJesus = c?.toARGB32(); }
+                        catch (e) { draftLightJesus = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'App Bar (Dark)',
+                    subtitle: 'Default is deep purple',
+                    currentColor: draftDarkAppBar,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftDarkAppBar = c?.toARGB32(); }
+                        catch (e) { draftDarkAppBar = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Primary Accent (Dark)',
+                    subtitle: 'Default is purple',
+                    currentColor: draftDarkSeed,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftDarkSeed = c?.toARGB32(); }
+                        catch (e) { draftDarkSeed = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Background (Dark)',
+                    subtitle: 'Default is very dark blue',
+                    currentColor: draftDarkSurface,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftDarkSurface = c?.toARGB32(); }
+                        catch (e) { draftDarkSurface = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Text Color (Dark)',
+                    subtitle: 'Default is light gray',
+                    currentColor: draftDarkText,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftDarkText = c?.toARGB32(); }
+                        catch (e) { draftDarkText = c?.value; }
+                      });
+                    },
+                  ),
+                  _buildColorPickerTile(
+                    context,
+                    title: 'Jesus Words (Dark)',
+                    subtitle: 'Default is light red',
+                    currentColor: draftDarkJesus,
+                    onColorChanged: (c) {
+                      setState(() {
+                        try { draftDarkJesus = c?.toARGB32(); }
+                        catch (e) { draftDarkJesus = c?.value; }
+                      });
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: _revertDraftState,
+                          child: const Text('Revert'),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            _applyDraftState();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Custom theme applied!')),
+                            );
+                          },
+                          child: const Text('Apply Theme'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           const Divider(),
 
           // ── Appearance ──
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Reader',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
             ),
           ),
           ListTile(
@@ -280,23 +496,25 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(),
 
+
+
           // ── Sync ──
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Sync',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
             ),
           ),
           _buildSyncFolderSelector(context, ref),
           const Divider(),
 
           // ── Support ──
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Support',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
             ),
           ),
           ListTile(
@@ -423,6 +641,213 @@ class SettingsScreen extends ConsumerWidget {
         if (val != null) {
           ref.read(appColorThemeProvider.notifier).setTheme(val);
         }
+      },
+    );
+  }
+
+  Widget _buildThemePreview(
+    BuildContext context, {
+    required int? lightSeed, required int? lightSurface, required int? lightText, required int? lightJesus, required int? lightAppBar,
+    required int? darkSeed, required int? darkSurface, required int? darkText, required int? darkJesus, required int? darkAppBar,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Theme Preview', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPreviewCard(
+                  context,
+                  brightness: Brightness.light,
+                  seedColor: lightSeed != null ? Color(lightSeed) : null,
+                  surfaceColor: lightSurface != null ? Color(lightSurface) : null,
+                  textColor: lightText != null ? Color(lightText) : null,
+                  jesusWordsColor: lightJesus != null ? Color(lightJesus) : null,
+                  appBarColor: lightAppBar != null ? Color(lightAppBar) : null,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildPreviewCard(
+                  context,
+                  brightness: Brightness.dark,
+                  seedColor: darkSeed != null ? Color(darkSeed) : null,
+                  surfaceColor: darkSurface != null ? Color(darkSurface) : null,
+                  textColor: darkText != null ? Color(darkText) : null,
+                  jesusWordsColor: darkJesus != null ? Color(darkJesus) : null,
+                  appBarColor: darkAppBar != null ? Color(darkAppBar) : null,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreviewCard(
+    BuildContext context, {
+    required Brightness brightness,
+    Color? seedColor,
+    Color? surfaceColor,
+    Color? textColor,
+    Color? jesusWordsColor,
+    Color? appBarColor,
+  }) {
+    // Generate a miniature ThemeData
+    final theme = AppThemes.buildTheme(
+      brightness: brightness,
+      themeScheme: 'custom',
+      fontFamily: null,
+      fontSizeDelta: 0.0,
+      customTextColor: textColor,
+      customJesusWordsColor: jesusWordsColor,
+      customSeedColor: seedColor,
+      customSurfaceColor: surfaceColor,
+      customAppBarColor: appBarColor,
+    );
+    final isDark = brightness == Brightness.dark;
+    final fallbackJesus = isDark ? Colors.red.shade300 : Colors.red.shade700;
+    final jWordsColor = theme.extension<CustomAppColors>()?.jesusWordsColor ?? fallbackJesus;
+
+    return Theme(
+      data: theme,
+      child: Card(
+        color: theme.colorScheme.surface,
+        elevation: 2,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              color: theme.colorScheme.primaryContainer,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.menu, size: 16, color: theme.colorScheme.onPrimaryContainer),
+                  const SizedBox(width: 8),
+                  Text('John 3', style: TextStyle(color: theme.colorScheme.onPrimaryContainer, fontSize: 12, fontWeight: FontWeight.bold)),
+                  const Spacer(),
+                  Icon(Icons.search, size: 16, color: theme.colorScheme.onPrimaryContainer),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Nicodemus', style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+                  const SizedBox(height: 4),
+                  RichText(
+                    text: TextSpan(
+                      style: theme.textTheme.bodyMedium?.copyWith(fontSize: 10),
+                      children: [
+                        TextSpan(text: '16 ', style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 8)),
+                        TextSpan(text: 'For God so loved the world, '),
+                        TextSpan(text: '"that he gave his only Son..."', style: TextStyle(color: jWordsColor)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(0, 24),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        textStyle: const TextStyle(fontSize: 10),
+                      ),
+                      child: const Text('Notes'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorPickerTile(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required int? currentColor,
+    required ValueChanged<Color?> onColorChanged,
+  }) {
+    return ListTile(
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (currentColor != null)
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Color(currentColor),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey),
+              ),
+            ),
+          const SizedBox(width: 8),
+          const Icon(Icons.palette),
+        ],
+      ),
+      onTap: () {
+        Color pickerColor = currentColor != null ? Color(currentColor) : Colors.black;
+        final originalColor = currentColor;
+        
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Pick a color: $title'),
+              content: SingleChildScrollView(
+                child: ColorPicker(
+                  pickerColor: pickerColor,
+                  enableAlpha: false,
+                  onColorChanged: (color) {
+                    pickerColor = color;
+                    onColorChanged(color);
+                  },
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Default'),
+                  onPressed: () {
+                    onColorChanged(null);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    onColorChanged(originalColor != null ? Color(originalColor) : null);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text('Save'),
+                  onPressed: () {
+                    onColorChanged(pickerColor);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }

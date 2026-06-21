@@ -8,6 +8,11 @@ class AppThemes {
     required String themeScheme,
     required String? fontFamily,
     required double fontSizeDelta,
+    Color? customTextColor,
+    Color? customJesusWordsColor,
+    Color? customSeedColor,
+    Color? customSurfaceColor,
+    Color? customAppBarColor,
   }) {
     Color seedColor;
     ColorScheme? customColorScheme;
@@ -93,6 +98,14 @@ class AppThemes {
           );
         }
         break;
+      case 'custom':
+        seedColor = customSeedColor ?? const Color(0xFF6750A4);
+        customColorScheme = ColorScheme.fromSeed(
+          seedColor: seedColor,
+          brightness: brightness,
+          surface: customSurfaceColor,
+        );
+        break;
       case 'default':
       default:
         seedColor = brightness == Brightness.light
@@ -101,21 +114,32 @@ class AppThemes {
         break;
     }
 
-    final colorScheme = customColorScheme ??
+    var colorScheme = customColorScheme ??
         ColorScheme.fromSeed(
           seedColor: seedColor,
           brightness: brightness,
         );
 
+    if (customAppBarColor != null && themeScheme == 'custom') {
+      colorScheme = colorScheme.copyWith(
+        primaryContainer: customAppBarColor,
+      );
+    }
+
     final typography = Typography.material2021(
       platform: defaultTargetPlatform,
     );
-    final colorTextTheme = brightness == Brightness.light
+    var colorTextTheme = brightness == Brightness.light
         ? typography.black
         : typography.white.apply(
             bodyColor: const Color(0xFFD4D4D8), // Muted off-white for body text
             displayColor: const Color(0xFFE4E4E7), // Slightly brighter for headings
           );
+
+    colorTextTheme = colorTextTheme.apply(
+      bodyColor: customTextColor,
+      displayColor: colorScheme.primary,
+    );
 
     var textTheme = typography.englishLike
         .apply(fontSizeDelta: fontSizeDelta)
@@ -134,6 +158,34 @@ class AppThemes {
       colorScheme: colorScheme,
       useMaterial3: true,
       textTheme: textTheme,
+      extensions: [
+        CustomAppColors(
+          jesusWordsColor: customJesusWordsColor,
+        ),
+      ],
+    );
+  }
+}
+
+class CustomAppColors extends ThemeExtension<CustomAppColors> {
+  final Color? jesusWordsColor;
+
+  const CustomAppColors({this.jesusWordsColor});
+
+  @override
+  ThemeExtension<CustomAppColors> copyWith({Color? jesusWordsColor}) {
+    return CustomAppColors(
+      jesusWordsColor: jesusWordsColor ?? this.jesusWordsColor,
+    );
+  }
+
+  @override
+  ThemeExtension<CustomAppColors> lerp(ThemeExtension<CustomAppColors>? other, double t) {
+    if (other is! CustomAppColors) {
+      return this;
+    }
+    return CustomAppColors(
+      jesusWordsColor: Color.lerp(jesusWordsColor, other.jesusWordsColor, t),
     );
   }
 }

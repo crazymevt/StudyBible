@@ -259,3 +259,213 @@ class SyncFolderBookmarkNotifier extends Notifier<String?> {
 final syncFolderBookmarkProvider = NotifierProvider<SyncFolderBookmarkNotifier, String?>(
   () => SyncFolderBookmarkNotifier(),
 );
+
+class CustomLightTextColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customLightTextColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customLightTextColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customLightTextColor', color);
+    }
+  }
+}
+
+final customLightTextColorProvider = NotifierProvider<CustomLightTextColorNotifier, int?>(
+  () => CustomLightTextColorNotifier(),
+);
+
+class CustomDarkTextColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customDarkTextColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customDarkTextColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customDarkTextColor', color);
+    }
+  }
+}
+
+final customDarkTextColorProvider = NotifierProvider<CustomDarkTextColorNotifier, int?>(
+  () => CustomDarkTextColorNotifier(),
+);
+
+class CustomLightJesusWordsColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customLightJesusWordsColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customLightJesusWordsColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customLightJesusWordsColor', color);
+    }
+  }
+}
+
+final customLightJesusWordsColorProvider = NotifierProvider<CustomLightJesusWordsColorNotifier, int?>(
+  () => CustomLightJesusWordsColorNotifier(),
+);
+
+class CustomDarkJesusWordsColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customDarkJesusWordsColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customDarkJesusWordsColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customDarkJesusWordsColor', color);
+    }
+  }
+}
+
+final customDarkJesusWordsColorProvider = NotifierProvider<CustomDarkJesusWordsColorNotifier, int?>(
+  () => CustomDarkJesusWordsColorNotifier(),
+);
+
+class CustomLightSeedColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customLightSeedColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customLightSeedColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customLightSeedColor', color);
+    }
+  }
+}
+
+final customLightSeedColorProvider = NotifierProvider<CustomLightSeedColorNotifier, int?>(
+  () => CustomLightSeedColorNotifier(),
+);
+
+class CustomDarkSeedColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customDarkSeedColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customDarkSeedColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customDarkSeedColor', color);
+    }
+  }
+}
+
+final customDarkSeedColorProvider = NotifierProvider<CustomDarkSeedColorNotifier, int?>(
+  () => CustomDarkSeedColorNotifier(),
+);
+
+class CustomLightSurfaceColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customLightSurfaceColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customLightSurfaceColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customLightSurfaceColor', color);
+    }
+  }
+}
+
+final customLightSurfaceColorProvider = NotifierProvider<CustomLightSurfaceColorNotifier, int?>(
+  () => CustomLightSurfaceColorNotifier(),
+);
+
+class CustomDarkSurfaceColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customDarkSurfaceColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customDarkSurfaceColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customDarkSurfaceColor', color);
+    }
+  }
+}
+
+final customDarkSurfaceColorProvider = NotifierProvider<CustomDarkSurfaceColorNotifier, int?>(
+  () => CustomDarkSurfaceColorNotifier(),
+);
+
+class CustomLightAppBarColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customLightAppBarColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customLightAppBarColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customLightAppBarColor', color);
+    }
+  }
+}
+
+final customLightAppBarColorProvider = NotifierProvider<CustomLightAppBarColorNotifier, int?>(
+  () => CustomLightAppBarColorNotifier(),
+);
+
+class CustomDarkAppBarColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('customDarkAppBarColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    if (color == null) {
+      ref.read(sharedPreferencesProvider).remove('customDarkAppBarColor');
+    } else {
+      ref.read(sharedPreferencesProvider).setInt('customDarkAppBarColor', color);
+    }
+  }
+}
+
+final customDarkAppBarColorProvider = NotifierProvider<CustomDarkAppBarColorNotifier, int?>(
+  () => CustomDarkAppBarColorNotifier(),
+);
