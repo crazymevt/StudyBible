@@ -72,7 +72,7 @@ class MyBibleImporter {
 
       final Map<int, int> bookIdMap = {};
       final booksQuery = db.select(
-        'SELECT book_number, short_name, long_name FROM books ORDER BY book_number',
+        'SELECT * FROM books ORDER BY book_number',
       );
 
       for (final row in booksQuery) {
@@ -143,7 +143,7 @@ class MyBibleImporter {
 
       if (hasStories) {
         final storiesQuery = db.select(
-          'SELECT book_number, chapter, verse, order_if_several, title FROM stories ORDER BY book_number, chapter, verse, order_if_several',
+          'SELECT * FROM stories ORDER BY book_number, chapter, verse',
         );
 
         await store.batch((batch) {
@@ -228,7 +228,7 @@ class MyBibleImporter {
 
       if (hasStories) {
         final storiesQuery = db.select(
-          'SELECT book_number, chapter, verse, order_if_several, title FROM stories ORDER BY book_number, chapter, verse, order_if_several',
+          'SELECT * FROM stories ORDER BY book_number, chapter, verse',
         );
 
         await store.batch((batch) {
