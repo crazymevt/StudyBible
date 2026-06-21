@@ -116,6 +116,15 @@
     ],
     "John": [
       {
+        "title": "JESUS Film",
+        "type": "web",
+        "url": "https://www.jesusfilm.org/watch/jesus.html/english.html",
+        "chapters": [
+          1,
+          21
+        ]
+      },
+      {
         "title": "The Woman at the Well",
         "type": "web",
         "url": "https://www.jesusfilm.org/watch/life-of-jesus-gospel-of-john.html/the-woman-at-the-well/english.html",
@@ -144,6 +153,15 @@
       }
     ],
     "Luke": [
+      {
+        "title": "JESUS Film",
+        "type": "web",
+        "url": "https://www.jesusfilm.org/watch/jesus.html/english.html",
+        "chapters": [
+          1,
+          24
+        ]
+      },
       {
         "title": "Miraculous Birth",
         "type": "web",
@@ -489,6 +507,15 @@
     ],
     "Matthew": [
       {
+        "title": "JESUS Film",
+        "type": "web",
+        "url": "https://www.jesusfilm.org/watch/jesus.html/english.html",
+        "chapters": [
+          1,
+          28
+        ]
+      },
+      {
         "title": "Great Command",
         "type": "web",
         "url": "https://www.jesusfilm.org/watch/40-days-with-jesus.html/day-40-great-command/english.html",
@@ -506,6 +533,17 @@
         "chapters": [
           3,
           6
+        ]
+      }
+    ],
+    "Mark": [
+      {
+        "title": "JESUS Film",
+        "type": "web",
+        "url": "https://www.jesusfilm.org/watch/jesus.html/english.html",
+        "chapters": [
+          1,
+          16
         ]
       }
     ]
