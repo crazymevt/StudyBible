@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.20+12",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "fix(sync): resolve operation not permitted for macOS and Android",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+11",
     "date": "2026-06-20",
     "features": [
