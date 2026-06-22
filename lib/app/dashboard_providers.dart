@@ -86,8 +86,17 @@ final timeAnalyticsProvider = Provider<Map<String, int>>((ref) {
 });
 
 final readingPaceProvider = Provider<Map<String, int>>((ref) {
-  final progress = ref.watch(readingProgressProvider).value ?? [];
+  final progressRaw = ref.watch(readingProgressProvider).value ?? [];
   final trackers = ref.watch(timeTrackerProvider).value ?? [];
+
+  final uniqueProgressMap = <String, ReadingProgress>{};
+  for (final p in progressRaw) {
+    final key = '${p.bookName}_${p.chapter}_${p.iteration}';
+    if (!uniqueProgressMap.containsKey(key)) {
+      uniqueProgressMap[key] = p;
+    }
+  }
+  final progress = uniqueProgressMap.values.toList();
 
   final daysActive = <DateTime>{};
   for (final p in progress) {
@@ -182,7 +191,7 @@ class DashboardAction {
 
     if (existing.isEmpty) {
       final newProgress = ReadingProgress(
-        id: const Uuid().v4(),
+        id: '${bookName}_${chapter}_1',
         updatedAt: now,
         deviceId: deviceId,
         deleted: false,

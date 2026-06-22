@@ -24,7 +24,17 @@ class AchievementService {
     final highlights = await (store.select(store.highlights)..where((h) => h.deleted.equals(false))).get();
     final prayers = await (store.select(store.prayers)..where((p) => p.deleted.equals(false))).get();
     final sermons = await (store.select(store.sermons)..where((s) => s.deleted.equals(false))).get();
-    final readingProgress = await (store.select(store.readingProgresses)..where((r) => r.deleted.equals(false))).get();
+    final readingProgressRaw = await (store.select(store.readingProgresses)..where((r) => r.deleted.equals(false))).get();
+    
+    final uniqueProgressMap = <String, ReadingProgress>{};
+    final sortedProgress = readingProgressRaw.toList()..sort((a, b) => b.readAt.compareTo(a.readAt));
+    for (final p in sortedProgress) {
+      final key = '${p.bookName}_${p.chapter}_${p.iteration}';
+      if (!uniqueProgressMap.containsKey(key)) {
+        uniqueProgressMap[key] = p;
+      }
+    }
+    final readingProgress = uniqueProgressMap.values.toList();
     final timeTrackers = await (store.select(store.timeTrackers)..where((t) => t.deleted.equals(false))).get();
     final plans = await (store.select(store.readingPlans)..where((p) => p.deleted.equals(false))).get();
     
