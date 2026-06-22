@@ -2,6 +2,12 @@
 
 A clean-slate reimplementation of the Clojure/JavaFX Study Bible as a single Flutter codebase targeting **Android, iOS, Windows, macOS, and Linux**, with **first-class cross-device sync** as a new capability.
 
+## Download
+
+### ⬇ [Download the latest release](https://github.com/crazymevt/flutterbible/releases/latest)
+
+Always points to the newest version — Android (APK), Windows, macOS, and Linux builds. (Use this link rather than browsing the releases list, which may not show the newest build first.)
+
 ## Features
 
 - **Multi-version Bible reader** — parallel panels, verse selection, version swap, verse-by-verse and flowing paragraph view, highlight bands.
