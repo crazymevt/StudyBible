@@ -1,6 +1,20 @@
 #!/bin/bash
 set -e
 
+# Abort if the working tree has uncommitted changes, so nothing is silently
+# left out of the release (the script only stages the version/changelog files).
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "❌ Working tree is not clean. Commit or stash your changes first."
+  git status --short
+  exit 1
+fi
+
+# Quality gate: never tag a release that doesn't pass the same checks as CI.
+echo "Running pre-release checks (domain purity, analyze, tests)..."
+bash tool/lint_domain.sh
+flutter analyze
+flutter test
+
 echo "Starting automated release process..."
 
 # Get latest tag

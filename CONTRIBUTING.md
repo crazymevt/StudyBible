@@ -41,7 +41,7 @@ The following prefixes are for changes with **no user-facing impact**. They are 
 ## Release Process
 
 When you are ready to create a new release:
-1. Ensure all your changes are committed using the prefixes above.
+1. Ensure all your changes are committed using the prefixes above (the script aborts on a dirty working tree).
 2. Run `./scripts/release.sh` from the root of the project.
-3. The script will automatically calculate the new version tag, write the changelog, update `pubspec.yaml`, and create the Git commit and tag.
+3. The script first runs the quality gate (`tool/lint_domain.sh`, `flutter analyze`, `flutter test`) and aborts if anything fails, then calculates the new version tag, writes the changelog, updates `pubspec.yaml`, and creates the Git commit and tag.
 4. Run `git push && git push --tags` to publish.
