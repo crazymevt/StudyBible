@@ -1,0 +1,62 @@
+# Flatpak manifest for Study Bible.
+#
+# This packages a PREBUILT Flutter Linux bundle (no network/SDK needed at
+# flatpak-build time), which is what Flathub requires. Flutter Linux apps use
+# the GNOME runtime because they depend on GTK3.
+#
+# Local build (see ./build-local.sh): builds the bundle with
+#   flutter build linux --release
+# then this manifest copies build/linux/x64/release/bundle into /app.
+#
+# For FLATHUB: swap the `studybible` module's source from the local `dir`
+# below to the released tarball, pinned by sha256, e.g.
+#   sources:
+#     - type: archive
+#       url: https://github.com/crazymevt/StudyBible/releases/download/<tag>/StudyBible-Linux.tar.gz
+#       sha256: <checksum>
+#       dest: bundle
+# (Flathub builds on its own buildbot and cannot run `flutter build`.)
+
+app-id: io.github.crazymevt.StudyBible
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+command: StudyBible
+
+finish-args:
+  # Display
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+  # Audio (just_audio / video_player)
+  - --socket=pulseaudio
+  # Content manager downloads + YouTube/web media
+  - --share=network
+  # NOTE: no static --filesystem grant. The sync-folder picker and any file
+  # imports go through the XDG desktop portal, which grants access to exactly
+  # the folder/file the user chooses. Verify the sync folder stays readable
+  # across restarts during local testing; if portal persistence is not enough
+  # for the background sync engine, add a narrow grant here.
+
+modules:
+  - name: studybible
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/studybible
+      - cp -r bundle/* /app/studybible/
+      - mkdir -p /app/bin
+      - ln -s /app/studybible/StudyBible /app/bin/StudyBible
+      - install -Dm644 io.github.crazymevt.StudyBible.desktop /app/share/applications/io.github.crazymevt.StudyBible.desktop
+      - install -Dm644 io.github.crazymevt.StudyBible.metainfo.xml /app/share/metainfo/io.github.crazymevt.StudyBible.metainfo.xml
+      - install -Dm644 io.github.crazymevt.StudyBible.png /app/share/icons/hicolor/512x512/apps/io.github.crazymevt.StudyBible.png
+    sources:
+      - type: dir
+        path: ../build/linux/x64/release/bundle
+        dest: bundle
+      - type: file
+        path: io.github.crazymevt.StudyBible.desktop
+      - type: file
+        path: io.github.crazymevt.StudyBible.metainfo.xml
+      - type: file
+        path: io.github.crazymevt.StudyBible.png

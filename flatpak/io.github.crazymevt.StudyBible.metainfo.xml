@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.crazymevt.StudyBible</id>
+
+  <name>Study Bible</name>
+  <summary>Multi-version Bible reader with study tools and cross-device sync</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <!-- TODO(license): replace with the app's real SPDX license identifier.
+       Flathub requires a valid project_license AND a matching LICENSE file in
+       the repo root. Pick one (e.g. GPL-3.0-or-later, MIT, Apache-2.0) before
+       submitting to Flathub. -->
+  <project_license>LicenseRef-proprietary=https://github.com/crazymevt/StudyBible</project_license>
+
+  <developer id="io.github.crazymevt">
+    <name>Jessie Hughart</name>
+  </developer>
+
+  <description>
+    <p>
+      Study Bible is a cross-platform Bible study app: a multi-version reader
+      with integrated commentaries, dictionaries, and a full set of personal
+      study tools — all offline-first, with optional zero-cost cross-device
+      sync.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Multi-version reader with parallel panels, verse-by-verse and flowing paragraph views, and highlights</li>
+      <li>Integrated commentaries and multi-dictionary search with tap-a-word lookup</li>
+      <li>Study tools: journals, prayer tracker, sermon builder, reading-plan generator, notes, and bookmarks</li>
+      <li>Progress dashboard with reading coverage, pace, achievements, and time analytics</li>
+      <li>Content manager to install bibles, commentaries, and dictionaries (ph4.org catalog, OSIS and MyBible import)</li>
+      <li>Cross-device sync of your highlights, notes, journals, and progress via a synced folder (e.g. Syncthing)</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.crazymevt.StudyBible.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Multi-version Bible reader</caption>
+      <image>https://raw.githubusercontent.com/crazymevt/StudyBible/main/docs/screenshots/reader.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Search across the whole library</caption>
+      <image>https://raw.githubusercontent.com/crazymevt/StudyBible/main/docs/screenshots/search.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Progress dashboard</caption>
+      <image>https://raw.githubusercontent.com/crazymevt/StudyBible/main/docs/screenshots/dashboard.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Content manager</caption>
+      <image>https://raw.githubusercontent.com/crazymevt/StudyBible/main/docs/screenshots/content-manager.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://github.com/crazymevt/StudyBible</url>
+  <url type="bugtracker">https://github.com/crazymevt/StudyBible/issues</url>
+  <url type="donation">https://ko-fi.com/jessiehughart</url>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="26.6.21" date="2026-06-22">
+      <description>
+        <p>Cross-platform Study Bible with reader, study tools, dashboard, content manager, and folder-based sync.</p>
+      </description>
+    </release>
+  </releases>
+</component>

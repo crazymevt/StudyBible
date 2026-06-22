@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Study Bible
+GenericName=Bible Study
+Comment=Multi-version Bible reader with commentaries, dictionaries, and study tools
+Exec=StudyBible
+Icon=io.github.crazymevt.StudyBible
+Terminal=false
+Categories=Education;Viewer;
+Keywords=Bible;Scripture;Study;Devotional;Commentary;Dictionary;Sermon;
+StartupNotify=true
+StartupWMClass=io.github.crazymevt.StudyBible
