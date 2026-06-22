@@ -1,5 +1,53 @@
 [
   {
+    "version": "26.6.22+3",
+    "date": "2026-06-22",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "stop setState-during-build error from version self-heal",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "make the cross-reference import concurrency-safe",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "set busy_timeout before switching SQLite to WAL",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "enable Create Backup on Android/iOS (was desktop-only)",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "use Storage Access Framework for Android sync folder",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "decouple sync engine from dart:io behind SyncStorage",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "import OSIS <note> elements as footnotes, not inline verse text",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.22+2",
     "date": "2026-06-22",
     "features": [
