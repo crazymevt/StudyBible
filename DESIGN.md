@@ -274,7 +274,7 @@ Status legend: ☐ todo · ◐ in progress · ☑ done
 - ☑ 2.2 Domain: pure LWW `merge` + tombstones; exhaustive unit tests.
 - ☑ 2.3 Local-only highlights, notes, bookmarks against the User store.
 - ☑ 2.4 `SyncEngine` interface; per-device file impl (`state-<deviceId>.db`).
-- ☐ 2.5 Point the file transport at a user-chosen synced folder (TODO: Build Settings UI file chooser).
+- ☑ 2.5 Point the file transport at a user-chosen synced folder (Settings UI file chooser).
 - ☑ 2.6 End-to-end: two devices share a folder, edits + tombstones converge regardless of sync order.
 - ☐ 2.7 *(optional/later)* BYO-backend impl: user-supplied Supabase URL+key, outbox queue, realtime.
 
@@ -288,23 +288,28 @@ Status legend: ☐ todo · ◐ in progress · ☑ done
 - ☑ 3.7 Study pane: a slide-over or bottom-sheet UI showing notes/bookmarks for the active chapter.
 
 ### Phase 4 — Personal study / tracking
-- ☐ 4.1 Journals + prayer tracker (synced records).
-- ☐ 4.2 Reading progress capture + coverage drill-down.
-- ☐ 4.3 Reading pace (streaks, projection) + achievements engine.
-- ☐ 4.4 Time tracker + analytics graphs.
-- ☐ 4.5 Sermon builder + generator + HTML/Text/ZIP export (port `sermon-generator`).
-- ☐ 4.6 Plan generator + active devotionals (port `plan-generator`).
+- ☑ 4.1 Journals + prayer tracker (synced records).
+- ☑ 4.2 Reading progress capture + coverage drill-down.
+- ☑ 4.3 Reading pace (streaks, projection) + achievements engine.
+- ☑ 4.4 Time tracker + analytics graphs.
+- ☑ 4.5 Sermon builder + generator + HTML/Text/ZIP export (port `sermon-generator`).
+- ☑ 4.6 Plan generator + active devotionals (port `plan-generator`).
 
 ### Phase 5 — Media, theming, content manager
-- ☐ 5.1 Theme engine: port 16 themes as `ThemeSpec` data → `ThemeData`.
-- ☐ 5.2 Local audio/video players; YouTube overlay; image lightbox.
-- ☐ 5.3 In-app Content Manager (ph4.org catalog, download, import).
-- ☐ 5.4 Backup/restore (zip of user data) — adapt `backup`.
+- ☑ 5.1 Theme engine — *built differently than planned:* instead of porting the
+  16 CSS themes verbatim as `ThemeSpec` data, `AppThemes.buildTheme` derives
+  `ThemeData` from a handful of named seed-color schemes (softIndiglow,
+  modernIndigo, quietSage, onyx, ocean) × light/dark, plus a fully custom theme
+  (user-picked text / Jesus-words / seed / surface / app-bar colors) and font
+  controls. See decision in §10.
+- ☑ 5.2 Local audio/video players; YouTube overlay; image lightbox.
+- ☑ 5.3 In-app Content Manager (ph4.org catalog, download, import).
+- ☑ 5.4 Backup/restore (zip of user data) — adapt `backup`.
 
 ### Phase 6 — Release
-- ☐ 6.1 Per-OS desktop packaging + Android AAB; icons/metadata. iOS: simulator builds now; real-device/App-Store deferred (needs $99/yr Apple Developer + a device).
-- ☐ 6.2 Desktop auto-update check; store-based updates on Android (and iOS if/when shipped).
-- ☐ 6.3 Onboarding (sign-in / device pairing for sync).
+- ☑ 6.1 Per-OS desktop packaging + Android build via `.github/workflows/release.yml` (tag-triggered); icons/metadata. iOS: simulator builds now; real-device/App-Store deferred (needs $99/yr Apple Developer + a device).
+- ☐ 6.2 Desktop auto-update check; store-based updates on Android (and iOS if/when shipped). *(Only the post-update "What's New" changelog dialog exists so far; no release-version check.)*
+- ☑ 6.3 Onboarding screen — welcome + starter-content download. (No sign-in / device pairing: the default file-sync transport needs neither — the synced folder *is* the boundary, per §10.)
 
 ---
 
@@ -346,6 +351,12 @@ Defaults chosen so work can start; revisit explicitly.
   folder *is* the boundary); each device just needs a stable `deviceId`. Auth
   only applies to the optional BYO-backend path (user's own Supabase
   credentials). TBD in Phase 2.7.
+- **Theme engine** — *Resolved: seed-color schemes + custom theme, not a verbatim
+  port of the 16 CSS themes.* `AppThemes.buildTheme` builds `ThemeData` from a few
+  named seed colors × light/dark plus a fully user-customizable theme and font
+  controls. This covers the original intent (varied, themeable looks) with far
+  less data to maintain than 16 hand-tuned `ThemeSpec`s, and lets users roll their
+  own. The `ThemeSpec`-as-data model in §5/§8 was superseded. (2026-06-22)
 - **jsoup replacement** — Dart HTML parser + allowlist sanitizer for
   commentary/dictionary HTML. Pick exact package in Phase 3.1.
 - **Importer language** — *Resolved: rewrite in Dart, run in-app* so import works

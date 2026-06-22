@@ -4,7 +4,7 @@ A clean-slate reimplementation of the Clojure/JavaFX Study Bible as a single Flu
 
 ## Download
 
-### ⬇ [Download the latest release](https://github.com/crazymevt/flutterbible/releases/latest)
+### ⬇ [Download the latest release](https://github.com/crazymevt/StudyBible/releases/latest)
 
 Always points to the newest version — Android (APK), Windows, macOS, and Linux builds. (Use this link rather than browsing the releases list, which may not show the newest build first.)
 
