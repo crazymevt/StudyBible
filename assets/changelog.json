@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.22+8",
+    "date": "2026-06-22",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "fix(android): revert file_picker -> file_selector to fix Linux APK build",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.6.22+7",
     "date": "2026-06-22",
     "features": [
