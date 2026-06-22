@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
+import '../data/app_paths.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart';
@@ -16,7 +16,7 @@ import 'achievement_service.dart';
 import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 
 final deviceIdProvider = FutureProvider<String>((ref) async {
-  final docs = await getApplicationDocumentsDirectory();
+  final docs = await appDataDir();
   final file = File(p.join(docs.path, 'device_id.txt'));
   if (await file.exists()) {
     return await file.readAsString();
@@ -60,7 +60,7 @@ class SyncService {
     } else if (customPath != null && customPath.isNotEmpty) {
       syncDir = Directory(customPath);
     } else {
-      final docs = await getApplicationDocumentsDirectory();
+      final docs = await appDataDir();
       syncDir = Directory(p.join(docs.path, 'StudyBibleSync'));
     }
 

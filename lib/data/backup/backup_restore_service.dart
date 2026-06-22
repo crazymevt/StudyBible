@@ -4,6 +4,7 @@ import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:intl/intl.dart';
+import '../app_paths.dart';
 
 /// Metadata about a backup file.
 class BackupManifest {
@@ -56,7 +57,7 @@ class BackupRestoreService {
 
   /// Returns the path to the documents directory where the databases live.
   Future<String> _getDbDir() async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await appDataDir();
     return dir.path;
   }
 

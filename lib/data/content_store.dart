@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
+import 'app_paths.dart';
 import 'package:path/path.dart' as p;
 
 import 'tables/content_tables.dart';
@@ -228,7 +228,7 @@ class ContentStore extends _$ContentStore {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
+    final dbFolder = await appDataDir();
     final file = File(p.join(dbFolder.path, 'content.db'));
     return NativeDatabase.createInBackground(file, setup: (db) {
       db.execute('PRAGMA journal_mode=WAL;');
