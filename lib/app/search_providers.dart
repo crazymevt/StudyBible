@@ -63,8 +63,12 @@ final autocompleteWordsProvider = FutureProvider<List<String>>((ref) async {
   try {
     // Escape single quotes for SQL
     final safeWord = lastWord.replaceAll("'", "''");
+    // Restrict to alphabetic, sane-length terms: the FTS index includes raw
+    // commentary HTML, so the vocab contains markup and junk tokens.
     final rows = await contentStore.customSelect(
-      "SELECT term FROM content_vocab WHERE term LIKE ? ORDER BY cnt DESC LIMIT 15",
+      "SELECT term FROM content_vocab WHERE term LIKE ? "
+      "AND term NOT GLOB '*[^a-z]*' AND length(term) BETWEEN 2 AND 18 "
+      "ORDER BY cnt DESC LIMIT 15",
       variables: [Variable.withString('$safeWord%')],
     ).get();
 

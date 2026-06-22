@@ -81,8 +81,14 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
           // Escape single quotes for SQL
           final safeWord = lastWord.replaceAll("'", "''");
           try {
+            // Only suggest real word-like terms. The FTS index includes raw
+            // commentary HTML, so the vocab is polluted with markup and junk
+            // tokens (e.g. embedded ids); restrict to alphabetic terms of a
+            // sane length so those don't surface as autocomplete suggestions.
             final rows = await contentStore.customSelect(
-              "SELECT term FROM content_vocab WHERE term LIKE ? ORDER BY cnt DESC LIMIT 15",
+              "SELECT term FROM content_vocab WHERE term LIKE ? "
+              "AND term NOT GLOB '*[^a-z]*' AND length(term) BETWEEN 2 AND 18 "
+              "ORDER BY cnt DESC LIMIT 15",
               variables: [drift.Variable.withString('$safeWord%')],
             ).get();
             results.addAll(rows.map((row) => row.read<String>('term')));
