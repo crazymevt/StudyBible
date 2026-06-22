@@ -9,6 +9,8 @@ import '../data/user_store.dart';
 import '../data/fts_text.dart';
 
 import '../data/sync/file_sync_engine.dart';
+import '../data/sync/sync_storage.dart';
+import '../data/sync/saf_sync_storage.dart';
 import '../domain/sync/lww_merge.dart';
 import 'user_providers.dart';
 import 'app_state.dart';
@@ -46,9 +48,16 @@ class SyncService {
 
     final customPath = _ref.read(syncFolderPathProvider);
     final customBookmark = _ref.read(syncFolderBookmarkProvider);
-    Directory syncDir;
+    _resolvedBookmarkEntity = null;
+    SyncStorage storage;
 
-    if (Platform.isMacOS &&
+    if (Platform.isAndroid &&
+        customPath != null &&
+        customPath.startsWith('content://')) {
+      // On Android a custom folder is a persisted SAF tree URI, accessed
+      // without any storage permission.
+      storage = SafSyncStorage(customPath);
+    } else if (Platform.isMacOS &&
         customBookmark != null &&
         customBookmark.isNotEmpty) {
       final secureBookmarks = SecureBookmarks();
@@ -56,20 +65,24 @@ class SyncService {
         customBookmark,
         isDirectory: true,
       );
-      syncDir = Directory(_resolvedBookmarkEntity!.path);
-    } else if (customPath != null && customPath.isNotEmpty) {
-      syncDir = Directory(customPath);
+      storage = IoSyncStorage(Directory(_resolvedBookmarkEntity!.path));
+    } else if (!Platform.isAndroid &&
+        customPath != null &&
+        customPath.isNotEmpty) {
+      // Desktop platforms address folders by plain filesystem path.
+      storage = IoSyncStorage(Directory(customPath));
     } else {
+      // Default: the app-private support directory — no permission needed.
       final docs = await appDataDir();
-      syncDir = Directory(p.join(docs.path, 'StudyBibleSync'));
+      storage = IoSyncStorage(Directory(p.join(docs.path, 'StudyBibleSync')));
     }
 
-    // Only re-initialize if the path changed
-    if (_engine != null && _engine!.syncFolder.path == syncDir.path) {
+    // Only re-initialize if the configured target changed.
+    if (_engine != null && _engine!.storage.id == storage.id) {
       return;
     }
 
-    _engine = FileSyncEngine(syncFolder: syncDir, localDeviceId: deviceId);
+    _engine = FileSyncEngine(storage: storage, localDeviceId: deviceId);
   }
 
   Future<void> sync() async {

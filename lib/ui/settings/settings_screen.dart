@@ -12,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../whats_new_dialog.dart';
 import 'dart:io';
 import 'dart:convert';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:saf_util/saf_util.dart';
 import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 import 'acknowledgments_screen.dart';
 
@@ -692,20 +692,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             children: [
               ElevatedButton.icon(
                 onPressed: () async {
+                  String? selectedDirectory;
                   if (Platform.isAndroid) {
-                    final status = await Permission.manageExternalStorage.request();
-                    if (!status.isGranted) {
-                      final storageStatus = await Permission.storage.request();
-                      if (!storageStatus.isGranted && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Storage permission is required to select a sync folder.')),
-                        );
-                        return;
-                      }
-                    }
+                    // Use the Storage Access Framework folder picker, which
+                    // grants persistable access to the chosen tree without any
+                    // storage permission. The returned content:// URI is what
+                    // we persist and sync against.
+                    final dir = await SafUtil().pickDirectory(
+                      writePermission: true,
+                      persistablePermission: true,
+                      initialUri: '',
+                    );
+                    selectedDirectory = dir?.uri;
+                  } else {
+                    selectedDirectory = await getDirectoryPath();
                   }
-                  
-                  final String? selectedDirectory = await getDirectoryPath();
 
                   if (selectedDirectory != null) {
                     ref.read(syncFolderPathProvider.notifier).setPath(selectedDirectory);
