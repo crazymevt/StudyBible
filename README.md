@@ -10,6 +10,15 @@ Always points to the newest version — Android (APK), Windows, macOS, and Linux
 
 > iOS is supported in the codebase but isn't distributed as a signed build yet — build it from source (see [Getting Started](#getting-started)).
 
+## Screenshots
+
+_Click any image to view it full size._
+
+|                                                          |                                                  |
+| :------------------------------------------------------: | :----------------------------------------------: |
+| [![Reader](docs/screenshots/thumbs/reader.png)](docs/screenshots/reader.png)<br>**Multi-version reader** | [![Search](docs/screenshots/thumbs/search.png)](docs/screenshots/search.png)<br>**Search** |
+| [![Dashboard](docs/screenshots/thumbs/dashboard.png)](docs/screenshots/dashboard.png)<br>**Progress dashboard** | [![Content manager](docs/screenshots/thumbs/content-manager.png)](docs/screenshots/content-manager.png)<br>**Content manager** |
+
 ## Features
 
 - **Multi-version Bible reader** — parallel panels, verse selection, version swap, verse-by-verse and flowing paragraph view, highlight bands.
