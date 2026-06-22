@@ -4,23 +4,27 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 /// Files that live in the app data directory and should be carried over from
-/// the legacy location on first run.
+/// the legacy location on first run (Linux only).
 const _migratableFiles = ['content.db', 'user.db', 'device_id.txt'];
 
-bool _migrationDone = false;
+Future<void>? _migration;
 
 /// Directory for app-internal data: the content and user databases, the device
 /// id, and the default sync folder.
 ///
-/// Uses [getApplicationSupportDirectory] (backed by `XDG_DATA_HOME` on Linux),
-/// which is persistent and works inside sandboxes such as Flatpak. The previous
-/// location, [getApplicationDocumentsDirectory], depends on the optional
-/// `xdg-user-dir` tool and the user's Documents folder, which is unreliable in
-/// the Flatpak sandbox and caused data to vanish on restart.
+/// **Linux only** uses [getApplicationSupportDirectory] (backed by
+/// `XDG_DATA_HOME`), which is persistent and works inside the Flatpak sandbox.
+/// The Documents dir relies on the optional `xdg-user-dir` tool and is not a
+/// stable, persistent location under Flatpak, so a downloaded bible vanished on
+/// restart. Existing Linux installs are migrated from the old location.
 ///
-/// On first run this migrates the databases and device id from the old
-/// Documents location so existing installs keep their data.
+/// Every other platform keeps [getApplicationDocumentsDirectory] — it persists
+/// fine there and is where existing installs already store their data, so no
+/// migration is needed and nothing moves.
 Future<Directory> appDataDir() async {
+  if (!Platform.isLinux) {
+    return getApplicationDocumentsDirectory();
+  }
   final dir = await getApplicationSupportDirectory();
   if (!await dir.exists()) {
     await dir.create(recursive: true);
@@ -29,9 +33,14 @@ Future<Directory> appDataDir() async {
   return dir;
 }
 
-Future<void> _migrateLegacyData(Directory target) async {
-  if (_migrationDone) return;
-  _migrationDone = true;
+// Cache the migration as a single Future so concurrent callers (the content
+// store and user store both open at startup) await the *same* completion rather
+// than the second caller seeing a "done" flag and racing ahead before the
+// files have actually been copied.
+Future<void> _migrateLegacyData(Directory target) =>
+    _migration ??= _doMigrateLegacyData(target);
+
+Future<void> _doMigrateLegacyData(Directory target) async {
   try {
     final legacy = await getApplicationDocumentsDirectory();
     if (legacy.path == target.path) return;
