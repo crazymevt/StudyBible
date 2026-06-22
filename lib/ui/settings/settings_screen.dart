@@ -35,6 +35,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   int? draftDarkJesus;
   int? draftDarkAppBar;
   bool _isDraftInitialized = false;
+  bool _rebuildingSearchIndex = false;
+
+  Future<void> _rebuildSearchIndex() async {
+    setState(() => _rebuildingSearchIndex = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(contentStoreProvider).rebuildSearchIndex();
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Search index rebuilt.')),
+      );
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('Failed to rebuild search index: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _rebuildingSearchIndex = false);
+    }
+  }
 
   void _initDraftState() {
     draftLightSeed = ref.read(customLightSeedColorProvider);
@@ -600,6 +618,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           _buildSyncFolderSelector(context, ref),
+          const Divider(),
+
+          // ── Maintenance ──
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Maintenance',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.manage_search),
+            title: const Text('Rebuild search index'),
+            subtitle: const Text(
+              'Re-indexes installed content to remove markup and junk tokens from search suggestions.',
+            ),
+            trailing: _rebuildingSearchIndex
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : null,
+            onTap: _rebuildingSearchIndex ? null : _rebuildSearchIndex,
+          ),
           const Divider(),
 
           // ── Support ──
