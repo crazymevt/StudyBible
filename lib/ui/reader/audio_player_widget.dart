@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import '../../app/app_state.dart';
 import '../../app/audio_providers.dart';
 import '../../app/content_providers.dart';
+import '../../app/dashboard_providers.dart';
 import '../../app/reader_state.dart';
 
 class AudioPlayerWidget extends ConsumerStatefulWidget {
@@ -25,6 +27,12 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
     _playerStateSubscription = _player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
         _shouldAutoPlay = true;
+        // Mark the just-finished chapter read before advancing, if enabled.
+        if (ref.read(audioAdvanceMarksReadProvider)) {
+          final book = ref.read(selectedBookNameProvider);
+          final chapter = ref.read(selectedChapterProvider);
+          ref.read(dashboardActionProvider).markChapterRead(book, chapter);
+        }
         ref.read(navigationControllerProvider).nextChapter();
       }
     });

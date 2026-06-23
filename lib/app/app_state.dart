@@ -139,14 +139,14 @@ final appShowStrongNumbersProvider =
       () => AppShowStrongNumbersNotifier(),
     );
 
-/// When true, chapters are only marked read when the user taps the "Mark
-/// Chapter Read" button. When false (the default), a chapter is marked read
+/// When true (the default), chapters are only marked read when the user taps
+/// the "Mark Chapter Read" button. When false, a chapter is marked read
 /// automatically after it has been on screen for a few seconds.
 class ManualChapterReadNotifier extends Notifier<bool> {
   @override
   bool build() {
     final prefs = ref.watch(sharedPreferencesProvider);
-    return prefs.getBool('manualChapterRead') ?? false;
+    return prefs.getBool('manualChapterRead') ?? true;
   }
 
   void set(bool value) {
@@ -158,6 +158,26 @@ class ManualChapterReadNotifier extends Notifier<bool> {
 final manualChapterReadProvider =
     NotifierProvider<ManualChapterReadNotifier, bool>(
       () => ManualChapterReadNotifier(),
+    );
+
+/// When true (the default), a chapter is marked read when audio playback
+/// completes and automatically advances to the next chapter.
+class AudioAdvanceMarksReadNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool('audioAdvanceMarksRead') ?? true;
+  }
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool('audioAdvanceMarksRead', value);
+  }
+}
+
+final audioAdvanceMarksReadProvider =
+    NotifierProvider<AudioAdvanceMarksReadNotifier, bool>(
+      () => AudioAdvanceMarksReadNotifier(),
     );
 
 class AppModuleNotifier extends Notifier<AppModule> {
