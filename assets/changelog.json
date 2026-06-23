@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.23+4",
+    "date": "2026-06-23",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "strip verse markup before text-to-speech",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.23+3",
     "date": "2026-06-23",
     "features": [
