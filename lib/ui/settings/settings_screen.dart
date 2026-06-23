@@ -523,6 +523,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ref.read(manualChapterReadProvider.notifier).set(value);
             },
           ),
+          SwitchListTile(
+            title: const Text('Mark chapters read with audio'),
+            subtitle: const Text(
+              'When audio finishes a chapter and advances to the next, '
+              'mark the finished chapter as read.',
+            ),
+            value: ref.watch(audioAdvanceMarksReadProvider),
+            onChanged: (bool value) {
+              ref.read(audioAdvanceMarksReadProvider.notifier).set(value);
+            },
+          ),
           ListTile(
             title: const Text('Subheadings Source'),
             subtitle: const Text('Select which module to use for inline subheadings'),
