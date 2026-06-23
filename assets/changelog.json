@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.23+5",
+    "date": "2026-06-23",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add Places (biblical maps) for the active passage",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.23+4",
     "date": "2026-06-23",
     "features": [
