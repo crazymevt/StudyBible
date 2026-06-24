@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
+
 import 'sword_config.dart';
+import 'sword_verse_reader.dart';
 
 /// Reads raw entry text out of a SWORD compressed verse driver (`zText`/`zCom`)
 /// for a single testament.
@@ -25,7 +28,7 @@ import 'sword_config.dart';
 ///
 /// The core operates on in-memory buffers so it is unit-testable without files;
 /// [SwordZTextReader.fromTestamentFiles] loads the three files from disk.
-class SwordZTextReader {
+class SwordZTextReader implements SwordVerseReader {
   /// The `…zv` verse-index bytes.
   final Uint8List verseIndex;
 
@@ -39,8 +42,9 @@ class SwordZTextReader {
   /// u32 (12-byte records) rather than a u16 (10-byte records).
   final bool isZText4;
 
-  /// Block compression. Only [SwordCompressType.zip] (zlib) is implemented;
-  /// others throw from [_decompressBlock] with a clear message.
+  /// Block compression. [SwordCompressType.zip] (zlib) and
+  /// [SwordCompressType.bzip2] are implemented; the rest throw from
+  /// [_decompressBlock] with a clear message.
   final SwordCompressType compressType;
 
   /// Whether to decode entry bytes as UTF-8 (else Latin-1).
@@ -63,11 +67,13 @@ class SwordZTextReader {
   int get _verseRecordSize => isZText4 ? 12 : 10;
 
   /// Number of verse-index slots available.
+  @override
   int get recordCount => verseIndex.length ~/ _verseRecordSize;
 
   /// The decoded entry text at testament-relative [index], or null when the
   /// slot is out of range or has zero length (a verse not present in this
   /// module — common for headings and gaps in the versification).
+  @override
   String? entryAt(int index) {
     if (index < 0) return null;
     final pos = index * _verseRecordSize;
@@ -131,11 +137,12 @@ class SwordZTextReader {
         // decode with the zlib codec rather than raw inflate.
         return Uint8List.fromList(zlib.decode(compressed));
       case SwordCompressType.bzip2:
+        return BZip2Decoder().decodeBytes(compressed);
       case SwordCompressType.lzss:
       case SwordCompressType.xz:
         throw UnsupportedError(
           'SWORD ${compressType.name.toUpperCase()} compression is not yet '
-          'supported; only ZIP (zlib) modules can be imported.',
+          'supported; only ZIP (zlib) and BZIP2 modules can be imported.',
         );
     }
   }

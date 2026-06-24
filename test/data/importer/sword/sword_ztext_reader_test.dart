@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:study_bible/data/importer/sword/sword_config.dart';
 import 'package:study_bible/data/importer/sword/sword_ztext_reader.dart';
@@ -139,6 +140,25 @@ void main() {
     );
     expect(r.recordCount, 1);
     expect(r.entryAt(0), text);
+  });
+
+  test('BZIP2 module decodes blocks via the bzip2 codec', () {
+    const verseA = 'In the beginning — God';
+    const verseB = 'created the heavens';
+    final block = utf8.encode('$verseA$verseB');
+    final comp = BZip2Encoder().encode(block);
+    final offsetB = utf8.encode(verseA).length;
+    final r = SwordZTextReader(
+      verseIndex: _concat([
+        _verseRec(0, 0, utf8.encode(verseA).length),
+        _verseRec(0, offsetB, utf8.encode(verseB).length),
+      ]),
+      blockIndex: _blockRec(0, comp.length, block.length),
+      textData: Uint8List.fromList(comp),
+      compressType: SwordCompressType.bzip2,
+    );
+    expect(r.entryAt(0), verseA);
+    expect(r.entryAt(1), verseB); // second slice from the same decoded block
   });
 
   test('unsupported compression throws a clear error', () {

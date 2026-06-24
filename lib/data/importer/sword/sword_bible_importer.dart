@@ -8,20 +8,22 @@ import '../../content_store.dart';
 import '../../models/verse_segment.dart';
 import 'osis_fragment_parser.dart';
 import 'sword_config.dart';
+import 'sword_rawtext_reader.dart';
+import 'sword_verse_reader.dart';
 import 'sword_versification.dart';
 import 'sword_ztext_reader.dart';
 
-/// Imports a SWORD compressed Bible module (`zText`/`zText4`) into the content
-/// store, mapping it onto `versions`/`books`/`verses` exactly as the OSIS and
-/// MyBible importers do.
+/// Imports a SWORD Bible module (`zText`/`zText4` compressed, or
+/// `RawText`/`RawText4` uncompressed) into the content store, mapping it onto
+/// `versions`/`books`/`verses` exactly as the OSIS and MyBible importers do.
 ///
 /// The walk is driven by the module's versification (see
 /// `sword_versification.dart`): for every book/chapter/verse slot it computes
-/// the index, reads the raw entry via a [SwordZTextReader], parses the markup,
+/// the index, reads the raw entry via a [SwordVerseReader], parses the markup,
 /// and accumulates verse rows. Books with no present verses are skipped, so a
 /// partial (e.g. NT-only) module yields only the books it actually contains.
 ///
-/// Scope (phase 1): compressed `zText` Bibles with the `KJV` versification and
+/// Scope: `zText`/`RawText` Bibles with the `KJV` versification and
 /// `OSIS`/plaintext source. Other drivers, versifications, source types, and
 /// compression schemes throw a clear error rather than importing garbage.
 class SwordBibleImporter {
@@ -39,8 +41,15 @@ class SwordBibleImporter {
     final rel = (config.dataPath ?? '').replaceFirst(RegExp(r'^\./'), '');
     final dataDir = Directory(p.normalize(p.join(moduleRoot.path, rel)));
 
-    final ot = await SwordZTextReader.fromTestamentFiles(dataDir, 'ot', config);
-    final nt = await SwordZTextReader.fromTestamentFiles(dataDir, 'nt', config);
+    // Compressed (z*) and uncompressed (Raw*) Bibles share the same positional
+    // verse index but a different on-disk layout, so pick the matching reader.
+    final compressed = config.modDrv.isCompressed;
+    Future<SwordVerseReader?> readerFor(String testament) => compressed
+        ? SwordZTextReader.fromTestamentFiles(dataDir, testament, config)
+        : SwordRawTextReader.fromTestamentFiles(dataDir, testament, config);
+
+    final ot = await readerFor('ot');
+    final nt = await readerFor('nt');
     if (ot == null && nt == null) {
       throw Exception(
         'No SWORD testament data files found under "${dataDir.path}".',
@@ -54,13 +63,12 @@ class SwordBibleImporter {
   /// file resolution so it can be driven from in-memory readers in tests.
   Future<void> importBible(
     SwordConfig config, {
-    SwordZTextReader? ot,
-    SwordZTextReader? nt,
+    SwordVerseReader? ot,
+    SwordVerseReader? nt,
   }) async {
-    if (!(config.modDrv == SwordModDrv.zText ||
-        config.modDrv == SwordModDrv.zText4)) {
+    if (!config.modDrv.isBible) {
       throw UnsupportedError(
-        'SwordBibleImporter handles compressed Bible modules (zText); '
+        'SwordBibleImporter handles Bible modules (zText/RawText); '
         'got ModDrv "${config.value('ModDrv')}".',
       );
     }

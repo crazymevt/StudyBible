@@ -255,5 +255,43 @@ Description=Disk KJV
         throwsA(isException),
       );
     });
+
+    test('imports an uncompressed RawText module (ot + ot.vss)', () async {
+      final rawRoot = await Directory.systemTemp.createTemp('sword_rawtext');
+      addTearDown(() => rawRoot.delete(recursive: true));
+      final dataDir =
+          Directory(p.join(rawRoot.path, 'modules', 'texts', 'rawtext', 'test'))
+            ..createSync(recursive: true);
+
+      // Gen 1:1 laid out as flat text + a positional .vss index.
+      const fragment = 'In the beginning God created.';
+      final slot = kjv.indexOf('OT', 0, 1, 1)!;
+      final bytes = utf8.encode(fragment);
+      final records = <List<int>>[];
+      for (var i = 0; i <= slot; i++) {
+        records.add(i == slot
+            ? _concat([_le32(0), _le16(bytes.length)])
+            : _concat([_le32(0), _le16(0)]));
+      }
+      File(p.join(dataDir.path, 'ot')).writeAsBytesSync(bytes);
+      File(p.join(dataDir.path, 'ot.vss'))
+          .writeAsBytesSync(_concat(records));
+
+      final cfg = SwordConfig.parse('''
+[KJV]
+DataPath=./modules/texts/rawtext/test/
+ModDrv=RawText
+SourceType=OSIS
+Encoding=UTF-8
+Versification=KJV
+Description=Raw KJV
+''');
+
+      await SwordBibleImporter(store).importFromDirectory(rawRoot, cfg);
+
+      final gen = await versesFor('Genesis');
+      expect(gen, hasLength(1));
+      expect(gen.first.textContent, 'In the beginning God created.');
+    });
   });
 }
