@@ -52,13 +52,49 @@ Running list of known issues and follow-ups.
 
 - [ ] **Investigate importing SWORD modules.** SWORD is the CrossWire module
   format used by many open Bible apps — a large library of translations,
-  commentaries, and dictionaries. Scope out what it would take to import them:
-  the on-disk module layout (conf + compressed `ztext`/`zld`/`zcom` data),
-  the compression/encoding (LZSS/zlib, versification), and how it maps onto our
-  existing `verses`/`commentary`/`dictionary` tables. We already import OSIS
-  XML, and many SWORD modules are OSIS-encoded internally, so the existing
-  `OsisImporter` (now milestone-aware) may be reusable for the text once a
-  module is unpacked.
+  commentaries, and dictionaries.
+  - **Researched (2026-06-24).** A module is a `.conf` metadata file (`mods.d/`)
+    plus binary data files (`modules/…/`). The `.conf` is INI-like and drives
+    everything: `ModDrv` (`zText`/`RawText` Bibles, `zCom`/`RawCom`
+    commentaries, `zLD`/`RawLD` dictionaries, `RawGenBook` trees); `SourceType`
+    (the per-verse markup: `OSIS`/`GBF`/`ThML`/`TEI`/plain); `CompressType`
+    (`ZIP`=zlib, `BZIP2`, `LZSS`, `XZ`); `Versification`; plus `Encoding`,
+    `Lang`, `Description`, `About`.
+  - **`zText` layout** (compressed Bibles, common case): per testament
+    (`ot`/`nt`) three files — `.bzz` (concatenated compressed text blocks),
+    `.bzs` (block index: `[fileOffset(4), compSize(4), uncompSize(4)]`), `.bzv`
+    (verse index, one record **per verse slot in the versification**:
+    `[blockNum(4), offsetInBlock(4), length(2)]`). Read a verse = `.bzv` lookup
+    by positional index → block#/offset/length → `.bzs` → seek/decompress
+    `.bzz` block → slice. `RawText` has no block layer (`ot` + `ot.vss`).
+  - **Schema fit is clean, no migrations needed:** `zText`/`RawText` →
+    `Versions`/`Books`/`Verses` (+ `content_search` FTS); `zCom` →
+    `Commentaries`/`CommentaryEntries`; `zLD` →
+    `Dictionaries`/`DictionaryEntries`. SWORD inline markup maps onto our
+    `VerseSegment`/footnote model.
+  - **Reusable:** `extractOsisBookVerses` ([osis_importer.dart](lib/data/importer/osis_importer.dart),
+    already milestone-aware) for OSIS modules — but SWORD stores an OSIS
+    *fragment per verse*, not a whole document, so it needs adapting to
+    per-verse fragments. Decompression: `package:archive` (already a dep) has
+    `ZLibDecoder` + `BZip2Decoder`, and `dart:io` has zlib built in, so ZIP and
+    BZIP2 are free. The download→extract→pick-driver→import→invalidate flow in
+    [content_manager_providers.dart](lib/app/content_manager_providers.dart)
+    drops straight in.
+  - **Hard part = versification.** The `.bzv` index is *positional*: entry N is
+    the Nth verse slot in the module's v11n, uninterpretable without the full
+    ordered canon (per-chapter verse counts + testament/book intro "verse 0"
+    slots). SWORD hardcodes ~20 of these in C++ (`canon_*.h`); we'd port **KJV**
+    first, then Synodal/LXX/etc. as needed. An off-by-one shifts every verse —
+    this is the line item to budget for, *not* the compression.
+  - **Other new work:** `.conf` parser (INI-ish, has continuation lines +
+    repeated keys like `GlobalOptionFilter`); GBF/ThML filters for older
+    non-OSIS modules; LZSS decoder (SWORD's own variant, ~100 lines to port, no
+    Dart package); `zLD` dictionary index (`.dat/.idx/.zdt/.zdx`). XZ + LZSS
+    can be rejected with a clear message initially.
+  - **Phased plan:** (1) `.conf` parser + `zText`/`RawText` with ZIP + OSIS +
+    KJV versification only — covers KJV/ASV/WEB and proves the binary-index +
+    versification machinery end-to-end. (2) BZIP2, then GBF/ThML, then more
+    versifications. (3) commentaries (`zCom`) and dictionaries (`zLD`).
 
 ## Issues
 
