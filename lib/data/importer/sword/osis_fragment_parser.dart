@@ -55,6 +55,14 @@ ParsedVerseEntry parseOsisFragment(String fragment) {
           segments.add(const VerseSegment(isLineBreak: true));
           plain.write(' ');
           continue;
+        case 'p':
+        case 'lg':
+          // Paragraph/line-group: rare in a Bible verse fragment, common in
+          // commentary prose. Break before the block so paragraphs separate.
+          segments.add(const VerseSegment(isParagraphBreak: true));
+          plain.write(' ');
+          walk(child, italic: italic, jesus: jesus, strongs: strongs);
+          continue;
         case 'w':
           walk(child,
               italic: italic,

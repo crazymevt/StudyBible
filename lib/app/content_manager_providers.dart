@@ -9,6 +9,7 @@ import '../data/importer/archive_extractor.dart';
 import '../data/importer/mybible_importer.dart';
 import '../data/importer/osis_importer.dart';
 import '../data/importer/sword/sword_bible_importer.dart';
+import '../data/importer/sword/sword_commentary_importer.dart';
 import '../data/importer/sword/sword_config.dart';
 import '../data/logging.dart';
 import 'content_providers.dart'; // To get contentStoreProvider
@@ -303,11 +304,14 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
 
       if (config.modDrv.isBible) {
         await SwordBibleImporter(store).importFromDirectory(extractDir, config);
+      } else if (config.modDrv.isCommentary) {
+        await SwordCommentaryImporter(store)
+            .importFromDirectory(extractDir, config);
       } else {
         throw Exception(
           'SWORD module "${config.name}" is a '
           '${config.value('ModDrv') ?? 'non-Bible'} module; only Bible texts '
-          'are supported so far.',
+          'and commentaries are supported so far.',
         );
       }
 
@@ -315,6 +319,7 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
 
       ref.read(versionsProvider.notifier).reload();
       ref.read(bibleVersionsProvider.notifier).reload();
+      ref.read(commentariesProvider.notifier).reload();
       ref.read(installedModuleIdsProvider.notifier).reload();
 
       return 'Imported ${config.description ?? config.name} '
