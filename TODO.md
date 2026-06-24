@@ -113,22 +113,16 @@ Running list of known issues and follow-ups.
       source filters alongside `parseOsisFragment` (ThML can lean on
       `package:html`). LZSS (~100-line port) and XZ stay rejected with a clear
       message until needed.
-    - **Phase 4 — CrossWire download manager** (decided: build it,
-      license-aware). New "CrossWire Catalog" tab beside ph4.org/OSIS: fetch
+    - **Phase 4 DONE — CrossWire download manager** (2026-06-24).
+      New "CrossWire Catalog" tab beside ph4.org/OSIS: fetches
       [`masterRepoList.conf`](https://crosswire.org/ftpmirror/pub/sword/masterRepoList.conf)
-      → repos; fetch each repo's `mods.d.tar.gz` → parse confs into a catalog
-      (Description + license); download `packages/rawzip/<NAME>.zip` → existing
-      SWORD importer. **Gate the list** to supported + freely-distributable +
-      **unlocked** modules (skip any conf with a `CipherKey`); grey out the
-      rest with the reason. Keep the manual `.zip` import as the fallback.
-      - **Legality (researched 2026-06-24):** permissible and the intended use
-        — CrossWire publishes only modules it may distribute in the public
-        `…/sword/raw` repo, and SWORD frontends (And Bible, Xiphos, PocketSword)
-        consume these repos. Conditions: fetch only from the official repos
-        (don't re-host/mirror); skip `CipherKey`-locked modules; **preserve and
-        display** each module's `DistributionLicense`/`Copyright`/
-        `ShortCopyright` (store in `versions.about`); be a good network citizen
-        (HTTPS, real User-Agent, cache the index). Not legal advice.
+      → repos; fetches each repo's `mods.d.tar.gz` → parses confs into a catalog
+      (Description + license); downloads `packages/rawzip/<NAME>.zip` → existing
+      SWORD importer. Gates the list to supported + freely-distributable +
+      **unlocked** modules (skips any conf with a `CipherKey`); greys out the
+      rest with the reason. Preserves and displays each module's
+      `DistributionLicense`/`Copyright`/`ShortCopyright`. Sets a proper
+      `User-Agent` and utilizes HTTPS.
     - **Phase 3 — more versifications** (data-heavy, mechanical): Synodal,
       German, Vulgate, LXX, NRSV(A), Catholic/Catholic2, … Same
       `SwordVersification` shape, validated against aggregate totals as KJV was.
