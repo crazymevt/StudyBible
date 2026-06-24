@@ -121,7 +121,12 @@ Running list of known issues and follow-ups.
       parse result is now `ParsedVerseEntry` (renamed from `ParsedOsisEntry`).
       LZSS and XZ compression, and `TEI` source, still throw a clear
       unsupported-format error. All unit-tested (readers, both filters,
-      end-to-end RawText import).
+      end-to-end RawText import), and **verified in the macOS app** against real
+      CrossWire **GBF** and **ThML** modules — download → install → text and
+      footnotes rendering correctly in the reader. Not yet exercised against a
+      real module: **BZIP2** (none in the CrossWire repo) and GBF/ThML
+      **Strong's** attachment (no available GBF/ThML Bible ships Strong's) —
+      both remain synthetic-tested only.
     - **Phase 4 DONE — CrossWire download manager** (2026-06-24).
       New "CrossWire Catalog" tab beside ph4.org/OSIS: fetches
       [`masterRepoList.conf`](https://crosswire.org/ftpmirror/pub/sword/masterRepoList.conf)
