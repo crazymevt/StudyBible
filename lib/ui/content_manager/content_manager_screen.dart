@@ -757,15 +757,17 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
 
             Widget downloadWidget;
             final isInstalled = installedIds.contains(m.config.name.toUpperCase());
-            // Only freely-distributable Bible/commentary modules can be
-            // installed today. Anything else stays visible but greyed out with
-            // the reason.
+            // Only freely-distributable Bible/commentary/dictionary modules can
+            // be installed today. Anything else stays visible but greyed out
+            // with the reason.
             final drv = m.config.modDrv;
-            final String? blockReason = !(drv.isBible || drv.isCommentary)
-                ? 'Only Bible and commentary modules are currently supported'
-                : !m.config.isFreelyDistributable
-                    ? 'License does not permit redistribution'
-                    : null;
+            final String? blockReason =
+                !(drv.isBible || drv.isCommentary || drv.isDictionary)
+                    ? 'Only Bible, commentary, and dictionary modules are '
+                        'currently supported'
+                    : !m.config.isFreelyDistributable
+                        ? 'License does not permit redistribution'
+                        : null;
             final canInstall = blockReason == null;
 
             if (isInstalled) {

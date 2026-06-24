@@ -3,6 +3,7 @@ import 'gbf_fragment_parser.dart';
 import 'osis_fragment_parser.dart';
 import 'parsed_verse_entry.dart';
 import 'sword_config.dart';
+import 'tei_fragment_parser.dart';
 import 'thml_fragment_parser.dart';
 
 /// Parse a single SWORD entry's raw text according to its module [sourceType],
@@ -18,9 +19,7 @@ ParsedVerseEntry parseSwordSource(String raw, SwordSourceType sourceType) {
     case SwordSourceType.thml:
       return parseThmlFragment(raw);
     case SwordSourceType.tei:
-      throw UnsupportedError(
-        'SWORD TEI source is not yet supported for this content type.',
-      );
+      return parseTeiFragment(raw);
     case SwordSourceType.plaintext:
       return parsePlaintextEntry(raw);
   }

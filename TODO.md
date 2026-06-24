@@ -149,11 +149,30 @@ Running list of known issues and follow-ups.
       German, Vulgate, LXX, NRSV(A), Catholic/Catholic2, … Same
       `SwordVersification` shape, validated against aggregate totals as KJV was.
       Needed for most non-English and Catholic modules.
-    - **Phase 5 — other content types:** commentaries (`zCom`/`RawCom` →
-      `Commentaries`/`CommentaryEntries`; same `zVerse` index math — reuse the
-      reader, new importer); dictionaries/lexicons (`zLD`/`RawLD` →
-      `Dictionaries`/`DictionaryEntries`; different key-based `.dat/.idx/.zdt/
-      .zdx` index — new reader).
+    - **Phase 5 DONE — other content types** (2026-06-24).
+      - **Commentaries** (`zCom`/`zCom4`/`RawCom`/`RawCom4` →
+        `commentaries`/`commentary_entries`). A commentary uses the same
+        verse-keyed `zVerse`/`RawVerse` backend as a Bible, so
+        `SwordCommentaryImporter` reuses the existing verse readers and walks
+        the versification just like the Bible importer. Verified against the
+        real CrossWire **MHCC** module (28,718 entries).
+      - **Dictionaries/lexicons** (`zLD`/`RawLD`/`RawLD4` →
+        `dictionaries`/`dictionary_entries`) via a new key-based
+        `SwordLdReader`. The on-disk format was reverse-engineered and verified:
+        `.idx` (`offset` + `size`; **8-byte for zLD/RawLD4, 6-byte for RawLD**,
+        auto-detected by bounds-checking) → `.dat`, whose record is
+        `KEY\r\n<body>` (RawLD) or `KEY\r\n` + `blockNum(u32)` +
+        `entryInBlock(u32)` (zLD). For zLD the body lives in a `.zdt` zlib block
+        located via `.zdx` (`offset` + `compSize`); each decompressed block is
+        `count(u32)` + `count×(offset,size)` directory + bodies. Verified against
+        real CrossWire **Easton** (zLD/TEI, 3,963 entries) and **AmTract**
+        (RawLD/ThML, 2,286).
+      - Added a **TEI** per-source filter (`parseTeiFragment`) — most lexicons
+        are TEI — and a shared `parseSwordSource` dispatcher + `segmentsToHtml`
+        serialiser feeding both new importers (their panels render with
+        `HtmlWidget`). The CrossWire catalog now installs Bible, commentary, and
+        dictionary modules; book/chapter intro ("verse 0") commentary entries
+        are not yet mapped.
 
 ## Issues
 
