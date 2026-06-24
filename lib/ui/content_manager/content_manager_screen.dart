@@ -13,6 +13,7 @@ import '../../app/app_state.dart';
 import '../../app/content_manager_providers.dart';
 import '../../app/content_providers.dart';
 import '../../app/search_providers.dart';
+import '../../data/importer/sword/sword_versification.dart';
 import '../app_drawer.dart';
 
 class ContentManagerScreen extends ConsumerStatefulWidget {
@@ -758,16 +759,24 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
             Widget downloadWidget;
             final isInstalled = installedIds.contains(m.config.name.toUpperCase());
             // Only freely-distributable Bible/commentary/dictionary modules can
-            // be installed today. Anything else stays visible but greyed out
-            // with the reason.
+            // be installed today, and only in a supported versification (KJV
+            // for now — Bibles/commentaries map verses through it; dictionaries
+            // are key-based and exempt). Anything else stays visible but greyed
+            // out with the reason.
             final drv = m.config.modDrv;
+            final usesVersification = drv.isBible || drv.isCommentary;
             final String? blockReason =
                 !(drv.isBible || drv.isCommentary || drv.isDictionary)
                     ? 'Only Bible, commentary, and dictionary modules are '
                         'currently supported'
-                    : !m.config.isFreelyDistributable
-                        ? 'License does not permit redistribution'
-                        : null;
+                    : usesVersification &&
+                            swordVersificationByName(m.config.versification) ==
+                                null
+                        ? 'Versification "${m.config.versification}" is not yet '
+                            'supported'
+                        : !m.config.isFreelyDistributable
+                            ? 'License does not permit redistribution'
+                            : null;
             final canInstall = blockReason == null;
 
             if (isInstalled) {
