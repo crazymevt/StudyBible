@@ -196,6 +196,10 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
+              // Bump relative to the (delta-applied) label size so verse
+              // numbers stay legible yet still track the user's font setting.
+              fontSize:
+                  (Theme.of(context).textTheme.labelSmall?.fontSize ?? 11) + 2,
               backgroundColor: bgColor,
             ),
             recognizer: recognizer,

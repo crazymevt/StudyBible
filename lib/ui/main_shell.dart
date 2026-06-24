@@ -179,12 +179,9 @@ class _DesktopLayout extends ConsumerWidget {
       ),
     );
 
-    final navRail = LayoutBuilder(
-      builder: (context, constraints) => SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: IntrinsicHeight(
-            child: NavigationRail(
+    final navRail = _ScrollFadeColumn(
+      fadeColor: theme.colorScheme.surfaceContainer,
+      child: NavigationRail(
       backgroundColor: theme.colorScheme.surfaceContainer,
       labelType: NavigationRailLabelType.all,
       selectedIconTheme: IconThemeData(color: theme.colorScheme.onSecondaryContainer),
@@ -252,9 +249,6 @@ class _DesktopLayout extends ConsumerWidget {
         final tool = _getToolFromIndex(index);
         ref.read(activeToolProvider.notifier).setTool(tool);
       },
-            ),
-          ),
-        ),
       ),
     );
 
@@ -328,5 +322,96 @@ class _DesktopLayout extends ConsumerWidget {
       default:
         return ActiveTool.none;
     }
+  }
+}
+
+/// Wraps a fixed-height [child] (e.g. the tools [NavigationRail]) in a vertical
+/// scroll view that fills the available height, and draws a subtle fade at
+/// whichever edge still has content off-screen — the scroll affordance a bare
+/// SingleChildScrollView lacks, so users on short windows can tell the rail
+/// scrolls. Both fades are absent when the child fits without scrolling.
+class _ScrollFadeColumn extends StatefulWidget {
+  final Widget child;
+  final Color fadeColor;
+
+  const _ScrollFadeColumn({required this.child, required this.fadeColor});
+
+  @override
+  State<_ScrollFadeColumn> createState() => _ScrollFadeColumnState();
+}
+
+class _ScrollFadeColumnState extends State<_ScrollFadeColumn> {
+  final ScrollController _controller = ScrollController();
+  bool _atTop = true;
+  bool _atBottom = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_update);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _update());
+  }
+
+  void _update() {
+    if (!_controller.hasClients) return;
+    final pos = _controller.position;
+    final atTop = pos.pixels <= pos.minScrollExtent + 0.5;
+    final atBottom = pos.pixels >= pos.maxScrollExtent - 0.5;
+    if (atTop != _atTop || atBottom != _atBottom) {
+      setState(() {
+        _atTop = atTop;
+        _atBottom = atBottom;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_update);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _fade({required bool top}) => IgnorePointer(
+        child: Container(
+          height: 24,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: top ? Alignment.topCenter : Alignment.bottomCenter,
+              end: top ? Alignment.bottomCenter : Alignment.topCenter,
+              colors: [
+                widget.fadeColor,
+                widget.fadeColor.withValues(alpha: 0.0),
+              ],
+            ),
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Re-evaluate the edge flags after this layout, since a resize can
+        // change whether the child overflows.
+        WidgetsBinding.instance.addPostFrameCallback((_) => _update());
+        return Stack(
+          children: [
+            SingleChildScrollView(
+              controller: _controller,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(child: widget.child),
+              ),
+            ),
+            if (!_atTop)
+              Positioned(top: 0, left: 0, right: 0, child: _fade(top: true)),
+            if (!_atBottom)
+              Positioned(
+                  bottom: 0, left: 0, right: 0, child: _fade(top: false)),
+          ],
+        );
+      },
+    );
   }
 }

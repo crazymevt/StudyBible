@@ -241,6 +241,13 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
+                          // Bump relative to the (delta-applied) label size so
+                          // verse numbers stay legible yet still track the
+                          // user's font-size setting.
+                          fontSize:
+                              (Theme.of(context).textTheme.labelSmall?.fontSize ??
+                                      11) +
+                                  2,
                         ),
                       ),
                       if (widget.versesWithNotes.contains(verse.verse))

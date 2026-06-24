@@ -405,8 +405,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             onPressed: _showVersionPicker,
           ),
           IconButton(
-            icon: Icon(_isFlowing ? Icons.format_list_numbered : Icons.notes),
-            tooltip: 'Toggle View Mode',
+            icon: Icon(
+                _isFlowing ? Icons.format_list_numbered : Icons.article_outlined),
+            tooltip: _isFlowing
+                ? 'Switch to verse-by-verse view'
+                : 'Switch to paragraph view',
             onPressed: () {
               setState(() {
                 _isFlowing = !_isFlowing;
@@ -602,6 +605,15 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     searchQuery: _searchQuery,
                     headerWidget: headerWidget,
                   );
+            // Cap the single-column reading measure so verse text doesn't
+            // stretch the full pane width on desktop; centered with margins.
+            // (Parallel view keeps the full width for its side-by-side columns.)
+            content = Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: content,
+              ),
+            );
           } else {
             content = ParallelView(
               versesMap: versesMap,
@@ -830,25 +842,29 @@ class _BreadcrumbBar extends ConsumerWidget {
                     ),
                   ),
                 ),
+                // Chapter prev/next sit immediately after the chapter selector
+                // so chapter navigation reads as a single grouped unit rather
+                // than being stranded at the far edge of the bar.
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.chevron_left),
+                  tooltip: 'Previous Chapter',
+                  iconSize: 20,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right),
+                  tooltip: 'Next Chapter',
+                  iconSize: 20,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
+                ),
               ],
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            tooltip: 'Previous Chapter',
-            iconSize: 20,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            tooltip: 'Next Chapter',
-            iconSize: 20,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
           ),
         ],
       ),

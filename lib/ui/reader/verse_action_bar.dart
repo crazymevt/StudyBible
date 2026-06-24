@@ -21,8 +21,11 @@ class VerseActionBar extends ConsumerWidget {
     if (selectedVerses.isEmpty) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
-    final barColor = theme.colorScheme.inverseSurface;
-    final onBarColor = theme.colorScheme.onInverseSurface;
+    // Use a normal elevated surface (not inverseSurface, which is deliberately
+    // a contrasting light tone in dark mode) so the floating bar matches the
+    // surrounding theme in both light and dark; elevation provides separation.
+    final barColor = theme.colorScheme.surfaceContainerHighest;
+    final onBarColor = theme.colorScheme.onSurface;
 
     // On phones the labeled actions make the row too wide, so FittedBox would
     // shrink the whole bar (and its touch targets) below a usable size. Drop
@@ -367,11 +370,11 @@ class _ClearHighlightSwatch extends ConsumerWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onInverseSurface.withValues(alpha: 0.24),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.24),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.format_color_reset,
-                    size: 14, color: theme.colorScheme.onInverseSurface),
+                    size: 14, color: theme.colorScheme.onSurface),
               ),
             ),
           ),

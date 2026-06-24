@@ -66,6 +66,10 @@ List<InlineSpan> buildVerseSpans({
       } else if (seg.isLineBreak) {
         spans.add(const TextSpan(text: '\n'));
       } else if (seg.isFootnote) {
+        // A quiet, link-coloured superscript reference rather than a heavy
+        // filled chip — the old solid box competed with the verse text and
+        // read like a tappable verse number / button. The raised baseline and
+        // lighter weight keep it distinct from the bold, baseline verse number.
         spans.add(
           WidgetSpan(
             alignment: PlaceholderAlignment.top,
@@ -73,19 +77,17 @@ List<InlineSpan> buildVerseSpans({
               onTap: () {
                 onFootnoteTap?.call(verse.verse);
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-                margin: const EdgeInsets.only(left: 2, right: 2),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(4),
-                ),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                // Small inset preserves a comfortable tap target without a box.
+                padding: const EdgeInsets.symmetric(horizontal: 1.5),
                 child: Text(
                   seg.footnoteText ?? 'f',
+                  // Inherit labelSmall's size (which already tracks the user's
+                  // font-size delta) rather than pinning it.
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),

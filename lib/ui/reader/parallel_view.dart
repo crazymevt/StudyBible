@@ -305,6 +305,18 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                                                         context,
                                                       ).colorScheme.primary,
                                                       fontWeight: FontWeight.bold,
+                                                      // Bump relative to the
+                                                      // (delta-applied) label
+                                                      // size so verse numbers
+                                                      // track the user's font
+                                                      // setting.
+                                                      fontSize:
+                                                          (Theme.of(context)
+                                                                  .textTheme
+                                                                  .labelSmall
+                                                                  ?.fontSize ??
+                                                              11) +
+                                                          2,
                                                     ),
                                               ),
                                               ...buildVerseSpans(
