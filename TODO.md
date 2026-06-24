@@ -92,5 +92,9 @@ Running list of known issues and follow-ups.
     available" empty state. Audio load failures already drive a `_loadFailed`
     retry UI; sync/backup/export already showed SnackBars — those now log too.
   - analyze + domain lint + 104 tests all green.
-- [ ] **FutureBuilder inside build method.** `WhatsNewDialog` creates its future (`_loadChangelog()`) directly inside its `build` method. This causes the app to re-read and re-parse the JSON asset on every single widget rebuild, which is a common Flutter anti-pattern that can lead to flickering or performance hits. It should be converted to a `StatefulWidget` and initialized in `initState`.
+- [x] **FutureBuilder inside build method.** `WhatsNewDialog` creates its future (`_loadChangelog()`) directly inside its `build` method. This causes the app to re-read and re-parse the JSON asset on every single widget rebuild, which is a common Flutter anti-pattern that can lead to flickering or performance hits. It should be converted to a `StatefulWidget` and initialized in `initState`.
+  - Done (2026-06-24): converted to a `StatefulWidget`; the changelog future is
+    created once in `initState` and held in `_changelogFuture`, so the asset is
+    read/parsed a single time per dialog instead of on every rebuild. The
+    `const WhatsNewDialog()` call sites are unchanged. analyze + 104 tests green.
 - [ ] **TextEditingController memory leaks.** Several dialogs create `TextEditingController` instances but fail to dispose them. For example, `_NoteEditorDialogState` (in `note_editor.dart`) lacks a `dispose()` method entirely, while methods like `_showNewSermonDialog` (in `sermons_panel.dart`) and `_showOutlineGeneratorDialog` (in `sermon_editor_screen.dart`) instantiate controllers before calling `showDialog` but never call `.dispose()` after the dialog completes. This causes compounding memory leaks as users open and close dialogs.

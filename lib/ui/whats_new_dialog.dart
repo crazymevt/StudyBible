@@ -3,8 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../app/version.dart';
 
-class WhatsNewDialog extends StatelessWidget {
+class WhatsNewDialog extends StatefulWidget {
   const WhatsNewDialog({super.key});
+
+  @override
+  State<WhatsNewDialog> createState() => _WhatsNewDialogState();
+}
+
+class _WhatsNewDialogState extends State<WhatsNewDialog> {
+  // Loaded once here rather than inside build(): a FutureBuilder whose future
+  // is created in build() re-reads and re-parses the asset on every rebuild
+  // (theme/MediaQuery changes, etc.) while the dialog is open.
+  late final Future<List<Map<String, dynamic>>> _changelogFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _changelogFuture = _loadChangelog();
+  }
 
   Future<List<Map<String, dynamic>>> _loadChangelog() async {
     final String response = await rootBundle.loadString('assets/changelog.json');
@@ -37,7 +53,7 @@ class WhatsNewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: _loadChangelog(),
+      future: _changelogFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const AlertDialog(
