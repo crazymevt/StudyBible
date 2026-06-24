@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../data/content_store.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -91,6 +92,9 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
   }
 
   void _openDictionary(String word, Offset position) async {
+    // The long-press timer that triggers this can fire after the widget is
+    // gone (e.g. a rebuild mid-press), so bail before touching context.
+    if (!mounted) return;
     final result = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
@@ -129,21 +133,6 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
         );
       }
     }
-  }
-
-  List<InlineSpan> _buildVerseSpans(BuildContext context, Verse verse) {
-    return buildVerseSpans(
-      context: context,
-      verse: verse,
-      bgColor: null, // List view tileColor handles background
-      onVerseTap: widget.onVerseTap,
-      onFootnoteTap: widget.onFootnoteTap,
-      onStrongTap: widget.onStrongTap,
-      showStrongNumbers: widget.showStrongNumbers,
-      onWordRightClick: _openDictionary,
-      ignoreLeadingBreaks: true,
-      searchQuery: widget.searchQuery,
-    );
   }
 
   @override
@@ -208,74 +197,160 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
         final verseSpacing = ref.watch(appVerseSpacingProvider);
         final verseSubheadings = widget.subheadings[verse.verse] ?? [];
 
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: verseSpacing / 2),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (verseSubheadings.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 4.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: verseSubheadings
-                        .map((sh) => Text(
-                              sh,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.italic,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                            ))
-                        .toList(),
-                  ),
-                ),
-              ListTile(
-                tileColor: bgColor,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                title: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '${verse.verse} ',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                          // Bump relative to the (delta-applied) label size so
-                          // verse numbers stay legible yet still track the
-                          // user's font-size setting.
-                          fontSize:
-                              (Theme.of(context).textTheme.labelSmall?.fontSize ??
-                                      11) +
-                                  2,
-                        ),
-                      ),
-                      if (widget.versesWithNotes.contains(verse.verse))
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 4.0),
-                            child: Icon(Icons.edit_note, size: 14, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8)),
-                          ),
-                        ),
-                      if (widget.versesWithTags.contains(verse.verse))
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 4.0),
-                            child: Icon(Icons.label, size: 12, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8)),
-                          ),
-                        ),
-                      ..._buildVerseSpans(context, verse),
-                    ],
-                  ),
-                ),
-                onTap: () => widget.onVerseTap(verse.verse),
-              ),
-            ],
-          ),
+        return _VerseTile(
+          key: ValueKey(verse.verse),
+          verse: verse,
+          bgColor: bgColor,
+          subheadings: verseSubheadings,
+          hasNote: widget.versesWithNotes.contains(verse.verse),
+          hasTag: widget.versesWithTags.contains(verse.verse),
+          verseSpacing: verseSpacing,
+          showStrongNumbers: widget.showStrongNumbers,
+          searchQuery: widget.searchQuery,
+          onVerseTap: widget.onVerseTap,
+          onFootnoteTap: widget.onFootnoteTap,
+          onStrongTap: widget.onStrongTap,
+          onWordRightClick: _openDictionary,
         );
       },
+    );
+  }
+}
+
+/// One verse row. Owns the per-span tap recognizers that [buildVerseSpans]
+/// creates for its words, so they are disposed exactly when this row leaves the
+/// list (its [State.dispose]) and rebuilt only when this row itself rebuilds —
+/// no accumulation across scrolling, and no coupling to sibling rebuilds.
+class _VerseTile extends StatefulWidget {
+  final Verse verse;
+  final Color? bgColor;
+  final List<String> subheadings;
+  final bool hasNote;
+  final bool hasTag;
+  final double verseSpacing;
+  final bool showStrongNumbers;
+  final String? searchQuery;
+  final Function(int) onVerseTap;
+  final ValueChanged<int>? onFootnoteTap;
+  final ValueChanged<String>? onStrongTap;
+  final Function(String, Offset) onWordRightClick;
+
+  const _VerseTile({
+    super.key,
+    required this.verse,
+    required this.bgColor,
+    required this.subheadings,
+    required this.hasNote,
+    required this.hasTag,
+    required this.verseSpacing,
+    required this.showStrongNumbers,
+    required this.searchQuery,
+    required this.onVerseTap,
+    required this.onFootnoteTap,
+    required this.onStrongTap,
+    required this.onWordRightClick,
+  });
+
+  @override
+  State<_VerseTile> createState() => _VerseTileState();
+}
+
+class _VerseTileState extends State<_VerseTile> {
+  final List<GestureRecognizer> _recognizers = [];
+
+  void _disposeRecognizers() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+  }
+
+  @override
+  void dispose() {
+    _disposeRecognizers();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Dispose the previous build's recognizers before creating fresh ones.
+    _disposeRecognizers();
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: widget.verseSpacing / 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.subheadings.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 4.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: widget.subheadings
+                    .map((sh) => Text(
+                          sh,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                                color: theme.colorScheme.primary,
+                              ),
+                        ))
+                    .toList(),
+              ),
+            ),
+          ListTile(
+            tileColor: widget.bgColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+            title: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${widget.verse.verse} ',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      // Bump relative to the (delta-applied) label size so
+                      // verse numbers stay legible yet still track the user's
+                      // font-size setting.
+                      fontSize: (theme.textTheme.labelSmall?.fontSize ?? 11) + 2,
+                    ),
+                  ),
+                  if (widget.hasNote)
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 4.0),
+                        child: Icon(Icons.edit_note, size: 14, color: theme.colorScheme.primary.withValues(alpha: 0.8)),
+                      ),
+                    ),
+                  if (widget.hasTag)
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 4.0),
+                        child: Icon(Icons.label, size: 12, color: theme.colorScheme.primary.withValues(alpha: 0.8)),
+                      ),
+                    ),
+                  ...buildVerseSpans(
+                    context: context,
+                    verse: widget.verse,
+                    bgColor: null, // List view tileColor handles background
+                    onVerseTap: widget.onVerseTap,
+                    onFootnoteTap: widget.onFootnoteTap,
+                    onStrongTap: widget.onStrongTap,
+                    showStrongNumbers: widget.showStrongNumbers,
+                    onWordRightClick: widget.onWordRightClick,
+                    ignoreLeadingBreaks: true,
+                    searchQuery: widget.searchQuery,
+                    recognizers: _recognizers,
+                  ),
+                ],
+              ),
+            ),
+            onTap: () => widget.onVerseTap(widget.verse.verse),
+          ),
+        ],
+      ),
     );
   }
 }
