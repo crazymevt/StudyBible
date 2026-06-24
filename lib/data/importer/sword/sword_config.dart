@@ -211,6 +211,45 @@ class SwordConfig {
   /// (e.g. `OSISStrongs`, `OSISFootnotes`, `OSISMorph`).
   List<String> get globalOptionFilters => values('GlobalOptionFilter');
 
+  /// The redistribution terms (`DistributionLicense`). Null when absent.
+  String? get distributionLicense => value('DistributionLicense');
+
+  /// The full copyright notice (`Copyright`). Null when absent.
+  String? get copyright => value('Copyright');
+
+  /// The short one-line copyright (`ShortCopyright`). Null when absent.
+  String? get shortCopyright => value('ShortCopyright');
+
+  /// Whether the module's stated [distributionLicense] grants redistribution,
+  /// so we may legally download and re-host it.
+  ///
+  /// `DistributionLicense` is a free-text field, but CrossWire uses a small set
+  /// of canonical phrasings. We recognise only the ones that explicitly permit
+  /// distribution (public domain, Creative Commons, the GNU licenses, and the
+  /// "Free .../Permission … to distribute" copyrighted grants). A bare
+  /// `Copyrighted`, an unrecognised phrasing, or an absent license is treated
+  /// as NOT freely distributable — fail closed rather than re-host content we
+  /// have no clear right to.
+  bool get isFreelyDistributable {
+    final lic = distributionLicense?.toLowerCase().trim();
+    if (lic == null || lic.isEmpty) return false;
+    const grants = [
+      'public domain',
+      'creative commons',
+      'general public license',
+      'free documentation license',
+      'gpl',
+      'gfdl',
+      'free non-commercial',
+      'free for non-commercial',
+      'permission to distribute',
+      'permission granted to distribute',
+      'distribution for any purpose',
+      'distribution granted',
+    ];
+    return grants.any(lic.contains);
+  }
+
   /// Parse SWORD conf [text] (already decoded to a String) into a config.
   ///
   /// Handles `#` comments, the `[Name]` section header, repeated keys, and

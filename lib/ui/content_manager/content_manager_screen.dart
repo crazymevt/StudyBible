@@ -757,7 +757,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
 
             Widget downloadWidget;
             final isInstalled = installedIds.contains(m.config.name.toUpperCase());
-            final isSupported = m.config.modDrv.isBible;
+            // Only freely-distributable Bible modules can be installed today.
+            // Anything else stays visible but greyed out with the reason.
+            final String? blockReason = !m.config.modDrv.isBible
+                ? 'Only Bible modules are currently supported'
+                : !m.config.isFreelyDistributable
+                    ? 'License does not permit redistribution'
+                    : null;
+            final canInstall = blockReason == null;
 
             if (isInstalled) {
               downloadWidget = Row(
@@ -766,8 +773,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                   const Icon(Icons.check_circle, color: Colors.green),
                   IconButton(
                     icon: const Icon(Icons.refresh),
-                    tooltip: 'Redownload',
-                    onPressed: isSupported ? () {
+                    tooltip: canInstall ? 'Redownload' : blockReason,
+                    onPressed: canInstall ? () {
                       ref
                           .read(contentManagerControllerProvider.notifier)
                           .downloadAndImportCrosswire(m);
@@ -798,8 +805,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
             } else {
               downloadWidget = IconButton(
                 icon: const Icon(Icons.download),
-                tooltip: isSupported ? 'Download' : 'Only Bible modules are currently supported',
-                onPressed: isSupported ? () {
+                tooltip: canInstall ? 'Download' : blockReason,
+                onPressed: canInstall ? () {
                   ref
                       .read(contentManagerControllerProvider.notifier)
                       .downloadAndImportCrosswire(m);
@@ -808,13 +815,17 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
             }
 
             final aboutText = m.config.about;
-            final license = m.config.value('DistributionLicense');
-            final shortCopyright = m.config.value('ShortCopyright');
+            final license = m.config.distributionLicense;
+            final copyright = m.config.copyright;
+            final shortCopyright = m.config.shortCopyright;
 
             Widget trailing = Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (aboutText != null || license != null || shortCopyright != null)
+                if (aboutText != null ||
+                    license != null ||
+                    copyright != null ||
+                    shortCopyright != null)
                   IconButton(
                     icon: const Icon(Icons.info_outline),
                     tooltip: 'Info',
@@ -831,7 +842,13 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                   Text('License: $license', style: const TextStyle(fontWeight: FontWeight.bold)),
                                   const SizedBox(height: 8),
                                 ],
-                                if (shortCopyright != null) ...[
+                                if (copyright != null) ...[
+                                  Text('Copyright: $copyright', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 8),
+                                ],
+                                // Only show the short copyright when it isn't
+                                // already covered by the full notice above.
+                                if (shortCopyright != null && shortCopyright != copyright) ...[
                                   Text('Copyright: $shortCopyright', style: const TextStyle(fontWeight: FontWeight.bold)),
                                   const SizedBox(height: 8),
                                 ],
@@ -853,9 +870,15 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
               ],
             );
 
+            final dimmed = !canInstall && !isInstalled;
             return ListTile(
+              enabled: !dimmed,
               title: Text(m.config.description ?? m.config.name),
-              subtitle: Text('${m.config.name} • ${m.config.value('ModDrv') ?? 'Unknown'} • ${m.config.lang ?? 'Unknown'}'),
+              subtitle: Text(
+                '${m.config.name} • ${m.config.value('ModDrv') ?? 'Unknown'} • ${m.config.lang ?? 'Unknown'}'
+                '${blockReason != null ? '\n$blockReason' : ''}',
+              ),
+              isThreeLine: blockReason != null,
               trailing: trailing,
             );
           },

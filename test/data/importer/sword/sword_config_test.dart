@@ -117,4 +117,54 @@ Lang=en
       expect(c.value('DistributionLicense'), 'a=b=c');
     });
   });
+
+  group('SwordConfig.isFreelyDistributable', () {
+    SwordConfig withLicense(String? license) => SwordConfig.parse(
+          '[M]\nModDrv=zText'
+          '${license == null ? '' : '\nDistributionLicense=$license'}',
+        );
+
+    test('recognises licenses that grant redistribution', () {
+      const granted = [
+        'Public Domain',
+        'Creative Commons: BY-SA 4.0',
+        'GNU General Public License',
+        'GNU Free Documentation License (GFDL)',
+        'Copyrighted; Free non-commercial distribution',
+        'Copyrighted; Permission to distribute granted to CrossWire',
+        'General public license for distribution for any purpose',
+      ];
+      for (final lic in granted) {
+        expect(withLicense(lic).isFreelyDistributable, isTrue, reason: lic);
+      }
+    });
+
+    test('fails closed for bare/absent/unknown licenses', () {
+      expect(withLicense('Copyrighted').isFreelyDistributable, isFalse);
+      expect(withLicense('All rights reserved').isFreelyDistributable, isFalse);
+      expect(withLicense('').isFreelyDistributable, isFalse);
+      expect(withLicense(null).isFreelyDistributable, isFalse);
+    });
+  });
+
+  group('SwordConfig copyright getters', () {
+    test('expose DistributionLicense / Copyright / ShortCopyright', () {
+      final c = SwordConfig.parse(
+        '[M]\n'
+        'DistributionLicense=Public Domain\n'
+        'Copyright=Copyright 1769, public domain.\n'
+        'ShortCopyright=Public domain.',
+      );
+      expect(c.distributionLicense, 'Public Domain');
+      expect(c.copyright, 'Copyright 1769, public domain.');
+      expect(c.shortCopyright, 'Public domain.');
+    });
+
+    test('return null when absent', () {
+      final c = SwordConfig.parse('[M]\nModDrv=zText');
+      expect(c.distributionLicense, isNull);
+      expect(c.copyright, isNull);
+      expect(c.shortCopyright, isNull);
+    });
+  });
 }

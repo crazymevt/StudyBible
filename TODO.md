@@ -116,13 +116,21 @@ Running list of known issues and follow-ups.
     - **Phase 4 DONE — CrossWire download manager** (2026-06-24).
       New "CrossWire Catalog" tab beside ph4.org/OSIS: fetches
       [`masterRepoList.conf`](https://crosswire.org/ftpmirror/pub/sword/masterRepoList.conf)
-      → repos; fetches each repo's `mods.d.tar.gz` → parses confs into a catalog
-      (Description + license); downloads `packages/rawzip/<NAME>.zip` → existing
-      SWORD importer. Gates the list to supported + freely-distributable +
-      **unlocked** modules (skips any conf with a `CipherKey`); greys out the
-      rest with the reason. Preserves and displays each module's
-      `DistributionLicense`/`Copyright`/`ShortCopyright`. Sets a proper
-      `User-Agent` and utilizes HTTPS.
+      to locate the **primary CrossWire repo**, fetches that repo's
+      `mods.d.tar.gz` → parses confs into a catalog (Description + license);
+      downloads `packages/rawzip/<NAME>.zip` → existing SWORD importer.
+      (Enumerating the *other* repos in the master list is deferred — see the
+      Phase-1 note's "single primary repo" caveat; revisit when broader coverage
+      is wanted.) **Unlocked** only — confs with a `CipherKey` are skipped
+      outright. Remaining modules stay visible but are **greyed out with the
+      reason** unless they are both supported (a Bible driver — `zText`/`RawText`)
+      and **freely distributable** (`SwordConfig.isFreelyDistributable` accepts
+      only `DistributionLicense` values that explicitly grant redistribution —
+      public domain, Creative Commons, the GNU licenses, and the "Free …/
+      Permission … to distribute" grants — and fails closed on a bare
+      `Copyrighted`/absent license). The info dialog preserves and displays each
+      module's `DistributionLicense`, full `Copyright`, and `ShortCopyright`.
+      Sets a proper `User-Agent` (incl. app version) and uses HTTPS throughout.
     - **Phase 3 — more versifications** (data-heavy, mechanical): Synodal,
       German, Vulgate, LXX, NRSV(A), Catholic/Catholic2, … Same
       `SwordVersification` shape, validated against aggregate totals as KJV was.
