@@ -4,7 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 /// Files that live in the app data directory and should be carried over from
-/// the legacy location on first run (Linux only).
+/// the legacy location on first run (desktop platforms).
 const _migratableFiles = ['content.db', 'user.db', 'device_id.txt'];
 
 Future<void>? _migration;
@@ -12,17 +12,25 @@ Future<void>? _migration;
 /// Directory for app-internal data: the content and user databases, the device
 /// id, and the default sync folder.
 ///
-/// **Linux only** uses [getApplicationSupportDirectory] (backed by
-/// `XDG_DATA_HOME`), which is persistent and works inside the Flatpak sandbox.
-/// The Documents dir relies on the optional `xdg-user-dir` tool and is not a
-/// stable, persistent location under Flatpak, so a downloaded bible vanished on
-/// restart. Existing Linux installs are migrated from the old location.
+/// **Desktop platforms** (Linux, Windows, macOS) use
+/// [getApplicationSupportDirectory] so app-internal databases stay out of the
+/// user's Documents root, where they were previously dumped alongside personal
+/// files:
+///   * Linux — `XDG_DATA_HOME`, persistent and working inside the Flatpak
+///     sandbox (Documents relies on the optional `xdg-user-dir` tool and is not
+///     a stable, persistent location under Flatpak, so a downloaded bible
+///     vanished on restart).
+///   * Windows — `%APPDATA%\<org>\<app>`.
+///   * macOS — `~/Library/Application Support/<bundle id>`.
 ///
-/// Every other platform keeps [getApplicationDocumentsDirectory] — it persists
-/// fine there and is where existing installs already store their data, so no
-/// migration is needed and nothing moves.
+/// Existing desktop installs are migrated from the old Documents location on
+/// first run.
+///
+/// **Mobile** (Android, iOS) keeps [getApplicationDocumentsDirectory] — it is
+/// already app-private and sandboxed there, and is where existing installs
+/// store their data, so no migration is needed and nothing moves.
 Future<Directory> appDataDir() async {
-  if (!Platform.isLinux) {
+  if (Platform.isAndroid || Platform.isIOS) {
     return getApplicationDocumentsDirectory();
   }
   final dir = await getApplicationSupportDirectory();
