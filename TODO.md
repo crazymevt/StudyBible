@@ -14,6 +14,8 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
+- [ ] **Gesture navigation using PageView.** Implement swipe navigation in the Reader to change chapters by wrapping the content in a `PageView`. This will require refactoring the state to eagerly load adjacent chapters to support smooth swipe animations.
+
 - [x] **Start TTS (read-aloud) from the selected verse, not the chapter
   beginning.** When a verse is selected, read-aloud now begins at the first
   selected verse instead of restarting from verse 1.

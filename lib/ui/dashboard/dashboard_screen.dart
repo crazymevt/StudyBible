@@ -13,6 +13,7 @@ import '../../app/reading_plan_providers.dart';
 import '../../app/app_state.dart';
 import '../../data/verse_of_the_day_list.dart';
 import '../../app/reader_state.dart';
+import '../../app/content_providers.dart';
 import '../common/search_title_bar.dart';
 import '../../app/sync_service.dart';
 import '../common/breakpoints.dart';
@@ -838,6 +839,8 @@ extension on DashboardScreen {
               ref.read(selectedVersesProvider.notifier).clear();
               ref.read(selectedVersesProvider.notifier).toggle(verseNum);
             }
+
+            ref.read(navigationControllerProvider).recordHistory(verse: verseNum);
 
             ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
           }
