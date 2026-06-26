@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.6.26+1",
+    "date": "2026-06-26",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "resolve iOS file picker and share sheet platform exceptions",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "show bible completions count on dashboard and support iteration checks in achievements",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.25+3",
     "date": "2026-06-25",
     "features": [
