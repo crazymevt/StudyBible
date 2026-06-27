@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.27+4",
+    "date": "2026-06-27",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "ci: automate appcast.xml version bump and gh-pages deployment",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.6.27+3",
     "date": "2026-06-27",
     "features": [
