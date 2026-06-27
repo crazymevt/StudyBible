@@ -1,6 +1,9 @@
 name: Build Windows Installer (Manual)
 
 on:
+  push:
+    branches:
+      - feature/windows-installer-auto-updater
   workflow_dispatch:
 
 jobs:
