@@ -34,7 +34,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       const _TutorialPage(
         icon: Icons.view_sidebar,
         title: 'Study Tools',
-        description: 'Access a powerful suite of tools from the side panel: Commentaries, Dictionaries, Reading Plans, Devotionals, and Media.',
+        description: 'Access a powerful suite of study tools from the side panel, including Cross-References, Notes, Commentaries, Dictionaries, Sermons, Reading Plans, Devotionals, and more.',
       ),
       const _TutorialPage(
         icon: Icons.search,
@@ -49,7 +49,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       const _TutorialPage(
         icon: Icons.cloud_download,
         title: 'Content Manager & Sync',
-        description: 'Download dozens of free Bibles and dictionaries from the CrossWire library. Use the Backup & Restore feature to safely sync your data across devices.',
+        description: 'Download hundreds of free Bibles, commentaries, dictionaries, and devotionals from multiple catalogs. Use the Backup & Restore feature to safely sync your data across devices.',
       ),
     ];
 
