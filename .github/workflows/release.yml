@@ -135,15 +135,15 @@ jobs:
       - name: Build Windows
         run: flutter build windows --release
 
-      - name: Compress Windows Build
-        run: Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath StudyBible-Windows.zip
+      - name: Compile Inno Setup Script
+        run: iscc windows\packaging\inno_setup.iss
 
       - name: Release Artifacts
         uses: softprops/action-gh-release@v2
         with:
           make_latest: "true"
           files: |
-            StudyBible-Windows.zip
+            build/windows/installer/StudyBible-Setup.exe
 
   build-flatpak:
     name: Build Flatpak
