@@ -32,7 +32,7 @@ class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration {
@@ -43,12 +43,16 @@ class UserStore extends _$UserStore {
           CREATE VIRTUAL TABLE IF NOT EXISTS user_search USING fts5(type UNINDEXED, reference_id UNINDEXED, text_content);
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
+          CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes 
+          WHEN new.deleted = 0
+          BEGIN
             INSERT INTO user_search(type, reference_id, text_content) VALUES ('note', new.id, new.content);
           END;
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS notes_au AFTER UPDATE ON notes BEGIN
+          CREATE TRIGGER IF NOT EXISTS notes_au AFTER UPDATE ON notes 
+          WHEN new.deleted = 0
+          BEGIN
             UPDATE user_search SET text_content = new.content WHERE type = 'note' AND reference_id = new.id;
           END;
         ''');
@@ -58,12 +62,23 @@ class UserStore extends _$UserStore {
           END;
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS sermons_ai AFTER INSERT ON sermons BEGIN
+          CREATE TRIGGER IF NOT EXISTS notes_soft_delete_au AFTER UPDATE ON notes 
+          WHEN new.deleted = 1 AND old.deleted = 0
+          BEGIN
+            DELETE FROM user_search WHERE type = 'note' AND reference_id = old.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS sermons_ai AFTER INSERT ON sermons 
+          WHEN new.deleted = 0
+          BEGIN
             INSERT INTO user_search(type, reference_id, text_content) VALUES ('sermon', new.id, new.title || ' ' || COALESCE(new.series, '') || ' ' || COALESCE(new.content_plain, ''));
           END;
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS sermons_au AFTER UPDATE ON sermons BEGIN
+          CREATE TRIGGER IF NOT EXISTS sermons_au AFTER UPDATE ON sermons 
+          WHEN new.deleted = 0
+          BEGIN
             UPDATE user_search SET text_content = new.title || ' ' || COALESCE(new.series, '') || ' ' || COALESCE(new.content_plain, '') WHERE type = 'sermon' AND reference_id = new.id;
           END;
         ''');
@@ -73,12 +88,23 @@ class UserStore extends _$UserStore {
           END;
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS journals_ai AFTER INSERT ON journals BEGIN
+          CREATE TRIGGER IF NOT EXISTS sermons_soft_delete_au AFTER UPDATE ON sermons 
+          WHEN new.deleted = 1 AND old.deleted = 0
+          BEGIN
+            DELETE FROM user_search WHERE type = 'sermon' AND reference_id = old.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS journals_ai AFTER INSERT ON journals 
+          WHEN new.deleted = 0
+          BEGIN
             INSERT INTO user_search(type, reference_id, text_content) VALUES ('journal', new.id, new.title || ' ' || new.content);
           END;
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS journals_au AFTER UPDATE ON journals BEGIN
+          CREATE TRIGGER IF NOT EXISTS journals_au AFTER UPDATE ON journals 
+          WHEN new.deleted = 0
+          BEGIN
             UPDATE user_search SET text_content = new.title || ' ' || new.content WHERE type = 'journal' AND reference_id = new.id;
           END;
         ''');
@@ -88,17 +114,35 @@ class UserStore extends _$UserStore {
           END;
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS prayers_ai AFTER INSERT ON prayers BEGIN
+          CREATE TRIGGER IF NOT EXISTS journals_soft_delete_au AFTER UPDATE ON journals 
+          WHEN new.deleted = 1 AND old.deleted = 0
+          BEGIN
+            DELETE FROM user_search WHERE type = 'journal' AND reference_id = old.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS prayers_ai AFTER INSERT ON prayers 
+          WHEN new.deleted = 0
+          BEGIN
             INSERT INTO user_search(type, reference_id, text_content) VALUES ('prayer', new.id, new.name || ' ' || new.description);
           END;
         ''');
         await customStatement('''
-          CREATE TRIGGER IF NOT EXISTS prayers_au AFTER UPDATE ON prayers BEGIN
+          CREATE TRIGGER IF NOT EXISTS prayers_au AFTER UPDATE ON prayers 
+          WHEN new.deleted = 0
+          BEGIN
             UPDATE user_search SET text_content = new.name || ' ' || new.description WHERE type = 'prayer' AND reference_id = new.id;
           END;
         ''');
         await customStatement('''
           CREATE TRIGGER IF NOT EXISTS prayers_ad AFTER DELETE ON prayers BEGIN
+            DELETE FROM user_search WHERE type = 'prayer' AND reference_id = old.id;
+          END;
+        ''');
+        await customStatement('''
+          CREATE TRIGGER IF NOT EXISTS prayers_soft_delete_au AFTER UPDATE ON prayers 
+          WHEN new.deleted = 1 AND old.deleted = 0
+          BEGIN
             DELETE FROM user_search WHERE type = 'prayer' AND reference_id = old.id;
           END;
         ''');
@@ -126,6 +170,13 @@ class UserStore extends _$UserStore {
           ''');
           await customStatement('''
             CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
+              DELETE FROM user_search WHERE type = 'note' AND reference_id = old.id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS notes_soft_delete_au AFTER UPDATE ON notes 
+            WHEN new.deleted = 1 AND old.deleted = 0
+            BEGIN
               DELETE FROM user_search WHERE type = 'note' AND reference_id = old.id;
             END;
           ''');
@@ -295,6 +346,250 @@ class UserStore extends _$UserStore {
           await customStatement('''
             INSERT INTO user_search(type, reference_id, text_content)
             SELECT 'sermon', id, title || ' ' || COALESCE(series, '') || ' ' || COALESCE(content_plain, '') FROM sermons WHERE deleted = 0;
+          ''');
+        }
+        if (from < 14) {
+          // Soft-delete triggers for search index cleanup
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS notes_soft_delete_au AFTER UPDATE ON notes 
+            WHEN new.deleted = 1 AND old.deleted = 0
+            BEGIN
+              DELETE FROM user_search WHERE type = 'note' AND reference_id = old.id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS sermons_soft_delete_au AFTER UPDATE ON sermons 
+            WHEN new.deleted = 1 AND old.deleted = 0
+            BEGIN
+              DELETE FROM user_search WHERE type = 'sermon' AND reference_id = old.id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS journals_soft_delete_au AFTER UPDATE ON journals 
+            WHEN new.deleted = 1 AND old.deleted = 0
+            BEGIN
+              DELETE FROM user_search WHERE type = 'journal' AND reference_id = old.id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS prayers_soft_delete_au AFTER UPDATE ON prayers 
+            WHEN new.deleted = 1 AND old.deleted = 0
+            BEGIN
+              DELETE FROM user_search WHERE type = 'prayer' AND reference_id = old.id;
+            END;
+          ''');
+
+          // Cleanup orphaned items from FTS index
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'note' AND reference_id IN (SELECT id FROM notes WHERE deleted = 1);
+          ''');
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'sermon' AND reference_id IN (SELECT id FROM sermons WHERE deleted = 1);
+          ''');
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'journal' AND reference_id IN (SELECT id FROM journals WHERE deleted = 1);
+          ''');
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'prayer' AND reference_id IN (SELECT id FROM prayers WHERE deleted = 1);
+          ''');
+        }
+
+        if (from < 16) {
+          // Drop all existing triggers
+          await customStatement('DROP TRIGGER IF EXISTS notes_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS notes_au;');
+          await customStatement('DROP TRIGGER IF EXISTS notes_ad;');
+          await customStatement('DROP TRIGGER IF EXISTS sermons_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS sermons_au;');
+          await customStatement('DROP TRIGGER IF EXISTS sermons_ad;');
+          await customStatement('DROP TRIGGER IF EXISTS journals_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS journals_au;');
+          await customStatement('DROP TRIGGER IF EXISTS journals_ad;');
+          await customStatement('DROP TRIGGER IF EXISTS prayers_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS prayers_au;');
+          await customStatement('DROP TRIGGER IF EXISTS prayers_ad;');
+          await customStatement('DROP TRIGGER IF EXISTS notes_soft_delete_au;');
+          await customStatement('DROP TRIGGER IF EXISTS sermons_soft_delete_au;');
+          await customStatement('DROP TRIGGER IF EXISTS journals_soft_delete_au;');
+          await customStatement('DROP TRIGGER IF EXISTS prayers_soft_delete_au;');
+
+          // Recreate with robust INSERT OR REPLACE support
+          await customStatement('''
+            CREATE TRIGGER notes_ai AFTER INSERT ON notes 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'note' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'note', new.id, new.content WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER notes_au AFTER UPDATE ON notes 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'note' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'note', new.id, new.content WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER notes_ad AFTER DELETE ON notes 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'note' AND reference_id = old.id;
+            END;
+          ''');
+
+          await customStatement('''
+            CREATE TRIGGER sermons_ai AFTER INSERT ON sermons 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'sermon' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'sermon', new.id, new.title || ' ' || COALESCE(new.series, '') || ' ' || COALESCE(new.content_plain, '') WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER sermons_au AFTER UPDATE ON sermons 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'sermon' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'sermon', new.id, new.title || ' ' || COALESCE(new.series, '') || ' ' || COALESCE(new.content_plain, '') WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER sermons_ad AFTER DELETE ON sermons 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'sermon' AND reference_id = old.id;
+            END;
+          ''');
+
+          await customStatement('''
+            CREATE TRIGGER journals_ai AFTER INSERT ON journals 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'journal' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'journal', new.id, new.title || ' ' || new.content WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER journals_au AFTER UPDATE ON journals 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'journal' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'journal', new.id, new.title || ' ' || new.content WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER journals_ad AFTER DELETE ON journals 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'journal' AND reference_id = old.id;
+            END;
+          ''');
+
+          await customStatement('''
+            CREATE TRIGGER prayers_ai AFTER INSERT ON prayers 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'prayer' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'prayer', new.id, new.name || ' ' || new.description WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER prayers_au AFTER UPDATE ON prayers 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'prayer' AND reference_id = new.id;
+              INSERT INTO user_search(type, reference_id, text_content) SELECT 'prayer', new.id, new.name || ' ' || new.description WHERE new.deleted = 0;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER prayers_ad AFTER DELETE ON prayers 
+            BEGIN
+              DELETE FROM user_search WHERE type = 'prayer' AND reference_id = old.id;
+            END;
+          ''');
+
+          // Wipe and rebuild the FTS index completely to guarantee perfection
+          await customStatement('DELETE FROM user_search;');
+          await customStatement("INSERT INTO user_search(type, reference_id, text_content) SELECT 'note', id, content FROM notes WHERE deleted = 0;");
+          await customStatement("INSERT INTO user_search(type, reference_id, text_content) SELECT 'journal', id, title || ' ' || content FROM journals WHERE deleted = 0;");
+          await customStatement("INSERT INTO user_search(type, reference_id, text_content) SELECT 'sermon', id, title || ' ' || COALESCE(series, '') || ' ' || COALESCE(content_plain, '') FROM sermons WHERE deleted = 0;");
+          await customStatement("INSERT INTO user_search(type, reference_id, text_content) SELECT 'prayer', id, name || ' ' || description FROM prayers WHERE deleted = 0;");
+        }
+
+        if (from < 15) {
+          // Drop all existing _ai and _au triggers
+          await customStatement('DROP TRIGGER IF EXISTS notes_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS notes_au;');
+          await customStatement('DROP TRIGGER IF EXISTS sermons_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS sermons_au;');
+          await customStatement('DROP TRIGGER IF EXISTS journals_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS journals_au;');
+          await customStatement('DROP TRIGGER IF EXISTS prayers_ai;');
+          await customStatement('DROP TRIGGER IF EXISTS prayers_au;');
+
+          // Recreate with WHEN new.deleted = 0
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes 
+            WHEN new.deleted = 0
+            BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('note', new.id, new.content);
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS notes_au AFTER UPDATE ON notes 
+            WHEN new.deleted = 0
+            BEGIN
+              UPDATE user_search SET text_content = new.content WHERE type = 'note' AND reference_id = new.id;
+            END;
+          ''');
+
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS sermons_ai AFTER INSERT ON sermons 
+            WHEN new.deleted = 0
+            BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('sermon', new.id, new.title || ' ' || COALESCE(new.series, '') || ' ' || COALESCE(new.content_plain, ''));
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS sermons_au AFTER UPDATE ON sermons 
+            WHEN new.deleted = 0
+            BEGIN
+              UPDATE user_search SET text_content = new.title || ' ' || COALESCE(new.series, '') || ' ' || COALESCE(new.content_plain, '') WHERE type = 'sermon' AND reference_id = new.id;
+            END;
+          ''');
+
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS journals_ai AFTER INSERT ON journals 
+            WHEN new.deleted = 0
+            BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('journal', new.id, new.title || ' ' || new.content);
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS journals_au AFTER UPDATE ON journals 
+            WHEN new.deleted = 0
+            BEGIN
+              UPDATE user_search SET text_content = new.title || ' ' || new.content WHERE type = 'journal' AND reference_id = new.id;
+            END;
+          ''');
+
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS prayers_ai AFTER INSERT ON prayers 
+            WHEN new.deleted = 0
+            BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('prayer', new.id, new.name || ' ' || new.description);
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS prayers_au AFTER UPDATE ON prayers 
+            WHEN new.deleted = 0
+            BEGIN
+              UPDATE user_search SET text_content = new.name || ' ' || new.description WHERE type = 'prayer' AND reference_id = new.id;
+            END;
+          ''');
+
+          // Cleanup orphaned items from FTS index (again, just in case)
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'note' AND reference_id IN (SELECT id FROM notes WHERE deleted = 1);
+          ''');
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'sermon' AND reference_id IN (SELECT id FROM sermons WHERE deleted = 1);
+          ''');
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'journal' AND reference_id IN (SELECT id FROM journals WHERE deleted = 1);
+          ''');
+          await customStatement('''
+            DELETE FROM user_search WHERE type = 'prayer' AND reference_id IN (SELECT id FROM prayers WHERE deleted = 1);
           ''');
         }
       },
