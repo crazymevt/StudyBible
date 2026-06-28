@@ -1,5 +1,35 @@
 [
   {
+    "version": "26.6.28+1",
+    "date": "2026-06-28",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "Integrate Find in Page into Global Search",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "improve tutorial descriptions for study tools and content manager",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "fix inaccuracies in tutorial screen text",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "add hover effect to content manager rows",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.6.27+4",
     "date": "2026-06-27",
     "features": [
