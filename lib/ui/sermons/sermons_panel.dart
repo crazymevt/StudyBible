@@ -137,55 +137,88 @@ class SermonsPanel extends ConsumerWidget {
   }
 
   Future<void> _showNewSermonDialog(BuildContext context, WidgetRef ref) async {
-    final titleController = TextEditingController();
-    final seriesController = TextEditingController();
-
-    await showDialog(
+    final result = await showDialog<({String title, String? series})>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('New Sermon'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
-            ),
-            TextField(
-              controller: seriesController,
-              decoration: const InputDecoration(labelText: 'Series (Optional)'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder: (context) => const _NewSermonDialog(),
+    );
+    if (result == null || !context.mounted) return;
+
+    final sermon = await ref
+        .read(sermonActionProvider)
+        .createSermon(result.title, series: result.series);
+    if (!context.mounted) return;
+
+    // Open the editor only after the dialog has fully dismissed (its future has
+    // completed). Mounting the editor's QuillEditor while the dialog route was
+    // still tearing down corrupted the element tree
+    // ("_dependents.isEmpty is not true") and crashed.
+    if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
+      ref.read(selectedSermonIdProvider.notifier).set(sermon.id);
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) =>
+            SermonEditorScreen(sermonId: sermon.id, isFullScreen: true),
+      ));
+    }
+  }
+}
+
+/// New-sermon dialog. A [StatefulWidget] so its controllers are disposed in
+/// [State.dispose] — i.e. after the route is fully removed — rather than the
+/// instant `showDialog` returns, which raced the dismiss animation and threw
+/// "TextEditingController used after disposed". Returns the entered
+/// (title, series) via [Navigator.pop], or null on cancel.
+class _NewSermonDialog extends StatefulWidget {
+  const _NewSermonDialog();
+
+  @override
+  State<_NewSermonDialog> createState() => _NewSermonDialogState();
+}
+
+class _NewSermonDialogState extends State<_NewSermonDialog> {
+  final _titleController = TextEditingController();
+  final _seriesController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _seriesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('New Sermon'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _titleController,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Title'),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final sermon = await ref.read(sermonActionProvider).createSermon(
-                titleController.text,
-                series: seriesController.text.isNotEmpty ? seriesController.text : null,
-              );
-              if (context.mounted) {
-                Navigator.pop(context);
-                if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
-                  ref.read(selectedSermonIdProvider.notifier).set(sermon.id);
-                } else {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => SermonEditorScreen(sermonId: sermon.id, isFullScreen: true),
-                  ));
-                }
-              }
-            },
-            child: const Text('Create'),
+          TextField(
+            controller: _seriesController,
+            decoration: const InputDecoration(labelText: 'Series (Optional)'),
           ),
         ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context, (
+            title: _titleController.text,
+            series: _seriesController.text.isNotEmpty
+                ? _seriesController.text
+                : null,
+          )),
+          child: const Text('Create'),
+        ),
+      ],
     );
-
-    titleController.dispose();
-    seriesController.dispose();
   }
 }
