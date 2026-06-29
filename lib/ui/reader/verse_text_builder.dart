@@ -50,6 +50,7 @@ List<InlineSpan> buildVerseSpans({
     final segments = jsonList.map((e) => VerseSegment.fromJson(e)).toList();
 
     bool hasText = false;
+    int footnoteCount = 0;
     for (final seg in segments) {
       if (!hasText && (seg.isParagraphBreak || seg.isLineBreak)) {
         if (!ignoreLeadingBreaks) {
@@ -69,23 +70,47 @@ List<InlineSpan> buildVerseSpans({
       } else if (seg.isLineBreak) {
         spans.add(const TextSpan(text: '\n'));
       } else if (seg.isFootnote) {
+        final footnoteText = seg.footnoteText;
+
+        // Some modules (e.g. the AV "KJV with cross references") store footnote
+        // markers whose body is only a bracketed index like "[1]" — a call-out
+        // into a cross-reference apparatus that wasn't imported. There's no
+        // readable note behind them, so a marker would just open a useless
+        // "[1]" popup. Drop any footnote whose body carries no letters.
+        if (footnoteText == null ||
+            !RegExp(r'\p{L}', unicode: true).hasMatch(footnoteText)) {
+          continue;
+        }
+
         // A quiet, link-coloured superscript reference rather than a heavy
         // filled chip — the old solid box competed with the verse text and
         // read like a tappable verse number / button. The raised baseline and
         // lighter weight keep it distinct from the bold, baseline verse number.
+        //
+        // Crucially we render a compact marker, NOT the footnote body itself —
+        // some modules (e.g. the CrossWire KJV) carry very long notes, and
+        // dumping the whole body inline made verses hard to read. The full text
+        // is shown on tap.
+        //
+        // Conventional footnote marks rather than a number: numbering can't be
+        // chapter-continuous here (buildVerseSpans runs per verse, and the list
+        // builds verses lazily/out of order), so a per-verse number would just
+        // render "1" on almost every verse. Marks cycle within a verse and read
+        // as footnote indicators.
+        const marks = ['*', '†', '‡', '§'];
+        final mark = marks[footnoteCount % marks.length];
+        footnoteCount++;
         spans.add(
           WidgetSpan(
             alignment: PlaceholderAlignment.top,
             child: GestureDetector(
-              onTap: () {
-                onFootnoteTap?.call(verse.verse);
-              },
+              onTap: () => _showFootnote(context, footnoteText),
               behavior: HitTestBehavior.opaque,
               child: Padding(
                 // Small inset preserves a comfortable tap target without a box.
                 padding: const EdgeInsets.symmetric(horizontal: 1.5),
                 child: Text(
-                  seg.footnoteText ?? 'f',
+                  mark,
                   // Inherit labelSmall's size (which already tracks the user's
                   // font-size delta) rather than pinning it.
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -168,6 +193,48 @@ List<InlineSpan> buildVerseSpans({
     ));
     return spans;
   }
+}
+
+/// Shows a footnote's full text in a modal sheet. The inline marker stays a
+/// compact superscript number so long notes (common in the CrossWire KJV) don't
+/// clutter the verse; the body lives here, behind a tap.
+void _showFootnote(BuildContext context, String text) {
+  showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (sheetContext) {
+      return SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(sheetContext).size.height * 0.6,
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Footnote',
+                  style: Theme.of(sheetContext).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(sheetContext).colorScheme.primary,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                SelectableText(
+                  text,
+                  style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 List<InlineSpan> _buildHighlightedSpans(
