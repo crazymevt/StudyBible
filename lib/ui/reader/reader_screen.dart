@@ -21,6 +21,7 @@ import '../../data/tts_service.dart';
 import 'commentary_panel.dart';
 import 'dictionary_panel.dart';
 import '../common/search_title_bar.dart';
+import '../onboarding/tutorial_keys.dart';
 import '../common/sync_button.dart';
 import '../app_drawer.dart';
 import '../../app/dashboard_providers.dart';
@@ -436,7 +437,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           centerTitle: true,
-          title: const SearchTitleBar(),
+          // Explicit drawer button (mirrors Scaffold's auto leading) so the
+          // tutorial can spotlight it for the Journals and Content steps.
+          leading: Builder(
+            builder: (context) => IconButton(
+              key: tutorialMenuKey,
+              icon: const Icon(Icons.menu),
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+          title: SearchTitleBar(key: tutorialSearchKey),
           // Pack the action buttons with shrink-wrapped tap targets and
           // compact density so the full set (history, audio, TTS, sync,
           // versions, view-toggle, tools) still fits on narrow phones without
