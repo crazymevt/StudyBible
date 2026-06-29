@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/journal_providers.dart';
+import '../../data/export/document_pdf.dart';
 import 'journals_list_panel.dart';
 import '../tags/tag_editor_dialog.dart';
 import '../common/breakpoints.dart';
@@ -115,6 +116,27 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                 ),
               ),
               if (_currentId != null) ...[
+                  IconButton(
+                    icon: const Icon(Icons.print),
+                    tooltip: 'Print',
+                    onPressed: () {
+                      final title = _titleController.text.trim().isEmpty
+                          ? 'Journal Entry'
+                          : _titleController.text.trim();
+                      final date = ref.read(selectedJournalDateProvider);
+                      printPlainTextDocument(
+                        title: title,
+                        sections: [
+                          PdfDocSection(
+                            heading: title,
+                            subheading:
+                                '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
+                            body: _contentController.text,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.label),
                     tooltip: 'Manage Tags',
