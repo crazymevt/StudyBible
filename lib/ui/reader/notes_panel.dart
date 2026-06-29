@@ -3,7 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
+import '../../data/export/document_pdf.dart';
 import '../tags/tag_editor_dialog.dart';
+
+/// Heading shown for a note in the printed output and the panel list.
+String _noteLabel(dynamic note) {
+  if (note.selectedVerses != null) {
+    return (note.selectedVerses as String).contains(',')
+        ? 'Verses ${note.selectedVerses}'
+        : 'Verse ${note.selectedVerses}';
+  }
+  if (note.verse != null) return 'Verse ${note.verse}';
+  return 'Chapter Note';
+}
 
 class NotesPanel extends ConsumerWidget {
   const NotesPanel({super.key});
@@ -11,6 +23,9 @@ class NotesPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notesAsync = ref.watch(chapterNotesProvider);
+    final bookName = ref.watch(selectedBookNameProvider);
+    final chapter = ref.watch(selectedChapterProvider);
+    final notes = notesAsync.value ?? const [];
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -31,14 +46,34 @@ class NotesPanel extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    ref.read(activeToolProvider.notifier).close();
-                    if (Navigator.of(context).canPop()) {
-                      Navigator.of(context).pop();
-                    }
-                  },
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (notes.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(Icons.print),
+                        tooltip: 'Print notes',
+                        onPressed: () => printPlainTextDocument(
+                          title: 'Notes — $bookName $chapter',
+                          sections: [
+                            for (final note in notes)
+                              PdfDocSection(
+                                heading: _noteLabel(note),
+                                body: note.content,
+                              ),
+                          ],
+                        ),
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        ref.read(activeToolProvider.notifier).close();
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -58,16 +93,7 @@ class NotesPanel extends ConsumerWidget {
                   separatorBuilder: (_, _) => const Divider(),
                   itemBuilder: (context, index) {
                     final note = notes[index];
-                    String title;
-                    if (note.selectedVerses != null) {
-                      title = note.selectedVerses!.contains(',')
-                          ? 'Verses ${note.selectedVerses}'
-                          : 'Verse ${note.selectedVerses}';
-                    } else if (note.verse != null) {
-                      title = 'Verse ${note.verse}';
-                    } else {
-                      title = 'Chapter Note';
-                    }
+                    final title = _noteLabel(note);
 
                     return ListTile(
                       title: Text(

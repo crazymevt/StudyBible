@@ -11,6 +11,7 @@ import 'package:file_selector/file_selector.dart';
 import '../user_store.dart';
 import '../logging.dart';
 import 'print_service.dart';
+import 'document_pdf.dart';
 import 'dart:io';
 
 enum ExportFormat { pdf, html, text }
@@ -122,13 +123,18 @@ class SermonExporter {
     final pdf = pw.Document();
 
     for (final sermon in sermons) {
-      String plainText = '';
+      // Render the Quill delta with its formatting (headings, lists, bold…)
+      // rather than flattening it to plain text; fall back to raw text if the
+      // content can't be parsed.
+      List<pw.Widget> body;
       try {
-        final doc = Document.fromJson(jsonDecode(sermon.content));
-        plainText = doc.toPlainText();
+        body = quillDeltaToPdfWidgets(jsonDecode(sermon.content) as List<dynamic>);
       } catch (e, stack) {
         logError(e, stack, context: 'SermonExporter._generatePdf parse');
-        plainText = sermon.content;
+        body = [
+          pw.Text(sermon.content,
+              style: const pw.TextStyle(fontSize: 12, lineSpacing: 1.5)),
+        ];
       }
 
       pdf.addPage(
@@ -141,7 +147,7 @@ class SermonExporter {
               pw.Text(sermon.series!, style: pw.TextStyle(fontSize: 18, fontStyle: pw.FontStyle.italic)),
             ],
             pw.SizedBox(height: 20),
-            pw.Text(plainText, style: const pw.TextStyle(fontSize: 12, lineSpacing: 1.5)),
+            ...body,
           ],
         ),
       );
