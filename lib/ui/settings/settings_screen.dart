@@ -19,7 +19,6 @@ import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'acknowledgments_screen.dart';
-import '../onboarding/tutorial_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -242,11 +241,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             subtitle: const Text('View the introductory tutorial again'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const TutorialScreen(),
-                ),
-              );
+              // The tutorial is an overlay on the live shell; switch to the
+              // reader (where its spotlight targets live), clear the flag, and
+              // return there so it replays in context.
+              ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+              ref.read(hasSeenTutorialProvider.notifier).setSeen(false);
+              Navigator.of(context).popUntil((r) => r.isFirst);
             },
           ),
           ListTile(

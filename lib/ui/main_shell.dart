@@ -21,7 +21,8 @@ import 'settings/backup_restore_screen.dart';
 import 'reader/reading_plan_panel.dart';
 
 import 'onboarding/onboarding_screen.dart';
-import 'onboarding/tutorial_screen.dart';
+import 'onboarding/tutorial_overlay.dart';
+import 'onboarding/tutorial_keys.dart';
 import 'common/breakpoints.dart';
 import '../app/content_providers.dart';
 import '../app/shared_prefs.dart';
@@ -99,26 +100,42 @@ class _MainShellState extends ConsumerState<MainShell> {
       return const OnboardingScreen();
     }
 
-    final hasSeenTutorial = ref.watch(hasSeenTutorialProvider);
-    if (!hasSeenTutorial) {
-      return const TutorialScreen();
-    }
-
+    final Widget shell;
     if (currentModule == AppModule.journalsPrayers) {
-      return const JournalsPrayersScreen();
+      shell = const JournalsPrayersScreen();
     } else if (currentModule == AppModule.dashboard) {
-      return const DashboardScreen();
+      shell = const DashboardScreen();
+    } else {
+      shell = LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth > Breakpoints.compact) {
+            return const _DesktopLayout();
+          } else {
+            return const ReaderScreen();
+          }
+        },
+      );
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > Breakpoints.compact) {
-          return const _DesktopLayout();
-        } else {
-          return const ReaderScreen();
-        }
-      },
+    // The interactive tutorial spotlights real shell elements, so it renders
+    // over the live shell rather than replacing it. Marking it seen rebuilds
+    // here and drops the overlay. Only show it once a Bible is positively
+    // installed — otherwise, while versions are still loading (e.g. a fresh
+    // install), it would cover the reader before onboarding can offer a
+    // download, trapping the user behind a tap-absorbing overlay.
+    final hasBibles = versionsAsync.maybeWhen(
+      data: (versions) => versions.isNotEmpty,
+      orElse: () => false,
     );
+    final hasSeenTutorial = ref.watch(hasSeenTutorialProvider);
+    if (!hasSeenTutorial && hasBibles) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [shell, const TutorialOverlay()],
+      );
+    }
+
+    return shell;
   }
 }
 
@@ -134,7 +151,13 @@ class _DesktopLayout extends ConsumerWidget {
     final mainContent = Expanded(
       child: Row(
         children: [
-          const Expanded(flex: 5, child: ReaderScreen()),
+          Expanded(
+            flex: 5,
+            child: KeyedSubtree(
+              key: tutorialReaderKey,
+              child: const ReaderScreen(),
+            ),
+          ),
           if (activeTool != ActiveTool.none)
             const VerticalDivider(width: 1, thickness: 1),
           if (activeTool != ActiveTool.none)
@@ -257,11 +280,13 @@ class _DesktopLayout extends ConsumerWidget {
       ),
     );
 
+    final keyedRail = KeyedSubtree(key: tutorialToolsRailKey, child: navRail);
+
     return Scaffold(
       body: Row(
         children: railSide == NavRailSide.left
-            ? [navRail, mainContent]
-            : [mainContent, navRail],
+            ? [keyedRail, mainContent]
+            : [mainContent, keyedRail],
       ),
     );
   }
