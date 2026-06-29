@@ -61,3 +61,6 @@ analyze.txt
 
 # Locally generated sample content DB (see test/starter_importer_test.dart)
 assets/content.db
+
+# Claude Code settings
+.claude/settings.json
