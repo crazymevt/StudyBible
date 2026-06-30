@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.6.29+6",
+    "date": "2026-06-29",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "refresh reader content caches after a module (re)import",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "use a module's own footnote marker as the inline label",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.29+5",
     "date": "2026-06-29",
     "features": [
