@@ -1,5 +1,59 @@
 [
   {
+    "version": "26.6.30+5",
+    "date": "2026-06-30",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add dashboard widgets toggles in settings",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add dashboard action items widget",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Add action items functionality",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "stop journal panel overflowing when the keyboard opens; move Sync to header",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add journal revision history with cross-device conflict failsafe",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add sermon revision history with cross-device conflict failsafe",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "stop first-launch DB migration races throwing \"already exists\"",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "split verse action bar into two lines on phones",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.30+4",
     "date": "2026-06-30",
     "features": [
