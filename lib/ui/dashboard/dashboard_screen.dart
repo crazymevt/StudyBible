@@ -17,6 +17,7 @@ import '../../app/content_providers.dart';
 import '../common/search_title_bar.dart';
 import '../../app/sync_service.dart';
 import '../common/breakpoints.dart';
+import 'action_items_widget.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -244,6 +245,8 @@ class DashboardScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            const DashboardActionItemsWidget(),
+                            const SizedBox(height: 16),
                             _buildTimeAnalyticsCard(context, timeData, ref),
                             const SizedBox(height: 16),
                             _buildAchievementsCard(context, achievementsAsync),
@@ -267,6 +270,8 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       _buildReadingPlansSection(context, ref),
+                      const SizedBox(height: 16),
+                      const DashboardActionItemsWidget(),
                       const SizedBox(height: 16),
                       _buildTimeAnalyticsCard(context, timeData, ref),
                       const SizedBox(height: 16),

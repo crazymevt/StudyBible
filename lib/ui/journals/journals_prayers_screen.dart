@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app/app_state.dart';
 import '../app_drawer.dart';
 import 'journals_list_panel.dart';
 import 'journal_editor_panel.dart';
@@ -17,10 +18,57 @@ class JournalsPrayersScreen extends ConsumerStatefulWidget {
       _JournalsPrayersScreenState();
 }
 
-class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
+class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen>
+    with TickerProviderStateMixin {
+  late final TabController _mobileTabController;
+  late final TabController _desktopTabController;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialTab = ref.read(journalsActiveTabProvider);
+    
+    int mobileIndex = 0;
+    if (initialTab == JournalsActiveTab.prayers) mobileIndex = 1;
+    if (initialTab == JournalsActiveTab.actions) mobileIndex = 2;
+    
+    int desktopIndex = 0;
+    if (initialTab == JournalsActiveTab.actions) desktopIndex = 1;
+
+    _mobileTabController = TabController(
+        initialIndex: mobileIndex, length: 3, vsync: this);
+    _desktopTabController = TabController(
+        initialIndex: desktopIndex, length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _mobileTabController.dispose();
+    _desktopTabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.sizeOf(context).width > Breakpoints.compact;
+
+    ref.listen(journalsActiveTabProvider, (prev, next) {
+      if (isDesktop) {
+        if (next == JournalsActiveTab.prayers) {
+          _desktopTabController.animateTo(0);
+        } else if (next == JournalsActiveTab.actions) {
+          _desktopTabController.animateTo(1);
+        }
+      } else {
+        if (next == JournalsActiveTab.journals) {
+          _mobileTabController.animateTo(0);
+        } else if (next == JournalsActiveTab.prayers) {
+          _mobileTabController.animateTo(1);
+        } else if (next == JournalsActiveTab.actions) {
+          _mobileTabController.animateTo(2);
+        }
+      }
+    });
 
     if (isDesktop) {
       return Scaffold(
@@ -57,6 +105,7 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
               flex: 3,
               child: _buildTabbedCard(
                 context,
+                controller: _desktopTabController,
                 tabs: const [
                   Tab(text: 'Prayers'),
                   Tab(text: 'Actions'),
@@ -69,31 +118,30 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
       );
     }
 
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        drawer: const AppDrawer(),
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-          centerTitle: true,
-          title: const SearchTitleBar(),
-          actions: const [SyncButton()],
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Journals'),
-              Tab(text: 'Prayers'),
-              Tab(text: 'Actions'),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            JournalsListPanel(),
-            PrayerTrackerPanel(),
-            ActionItemsPanel(),
+    return Scaffold(
+      drawer: const AppDrawer(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        centerTitle: true,
+        title: const SearchTitleBar(),
+        actions: const [SyncButton()],
+        bottom: TabBar(
+          controller: _mobileTabController,
+          tabs: const [
+            Tab(text: 'Journals'),
+            Tab(text: 'Prayers'),
+            Tab(text: 'Actions'),
           ],
         ),
+      ),
+      body: TabBarView(
+        controller: _mobileTabController,
+        children: const [
+          JournalsListPanel(),
+          PrayerTrackerPanel(),
+          ActionItemsPanel(),
+        ],
       ),
     );
   }
@@ -152,6 +200,7 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
   /// the supplied [views] — used to fit Prayers and Actions into one column.
   Widget _buildTabbedCard(
     BuildContext context, {
+    required TabController controller,
     required List<Tab> tabs,
     required List<Widget> views,
   }) {
@@ -166,27 +215,24 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
-      child: DefaultTabController(
-        length: tabs.length,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
-                border: Border(
-                  bottom: BorderSide(
-                    color:
-                        theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.5),
+              border: Border(
+                bottom: BorderSide(
+                  color:
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                 ),
               ),
-              child: TabBar(tabs: tabs),
             ),
-            Expanded(child: TabBarView(children: views)),
-          ],
-        ),
+            child: TabBar(controller: controller, tabs: tabs),
+          ),
+          Expanded(child: TabBarView(controller: controller, children: views)),
+        ],
       ),
     );
   }

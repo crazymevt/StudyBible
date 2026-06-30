@@ -54,6 +54,26 @@ enum AppModule {
   backupRestore,
 }
 
+enum JournalsActiveTab {
+  journals,
+  prayers,
+  actions,
+}
+
+class JournalsActiveTabNotifier extends Notifier<JournalsActiveTab> {
+  @override
+  JournalsActiveTab build() => JournalsActiveTab.journals;
+
+  void setTab(JournalsActiveTab tab) {
+    state = tab;
+  }
+}
+
+final journalsActiveTabProvider =
+    NotifierProvider<JournalsActiveTabNotifier, JournalsActiveTab>(
+  () => JournalsActiveTabNotifier(),
+);
+
 /// Which side of the desktop layout the study-tools navigation rail sits on.
 enum NavRailSide { left, right }
 
