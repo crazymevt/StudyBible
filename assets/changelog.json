@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.30+4",
+    "date": "2026-06-30",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "stop chapter swipe from flashing the first chapter",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.30+3",
     "date": "2026-06-30",
     "features": [
