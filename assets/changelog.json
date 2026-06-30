@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.6.30+8",
+    "date": "2026-06-30",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "extend empty/loading/error polish and tooltips across the app",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "polish reader panels with skeletons, empty states, and motion",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.30+7",
     "date": "2026-06-30",
     "features": [
