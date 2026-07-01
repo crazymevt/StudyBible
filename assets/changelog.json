@@ -1,5 +1,41 @@
 [
   {
+    "version": "26.7.1+4",
+    "date": "2026-07-01",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "system back unwinds in-app state instead of exiting",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "system back button steps back through the tool panel",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "customizable highlight colours with per-theme shades",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "make green and blue highlights more distinct",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "make \"Full Palette\" achievement earnable",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.1+3",
     "date": "2026-07-01",
     "features": [
