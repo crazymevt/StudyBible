@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.1+3",
+    "date": "2026-07-01",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "heal DB upgrade wedges from schema <17 and schema 1",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.1+2",
     "date": "2026-07-01",
     "features": [
