@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.7.1+2",
+    "date": "2026-07-01",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "search dictionary definitions, not just headwords",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "make dictionary and commentary text selectable",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.7.1+1",
     "date": "2026-07-01",
     "features": [
