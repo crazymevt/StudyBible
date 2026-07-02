@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../app/explorer_providers.dart';
 import '../../app/people_providers.dart';
 import '../../app/topic_providers.dart';
+import '../../app/user_providers.dart';
 import '../../data/content_store.dart';
+import '../../data/user_store.dart';
 import '../../domain/explorer/explorer_ref.dart';
 import '../common/skeleton.dart';
 import 'explorer_common.dart';
@@ -573,6 +576,18 @@ class _PassagePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final overviewAsync = ref
         .watch(explorerPassageOverviewProvider((book: book, chapter: chapter)));
+    final commentaries = ref
+            .watch(explorerPassageCommentariesProvider(
+                (book: book, chapter: chapter)))
+            .asData
+            ?.value ??
+        const <ExplorerCommentarySection>[];
+    final notes = ref
+            .watch(
+                chapterNotesFamilyProvider((bookName: book, chapter: chapter)))
+            .asData
+            ?.value ??
+        const <Note>[];
     return overviewAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this passage: $e'),
@@ -588,7 +603,7 @@ class _PassagePage extends ConsumerWidget {
                     context, ref, book, chapter, 1),
               ),
             ),
-            if (d.isEmpty)
+            if (d.isEmpty && commentaries.isEmpty && notes.isEmpty)
               const _ErrorBody(
                   'The datasets don\'t tag anything in this chapter yet.'),
             if (d.people.isNotEmpty)
@@ -668,9 +683,126 @@ class _PassagePage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (commentaries.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.import_contacts_outlined,
+                title: 'Commentaries (${commentaries.length})',
+                child: Column(
+                  children: [
+                    for (final section in commentaries)
+                      _CommentarySection(section: section),
+                  ],
+                ),
+              ),
+            if (notes.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.edit_note_outlined,
+                title: 'Your notes (${notes.length})',
+                child: Column(
+                  children: [
+                    for (final n in notes)
+                      _PassageNoteTile(book: book, chapter: chapter, note: n),
+                  ],
+                ),
+              ),
           ],
         );
       },
+    );
+  }
+}
+
+/// One commentary module's chapter entries, collapsed behind the module name
+/// so several installed commentaries stay scannable.
+class _CommentarySection extends StatelessWidget {
+  const _CommentarySection({required this.section});
+
+  final ExplorerCommentarySection section;
+
+  @override
+  Widget build(BuildContext context) {
+    final count = section.entries.length;
+    return ExpansionTile(
+      dense: true,
+      tilePadding: EdgeInsets.zero,
+      title: Text(section.commentary.name),
+      subtitle: Text('$count ${count == 1 ? 'entry' : 'entries'}'),
+      children: [
+        for (final entry in section.entries)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (entry.verse != null && entry.verse! > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      'Verse ${entry.verse}',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ),
+                HtmlWidget(entry.textContent),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// A user note anchored in this chapter; tapping jumps the reader to the
+/// note's verse.
+class _PassageNoteTile extends ConsumerWidget {
+  const _PassageNoteTile({
+    required this.book,
+    required this.chapter,
+    required this.note,
+  });
+
+  final String book;
+  final int chapter;
+  final Note note;
+
+  String get _label {
+    final selected = note.selectedVerses;
+    if (selected != null) {
+      return selected.contains(',') ? 'Verses $selected' : 'Verse $selected';
+    }
+    if (note.verse != null) return 'Verse ${note.verse}';
+    return 'Chapter note';
+  }
+
+  /// The verse the reader should land on: the explicit anchor, else the first
+  /// of the selected verses, else the chapter top.
+  int get _targetVerse {
+    if (note.verse != null) return note.verse!;
+    final first = note.selectedVerses?.split(',').first.trim();
+    return int.tryParse(first ?? '') ?? 1;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Text(
+        _label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+      subtitle: Text(
+        note.content,
+        maxLines: 4,
+        overflow: TextOverflow.ellipsis,
+      ),
+      onTap: () => explorerOpenVerseInReader(
+          context, ref, book, chapter, _targetVerse),
     );
   }
 }

@@ -119,6 +119,25 @@ void main() {
         chapter: Value(24),
         verse: Value(3)));
 
+    // Commentaries: Henry has entries in 1 Samuel 24, Scofield doesn't.
+    await store.into(store.commentaries).insert(const CommentariesCompanion(
+        id: Value(1), abbreviation: Value('MHC'), name: Value('Matthew Henry')));
+    await store.into(store.commentaries).insert(const CommentariesCompanion(
+        id: Value(2), abbreviation: Value('SCO'), name: Value('Scofield')));
+    Future<void> commentaryEntry(
+            int id, int commentary, String book, int ch, int v, String text) =>
+        store.into(store.commentaryEntries).insert(CommentaryEntriesCompanion(
+              id: Value(id),
+              commentaryId: Value(commentary),
+              bookName: Value(book),
+              chapter: Value(ch),
+              verse: Value(v),
+              textContent: Value(text),
+            ));
+    await commentaryEntry(1, 1, '1 Samuel', 24, 2, 'On verse two');
+    await commentaryEntry(2, 1, '1 Samuel', 24, 1, 'On verse one');
+    await commentaryEntry(3, 2, 'Genesis', 1, 1, 'Elsewhere');
+
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
@@ -220,6 +239,25 @@ void main() {
           explorerPassageOverviewProvider((book: 'Obadiah', chapter: 1))
               .future);
       expect(d.isEmpty, isTrue);
+    });
+  });
+
+  group('passage commentaries', () {
+    test('groups chapter entries by module, verse-ordered, skipping modules '
+        'with nothing for the chapter', () async {
+      final sections = await container.read(
+          explorerPassageCommentariesProvider((book: '1 Samuel', chapter: 24))
+              .future);
+      expect(sections.length, 1);
+      expect(sections.single.commentary.name, 'Matthew Henry');
+      expect(sections.single.entries.map((e) => e.verse).toList(), [1, 2]);
+    });
+
+    test('chapter without entries returns empty', () async {
+      final sections = await container.read(
+          explorerPassageCommentariesProvider((book: 'Obadiah', chapter: 1))
+              .future);
+      expect(sections, isEmpty);
     });
   });
 

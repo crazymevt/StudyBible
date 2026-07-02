@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/explorer_providers.dart';
 import '../../app/reader_state.dart';
@@ -27,6 +28,9 @@ void explorerOpenVerseInReader(
   int chapter,
   int verse,
 ) {
+  // The Explorer can be opened from any module (e.g. the dashboard); the
+  // shell must be showing the reader once the route unwinds.
+  ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
   ref.read(selectedBookNameProvider.notifier).set(book);
   ref.read(selectedChapterProvider.notifier).set(chapter);
   ref.read(targetVerseToScrollProvider.notifier).set(verse);
