@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.7.2+5",
+    "date": "2026-07-02",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "show commentaries and your notes on the Explorer passage page",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Explorer — searchable, cross-linked pages for people, places, events, topics, and passages",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "prevent map crash when passage places share one location",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.2+4",
     "date": "2026-07-02",
     "features": [
