@@ -3,6 +3,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/sync_service.dart';
 import '../../data/logging.dart';
 
+/// Runs a sync and reports the outcome via snackbars. Shared by [SyncButton]
+/// and surfaces that trigger sync without hosting their own spinner (e.g. the
+/// phone app bar's overflow menu).
+Future<void> runSyncWithFeedback(BuildContext context, WidgetRef ref) async {
+  try {
+    await ref.read(syncServiceProvider).sync();
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sync complete!')),
+      );
+    }
+  } catch (e, stack) {
+    logError(e, stack, context: 'SyncButton.sync');
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sync failed: $e')),
+      );
+    }
+  }
+}
+
 class SyncButton extends ConsumerStatefulWidget {
   const SyncButton({super.key});
 
@@ -31,26 +52,14 @@ class _SyncButtonState extends ConsumerState<SyncButton> with SingleTickerProvid
 
   Future<void> _sync() async {
     if (_isSyncing) return;
-    
+
     setState(() {
       _isSyncing = true;
     });
     _controller.repeat();
 
     try {
-      await ref.read(syncServiceProvider).sync();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sync complete!')),
-        );
-      }
-    } catch (e, stack) {
-      logError(e, stack, context: 'SyncButton.sync');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sync failed: $e')),
-        );
-      }
+      await runSyncWithFeedback(context, ref);
     } finally {
       if (mounted) {
         setState(() {

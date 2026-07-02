@@ -32,6 +32,10 @@ import '../../app/app_state.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 
+/// Actions collapsed into the phone app bar's overflow menu; wider layouts
+/// show each as its own icon button.
+enum _ReaderAction { audio, readAloud, sync, ribbons, versions, toggleView }
+
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({super.key});
 
@@ -302,6 +306,83 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     );
   }
 
+  void _showHistorySheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (_, _) => const HistoryPanel(),
+      ),
+    );
+  }
+
+  void _showRibbonsSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (_, _) => const RibbonsPanel(),
+      ),
+    );
+  }
+
+  void _showAudioPlayer() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => const AudioPlayerWidget(),
+    );
+  }
+
+  void _showTtsPlayer() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => const TtsPlayerWidget(),
+    );
+  }
+
+  void _toggleViewMode() {
+    setState(() {
+      _isFlowing = !_isFlowing;
+    });
+  }
+
+  void _handleReaderAction(_ReaderAction action) {
+    switch (action) {
+      case _ReaderAction.audio:
+        _showAudioPlayer();
+      case _ReaderAction.readAloud:
+        _showTtsPlayer();
+      case _ReaderAction.sync:
+        runSyncWithFeedback(context, ref);
+      case _ReaderAction.ribbons:
+        _showRibbonsSheet();
+      case _ReaderAction.versions:
+        _showVersionPicker();
+      case _ReaderAction.toggleView:
+        _toggleViewMode();
+    }
+  }
+
   void _openCommentaryPanel() {
     showModalBottomSheet(
       context: context,
@@ -462,128 +543,150 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             ),
           ),
           title: SearchTitleBar(key: tutorialSearchKey),
-          // Pack the action buttons with shrink-wrapped tap targets and
-          // compact density so the full set (history, audio, TTS, sync,
-          // versions, view-toggle, tools) still fits on narrow phones without
-          // a RenderFlex overflow.
+          // Phones can't fit the full action set even with shrunk tap
+          // targets, so they get the two highest-frequency actions (history,
+          // tools) at full 48dp size plus an overflow menu for the rest.
+          // Versions stays one tap away there via the breadcrumb's version
+          // chip. Wider layouts show the full row.
           actions: [
-            IconButtonTheme(
-              data: IconButtonThemeData(
-                style: IconButton.styleFrom(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
+            if (context.isPhone) ...[
+              IconButton(
+                icon: const Icon(Icons.history),
+                tooltip: 'History',
+                onPressed: _showHistorySheet,
+              ),
+              Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.build),
+                  tooltip: 'Tools',
+                  onPressed: () => Scaffold.of(context).openEndDrawer(),
                 ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.history),
-                    tooltip: 'History',
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        useSafeArea: true,
-                        builder: (context) => DraggableScrollableSheet(
-                          initialChildSize: 0.9,
-                          minChildSize: 0.5,
-                          maxChildSize: 1.0,
-                          expand: false,
-                          builder: (_, _) => const HistoryPanel(),
-                        ),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.bookmark_border),
-                    tooltip: 'Ribbons',
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        useSafeArea: true,
-                        builder: (context) => DraggableScrollableSheet(
-                          initialChildSize: 0.9,
-                          minChildSize: 0.5,
-                          maxChildSize: 1.0,
-                          expand: false,
-                          builder: (_, _) => const RibbonsPanel(),
-                        ),
-                      );
-                    },
-                  ),
+              PopupMenuButton<_ReaderAction>(
+                tooltip: 'More',
+                onSelected: _handleReaderAction,
+                itemBuilder: (context) => [
                   if (audioData != null)
-                    IconButton(
-                      icon: const Icon(Icons.headphones),
-                      tooltip: 'Audio Player',
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.surface,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(24)),
-                          ),
-                          builder: (context) => const AudioPlayerWidget(),
-                        );
-                      },
+                    const PopupMenuItem(
+                      value: _ReaderAction.audio,
+                      child: ListTile(
+                        leading: Icon(Icons.headphones),
+                        title: Text('Audio Player'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
                     ),
                   if (TtsService.isSupported)
-                    IconButton(
-                      icon: Icon(
-                        ref.watch(ttsControllerProvider).status ==
-                                TtsStatus.playing
-                            ? Icons.record_voice_over
-                            : Icons.record_voice_over_outlined,
-                      ),
-                      tooltip: 'Read aloud',
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.surface,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(24)),
-                          ),
-                          builder: (context) => const TtsPlayerWidget(),
-                        );
-                      },
-                    ),
-                  const SyncButton(),
-                  IconButton(
-                    icon: const Icon(Icons.library_books),
-                    tooltip: 'Versions',
-                    onPressed: _showVersionPicker,
-                  ),
-                  IconButton(
-                    icon: Icon(_isFlowing
-                        ? Icons.format_list_numbered
-                        : Icons.article_outlined),
-                    tooltip: _isFlowing
-                        ? 'Switch to verse-by-verse view'
-                        : 'Switch to paragraph view',
-                    onPressed: () {
-                      setState(() {
-                        _isFlowing = !_isFlowing;
-                      });
-                    },
-                  ),
-                  if (MediaQuery.sizeOf(context).width <= Breakpoints.compact)
-                    Builder(
-                      builder: (context) => IconButton(
-                        icon: const Icon(Icons.build),
-                        tooltip: 'Tools',
-                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    const PopupMenuItem(
+                      value: _ReaderAction.readAloud,
+                      child: ListTile(
+                        leading: Icon(Icons.record_voice_over_outlined),
+                        title: Text('Read aloud'),
+                        contentPadding: EdgeInsets.zero,
                       ),
                     ),
+                  const PopupMenuItem(
+                    value: _ReaderAction.sync,
+                    child: ListTile(
+                      leading: Icon(Icons.sync),
+                      title: Text('Sync Data'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: _ReaderAction.ribbons,
+                    child: ListTile(
+                      leading: Icon(Icons.bookmark_border),
+                      title: Text('Ribbons'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: _ReaderAction.versions,
+                    child: ListTile(
+                      leading: Icon(Icons.library_books),
+                      title: Text('Versions'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: _ReaderAction.toggleView,
+                    child: ListTile(
+                      leading: Icon(_isFlowing
+                          ? Icons.format_list_numbered
+                          : Icons.article_outlined),
+                      title: Text(_isFlowing
+                          ? 'Verse-by-verse view'
+                          : 'Paragraph view'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
                 ],
               ),
-            ),
+            ] else
+              IconButtonTheme(
+                data: IconButtonThemeData(
+                  style: IconButton.styleFrom(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.history),
+                      tooltip: 'History',
+                      onPressed: _showHistorySheet,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.bookmark_border),
+                      tooltip: 'Ribbons',
+                      onPressed: _showRibbonsSheet,
+                    ),
+                    if (audioData != null)
+                      IconButton(
+                        icon: const Icon(Icons.headphones),
+                        tooltip: 'Audio Player',
+                        onPressed: _showAudioPlayer,
+                      ),
+                    if (TtsService.isSupported)
+                      IconButton(
+                        icon: Icon(
+                          ref.watch(ttsControllerProvider).status ==
+                                  TtsStatus.playing
+                              ? Icons.record_voice_over
+                              : Icons.record_voice_over_outlined,
+                        ),
+                        tooltip: 'Read aloud',
+                        onPressed: _showTtsPlayer,
+                      ),
+                    const SyncButton(),
+                    IconButton(
+                      icon: const Icon(Icons.library_books),
+                      tooltip: 'Versions',
+                      onPressed: _showVersionPicker,
+                    ),
+                    IconButton(
+                      icon: Icon(_isFlowing
+                          ? Icons.format_list_numbered
+                          : Icons.article_outlined),
+                      tooltip: _isFlowing
+                          ? 'Switch to verse-by-verse view'
+                          : 'Switch to paragraph view',
+                      onPressed: _toggleViewMode,
+                    ),
+                    if (MediaQuery.sizeOf(context).width <=
+                        Breakpoints.compact)
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: const Icon(Icons.build),
+                          tooltip: 'Tools',
+                          onPressed: () => Scaffold.of(context).openEndDrawer(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
           ],
         ),
       endDrawer: MediaQuery.sizeOf(context).width <= Breakpoints.compact
