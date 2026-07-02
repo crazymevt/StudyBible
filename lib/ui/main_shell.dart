@@ -27,6 +27,7 @@ import 'onboarding/onboarding_screen.dart';
 import 'onboarding/tutorial_overlay.dart';
 import 'onboarding/tutorial_keys.dart';
 import 'common/breakpoints.dart';
+import 'grouped_tool_rail.dart';
 import '../app/content_providers.dart';
 import '../app/content_manager_providers.dart';
 import '../app/shared_prefs.dart';
@@ -313,80 +314,13 @@ class _DesktopLayout extends ConsumerWidget {
       ),
     );
 
-    final navRail = _ScrollFadeColumn(
-      fadeColor: theme.colorScheme.surfaceContainer,
-      child: NavigationRail(
-      backgroundColor: theme.colorScheme.surfaceContainer,
-      labelType: NavigationRailLabelType.all,
-      selectedIconTheme: IconThemeData(color: theme.colorScheme.onSecondaryContainer),
-      unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurfaceVariant),
-      selectedLabelTextStyle: theme.textTheme.labelSmall?.copyWith(
-        color: theme.colorScheme.onSurface,
-        fontWeight: FontWeight.w600,
-      ),
-      unselectedLabelTextStyle: theme.textTheme.labelSmall?.copyWith(
-        color: theme.colorScheme.onSurfaceVariant,
-      ),
-      indicatorColor: theme.colorScheme.secondaryContainer,
-      destinations: const [
-        NavigationRailDestination(
-          icon: Icon(Icons.compare_arrows),
-          label: Text('Cross-Ref'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.note),
-          label: Text('Notes'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.search),
-          label: Text('Search'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.import_contacts),
-          label: Text('Dictionary'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.menu_book),
-          label: Text('Commentaries'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.video_library),
-          label: Text('Media'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.event_note),
-          label: Text('Plans'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.co_present),
-          label: Text('Sermons'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.calendar_today),
-          label: Text('Devotionals'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.topic),
-          label: Text('Topics'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.map),
-          label: Text('Places'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.format_color_fill),
-          label: Text('Highlights'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.edit_note),
-          label: Text('Scratch'),
-        ),
-      ],
-      selectedIndex: _getSelectedIndex(activeTool),
-      onDestinationSelected: (index) {
-        final tool = _getToolFromIndex(index);
-        ref.read(activeToolProvider.notifier).setTool(tool);
-      },
+    // Material (not Container) so the rail items' ink splashes render on the
+    // rail's own surface instead of being hidden under an opaque background.
+    final navRail = Material(
+      color: theme.colorScheme.surfaceContainer,
+      child: _ScrollFadeColumn(
+        fadeColor: theme.colorScheme.surfaceContainer,
+        child: const GroupedToolRail(),
       ),
     );
 
@@ -403,73 +337,6 @@ class _DesktopLayout extends ConsumerWidget {
     );
   }
 
-  int? _getSelectedIndex(ActiveTool tool) {
-    switch (tool) {
-      case ActiveTool.crossReference:
-        return 0;
-      case ActiveTool.notes:
-        return 1;
-      case ActiveTool.search:
-        return 2;
-      case ActiveTool.dictionary:
-        return 3;
-      case ActiveTool.commentaries:
-        return 4;
-      case ActiveTool.media:
-        return 5;
-      case ActiveTool.readingPlans:
-        return 6;
-      case ActiveTool.sermons:
-        return 7;
-      case ActiveTool.devotionals:
-        return 8;
-      case ActiveTool.topics:
-        return 9;
-      case ActiveTool.places:
-        return 10;
-      case ActiveTool.highlights:
-        return 11;
-      case ActiveTool.scratch:
-        return 12;
-      case ActiveTool.history:
-      case ActiveTool.none:
-      case ActiveTool.compare:
-        return null;
-    }
-  }
-
-  ActiveTool _getToolFromIndex(int index) {
-    switch (index) {
-      case 0:
-        return ActiveTool.crossReference;
-      case 1:
-        return ActiveTool.notes;
-      case 2:
-        return ActiveTool.search;
-      case 3:
-        return ActiveTool.dictionary;
-      case 4:
-        return ActiveTool.commentaries;
-      case 5:
-        return ActiveTool.media;
-      case 6:
-        return ActiveTool.readingPlans;
-      case 7:
-        return ActiveTool.sermons;
-      case 8:
-        return ActiveTool.devotionals;
-      case 9:
-        return ActiveTool.topics;
-      case 10:
-        return ActiveTool.places;
-      case 11:
-        return ActiveTool.highlights;
-      case 12:
-        return ActiveTool.scratch;
-      default:
-        return ActiveTool.none;
-    }
-  }
 }
 
 /// Wraps a fixed-height [child] (e.g. the tools [NavigationRail]) in a vertical
