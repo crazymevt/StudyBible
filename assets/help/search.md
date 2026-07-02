@@ -8,6 +8,11 @@ The global search allows you to search across all downloaded Bibles, your person
 - **Prefix Match:** You can use an asterisk `*` to perform prefix searches (e.g., `bapt*` will find baptize, baptism, baptist).
 - **Navigation (Goto):** You can enter a book reference directly into the search bar to jump straight there! For example, typing "John 3:16" or "1 Cor 13" will instantly take you to that chapter in the Reader.
 
+## Tag Search
+Start your query with `#` to search your tags directly. For example, `#advent` finds everything—verses, notes, journals, sermons—filed under a matching tag. As you type, the search bar suggests tag names, so you don't have to remember exact spelling.
+
+A tag search stays focused on tags: it ignores the scripture and note full-text search, the reference shortcut, and the testament/book scopes, and shows a dismissible `#tag` chip so you can see the filter that's active. Tap the chip to clear it and return to a normal search.
+
 ## Scope Filtering
 You can restrict your search to the Old Testament, New Testament, or a specific book using prefixes:
 - `ot: love` - Searches only in the Old Testament.
