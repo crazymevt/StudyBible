@@ -35,3 +35,8 @@ Listen to professionally narrated, chapter-by-chapter audio Bibles, with multipl
 Browse and play related video media (such as teaching clips and dramatizations) tied to the chapter you are reading.
 
 > 🌐 **Needs internet** — Media is streamed from the web, so an internet connection is required.
+
+## Scratch
+A quick, no-friction pad for rough notes and half-formed ideas. It uses the same rich-text editor as Sermons and Journals, saves as you type, and turns any Bible reference you type (like `John 3:16`) into a tappable link.
+
+The Scratch pad is **device-local and never syncs**—it's your private workspace on this device. When an idea is ready to grow, tap **Promote to Sermon** to start a full sermon from its contents (the pad is left untouched), or **Clear** to wipe the pad and start fresh.

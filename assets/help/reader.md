@@ -14,6 +14,12 @@ The Reader is the core of the StudyBible app, allowing you to study God's Word w
 - **Strong's Numbers:** If you have a Strong's-enabled Bible (like the KJV with Strong's), you can toggle Strong's numbers in the Settings. Tap any highlighted word to see its original Greek or Hebrew definition and morphology.
 - **Reading Progress:** By default, you must manually tap the "Mark Chapter Read" button at the bottom of the chapter. You can change this in Settings to mark chapters as "read" automatically after a few seconds of viewing!
 
+## Ribbons
+Ribbons are lightweight markers for a single verse—drop one to save your spot and jump back to it later.
+- **Drop a ribbon:** Select a verse and tap **Ribbon** in the verse action bar. It's labeled with the reference automatically.
+- **See your markers:** A ribboned verse shows a small bookmark icon beside its verse number, next to the note and tag markers.
+- **Jump back:** Open the **Ribbons** panel (the icon in the app bar, next to History) for a list of every ribbon in Bible order. Tap one to jump straight to that verse; swipe it away or tap `✕` to remove it.
+
 ## Listen While You Read
 - **Read Aloud:** Have the current chapter read to you by your device's built-in voices, with adjustable speed. Because it uses your device's text-to-speech, **Read Aloud works completely offline**.
 - **Audio:** For professionally narrated audio Bibles, use the Audio tool (🌐 streamed). See the **Study Tools** topic for the difference between the two.
