@@ -15,16 +15,13 @@ Running list of known issues and follow-ups.
   - *Next Steps:* To elevate this to an advanced study tool, build a dedicated, full-screen interactive Atlas. It should allow tracking sequential events (like Paul's missionary journeys or David's flight) step-by-step, drawing animated paths between locations.
   - *Data Integration:* Tie the existing Theographic timeline events (used in `people_timeline_screen.dart`) to geographic coordinates so users can scrub the timeline and watch events unfold on the map simultaneously.
 
-- [ ] **Hierarchical Topic Explorer**
-  - *Context:* We currently use Theographic metadata for people and timelines, but lack a dedicated topical navigation tool for Nave's Topical Bible or the Theographic concept graph.
-  - *Next Steps:* Design a schema for the Content DB to represent parent/child topic relationships (`topics` and `topic_verses` tables). 
-  - *UI:* Build a "Topic Explorer" pane — a drill-down list or expandable tree view (e.g., God -> Attributes -> Holiness) that pulls up all associated verses and dictionary articles for a given node, acting as a unified topical study dashboard.
-
-- [ ] **Aggregated Passage / Exegetical Guide**
-  - *Context:* Currently, users must manually open separate panes to see commentaries, cross-references, dictionaries, and maps for a passage.
-  - *Next Steps:* Build a unified `PassageGuideScreen` (similar to Logos' Passage Guide) where a user enters a reference (e.g., John 1).
-  - *Data Integration:* Create a composite Riverpod provider that concurrently fetches from existing providers (`commentaryEntriesProvider`, `crossReferencesProvider`, `currentPassagePlacesProvider`, and user-linked `notesProvider` / `sermonListProvider`).
-  - *UI:* Present these as expandable, stacked cards in a single scrolling dashboard, giving a complete exegetical overview of the passage at a glance.
+- [ ] **Aggregated Passage / Exegetical Guide** — *largely covered by the
+  Explorer* (see Archive): its passage pages already aggregate people, places,
+  events, and topics for a chapter behind one search.
+  - *Remaining:* fold the module-based and user-authored sources into the
+    Explorer's passage page as further facet cards — commentaries
+    (`commentaryEntriesProvider`), cross-references, and the user's own
+    notes/sermons touching the chapter.
 
 - [ ] **Import SWORD modules** (CrossWire format — translations, commentaries,
   dictionaries). Implementation lives in `lib/data/importer/sword/`. Phases
@@ -49,6 +46,17 @@ Running list of known issues and follow-ups.
 ## Issues
 
 ## Archive
+
+- [x] **Explorer (knowledge-web study tool).** Full-page browser over the
+  bundled datasets, opened from the app drawer: one search across people,
+  places, events, topics, and passages; every entity is a page of facet cards
+  that cross-link (person → events → places → topics → verses), navigated by a
+  session-persistent breadcrumb trail, with verse chips jumping into the
+  reader. Datasets are joined through shared verse references (events↔places,
+  people↔places have no direct links in the data). Code:
+  `lib/domain/explorer/`, `lib/app/explorer_providers.dart`,
+  `lib/ui/explorer/`. Deliberately *not* on the reader tool rail (at its
+  height budget); a verse-action entry point is a possible follow-up.
 
 - [x] **Auto sync.** Settings → Sync → "Auto sync" switch (off by default)
   plus a frequency dropdown (5/15/30/60 min, default 15, prefs
