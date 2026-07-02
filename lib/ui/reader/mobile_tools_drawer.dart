@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 import 'cross_reference_panel.dart';
 import 'notes_panel.dart';
 import 'search_panel.dart';
@@ -15,6 +14,8 @@ import 'topics_panel.dart';
 import 'places_panel.dart';
 import 'highlights_panel.dart';
 import 'scratch_panel.dart';
+import '../common/tool_groups.dart';
+import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
 
 class MobileToolsDrawer extends ConsumerWidget {
@@ -36,8 +37,49 @@ class MobileToolsDrawer extends ConsumerWidget {
     );
   }
 
+  Widget _panelFor(ActiveTool tool, WidgetRef ref) {
+    switch (tool) {
+      case ActiveTool.crossReference:
+        return const CrossReferencePanel();
+      case ActiveTool.notes:
+        return const NotesPanel();
+      case ActiveTool.search:
+        return const SearchPanel();
+      case ActiveTool.dictionary:
+        return const DictionaryPanel();
+      case ActiveTool.commentaries:
+        return const CommentaryPanel();
+      case ActiveTool.media:
+        return MediaPanel(
+          bookName: ref.read(selectedBookNameProvider),
+          chapter: ref.read(selectedChapterProvider),
+        );
+      case ActiveTool.readingPlans:
+        return const ReadingPlanPanel();
+      case ActiveTool.sermons:
+        return const SermonsPanel();
+      case ActiveTool.devotionals:
+        return const DevotionalsPanel();
+      case ActiveTool.topics:
+        return const TopicsPanel();
+      case ActiveTool.places:
+        return const PlacesPanel();
+      case ActiveTool.highlights:
+        return const HighlightsPanel();
+      case ActiveTool.scratch:
+        return const ScratchPanel();
+      case ActiveTool.compare:
+      case ActiveTool.history:
+      case ActiveTool.none:
+        // Not offered by toolGroups; unreachable from this drawer.
+        return const SizedBox.shrink();
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
     return Drawer(
       child: SafeArea(
         child: ListView(
@@ -50,116 +92,28 @@ class MobileToolsDrawer extends ConsumerWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-            const Divider(),
-
-            ListTile(
-              leading: const Tooltip(
-                message: 'Cross-References',
-                child: Icon(Icons.compare_arrows),
+            const Divider(height: 1),
+            // Same groups and order as the desktop tools rail (toolGroups),
+            // so the tools live in one place in the user's mental map.
+            for (final group in toolGroups) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                child: Text(
+                  group.label.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                  ),
+                ),
               ),
-              title: const Text('Cross-References'),
-              onTap: () => _openTool(context, const CrossReferencePanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(message: 'Notes', child: Icon(Icons.note)),
-              title: const Text('Notes'),
-              onTap: () => _openTool(context, const NotesPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Search',
-                child: Icon(Icons.search),
-              ),
-              title: const Text('Search'),
-              onTap: () => _openTool(context, const SearchPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Dictionary',
-                child: Icon(Icons.import_contacts),
-              ),
-              title: const Text('Dictionary'),
-              onTap: () => _openTool(context, const DictionaryPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Commentaries',
-                child: Icon(Icons.menu_book),
-              ),
-              title: const Text('Commentaries'),
-              onTap: () => _openTool(context, const CommentaryPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Media',
-                child: Icon(Icons.video_library),
-              ),
-              title: const Text('Media'),
-              onTap: () {
-                final bookName = ref.read(selectedBookNameProvider);
-                final chapter = ref.read(selectedChapterProvider);
-                _openTool(
-                  context,
-                  MediaPanel(bookName: bookName, chapter: chapter),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Reading Plans',
-                child: Icon(Icons.event_note),
-              ),
-              title: const Text('Reading Plans'),
-              onTap: () => _openTool(context, const ReadingPlanPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Sermons',
-                child: Icon(Icons.co_present),
-              ),
-              title: const Text('Sermons'),
-              onTap: () => _openTool(context, const SermonsPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Devotionals',
-                child: Icon(Icons.calendar_today),
-              ),
-              title: const Text('Devotionals'),
-              onTap: () => _openTool(context, const DevotionalsPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Topics',
-                child: Icon(Icons.topic),
-              ),
-              title: const Text('Topics'),
-              onTap: () => _openTool(context, const TopicsPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Places',
-                child: Icon(Icons.map),
-              ),
-              title: const Text('Places'),
-              onTap: () => _openTool(context, const PlacesPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'My Highlights',
-                child: Icon(Icons.format_color_fill),
-              ),
-              title: const Text('My Highlights'),
-              onTap: () => _openTool(context, const HighlightsPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'Scratch',
-                child: Icon(Icons.edit_note),
-              ),
-              title: const Text('Scratch'),
-              onTap: () => _openTool(context, const ScratchPanel()),
-            ),
+              for (final item in group.items)
+                ListTile(
+                  leading: Icon(item.icon),
+                  title: Text(item.label),
+                  onTap: () => _openTool(context, _panelFor(item.tool, ref)),
+                ),
+            ],
           ],
         ),
       ),
