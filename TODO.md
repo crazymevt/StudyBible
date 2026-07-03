@@ -6,7 +6,13 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [ ] **Speech-to-Text Button.** Add a custom microphone button to input fields (like the Sermon Editor or Notes) that uses the `speech_to_text` package to programmatically trigger the OS native dictation feature. *(Note: This package does not support Linux natively, so hide or disable this button on Linux builds).*
+- [x] **Speech-to-Text Button.** DONE. Reusable `SpeechInputButton`
+  (`lib/ui/common/speech_input_button.dart`) using `speech_to_text`, wired into
+  all rich-text editors (Sermon, Notebook page, Journal, Scratch — inserts at
+  the cursor via `insertDictatedText`) and the Notes dialog. Auto-hides on
+  unsupported platforms (Linux); Windows is supported via `speech_to_text_windows`.
+  Mic/speech permissions added to macOS entitlements+Info.plist, iOS Info.plist,
+  and AndroidManifest; macOS deployment target bumped 10.15 → 11.0 (plugin floor).
 - [ ] **Expand Tags card in Explorer.** Expand the tags card to also cross reference people, places, events, and commentaries like the other cards do.
 - [~] **Notebooks tool.** Reader side tool (`ActiveTool.notebooks`) modeled on
   sermons: notebooks (folders) hold rich-text pages. Shipped: data model

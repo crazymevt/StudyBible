@@ -76,6 +76,9 @@ dependencies:
   flutter_colorpicker: ^1.1.0
   file_selector: ^1.0.0
   flutter_tts: ^4.2.5
+  # Native OS dictation for the mic buttons on rich-text/notes fields. No Windows
+  # or Linux implementation, so the button is hidden on those platforms.
+  speech_to_text: ^7.0.0
   flutter_map: ^8.3.0
   latlong2: ^0.9.1
   just_audio_windows: ^0.2.3

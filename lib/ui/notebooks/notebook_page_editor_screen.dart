@@ -10,7 +10,9 @@ import '../../app/user_providers.dart';
 import '../../data/logging.dart';
 import '../../data/user_store.dart';
 import '../common/breakpoints.dart';
+import '../common/quill_dictation.dart';
 import '../common/reference_autolink.dart';
+import '../common/speech_input_button.dart';
 import '../tags/tag_editor_dialog.dart';
 import 'insert_scripture_dialog.dart';
 import 'notebook_export_dialog.dart';
@@ -402,11 +404,20 @@ class _NotebookPageEditorScreenState
                 decoration: const InputDecoration(labelText: 'Title'),
               ),
             ),
-            QuillSimpleToolbar(
-              controller: _controller,
-              config: QuillSimpleToolbarConfig(
-                multiRowsDisplay: multiRowToolbar,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: QuillSimpleToolbar(
+                    controller: _controller,
+                    config: QuillSimpleToolbarConfig(
+                      multiRowsDisplay: multiRowToolbar,
+                    ),
+                  ),
+                ),
+                SpeechInputButton(
+                  onResult: (t) => insertDictatedText(_controller, t),
+                ),
+              ],
             ),
             Expanded(
               child: Padding(

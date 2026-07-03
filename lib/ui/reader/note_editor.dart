@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
 import '../../app/user_providers.dart';
 import '../../app/reader_state.dart';
+import '../common/speech_input_button.dart';
 
 class NoteEditorDialog extends ConsumerStatefulWidget {
   final Set<int> verses;
@@ -61,6 +62,24 @@ class _NoteEditorDialogState extends ConsumerState<NoteEditorDialog> {
     }
   }
 
+  /// Inserts dictated [text] at the current cursor (replacing any selection),
+  /// adding a leading space so spoken phrases don't run into the prior word.
+  void _insertDictation(String text) {
+    if (text.isEmpty) return;
+    final base = _controller.text;
+    final sel = _controller.selection;
+    final start = sel.isValid ? sel.start : base.length;
+    final end = sel.isValid ? sel.end : base.length;
+    final needsSpace =
+        start > 0 && RegExp(r'[A-Za-z0-9]').hasMatch(base[start - 1]);
+    final insert = needsSpace ? ' $text' : text;
+    final newText = base.replaceRange(start, end, insert);
+    _controller.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: start + insert.length),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = widget.verses.isEmpty
@@ -70,7 +89,12 @@ class _NoteEditorDialogState extends ConsumerState<NoteEditorDialog> {
             : 'Note for Verses ${(widget.verses.toList()..sort()).join(', ')}';
 
     return AlertDialog(
-      title: Text(title),
+      title: Row(
+        children: [
+          Expanded(child: Text(title)),
+          SpeechInputButton(onResult: _insertDictation),
+        ],
+      ),
       content: TextField(
         controller: _controller,
         autofocus: true,

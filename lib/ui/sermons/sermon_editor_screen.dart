@@ -16,6 +16,8 @@ import 'export_dialog.dart';
 import 'sermon_presentation_screen.dart';
 import 'sermon_revisions_dialog.dart';
 import '../common/breakpoints.dart';
+import '../common/quill_dictation.dart';
+import '../common/speech_input_button.dart';
 import '../tags/tag_editor_dialog.dart';
 
 /// Actions collapsed into the editor's overflow menu when the header is too
@@ -498,11 +500,20 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                 ],
               ),
             ),
-            QuillSimpleToolbar(
-              controller: _controller,
-              config: QuillSimpleToolbarConfig(
-                multiRowsDisplay: multiRowToolbar,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: QuillSimpleToolbar(
+                    controller: _controller,
+                    config: QuillSimpleToolbarConfig(
+                      multiRowsDisplay: multiRowToolbar,
+                    ),
+                  ),
+                ),
+                SpeechInputButton(
+                  onResult: (t) => insertDictatedText(_controller, t),
+                ),
+              ],
             ),
             Expanded(
               child: Padding(
