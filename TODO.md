@@ -6,6 +6,8 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
+- [ ] **Sidebar Redesign.** Possible redesign of the sidebar to make room for new tools.
+- [ ] **Dictation Snackbar.** Make a snackbar appear when dictation is enabled.
 - [x] **Speech-to-Text Button.** DONE. Reusable `SpeechInputButton`
   (`lib/ui/common/speech_input_button.dart`) using `speech_to_text`, wired into
   all rich-text editors (Sermon, Notebook page, Journal, Scratch — inserts at
