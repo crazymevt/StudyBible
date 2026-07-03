@@ -104,4 +104,38 @@ class GoogleDriveSyncStorage implements SyncStorage {
     }
     return const LineSplitter().convert(utf8.decode(builder.takeBytes()));
   }
+  @override
+  Future<void> writeBinary(String name, Uint8List bytes) async {
+    final media = drive.Media(
+      Stream<List<int>>.value(bytes),
+      bytes.length,
+      contentType: 'application/octet-stream',
+    );
+
+    final existingId = await _findFileId(name);
+    if (existingId != null) {
+      await _api.files.update(drive.File(), existingId, uploadMedia: media);
+    } else {
+      final metadata = drive.File()
+        ..name = name
+        ..parents = [_appDataFolder];
+      await _api.files.create(metadata, uploadMedia: media);
+    }
+  }
+
+  @override
+  Future<Uint8List?> readBinary(String name) async {
+    final fileId = await _findFileId(name);
+    if (fileId == null) return null;
+    final media = await _api.files.get(
+      fileId,
+      downloadOptions: drive.DownloadOptions.fullMedia,
+    ) as drive.Media;
+
+    final builder = BytesBuilder(copy: false);
+    await for (final chunk in media.stream) {
+      builder.add(chunk);
+    }
+    return builder.takeBytes();
+  }
 }

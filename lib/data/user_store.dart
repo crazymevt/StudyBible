@@ -34,13 +34,15 @@ part 'user_store.g.dart';
     Notebooks,
     NotebookPages,
     NotebookPageRevisions,
+    MediaAttachments,
+    AttachmentReferences,
   ],
 )
 class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 25;
+  int get schemaVersion => 27;
 
   @override
   MigrationStrategy get migration {
@@ -613,6 +615,22 @@ class UserStore extends _$UserStore {
           await m.createTable(notebookPageRevisions);
           await _installSearchTriggers();
         }
+        if (from < 26) {
+          // Media attachments and references.
+          await m.createTable(mediaAttachments);
+          await m.createTable(attachmentReferences);
+          await _installSearchTriggers();
+        }
+        if (from < 27) {
+          await _ensureMediaAttachmentTitleColumn(m);
+          await _installSearchTriggers();
+          if (await _tableExists('media_attachments')) {
+            await customStatement("DELETE FROM user_search WHERE type = 'mediaAttachment';");
+            await customStatement(
+              "INSERT INTO user_search(type, reference_id, text_content) SELECT 'mediaAttachment', id, COALESCE(title, filename) FROM media_attachments WHERE deleted = 0;",
+            );
+          }
+        }
       },
     );
   }
@@ -641,6 +659,16 @@ class UserStore extends _$UserStore {
     ).get();
     if (hasColumn.isEmpty) {
       await m.addColumn(sermons, sermons.pinned);
+    }
+  }
+
+  /// Idempotently adds the media_attachments.title column.
+  Future<void> _ensureMediaAttachmentTitleColumn(Migrator m) async {
+    final hasColumn = await customSelect(
+      "SELECT 1 FROM pragma_table_info('media_attachments') WHERE name = 'title'",
+    ).get();
+    if (hasColumn.isEmpty) {
+      await m.addColumn(mediaAttachments, mediaAttachments.title);
     }
   }
 
@@ -674,11 +702,20 @@ class UserStore extends _$UserStore {
         'journals',
         "new.title || ' ' || COALESCE(new.content_plain, '')",
       ],
-      ['prayer', 'prayers', "new.name || ' ' || new.description"],
+      [
+        'prayer',
+        'prayers',
+        "new.name || ' ' || new.description",
+      ],
       [
         'notebookPage',
         'notebook_pages',
         "new.title || ' ' || COALESCE(new.content_plain, '')",
+      ],
+      [
+        'mediaAttachment',
+        'media_attachments',
+        "COALESCE(new.title, new.filename)",
       ],
     ];
     for (final c in configs) {
@@ -742,6 +779,11 @@ class UserStore extends _$UserStore {
     if (await _tableExists('notebook_pages')) {
       await customStatement(
         "INSERT INTO user_search(type, reference_id, text_content) SELECT 'notebookPage', id, title || ' ' || COALESCE(content_plain, '') FROM notebook_pages WHERE deleted = 0;",
+      );
+    }
+    if (await _tableExists('media_attachments')) {
+      await customStatement(
+        "INSERT INTO user_search(type, reference_id, text_content) SELECT 'mediaAttachment', id, COALESCE(title, filename) FROM media_attachments WHERE deleted = 0;",
       );
     }
     // Restore tag rows, which share (type, reference_id) with their content row.

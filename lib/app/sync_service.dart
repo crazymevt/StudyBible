@@ -166,6 +166,8 @@ class SyncService {
           .get();
       final localTags = await _store.select(_store.tags).get();
       final localEntitytags = await _store.select(_store.entityTags).get();
+      final localMediaattachments = await _store.select(_store.mediaAttachments).get();
+      final localAttachmentreferences = await _store.select(_store.attachmentReferences).get();
 
       final localRecords = <GenericSyncRecord>[];
 
@@ -546,6 +548,41 @@ class SyncService {
               'tagId': item.tagId,
               'entityId': item.entityId,
               'entityType': item.entityType,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        localMediaattachments.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'mediaAttachment',
+              'filename': item.filename,
+              'mimeType': item.mimeType,
+              'sizeBytes': item.sizeBytes,
+              'createdAt': item.createdAt,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        localAttachmentreferences.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'attachmentReference',
+              'attachmentId': item.attachmentId,
+              'bookName': item.bookName,
+              'chapter': item.chapter,
+              'verse': item.verse,
+              'createdAt': item.createdAt,
             },
           ),
         ),
@@ -1013,6 +1050,35 @@ class SyncService {
             await _store
                 .into(_store.entityTags)
                 .insert(item, mode: InsertMode.replace);
+          } else if (type == 'mediaAttachment') {
+            final item = MediaAttachment(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              filename: rec.payload['filename'] as String,
+              mimeType: rec.payload['mimeType'] as String,
+              sizeBytes: (rec.payload['sizeBytes'] as num).toInt(),
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+            );
+            await _store
+                .into(_store.mediaAttachments)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'attachmentReference') {
+            final item = AttachmentReference(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              attachmentId: rec.payload['attachmentId'] as String,
+              bookName: rec.payload['bookName'] as String,
+              chapter: (rec.payload['chapter'] as num).toInt(),
+              verse: (rec.payload['verse'] as num?)?.toInt(),
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+            );
+            await _store
+                .into(_store.attachmentReferences)
+                .insert(item, mode: InsertMode.replace);
           }
         }
       });
@@ -1093,10 +1159,49 @@ class SyncService {
         }
       }
 
-      // 5. Push the resulting state
+      // 5. Push merged records
       await _engine!.push(merged);
 
-      // 6. Evaluate achievements locally in case new progress was synced
+      // 6. Sync Binary Attachments
+      final docsDir = await appDataDir();
+      final attachmentsDir = Directory(p.join(docsDir.path, 'media_attachments'));
+      if (!await attachmentsDir.exists()) {
+        await attachmentsDir.create(recursive: true);
+      }
+
+      // Pull missing binaries
+      for (final rec in merged) {
+        final type = rec.payload['type'] as String?;
+        if (type == 'mediaAttachment' && !rec.deleted) {
+          final filename = rec.payload['filename'] as String;
+          final localFile = File(p.join(attachmentsDir.path, filename));
+          if (!await localFile.exists()) {
+             final bytes = await _engine!.storage.readBinary(filename);
+             if (bytes != null) {
+               await localFile.writeAsBytes(bytes);
+             }
+          }
+        }
+      }
+
+      // Push missing binaries for items we created
+      for (final rec in merged) {
+        final type = rec.payload['type'] as String?;
+        if (type == 'mediaAttachment' && !rec.deleted && rec.deviceId == deviceId) {
+          final filename = rec.payload['filename'] as String;
+          final localFile = File(p.join(attachmentsDir.path, filename));
+          if (await localFile.exists()) {
+             // To avoid uploading every time, we check if it exists remotely
+             // Ideally we'd list them once, but doing it one by one is okay for occasional media.
+             final bytes = await _engine!.storage.readBinary(filename);
+             if (bytes == null) {
+                await _engine!.storage.writeBinary(filename, await localFile.readAsBytes());
+             }
+          }
+        }
+      }
+
+      // 7. Evaluate achievements locally in case new progress was synced
       _ref.read(achievementServiceProvider).evaluateAchievements();
     } finally {
       if (_resolvedBookmarkEntity != null) {

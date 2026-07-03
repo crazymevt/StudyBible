@@ -51,6 +51,10 @@ bool get useDevDataIsolation =>
 /// starts empty and legacy migration is skipped for it; to seed it with real
 /// content, copy the release directory's contents across manually.
 Future<Directory> appDataDir() async {
+  if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    final dir = Directory.systemTemp.createTempSync('study_bible_test');
+    return dir;
+  }
   if (Platform.isAndroid || Platform.isIOS) {
     return getApplicationDocumentsDirectory();
   }

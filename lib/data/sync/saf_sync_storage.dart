@@ -54,4 +54,21 @@ class SafSyncStorage implements SyncStorage {
     final bytes = await _stream.readFileBytes(doc.uri);
     return const LineSplitter().convert(utf8.decode(bytes));
   }
+  @override
+  Future<void> writeBinary(String name, Uint8List bytes) async {
+    await _stream.writeFileBytes(
+      treeUri,
+      name,
+      'application/octet-stream',
+      bytes,
+      overwrite: true,
+    );
+  }
+
+  @override
+  Future<Uint8List?> readBinary(String name) async {
+    final doc = await _util.child(treeUri, [name]);
+    if (doc == null) return null;
+    return await _stream.readFileBytes(doc.uri);
+  }
 }

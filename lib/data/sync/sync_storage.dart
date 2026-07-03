@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 
 /// The minimal document-store surface the sync engine needs, decoupled from any
@@ -21,6 +22,12 @@ abstract class SyncStorage {
 
   /// The lines of the document named [name], or an empty list if it is absent.
   Future<List<String>> readLines(String name);
+
+  /// Create or overwrite the binary document named [name] with [bytes].
+  Future<void> writeBinary(String name, Uint8List bytes);
+
+  /// Read the binary document named [name], or return null if it is absent.
+  Future<Uint8List?> readBinary(String name);
 }
 
 /// A [SyncStorage] backed by a real filesystem [Directory].
@@ -56,5 +63,20 @@ class IoSyncStorage implements SyncStorage {
     final file = File(p.join(directory.path, name));
     if (!await file.exists()) return [];
     return file.readAsLines();
+  }
+
+  @override
+  Future<void> writeBinary(String name, Uint8List bytes) async {
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    await File(p.join(directory.path, name)).writeAsBytes(bytes);
+  }
+
+  @override
+  Future<Uint8List?> readBinary(String name) async {
+    final file = File(p.join(directory.path, name));
+    if (!await file.exists()) return null;
+    return file.readAsBytes();
   }
 }

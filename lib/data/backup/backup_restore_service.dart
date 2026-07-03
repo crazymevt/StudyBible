@@ -113,6 +113,20 @@ class BackupRestoreService {
       );
     }
 
+    // Include media_attachments
+    final attachmentsDir = Directory(p.join(dbDir, 'media_attachments'));
+    if (await attachmentsDir.exists()) {
+      onProgress?.call('Adding media attachments...');
+      await for (final entity in attachmentsDir.list(recursive: false)) {
+        if (entity is File) {
+          final bytes = await entity.readAsBytes();
+          archive.addFile(
+            ArchiveFile('media_attachments/${p.basename(entity.path)}', bytes.length, bytes),
+          );
+        }
+      }
+    }
+
     // Write manifest
     final deviceId = await _readDeviceId();
     final manifest = BackupManifest(
@@ -219,6 +233,12 @@ class BackupRestoreService {
         if (await wal.exists()) await wal.delete();
         if (await shm.exists()) await shm.delete();
 
+        await targetFile.parent.create(recursive: true);
+        final outStream = OutputFileStream(targetFile.path);
+        file.writeContent(outStream);
+        outStream.close();
+      } else if (file.name.startsWith('media_attachments/')) {
+        final targetFile = File(p.join(dbDir, file.name));
         await targetFile.parent.create(recursive: true);
         final outStream = OutputFileStream(targetFile.path);
         file.writeContent(outStream);

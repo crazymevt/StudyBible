@@ -427,3 +427,37 @@ class NotebookPageRevisions extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+@DataClassName('MediaAttachment')
+class MediaAttachments extends Table {
+  TextColumn get id => text()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get title => text().nullable()();
+  TextColumn get filename => text()();
+  TextColumn get mimeType => text()();
+  IntColumn get sizeBytes => integer()();
+  IntColumn get createdAt => integer()(); // epoch ms
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('AttachmentReference')
+class AttachmentReferences extends Table {
+  TextColumn get id => text()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get attachmentId => text()();
+  TextColumn get bookName => text()();
+  IntColumn get chapter => integer()();
+  IntColumn get verse => integer().nullable()();
+  IntColumn get createdAt => integer()(); // epoch ms
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

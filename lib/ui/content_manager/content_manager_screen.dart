@@ -17,6 +17,16 @@ import '../../data/importer/sword/sword_versification.dart';
 import '../app_drawer.dart';
 import '../common/empty_state.dart';
 import '../common/skeleton.dart';
+import '../../data/user_store.dart';
+import '../../app/media_providers.dart';
+import '../../app/user_providers.dart';
+import 'package:drift/drift.dart' hide Column;
+import '../../data/app_paths.dart';
+import '../reader/image_viewer_dialog.dart';
+import '../reader/pdf_viewer_dialog.dart';
+import '../reader/attachment_config_dialog.dart';
+import '../../app/tag_providers.dart';
+import '../tags/tag_palette.dart';
 
 class ContentManagerScreen extends ConsumerStatefulWidget {
   const ContentManagerScreen({super.key});
@@ -39,7 +49,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     // Rebuild so the search field's hint reflects the active tab.
     _tabController.addListener(_onTabChanged);
   }
@@ -133,6 +143,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
         return 'Filter OSIS languages…';
       case 3:
         return 'Filter CrossWire catalog…';
+      case 4:
+        return 'Filter user content…';
       default:
         return 'Filter installed content…';
     }
@@ -198,13 +210,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
             Tab(text: 'ph4.org Catalog'),
             Tab(text: 'OSIS Catalog'),
             Tab(text: 'CrossWire Catalog'),
+            Tab(text: 'User Content'),
           ],
         ),
       ),
       drawer: const AppDrawer(),
       body: TabBarView(
         controller: _tabController,
-        children: [_buildInstalledTab(), _buildPh4Tab(), _buildOsisTab(), _buildCrosswireTab()],
+        children: [_buildInstalledTab(), _buildPh4Tab(), _buildOsisTab(), _buildCrosswireTab(), _buildUserContentTab()],
       ),
     );
   }
@@ -1029,6 +1042,178 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
               ),
               isThreeLine: blockReason != null,
               trailing: trailing,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildUserContentTab() {
+    final attachmentsAsync = ref.watch(allAttachmentsProvider);
+
+    return attachmentsAsync.when(
+      loading: () => const SkeletonList(),
+      error: (e, st) => EmptyState(
+        icon: Icons.error_outline,
+        title: 'Error',
+        message: 'Could not load attachments: $e',
+      ),
+      data: (attachments) {
+        final filtered = attachments.where((a) {
+          final text = (a.title ?? a.filename).toLowerCase();
+          return text.contains(_filterQuery);
+        }).toList();
+        if (filtered.isEmpty) {
+          return EmptyState(
+            icon: Icons.image_not_supported_outlined,
+            title: _filterQuery.isEmpty ? 'No user content' : 'No matches',
+            message: _filterQuery.isEmpty ? 'You haven\'t uploaded any personal attachments.' : 'No content matches "${_searchController.text}".',
+          );
+        }
+
+        return FutureBuilder<Directory>(
+          future: appDataDir(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+            final docsDir = snapshot.data!;
+            
+            return ListView.builder(
+              itemCount: filtered.length,
+              itemBuilder: (context, index) {
+                final a = filtered[index];
+                final isImage = a.mimeType.startsWith('image/');
+                final file = File(p.join(docsDir.path, 'media_attachments', a.filename));
+                
+                return ListTile(
+                  leading: Container(
+                    width: 45,
+                    height: 45,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: isImage
+                        ? Image.file(
+                            file,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => const Icon(Icons.image, color: Colors.white),
+                          )
+                        : const Icon(Icons.picture_as_pdf, color: Colors.white),
+                  ),
+                  title: Text(a.title ?? a.filename),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${(a.sizeBytes / 1024).toStringAsFixed(1)} KB'),
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final tagsAsync = ref.watch(tagsForEntityProvider(a.id));
+                          return tagsAsync.maybeWhen(
+                            data: (tags) {
+                              if (tags.isEmpty) return const SizedBox.shrink();
+                              return Wrap(
+                                spacing: 4,
+                                children: tags.map((et) {
+                                  final style = tagChipStyle(context, et.tag.colorHex);
+                                  return Chip(
+                                    label: Text('#${et.tag.name}', style: TextStyle(color: style.foreground, fontSize: 10)),
+                                    backgroundColor: style.background,
+                                    side: BorderSide(color: style.border),
+                                    padding: EdgeInsets.zero,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  );
+                                }).toList(),
+                              );
+                            },
+                            orElse: () => const SizedBox.shrink(),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 20),
+                        tooltip: 'Edit',
+                        onPressed: () async {
+                          final store = ref.read(userStoreProvider);
+                          final refs = await (store.select(store.attachmentReferences)..where((t) => t.attachmentId.equals(a.id))).get();
+                          if (!context.mounted) return;
+                          final result = await showDialog<Map<String, dynamic>>(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (_) => AttachmentConfigDialog(
+                              attachment: a,
+                              existingReferences: refs,
+                            ),
+                          );
+                          if (result == null) return;
+                          
+                          final finalTitle = result['title'] as String?;
+                          final finalReferences = result['references'] as List<AttachmentReference>;
+                          
+                          await store.transaction(() async {
+                            await store.update(store.mediaAttachments).replace(a.copyWith(
+                              title: Value(finalTitle),
+                              updatedAt: DateTime.now().millisecondsSinceEpoch,
+                            ));
+                            
+                            await (store.delete(store.attachmentReferences)..where((t) => t.attachmentId.equals(a.id))).go();
+                            for (final refItem in finalReferences) {
+                              await store.into(store.attachmentReferences).insert(refItem);
+                            }
+                          });
+                          ref.invalidate(allAttachmentsProvider);
+                          ref.invalidate(chapterAttachmentsProvider);
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        tooltip: 'Delete',
+                        onPressed: () async {
+                          final store = ref.read(userStoreProvider);
+                          await store.transaction(() async {
+                            await store.into(store.mediaAttachments).insert(
+                              a.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
+                              mode: InsertMode.replace,
+                            );
+                            final references = await (store.select(store.attachmentReferences)..where((r) => r.attachmentId.equals(a.id))).get();
+                            for (var r in references) {
+                              await store.into(store.attachmentReferences).insert(
+                                r.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
+                                mode: InsertMode.replace,
+                              );
+                            }
+                          });
+                          ref.invalidate(allAttachmentsProvider);
+                          ref.invalidate(chapterAttachmentsProvider);
+                        },
+                      ),
+                    ],
+                  ),
+                  onTap: () async {
+                    if (!await file.exists()) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('File not found locally. It may still be syncing.')));
+                      }
+                      return;
+                    }
+                    if (context.mounted) {
+                      if (isImage) {
+                        showDialog(context: context, builder: (_) => ImageViewerDialog(title: a.title ?? a.filename, file: file));
+                      } else if (a.mimeType == 'application/pdf') {
+                        showDialog(context: context, builder: (_) => PdfViewerDialog(title: a.title ?? a.filename, file: file));
+                      } else {
+                        launchUrl(file.uri, mode: LaunchMode.externalApplication);
+                      }
+                    }
+                  },
+                );
+              },
             );
           },
         );

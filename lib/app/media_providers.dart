@@ -3,6 +3,9 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../data/logging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/media_collection.dart';
+import '../data/user_store.dart';
+import 'package:drift/drift.dart';
+import 'user_providers.dart';
 
 // Provider that holds all loaded MediaCollections
 final mediaCollectionsProvider = FutureProvider<List<MediaCollection>>((
@@ -76,3 +79,35 @@ final chapterMediaProvider =
         orElse: () => [],
       );
     });
+
+// Provider for user-uploaded media attachments for a specific book and chapter
+final chapterAttachmentsProvider = FutureProvider.family<
+  List<MediaAttachment>,
+  ({String book, int chapter})
+>((ref, args) async {
+  final store = ref.watch(userStoreProvider);
+  
+  final query = store.select(store.attachmentReferences).join([
+    innerJoin(
+      store.mediaAttachments,
+      store.mediaAttachments.id.equalsExp(store.attachmentReferences.attachmentId),
+    )
+  ])..where(
+      store.attachmentReferences.bookName.equals(args.book) &
+      store.attachmentReferences.chapter.equals(args.chapter) &
+      store.attachmentReferences.deleted.equals(false) &
+      store.mediaAttachments.deleted.equals(false),
+    );
+
+
+  final results = await query.get();
+  // Use a Set to deduplicate attachments that have multiple references (e.g. verse ranges) in the same chapter
+  final attachments = results.map((row) => row.readTable(store.mediaAttachments)).toSet().toList();
+  return attachments;
+});
+
+// Provider for all user-uploaded media attachments
+final allAttachmentsProvider = FutureProvider<List<MediaAttachment>>((ref) async {
+  final store = ref.watch(userStoreProvider);
+  return (store.select(store.mediaAttachments)..where((t) => t.deleted.equals(false))).get();
+});
