@@ -9,7 +9,9 @@ import '../../app/user_providers.dart';
 import '../../data/export/document_pdf.dart';
 import '../../data/user_store.dart';
 import '../common/quill_content.dart';
+import '../common/quill_dictation.dart';
 import '../common/reference_autolink.dart';
+import '../common/speech_input_button.dart';
 import 'journal_revisions_dialog.dart';
 import 'journals_list_panel.dart';
 import '../tags/tag_editor_dialog.dart';
@@ -470,11 +472,21 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                         minEditorHeight + multiRowToolbarHeight;
                     return Column(
                       children: [
-                        QuillSimpleToolbar(
-                          controller: controller,
-                          config: QuillSimpleToolbarConfig(
-                            multiRowsDisplay: multiRow,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: QuillSimpleToolbar(
+                                controller: controller,
+                                config: QuillSimpleToolbarConfig(
+                                  multiRowsDisplay: multiRow,
+                                ),
+                              ),
+                            ),
+                            SpeechInputButton(
+                              onResult: (t) =>
+                                  insertDictatedText(controller, t),
+                            ),
+                          ],
                         ),
                         const Divider(height: 1),
                         Expanded(

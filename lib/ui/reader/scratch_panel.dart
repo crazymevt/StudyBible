@@ -7,7 +7,9 @@ import '../../app/app_state.dart';
 import '../../app/scratch_providers.dart';
 import '../../app/user_providers.dart';
 import '../common/quill_content.dart';
+import '../common/quill_dictation.dart';
 import '../common/reference_autolink.dart';
+import '../common/speech_input_button.dart';
 
 /// The Scratch space: a single, device-local rich-text pad for rough notes that
 /// never sync. Autosaves as you type and can be promoted into a full sermon.
@@ -220,11 +222,21 @@ class _ScratchPanelState extends ConsumerState<ScratchPanel> {
                           minEditorHeight + multiRowToolbarHeight;
                       return Column(
                         children: [
-                          QuillSimpleToolbar(
-                            controller: controller,
-                            config: QuillSimpleToolbarConfig(
-                              multiRowsDisplay: multiRow,
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: QuillSimpleToolbar(
+                                  controller: controller,
+                                  config: QuillSimpleToolbarConfig(
+                                    multiRowsDisplay: multiRow,
+                                  ),
+                                ),
+                              ),
+                              SpeechInputButton(
+                                onResult: (t) =>
+                                    insertDictatedText(controller, t),
+                              ),
+                            ],
                           ),
                           const Divider(height: 1),
                           Expanded(

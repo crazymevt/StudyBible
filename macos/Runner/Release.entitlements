@@ -22,5 +22,8 @@
 	<true/>
 	<key>com.apple.security.personal-information.desktop-folders</key>
 	<true/>
+	<!-- Microphone access for the speech-to-text dictation buttons. -->
+	<key>com.apple.security.device.audio-input</key>
+	<true/>
 </dict>
 </plist>

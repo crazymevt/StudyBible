@@ -79,5 +79,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access is used only for on-device dictation when you tap the mic button to speak text into notes and editors.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Speech recognition transcribes your dictation into text when you tap the mic button.</string>
 </dict>
 </plist>
