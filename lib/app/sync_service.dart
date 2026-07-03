@@ -561,6 +561,7 @@ class SyncService {
             deleted: item.deleted,
             payload: {
               'type': 'mediaAttachment',
+              'title': item.title,
               'filename': item.filename,
               'mimeType': item.mimeType,
               'sizeBytes': item.sizeBytes,
@@ -1056,6 +1057,7 @@ class SyncService {
               updatedAt: rec.updatedAt,
               deviceId: rec.deviceId,
               deleted: rec.deleted,
+              title: rec.payload['title'] as String?,
               filename: rec.payload['filename'] as String,
               mimeType: rec.payload['mimeType'] as String,
               sizeBytes: (rec.payload['sizeBytes'] as num).toInt(),
@@ -1191,12 +1193,25 @@ class SyncService {
           final filename = rec.payload['filename'] as String;
           final localFile = File(p.join(attachmentsDir.path, filename));
           if (await localFile.exists()) {
-             // To avoid uploading every time, we check if it exists remotely
-             // Ideally we'd list them once, but doing it one by one is okay for occasional media.
-             final bytes = await _engine!.storage.readBinary(filename);
-             if (bytes == null) {
+             // Only upload if the remote copy is absent — a cheap existence
+             // check, not a full download of the (potentially large) binary.
+             if (!await _engine!.storage.binaryExists(filename)) {
                 await _engine!.storage.writeBinary(filename, await localFile.readAsBytes());
              }
+          }
+        }
+      }
+
+      // Delete the local binaries of attachments that were tombstoned, so
+      // deleted media doesn't accumulate on disk forever.
+      for (final rec in merged) {
+        final type = rec.payload['type'] as String?;
+        if (type == 'mediaAttachment' && rec.deleted) {
+          final filename = rec.payload['filename'] as String?;
+          if (filename == null) continue;
+          final localFile = File(p.join(attachmentsDir.path, filename));
+          if (await localFile.exists()) {
+            await localFile.delete();
           }
         }
       }

@@ -50,10 +50,16 @@ bool get useDevDataIsolation =>
 /// real installed app's databases, notes, or sync state. The dev directory
 /// starts empty and legacy migration is skipped for it; to seed it with real
 /// content, copy the release directory's contents across manually.
+/// Memoized temp directory for the current test process. Without this, each
+/// call to [appDataDir] under `flutter test` would mint a fresh unique
+/// directory, so a file written by one call would be invisible to the next.
+Directory? _testDataDir;
+
 Future<Directory> appDataDir() async {
   if (Platform.environment.containsKey('FLUTTER_TEST')) {
-    final dir = Directory.systemTemp.createTempSync('study_bible_test');
-    return dir;
+    return _testDataDir ??= Directory.systemTemp.createTempSync(
+      'study_bible_test',
+    );
   }
   if (Platform.isAndroid || Platform.isIOS) {
     return getApplicationDocumentsDirectory();

@@ -151,7 +151,7 @@ class _AttachmentConfigDialogState extends ConsumerState<AttachmentConfigDialog>
             Container(
               height: 120,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: ListView.builder(

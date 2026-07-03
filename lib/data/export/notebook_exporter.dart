@@ -75,26 +75,29 @@ class NotebookExporter {
           final tempDir = await getTemporaryDirectory();
           final tempFile = File(p.join(tempDir.path, filename));
           await tempFile.writeAsBytes(bytes);
-          
-          final dir = await SafUtil().pickDirectory(
-            writePermission: true,
-            persistablePermission: false,
-            initialUri: '',
-          );
-          if (dir != null) {
-            await SafStream().pasteLocalFile(
-              tempFile.path,
-              dir.uri,
-              filename,
-              mimeType,
-              overwrite: true,
+
+          try {
+            final dir = await SafUtil().pickDirectory(
+              writePermission: true,
+              persistablePermission: false,
+              initialUri: '',
             );
-            if (!context.mounted) return;
-            scaffoldMessenger.showSnackBar(
-              const SnackBar(content: Text('Saved successfully!')),
-            );
+            if (dir != null) {
+              await SafStream().pasteLocalFile(
+                tempFile.path,
+                dir.uri,
+                filename,
+                mimeType,
+                overwrite: true,
+              );
+              if (!context.mounted) return;
+              scaffoldMessenger.showSnackBar(
+                const SnackBar(content: Text('Saved successfully!')),
+              );
+            }
+          } finally {
+            if (await tempFile.exists()) await tempFile.delete();
           }
-          await tempFile.delete();
           return;
         }
 

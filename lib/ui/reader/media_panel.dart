@@ -125,16 +125,16 @@ class MediaPanel extends ConsumerWidget {
                                         height: 45,
                                         clipBehavior: Clip.antiAlias,
                                         decoration: BoxDecoration(
-                                          color: Colors.black12,
+                                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: isImage
                                             ? Image.file(
                                                 file,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (_, _, _) => const Icon(Icons.image, color: Colors.white),
+                                                errorBuilder: (_, _, _) => Icon(Icons.image, color: Theme.of(context).colorScheme.onSurfaceVariant),
                                               )
-                                            : const Icon(Icons.picture_as_pdf, color: Colors.white),
+                                            : Icon(Icons.picture_as_pdf, color: Theme.of(context).colorScheme.onSurfaceVariant),
                                       ),
                                       title: Text(a.title ?? a.filename),
                                       subtitle: Column(
@@ -470,10 +470,21 @@ class MediaPanel extends ConsumerWidget {
       if (await destFile.exists()) {
         await destFile.delete();
       }
+      final now = DateTime.now().millisecondsSinceEpoch;
       await store.transaction(() async {
         await store.into(store.mediaAttachments).insert(
-          attachment.copyWith(deleted: true),
+          attachment.copyWith(deleted: true, updatedAt: now),
           mode: drift.InsertMode.replace,
+        );
+        // Tombstone the reference too so it doesn't dangle (and syncs the
+        // deletion if the row already reached another device).
+        await (store.update(store.attachmentReferences)
+              ..where((t) => t.attachmentId.equals(attachmentId)))
+            .write(
+          AttachmentReferencesCompanion(
+            deleted: const drift.Value(true),
+            updatedAt: drift.Value(now),
+          ),
         );
       });
       ref.invalidate(chapterAttachmentsProvider);

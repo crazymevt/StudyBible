@@ -138,4 +138,8 @@ class GoogleDriveSyncStorage implements SyncStorage {
     }
     return builder.takeBytes();
   }
+
+  @override
+  Future<bool> binaryExists(String name) async =>
+      await _findFileId(name) != null;
 }

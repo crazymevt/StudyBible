@@ -71,4 +71,8 @@ class SafSyncStorage implements SyncStorage {
     if (doc == null) return null;
     return await _stream.readFileBytes(doc.uri);
   }
+
+  @override
+  Future<bool> binaryExists(String name) async =>
+      await _util.child(treeUri, [name]) != null;
 }

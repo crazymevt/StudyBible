@@ -28,6 +28,9 @@ abstract class SyncStorage {
 
   /// Read the binary document named [name], or return null if it is absent.
   Future<Uint8List?> readBinary(String name);
+
+  /// Whether a binary document named [name] exists, without downloading it.
+  Future<bool> binaryExists(String name);
 }
 
 /// A [SyncStorage] backed by a real filesystem [Directory].
@@ -79,4 +82,8 @@ class IoSyncStorage implements SyncStorage {
     if (!await file.exists()) return null;
     return file.readAsBytes();
   }
+
+  @override
+  Future<bool> binaryExists(String name) =>
+      File(p.join(directory.path, name)).exists();
 }
