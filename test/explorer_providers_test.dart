@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,23 +11,27 @@ import 'package:study_bible/app/people_providers.dart';
 import 'package:study_bible/app/place_providers.dart';
 import 'package:study_bible/app/shared_prefs.dart';
 import 'package:study_bible/app/topic_providers.dart';
+import 'package:study_bible/app/user_providers.dart';
 import 'package:study_bible/data/content_store.dart';
+import 'package:study_bible/data/user_store.dart';
 import 'package:study_bible/domain/explorer/explorer_ref.dart';
 
 /// Exercises the Explorer's cross-dataset joins: events↔places and
 /// people↔places are linked through shared verses, the passage overview
-/// aggregates every dataset for one chapter, and the trail notifier drives
-/// breadcrumb navigation.
+/// aggregates every dataset for one chapter, the user's tags join in through
+/// verse refs, and the trail notifier drives breadcrumb navigation.
 void main() {
   // One test spins up a second in-memory ContentStore (the "no dictionary
   // installed" case), which drift otherwise warns about.
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
   late ContentStore store;
+  late UserStore userStore;
   late ProviderContainer container;
 
   setUp(() async {
     store = ContentStore(NativeDatabase.memory());
+    userStore = UserStore(NativeDatabase.memory());
 
     // People: David (3 verses), Saul (1 verse).
     Future<void> person(int id, String name, int verseCount) =>
@@ -160,11 +166,112 @@ void main() {
     await dictEntry(2, 1, 'En Gedi', '<p>Spring of the goat.</p>');
     await dictEntry(3, 1, 'Ziph', '<p>A city of Judah.</p>');
 
+    // Bible text, so tagged-verse entity ids resolve to real verses (the tag
+    // page hydrates them through entitiesForTagProvider).
+    await store.into(store.versions).insert(const VersionsCompanion(
+        id: Value('KJV'), abbreviation: Value('KJV'), name: Value('KJV')));
+    Future<void> book(int id, String name, int order) =>
+        store.into(store.books).insert(BooksCompanion(
+              id: Value(id),
+              versionId: const Value('KJV'),
+              name: Value(name),
+              bookOrder: Value(order),
+              testament: const Value('OT'),
+            ));
+    await book(1, '1 Samuel', 9);
+    await book(2, 'Psalms', 19);
+    Future<void> bibleVerse(int id, int bookId, int ch, int v, String text) =>
+        store.into(store.verses).insert(VersesCompanion(
+              id: Value(id),
+              bookId: Value(bookId),
+              chapter: Value(ch),
+              verse: Value(v),
+              textContent: Value(text),
+              segments: const Value('[]'),
+            ));
+    await bibleVerse(1, 1, 24, 1, 'David is in the wilderness of En Gedi.');
+    await bibleVerse(2, 1, 24, 2, 'Saul took three thousand chosen men.');
+    await bibleVerse(3, 2, 57, 1, 'Be merciful unto me, O God.');
+
+    // The user's tags. 'david' spans two verses plus one item of every other
+    // kind; 'caves' co-occurs with it on 1 Samuel 24:1. A deleted tag and a
+    // deleted link prove soft-deletes stay invisible.
+    Future<void> tag(String id, String name,
+            {String? color, bool deleted = false}) =>
+        userStore.into(userStore.tags).insert(TagsCompanion(
+              id: Value(id),
+              updatedAt: const Value(0),
+              deviceId: const Value('test-device'),
+              name: Value(name),
+              colorHex: Value(color),
+              deleted: Value(deleted),
+            ));
+    await tag('tag-david', 'david', color: '#1E88E5');
+    await tag('tag-caves', 'caves');
+    await tag('tag-gone', 'gone', deleted: true);
+
+    var linkId = 0;
+    Future<void> link(String tagId, String entityId, String entityType,
+            {bool deleted = false}) =>
+        userStore.into(userStore.entityTags).insert(EntityTagsCompanion(
+              id: Value('link-${linkId++}'),
+              updatedAt: const Value(0),
+              deviceId: const Value('test-device'),
+              tagId: Value(tagId),
+              entityId: Value(entityId),
+              entityType: Value(entityType),
+              deleted: Value(deleted),
+            ));
+    await link('tag-david', 'Verse:1 Samuel|24|1', 'verse');
+    await link('tag-david', 'Verse:Psalms|57|1', 'verse');
+    await link('tag-david', 'note-1', 'note');
+    await link('tag-david', 'sermon-1', 'sermon');
+    await link('tag-david', 'journal-1', 'journal');
+    await link('tag-david', 'prayer-1', 'prayer');
+    await link('tag-caves', 'Verse:1 Samuel|24|1', 'verse');
+    await link('tag-david', 'Verse:1 Samuel|24|2', 'verse', deleted: true);
+    await link('tag-gone', 'Verse:1 Samuel|24|1', 'verse');
+
+    await userStore.into(userStore.notes).insert(const NotesCompanion(
+          id: Value('note-1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          bookName: Value('1 Samuel'),
+          chapter: Value(24),
+          verse: Value(2),
+          content: Value('Saul chooses his men.'),
+        ));
+    await userStore.into(userStore.sermons).insert(const SermonsCompanion(
+          id: Value('sermon-1'),
+          createdAt: Value(0),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('On Caves'),
+          content: Value(''),
+        ));
+    await userStore.into(userStore.journals).insert(const JournalsCompanion(
+          id: Value('journal-1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('Wilderness thoughts'),
+          content: Value(''),
+          contentPlain: Value('Thinking about En Gedi.'),
+        ));
+    await userStore.into(userStore.prayers).insert(const PrayersCompanion(
+          id: Value('prayer-1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          name: Value('For refuge'),
+          description: Value('Psalm 57 prayer'),
+          createdAt: Value(0),
+        ));
+
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
     container = ProviderContainer(overrides: [
       contentStoreProvider.overrideWithValue(store),
+      userStoreProvider.overrideWithValue(userStore),
       sharedPreferencesProvider.overrideWithValue(prefs),
       peopleReadyProvider.overrideWith((ref) async => true),
       placesReadyProvider.overrideWith((ref) async => true),
@@ -175,7 +282,21 @@ void main() {
   tearDown(() async {
     container.dispose();
     await store.close();
+    await userStore.close();
   });
+
+  /// First data emission of a stream-backed provider. Reading its `.future`
+  /// directly races the container teardown (see ribbons_test), so listen and
+  /// complete on the first [AsyncData] instead.
+  Future<T> firstData<T>(StreamProvider<T> provider) {
+    final completer = Completer<T>();
+    final sub = container.listen<AsyncValue<T>>(provider, (_, next) {
+      if (next is AsyncData<T> && !completer.isCompleted) {
+        completer.complete(next.value);
+      }
+    }, fireImmediately: true);
+    return completer.future.whenComplete(sub.close);
+  }
 
   group('trail notifier', () {
     test('open appends, dedupes consecutive repeats, truncate and pop', () {
@@ -322,9 +443,18 @@ void main() {
   });
 
   group('universal search', () {
-    Future<ExplorerSearchResults> search(String q) {
+    // Holds a subscription while awaiting: without a listener, Riverpod 3
+    // pauses the provider if a dependency invalidates it mid-computation
+    // (the active-versions self-heal does exactly that on the first search),
+    // and the pending future never completes.
+    Future<ExplorerSearchResults> search(String q) async {
+      final sub = container.listen(explorerSearchResultsProvider, (_, _) {});
       container.read(explorerSearchQueryProvider.notifier).setQuery(q);
-      return container.read(explorerSearchResultsProvider.future);
+      try {
+        return await container.read(explorerSearchResultsProvider.future);
+      } finally {
+        sub.close();
+      }
     }
 
     test('finds each entity kind by name', () async {
@@ -344,6 +474,114 @@ void main() {
 
     test('short queries return nothing', () async {
       expect((await search('d')).isEmpty, isTrue);
+    });
+
+    test('finds your tags, with and without the # prefix, counting live '
+        'links only', () async {
+      final plain = await search('dav');
+      expect(plain.tags.single.tag.name, 'david');
+      expect(plain.tags.single.tag.colorHex, '#1E88E5');
+      // Six live links; the deleted verse link doesn't count.
+      expect(plain.tags.single.itemCount, 6);
+
+      final hashed = await search('#dav');
+      expect(hashed.tags.single.tag.name, 'david');
+    });
+
+    test('deleted tags never surface', () async {
+      expect((await search('gone')).tags, isEmpty);
+    });
+  });
+
+  group('tag detail', () {
+    test('splits items by kind, verses in canonical order, with the distinct '
+        'chapters as passages', () async {
+      final d =
+          await container.read(explorerTagDetailProvider('tag-david').future);
+      expect(d, isNotNull);
+      expect(d!.tag.name, 'david');
+
+      // 1 Samuel (book order 9) sorts before Psalms (19); the deleted
+      // verse link (24:2) is gone.
+      expect(d.verses.map((v) => v.title).toList(),
+          ['1 Samuel 24:1', 'Psalms 57:1']);
+      expect(d.notes.single.textContent, 'Saul chooses his men.');
+      expect(d.sermons.single.title, 'Sermon: On Caves');
+      expect(d.journals.single.textContent, 'Thinking about En Gedi.');
+      expect(d.prayers.single.title, 'Prayer: For refuge');
+      expect(d.isEmpty, isFalse);
+
+      expect(d.passages, [
+        (book: '1 Samuel', chapter: 24),
+        (book: 'Psalms', chapter: 57),
+      ]);
+    });
+
+    test('finds related tags through shared items', () async {
+      final d =
+          await container.read(explorerTagDetailProvider('tag-david').future);
+      // 'caves' shares 1 Samuel 24:1; the deleted 'gone' tag does not appear.
+      expect(d!.related.single.tag.name, 'caves');
+      expect(d.related.single.itemCount, 1);
+    });
+
+    test('unknown and deleted tags resolve to null', () async {
+      expect(
+          await container.read(explorerTagDetailProvider('nope').future),
+          isNull);
+      expect(
+          await container.read(explorerTagDetailProvider('tag-gone').future),
+          isNull);
+    });
+  });
+
+  group('passage tags', () {
+    test('groups a chapter\'s tags with their verse numbers, skipping '
+        'deleted tags and links', () async {
+      final tags = await firstData(
+          explorerPassageTagsProvider((book: '1 Samuel', chapter: 24)));
+      // Both tags sit on verse 1 (david's verse-2 link is deleted, the
+      // 'gone' tag is deleted), so they tie on verse and sort by name.
+      expect(tags.map((t) => t.tag.name).toList(), ['caves', 'david']);
+      expect(tags.first.verses, [1]);
+      expect(tags.last.verses, [1]);
+    });
+
+    test('untagged chapter is empty', () async {
+      final tags = await firstData(
+          explorerPassageTagsProvider((book: 'Obadiah', chapter: 1)));
+      expect(tags, isEmpty);
+    });
+  });
+
+  group('entity tags', () {
+    test('person: intersects tagged verses with the person\'s verses, most '
+        'shared first', () async {
+      // David appears in 1 Sam 24:1-2 and Ps 57:1; 'david' tags two of
+      // those verses, 'caves' one.
+      final tags = await firstData(explorerPersonTagsProvider(1));
+      expect(tags.map((t) => t.tag.name).toList(), ['david', 'caves']);
+      expect(tags.first.refs, [
+        (book: '1 Samuel', chapter: 24, verse: 1),
+        (book: 'Psalms', chapter: 57, verse: 1),
+      ]);
+      expect(tags.last.refs, [(book: '1 Samuel', chapter: 24, verse: 1)]);
+    });
+
+    test('person with no tagged verses has no tags', () async {
+      // Saul's only verse (24:2) carries just the deleted link.
+      expect(await firstData(explorerPersonTagsProvider(2)), isEmpty);
+    });
+
+    test('place and event intersect through their own verse lists', () async {
+      // En Gedi's verse (24:1) carries both tags — ties sort by name.
+      final placeTags = await firstData(explorerPlaceTagsProvider(1));
+      expect(placeTags.map((t) => t.tag.name).toList(), ['caves', 'david']);
+
+      // The event's account is 24:1-2; only 24:1 is live-tagged.
+      final eventTags = await firstData(explorerEventTagsProvider(1));
+      expect(eventTags.map((t) => t.tag.name).toList(), ['caves', 'david']);
+      expect(eventTags.first.refs, [(book: '1 Samuel', chapter: 24, verse: 1)]);
     });
   });
 }

@@ -16,7 +16,7 @@ Tap **Add Note** to attach a personal note to the selected verse or verses. Note
 - Open the **My Notes** tool in the side panel to read, print, or delete every note in the current chapter.
 
 ## Tagging
-Tap **Tag** to file a verse under one or more tags (e.g. `#faith`, `#promises`). Tags are shared across the whole app—the same tag can group verses, notes, journals, sermons, and prayers together. Browse everything under a tag from the **Tags** view, or search for it in the global search bar.
+Tap **Tag** to file a verse under one or more tags (e.g. `#faith`, `#promises`). Tags are shared across the whole app—the same tag can group verses, notes, journals, sermons, and prayers together. Browse everything under a tag from the **Tags** view, or search for it in the global search bar. Tags also get their own pages in the **Explorer**, cross-linked with the people, places, and events of the Bible—see the **Explorer** help topic.
 
 ### Colored Tags
 Give a tag a color to make it stand out at a glance. Pick a color from the palette when you create a tag, or recolor an existing one by opening it from the **Tags** view. Colored chips then appear everywhere the tag is shown. In the **Tags** view you can also filter by color to group all of your same-colored tags together.

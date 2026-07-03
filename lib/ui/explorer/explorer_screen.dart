@@ -5,6 +5,7 @@ import '../../app/explorer_providers.dart';
 import '../../app/reader_state.dart';
 import '../../domain/explorer/explorer_ref.dart';
 import '../common/skeleton.dart';
+import '../tags/tag_palette.dart';
 import 'explorer_common.dart';
 import 'explorer_pages.dart';
 
@@ -195,8 +196,8 @@ class _ExplorerHomeState extends ConsumerState<_ExplorerHome> {
                 controller: _controller,
                 decoration: InputDecoration(
                   hintText:
-                      'Search people, places, events, topics, or a passage '
-                      '(e.g. David, En Gedi, John 1)…',
+                      'Search people, places, events, topics, your tags, or '
+                      'a passage (e.g. David, En Gedi, #faith, John 1)…',
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: query.isEmpty
                       ? null
@@ -263,7 +264,8 @@ class _HomeIntro extends ConsumerWidget {
           'One search across the whole study library. Open anything, then '
           'follow the connections — a person to their events, an event to '
           'where it happened, a place to everyone mentioned there, and any '
-          'verse straight into the reader.',
+          'verse straight into the reader. Your own tags are part of the web '
+          'too: search a tag to see everything you\'ve filed under it.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: scheme.onSurfaceVariant,
@@ -344,6 +346,11 @@ class _SearchResultsList extends ConsumerWidget {
         section('Places', r.places);
         section('Events', r.events);
         section('Topics', r.topics);
+        if (r.tags.isNotEmpty) {
+          sections
+            ..add(const _ResultsHeader('Your Tags'))
+            ..addAll([for (final t in r.tags) _TagResultTile(t)]);
+        }
 
         return ListView(
           padding: const EdgeInsets.only(bottom: 24),
@@ -371,6 +378,34 @@ class _ResultsHeader extends StatelessWidget {
               letterSpacing: 0.8,
             ),
       ),
+    );
+  }
+}
+
+/// A tag search hit: the leading icon takes the tag's colour so results scan
+/// the same way tag chips do elsewhere in the app.
+class _TagResultTile extends ConsumerWidget {
+  const _TagResultTile(this.hit);
+
+  final ExplorerTagHit hit;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      dense: true,
+      leading: Icon(
+        Icons.label,
+        size: 20,
+        color: tagColorFromHex(hit.tag.colorHex) ??
+            Theme.of(context).colorScheme.primary,
+      ),
+      title: Text('#${hit.tag.name}'),
+      subtitle:
+          Text('${hit.itemCount} ${hit.itemCount == 1 ? 'item' : 'items'}'),
+      trailing: const Icon(Icons.chevron_right, size: 18),
+      onTap: () => ref
+          .read(explorerTrailProvider.notifier)
+          .open(ExplorerRef.tag(hit.tag.id, '#${hit.tag.name}')),
     );
   }
 }

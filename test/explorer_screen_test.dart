@@ -98,6 +98,41 @@ void main() {
           verse: Value(2),
           content: Value('Saul chooses three thousand men.'),
         ));
+
+    // A tag on 1 Samuel 24:2, with the Bible text behind it so the tag page
+    // can hydrate the tagged verse.
+    await store.into(store.versions).insert(const VersionsCompanion(
+        id: Value('KJV'), abbreviation: Value('KJV'), name: Value('KJV')));
+    await store.into(store.books).insert(const BooksCompanion(
+          id: Value(1),
+          versionId: Value('KJV'),
+          name: Value('1 Samuel'),
+          bookOrder: Value(9),
+          testament: Value('OT'),
+        ));
+    await store.into(store.verses).insert(const VersesCompanion(
+          id: Value(1),
+          bookId: Value(1),
+          chapter: Value(24),
+          verse: Value(2),
+          textContent: Value('Then Saul took three thousand chosen men.'),
+          segments: Value('[]'),
+        ));
+    await userStore.into(userStore.tags).insert(const TagsCompanion(
+          id: Value('tag-battles'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          name: Value('battles'),
+          colorHex: Value('#E53935'),
+        ));
+    await userStore.into(userStore.entityTags).insert(const EntityTagsCompanion(
+          id: Value('link-1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          tagId: Value('tag-battles'),
+          entityId: Value('Verse:1 Samuel|24|2'),
+          entityType: Value('verse'),
+        ));
   });
 
   tearDown(() async {
@@ -210,6 +245,53 @@ void main() {
     expect(container.read(appModuleProvider), AppModule.reader);
     expect(container.read(selectedBookNameProvider), '1 Samuel');
     expect(container.read(selectedChapterProvider), 24);
+  });
+
+  testWidgets('searching finds your tags and the tag page links back into '
+      'the knowledge web', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await pump(tester);
+
+    await tester.enterText(find.byType(TextField), 'batt');
+    await tester.pumpAndSettle();
+    expect(find.text('YOUR TAGS'), findsOneWidget);
+
+    await tester.tap(find.text('#battles'));
+    await tester.pumpAndSettle();
+
+    // Page title plus the breadcrumb crumb.
+    expect(find.text('#battles'), findsNWidgets(2));
+    expect(find.text('Tagged verses (1)'), findsOneWidget);
+    expect(find.text('1 Samuel 24:2'), findsOneWidget);
+    expect(find.text('Then Saul took three thousand chosen men.'),
+        findsOneWidget);
+    // The hop back into the knowledge web: the tagged verse's chapter.
+    expect(find.text('Explore their chapters'), findsOneWidget);
+    expect(find.text('1 Samuel 24'), findsOneWidget);
+  });
+
+  testWidgets('passage and person pages show the Your-tags card',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await pump(tester);
+
+    await tester.tap(find.textContaining('Explore 1 Samuel 24'));
+    await tester.pumpAndSettle();
+    expect(find.text('Your tags (1)'), findsOneWidget);
+    expect(find.textContaining('#battles', findRichText: true),
+        findsOneWidget);
+
+    // Saul appears in 24:2, the tagged verse, so his page carries the tag
+    // too — tap through the People facet chip.
+    await tester.tap(find.textContaining('Saul', findRichText: true).first);
+    await tester.pumpAndSettle();
+    expect(find.text('Your tags'), findsOneWidget);
+    expect(find.textContaining('#battles', findRichText: true),
+        findsOneWidget);
   });
 
   testWidgets('breadcrumb home returns to search; topic page renders entries',
