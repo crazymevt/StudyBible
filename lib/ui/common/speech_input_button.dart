@@ -4,15 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../../data/logging.dart';
 
-/// Whether the `speech_to_text` plugin has an implementation on this platform.
-/// It ships Android, iOS, macOS, web and (community) Windows backends, but
-/// **not Linux** — the mic button hides itself there (per the TODO note).
+/// Whether the mic dictation button is offered on this platform. Enabled on
+/// Android, iOS, macOS and web. **Excluded on Windows and Linux:** Linux has no
+/// `speech_to_text` backend at all, and the community `speech_to_text_windows`
+/// backend crashes natively on invocation (an unrecoverable crash Dart can't
+/// catch), so the button is hidden there rather than risk aborting the app.
 bool get speechToTextSupported {
   if (kIsWeb) return true;
-  return Platform.isAndroid ||
-      Platform.isIOS ||
-      Platform.isMacOS ||
-      Platform.isWindows;
+  return Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
 }
 
 /// A mic button that dictates OS speech-to-text into a field. On tap it starts
