@@ -84,12 +84,16 @@ class _EditFavoritesDialogState extends ConsumerState<_EditFavoritesDialog> {
             children: [
               for (final group in toolGroups) ...[
                 Padding(
-                  padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 16.0),
+                  padding: const EdgeInsets.only(
+                    top: 16.0,
+                    bottom: 8.0,
+                    left: 16.0,
+                  ),
                   child: Text(
                     group.label.toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 for (final item in group.items)

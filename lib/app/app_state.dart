@@ -84,17 +84,16 @@ class PinnedToolsNotifier extends Notifier<List<ActiveTool>> {
 
   void setPinnedTools(List<ActiveTool> tools) {
     state = tools;
-    ref.read(sharedPreferencesProvider).setStringList(
-          'pinnedTools',
-          tools.map((t) => t.name).toList(),
-        );
+    ref
+        .read(sharedPreferencesProvider)
+        .setStringList('pinnedTools', tools.map((t) => t.name).toList());
   }
 }
 
 final pinnedToolsProvider =
     NotifierProvider<PinnedToolsNotifier, List<ActiveTool>>(
-  () => PinnedToolsNotifier(),
-);
+      () => PinnedToolsNotifier(),
+    );
 
 enum AppModule {
   reader,
@@ -104,11 +103,7 @@ enum AppModule {
   backupRestore,
 }
 
-enum JournalsActiveTab {
-  journals,
-  prayers,
-  actions,
-}
+enum JournalsActiveTab { journals, prayers, actions }
 
 class JournalsActiveTabNotifier extends Notifier<JournalsActiveTab> {
   @override
@@ -121,8 +116,8 @@ class JournalsActiveTabNotifier extends Notifier<JournalsActiveTab> {
 
 final journalsActiveTabProvider =
     NotifierProvider<JournalsActiveTabNotifier, JournalsActiveTab>(
-  () => JournalsActiveTabNotifier(),
-);
+      () => JournalsActiveTabNotifier(),
+    );
 
 /// Which side of the desktop layout the study-tools navigation rail sits on.
 enum NavRailSide { left, right }
@@ -326,7 +321,9 @@ class WeekStartDayNotifier extends Notifier<int> {
   int build() {
     final prefs = ref.watch(sharedPreferencesProvider);
     final stored = prefs.getInt('weekStartDay');
-    if (stored != null && stored >= DateTime.monday && stored <= DateTime.sunday) {
+    if (stored != null &&
+        stored >= DateTime.monday &&
+        stored <= DateTime.sunday) {
       return stored;
     }
     return DateTime.monday;
@@ -418,14 +415,17 @@ class SubheadingsSourceNotifier extends Notifier<String?> {
     if (versionId == null) {
       ref.read(sharedPreferencesProvider).remove('subheadingsSourceVersionId');
     } else {
-      ref.read(sharedPreferencesProvider).setString('subheadingsSourceVersionId', versionId);
+      ref
+          .read(sharedPreferencesProvider)
+          .setString('subheadingsSourceVersionId', versionId);
     }
   }
 }
 
-final subheadingsSourceProvider = NotifierProvider<SubheadingsSourceNotifier, String?>(
-  () => SubheadingsSourceNotifier(),
-);
+final subheadingsSourceProvider =
+    NotifierProvider<SubheadingsSourceNotifier, String?>(
+      () => SubheadingsSourceNotifier(),
+    );
 
 class SyncFolderPathNotifier extends Notifier<String?> {
   @override
@@ -444,9 +444,10 @@ class SyncFolderPathNotifier extends Notifier<String?> {
   }
 }
 
-final syncFolderPathProvider = NotifierProvider<SyncFolderPathNotifier, String?>(
-  () => SyncFolderPathNotifier(),
-);
+final syncFolderPathProvider =
+    NotifierProvider<SyncFolderPathNotifier, String?>(
+      () => SyncFolderPathNotifier(),
+    );
 
 class SyncFolderBookmarkNotifier extends Notifier<String?> {
   @override
@@ -460,14 +461,17 @@ class SyncFolderBookmarkNotifier extends Notifier<String?> {
     if (bookmark == null) {
       ref.read(sharedPreferencesProvider).remove('syncFolderBookmark');
     } else {
-      ref.read(sharedPreferencesProvider).setString('syncFolderBookmark', bookmark);
+      ref
+          .read(sharedPreferencesProvider)
+          .setString('syncFolderBookmark', bookmark);
     }
   }
 }
 
-final syncFolderBookmarkProvider = NotifierProvider<SyncFolderBookmarkNotifier, String?>(
-  () => SyncFolderBookmarkNotifier(),
-);
+final syncFolderBookmarkProvider =
+    NotifierProvider<SyncFolderBookmarkNotifier, String?>(
+      () => SyncFolderBookmarkNotifier(),
+    );
 
 /// Whether the app syncs automatically: once shortly after startup, then on a
 /// fixed interval while running (see autoSyncControllerProvider). Off by
@@ -485,8 +489,7 @@ class AutoSyncEnabledNotifier extends Notifier<bool> {
   }
 }
 
-final autoSyncEnabledProvider =
-    NotifierProvider<AutoSyncEnabledNotifier, bool>(
+final autoSyncEnabledProvider = NotifierProvider<AutoSyncEnabledNotifier, bool>(
   () => AutoSyncEnabledNotifier(),
 );
 
@@ -517,9 +520,10 @@ class AutoSyncIntervalNotifier extends Notifier<int> {
   }
 }
 
-final autoSyncIntervalProvider = NotifierProvider<AutoSyncIntervalNotifier, int>(
-  () => AutoSyncIntervalNotifier(),
-);
+final autoSyncIntervalProvider =
+    NotifierProvider<AutoSyncIntervalNotifier, int>(
+      () => AutoSyncIntervalNotifier(),
+    );
 
 /// Whether sync should use the user's Google Drive (hidden app-data folder)
 /// instead of a local/SAF folder. When true, [SyncService] builds a Drive-backed
@@ -539,8 +543,8 @@ class GoogleDriveEnabledNotifier extends Notifier<bool> {
 
 final googleDriveEnabledProvider =
     NotifierProvider<GoogleDriveEnabledNotifier, bool>(
-  () => GoogleDriveEnabledNotifier(),
-);
+      () => GoogleDriveEnabledNotifier(),
+    );
 
 /// The connected Google account email, kept only for display in settings.
 class GoogleDriveAccountNotifier extends Notifier<String?> {
@@ -555,15 +559,17 @@ class GoogleDriveAccountNotifier extends Notifier<String?> {
     if (email == null) {
       ref.read(sharedPreferencesProvider).remove('googleDriveAccount');
     } else {
-      ref.read(sharedPreferencesProvider).setString('googleDriveAccount', email);
+      ref
+          .read(sharedPreferencesProvider)
+          .setString('googleDriveAccount', email);
     }
   }
 }
 
 final googleDriveAccountProvider =
     NotifierProvider<GoogleDriveAccountNotifier, String?>(
-  () => GoogleDriveAccountNotifier(),
-);
+      () => GoogleDriveAccountNotifier(),
+    );
 
 /// Default background colour for the action-due reminder banner — a noticeable
 /// yellow. Used when the user hasn't picked a custom colour.
@@ -591,8 +597,8 @@ class ActionBannerColorNotifier extends Notifier<int?> {
 
 final actionBannerColorProvider =
     NotifierProvider<ActionBannerColorNotifier, int?>(
-  () => ActionBannerColorNotifier(),
-);
+      () => ActionBannerColorNotifier(),
+    );
 
 class CustomLightTextColorNotifier extends Notifier<int?> {
   @override
@@ -611,9 +617,10 @@ class CustomLightTextColorNotifier extends Notifier<int?> {
   }
 }
 
-final customLightTextColorProvider = NotifierProvider<CustomLightTextColorNotifier, int?>(
-  () => CustomLightTextColorNotifier(),
-);
+final customLightTextColorProvider =
+    NotifierProvider<CustomLightTextColorNotifier, int?>(
+      () => CustomLightTextColorNotifier(),
+    );
 
 class CustomDarkTextColorNotifier extends Notifier<int?> {
   @override
@@ -632,9 +639,10 @@ class CustomDarkTextColorNotifier extends Notifier<int?> {
   }
 }
 
-final customDarkTextColorProvider = NotifierProvider<CustomDarkTextColorNotifier, int?>(
-  () => CustomDarkTextColorNotifier(),
-);
+final customDarkTextColorProvider =
+    NotifierProvider<CustomDarkTextColorNotifier, int?>(
+      () => CustomDarkTextColorNotifier(),
+    );
 
 class CustomLightJesusWordsColorNotifier extends Notifier<int?> {
   @override
@@ -648,14 +656,17 @@ class CustomLightJesusWordsColorNotifier extends Notifier<int?> {
     if (color == null) {
       ref.read(sharedPreferencesProvider).remove('customLightJesusWordsColor');
     } else {
-      ref.read(sharedPreferencesProvider).setInt('customLightJesusWordsColor', color);
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt('customLightJesusWordsColor', color);
     }
   }
 }
 
-final customLightJesusWordsColorProvider = NotifierProvider<CustomLightJesusWordsColorNotifier, int?>(
-  () => CustomLightJesusWordsColorNotifier(),
-);
+final customLightJesusWordsColorProvider =
+    NotifierProvider<CustomLightJesusWordsColorNotifier, int?>(
+      () => CustomLightJesusWordsColorNotifier(),
+    );
 
 class CustomDarkJesusWordsColorNotifier extends Notifier<int?> {
   @override
@@ -669,14 +680,17 @@ class CustomDarkJesusWordsColorNotifier extends Notifier<int?> {
     if (color == null) {
       ref.read(sharedPreferencesProvider).remove('customDarkJesusWordsColor');
     } else {
-      ref.read(sharedPreferencesProvider).setInt('customDarkJesusWordsColor', color);
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt('customDarkJesusWordsColor', color);
     }
   }
 }
 
-final customDarkJesusWordsColorProvider = NotifierProvider<CustomDarkJesusWordsColorNotifier, int?>(
-  () => CustomDarkJesusWordsColorNotifier(),
-);
+final customDarkJesusWordsColorProvider =
+    NotifierProvider<CustomDarkJesusWordsColorNotifier, int?>(
+      () => CustomDarkJesusWordsColorNotifier(),
+    );
 
 class CustomLightSeedColorNotifier extends Notifier<int?> {
   @override
@@ -695,9 +709,10 @@ class CustomLightSeedColorNotifier extends Notifier<int?> {
   }
 }
 
-final customLightSeedColorProvider = NotifierProvider<CustomLightSeedColorNotifier, int?>(
-  () => CustomLightSeedColorNotifier(),
-);
+final customLightSeedColorProvider =
+    NotifierProvider<CustomLightSeedColorNotifier, int?>(
+      () => CustomLightSeedColorNotifier(),
+    );
 
 class CustomDarkSeedColorNotifier extends Notifier<int?> {
   @override
@@ -716,9 +731,10 @@ class CustomDarkSeedColorNotifier extends Notifier<int?> {
   }
 }
 
-final customDarkSeedColorProvider = NotifierProvider<CustomDarkSeedColorNotifier, int?>(
-  () => CustomDarkSeedColorNotifier(),
-);
+final customDarkSeedColorProvider =
+    NotifierProvider<CustomDarkSeedColorNotifier, int?>(
+      () => CustomDarkSeedColorNotifier(),
+    );
 
 class CustomLightSurfaceColorNotifier extends Notifier<int?> {
   @override
@@ -732,14 +748,17 @@ class CustomLightSurfaceColorNotifier extends Notifier<int?> {
     if (color == null) {
       ref.read(sharedPreferencesProvider).remove('customLightSurfaceColor');
     } else {
-      ref.read(sharedPreferencesProvider).setInt('customLightSurfaceColor', color);
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt('customLightSurfaceColor', color);
     }
   }
 }
 
-final customLightSurfaceColorProvider = NotifierProvider<CustomLightSurfaceColorNotifier, int?>(
-  () => CustomLightSurfaceColorNotifier(),
-);
+final customLightSurfaceColorProvider =
+    NotifierProvider<CustomLightSurfaceColorNotifier, int?>(
+      () => CustomLightSurfaceColorNotifier(),
+    );
 
 class CustomDarkSurfaceColorNotifier extends Notifier<int?> {
   @override
@@ -753,14 +772,17 @@ class CustomDarkSurfaceColorNotifier extends Notifier<int?> {
     if (color == null) {
       ref.read(sharedPreferencesProvider).remove('customDarkSurfaceColor');
     } else {
-      ref.read(sharedPreferencesProvider).setInt('customDarkSurfaceColor', color);
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt('customDarkSurfaceColor', color);
     }
   }
 }
 
-final customDarkSurfaceColorProvider = NotifierProvider<CustomDarkSurfaceColorNotifier, int?>(
-  () => CustomDarkSurfaceColorNotifier(),
-);
+final customDarkSurfaceColorProvider =
+    NotifierProvider<CustomDarkSurfaceColorNotifier, int?>(
+      () => CustomDarkSurfaceColorNotifier(),
+    );
 
 class CustomLightAppBarColorNotifier extends Notifier<int?> {
   @override
@@ -774,14 +796,17 @@ class CustomLightAppBarColorNotifier extends Notifier<int?> {
     if (color == null) {
       ref.read(sharedPreferencesProvider).remove('customLightAppBarColor');
     } else {
-      ref.read(sharedPreferencesProvider).setInt('customLightAppBarColor', color);
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt('customLightAppBarColor', color);
     }
   }
 }
 
-final customLightAppBarColorProvider = NotifierProvider<CustomLightAppBarColorNotifier, int?>(
-  () => CustomLightAppBarColorNotifier(),
-);
+final customLightAppBarColorProvider =
+    NotifierProvider<CustomLightAppBarColorNotifier, int?>(
+      () => CustomLightAppBarColorNotifier(),
+    );
 
 class CustomDarkAppBarColorNotifier extends Notifier<int?> {
   @override
@@ -795,14 +820,17 @@ class CustomDarkAppBarColorNotifier extends Notifier<int?> {
     if (color == null) {
       ref.read(sharedPreferencesProvider).remove('customDarkAppBarColor');
     } else {
-      ref.read(sharedPreferencesProvider).setInt('customDarkAppBarColor', color);
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt('customDarkAppBarColor', color);
     }
   }
 }
 
-final customDarkAppBarColorProvider = NotifierProvider<CustomDarkAppBarColorNotifier, int?>(
-  () => CustomDarkAppBarColorNotifier(),
-);
+final customDarkAppBarColorProvider =
+    NotifierProvider<CustomDarkAppBarColorNotifier, int?>(
+      () => CustomDarkAppBarColorNotifier(),
+    );
 
 /// User overrides for the highlight-colour slots, keyed `'<slotId>_light'` /
 /// `'<slotId>_dark'` -> ARGB int. Absent keys fall back to the built-in default
@@ -857,8 +885,8 @@ class HighlightColorOverridesNotifier extends Notifier<Map<String, int>> {
 
 final highlightColorOverridesProvider =
     NotifierProvider<HighlightColorOverridesNotifier, Map<String, int>>(
-  () => HighlightColorOverridesNotifier(),
-);
+      () => HighlightColorOverridesNotifier(),
+    );
 
 /// How selected verses are rendered when copied or shared. Backed by three
 /// SharedPreferences keys so each toggle is independently persisted; exposed as
@@ -874,8 +902,9 @@ class VerseShareFormatNotifier extends Notifier<VerseShareFormat> {
     return VerseShareFormat(
       includeVerseNumbers: prefs.getBool(_numbersKey) ?? true,
       includeVersionAbbreviation: prefs.getBool(_versionKey) ?? false,
-      referencePosition:
-          VerseReferencePosition.fromName(prefs.getString(_positionKey)),
+      referencePosition: VerseReferencePosition.fromName(
+        prefs.getString(_positionKey),
+      ),
     );
   }
 
@@ -897,5 +926,5 @@ class VerseShareFormatNotifier extends Notifier<VerseShareFormat> {
 
 final verseShareFormatProvider =
     NotifierProvider<VerseShareFormatNotifier, VerseShareFormat>(
-  () => VerseShareFormatNotifier(),
-);
+      () => VerseShareFormatNotifier(),
+    );

@@ -14,9 +14,7 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
 
     final container = ProviderContainer(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
     );
     addTearDown(container.dispose);
     await tester.pumpWidget(
@@ -34,8 +32,7 @@ void main() {
     return container;
   }
 
-  testWidgets('shows default pinned tools and an edit button',
-      (tester) async {
+  testWidgets('shows default pinned tools and an edit button', (tester) async {
     await pumpRail(tester);
 
     // Default pinned tools: notes, highlights, scratch, sermons, notebooks, commentaries, media
@@ -54,8 +51,9 @@ void main() {
     expect(find.byIcon(Icons.edit), findsOneWidget);
   });
 
-  testWidgets('tapping a tool selects it and tapping again closes it',
-      (tester) async {
+  testWidgets('tapping a tool selects it and tapping again closes it', (
+    tester,
+  ) async {
     final container = await pumpRail(tester);
 
     await tester.tap(find.text('Notes'));
@@ -67,8 +65,9 @@ void main() {
     expect(container.read(activeToolProvider), ActiveTool.none);
   });
 
-  testWidgets('natural height fits a typical laptop window without scrolling',
-      (tester) async {
+  testWidgets('natural height fits a typical laptop window without scrolling', (
+    tester,
+  ) async {
     await pumpRail(tester);
 
     // With 7 default pinned tools and generous padding, it should still
@@ -77,8 +76,9 @@ void main() {
     expect(height, lessThan(730));
   });
 
-  testWidgets('tools further down the rail are reachable and selectable',
-      (tester) async {
+  testWidgets('tools further down the rail are reachable and selectable', (
+    tester,
+  ) async {
     final container = await pumpRail(tester);
 
     await tester.scrollUntilVisible(find.text('Media'), 100);
@@ -87,15 +87,16 @@ void main() {
     expect(container.read(activeToolProvider), ActiveTool.media);
   });
 
-  testWidgets('edit button opens dialog to edit pinned favorites',
-      (tester) async {
+  testWidgets('edit button opens dialog to edit pinned favorites', (
+    tester,
+  ) async {
     final container = await pumpRail(tester);
 
     await tester.tap(find.byIcon(Icons.edit));
     await tester.pumpAndSettle();
 
     expect(find.text('Edit Favorites'), findsOneWidget);
-    
+
     // Toggle off Notes
     await tester.tap(find.text('Notes').last);
     await tester.pumpAndSettle();

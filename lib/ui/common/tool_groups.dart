@@ -16,7 +16,7 @@ class ToolItem {
   final String railLabel;
 
   const ToolItem(this.tool, this.icon, this.label, {String? railLabel})
-      : railLabel = railLabel ?? label;
+    : railLabel = railLabel ?? label;
 }
 
 class ToolGroup {
@@ -31,32 +31,55 @@ class ToolGroup {
 /// you author, scheduled reading, and browsable extras.
 const List<ToolGroup> toolGroups = [
   ToolGroup('Study', [
-    ToolItem(ActiveTool.crossReference, Icons.compare_arrows,
-        'Cross-References',
-        railLabel: 'Cross-Ref'),
-    ToolItem(ActiveTool.commentaries, Icons.menu_book, 'Commentaries',
-        railLabel: 'Commentary'),
+    ToolItem(
+      ActiveTool.crossReference,
+      Icons.compare_arrows,
+      'Cross-References',
+      railLabel: 'Cross-Ref',
+    ),
+    ToolItem(
+      ActiveTool.commentaries,
+      Icons.menu_book,
+      'Commentaries',
+      railLabel: 'Commentary',
+    ),
     ToolItem(ActiveTool.dictionary, Icons.import_contacts, 'Dictionary'),
     ToolItem(ActiveTool.search, Icons.search, 'Search'),
   ]),
   ToolGroup('My Work', [
     ToolItem(ActiveTool.notes, Icons.note, 'Notes'),
-    ToolItem(ActiveTool.highlights, Icons.format_color_fill, 'My Highlights',
-        railLabel: 'Highlights'),
+    ToolItem(
+      ActiveTool.highlights,
+      Icons.format_color_fill,
+      'My Highlights',
+      railLabel: 'Highlights',
+    ),
     ToolItem(ActiveTool.scratch, Icons.edit_note, 'Scratch'),
     ToolItem(ActiveTool.sermons, Icons.co_present, 'Sermons'),
-    ToolItem(ActiveTool.notebooks, Icons.library_books, 'Notebooks',
-        railLabel: 'Notebooks'),
+    ToolItem(
+      ActiveTool.notebooks,
+      Icons.library_books,
+      'Notebooks',
+      railLabel: 'Notebooks',
+    ),
   ]),
   ToolGroup('Plans', [
-    ToolItem(ActiveTool.readingPlans, Icons.event_note, 'Reading Plans',
-        railLabel: 'Plans'),
+    ToolItem(
+      ActiveTool.readingPlans,
+      Icons.event_note,
+      'Reading Plans',
+      railLabel: 'Plans',
+    ),
     ToolItem(ActiveTool.devotionals, Icons.calendar_today, 'Devotionals'),
   ]),
   ToolGroup('Explore', [
     ToolItem(ActiveTool.topics, Icons.topic, 'Topics'),
-    ToolItem(ActiveTool.harmony, Icons.auto_stories, 'Gospel Harmony',
-        railLabel: 'Harmony'),
+    ToolItem(
+      ActiveTool.harmony,
+      Icons.auto_stories,
+      'Gospel Harmony',
+      railLabel: 'Harmony',
+    ),
     ToolItem(ActiveTool.places, Icons.map, 'Places'),
     ToolItem(ActiveTool.people, Icons.people, 'People'),
     ToolItem(ActiveTool.media, Icons.video_library, 'Media'),
