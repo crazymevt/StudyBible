@@ -25,20 +25,15 @@ Running list of known issues and follow-ups.
 
 - [ ] **Explorer — richer content on entity/passage pages.** Three enrichments
   scoped from a data-source audit (2026-07-02). Ordered cheapest-first.
-  - **(a) Dictionary facet card for places & topics.** Easton's Bible Dictionary
-    is already bundled in `assets/content.db` (`dictionaries` id 1,
-    `dictionary_entries`) and is *already* the source of person bios in the
-    Theographic import. Surface the full Easton entry as a facet card on **place**
-    and **topic** pages too, keyed by entry name/slug.
-    - *Research notes:* place names come from OpenBible (`places.name`, no
-      description today); topic names from Nave's (`topics.name`, e.g. "AARON").
-      Easton headwords won't always match exactly — need a normalization/lookup
-      (case-fold, strip parentheticals, maybe an alias table) against
-      `dictionary_entries`. Person bios prove the join works; check how
-      `theographic_importer.dart` currently pairs a person to its Easton text and
-      reuse that matching. Add a provider in `lib/app/explorer_providers.dart`
-      (mirror `commentaryEntriesProvider`) and a card in `explorer_pages.dart`.
-      No new dataset — pure wiring.
+  - **(a) Dictionary facet card for places & topics. — DONE** (commit 1e9821c).
+    `explorerEntryDictionaryProvider` matches an entity name against every
+    installed dictionary's headwords (case-insensitive `LIKE`, trailing
+    parenthetical qualifier stripped), and `_DictionaryCard` in
+    `explorer_pages.dart` renders it on place/topic pages, grouped by module.
+    Person pages are excluded on purpose (their bio card already shows the
+    Easton entry). Note: only surfaces content the user has *imported* — the
+    bundled `content.db` ships just a 2-entry seed, not full Easton's; person
+    bios come baked into `theographic.json`, not the `dictionary_entries` table.
   - **(b) Fuller timeline events: summaries, end years, locations.** The
     `timeline_events` table only stores `title`/`sortKey`/`startYear`; the
     upstream Theographic dataset carries an event **description/summary**, an
