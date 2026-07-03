@@ -21,6 +21,7 @@ Running list of known issues and follow-ups.
 ## Research
 
 - [ ] **Media Attachments.** Research the ability to upload and tag images and possibly PDFs that can be shown within the app. Crucially, these attachments must be included in the app's backup/restore functionality.
+  - *Note on PDFs:* Aim to render PDFs internally (using packages like `syncfusion_flutter_pdfviewer` or `pdfx`) to keep users in the app and allow side-by-side study, rather than kicking them out to an external viewer.
 
 - [ ] **Interactive Atlas / Geographic Tracker** (Advanced Map Tool)
   - *Context:* The app currently has a `PlacesPanel` (`lib/ui/reader/places_panel.dart`) that uses `flutter_map` and OpenBible data to plot places for the active chapter.
