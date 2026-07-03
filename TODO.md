@@ -34,20 +34,37 @@ Running list of known issues and follow-ups.
     Easton entry). Note: only surfaces content the user has *imported* — the
     bundled `content.db` ships just a 2-entry seed, not full Easton's; person
     bios come baked into `theographic.json`, not the `dictionary_entries` table.
-  - **(b) Fuller timeline events: summaries, end years, locations.** The
-    `timeline_events` table only stores `title`/`sortKey`/`startYear`; the
-    upstream Theographic dataset carries an event **description/summary**, an
-    **end year**, and a **location** (place link) that our importer drops.
-    - *Research notes:* re-widen the projection in `scripts/build_theographic.dart`
-      (downloads Airtable-export JSON from `robertrouse/theographic-bible-metadata`,
-      cached in `scratch/theographic/`) to keep those fields, regrow
-      `assets/data/theographic.json`, add columns in
-      `lib/data/tables/content_tables.dart` (`timeline_events`), extend
-      `theographic_importer.dart`, and run
-      `dart run build_runner build --delete-conflicting-outputs`. An explicit
-      event→place link would also let events stop bridging through shared verses.
-      Bundle the Theographic `periods` table at the same time for era buckets
-      (feeds a future timeline view). License unchanged (CC BY-SA 4.0).
+  - **(b) Fuller timeline events. — DEFERRED; premise corrected 2026-07-02.**
+    The original note assumed the upstream events carried a summary, an end
+    year, and a location. Audited the real `events.json` (450 records) — the
+    reality is narrower:
+    - **Summaries don't exist.** The only descriptive text is `title` (already
+      imported). There's a `notes` field but it's on just **6 of 450** events
+      and holds trivia, not summaries. Drop this entirely.
+    - **No end year.** No `endDate` field. There *is* a `duration` on all 450
+      (`"1D"` for 301 of them, else `"40Y"`/`"7Y"`/`"1M"`…). An end year is only
+      *derivable*; `duration` displayed as "lasted 40 years" reads better and is
+      the cheap win. Skip the derived end year.
+    - **Locations are real and worth it.** `locations` links on **305** events
+      point to Theographic's *own* `places.json` (1,274 records w/ names +
+      lat/lng, pre-matched to OpenBible via `openBibleLat`). We don't download
+      that file today. Of 160 distinct event-location places, **126 (79%) match
+      an existing OpenBible `places` row by name** → can become a clickable
+      place chip + authoritative map pin; the ~21% miss (name variants like
+      Galilee/Samaria, regions like Olivet) fall back to a stored name+coords.
+    - *If picked up:* recommended scope is **duration (display) + locations
+      (cross-linked)**. Build script (`scripts/build_theographic.dart`,
+      Airtable-export JSON, cached in `scratch/theographic/`): keep `duration`,
+      download `places.json`, resolve `locations[]` → name+lat/lng. Importer
+      (`theographic_importer.dart`) does the name→`places.id` match at import
+      time (both come from the same import gate) storing a `location_place_id`
+      FK plus name/coords fallback. Add columns in
+      `lib/data/tables/content_tables.dart` (`timeline_events`), regen with
+      `dart run build_runner build --delete-conflicting-outputs`, and lead the
+      event page's "Where it happened" with the explicit location (verse-derived
+      places stay below as "also mentioned"). Out of scope but interesting for
+      later: `predecessor`/`partOf` (event chains/hierarchy), `groups` links,
+      and the `periods` table for era buckets. License unchanged (CC BY-SA 4.0).
   - **(c) OpenBible.info place descriptions.** Places currently have only
     `name`/`lat`/`lng` — no prose. OpenBible's Bible-Geocoding-Data carries
     descriptive text and ancient/modern name variants we don't ingest.
