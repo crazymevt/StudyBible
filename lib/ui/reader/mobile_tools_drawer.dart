@@ -9,6 +9,7 @@ import 'commentary_panel.dart';
 import 'media_panel.dart';
 import 'reading_plan_panel.dart';
 import '../sermons/sermons_panel.dart';
+import '../notebooks/notebooks_panel.dart';
 import 'devotionals_panel.dart';
 import 'topics_panel.dart';
 import 'harmony_panel.dart';
@@ -60,6 +61,8 @@ class MobileToolsDrawer extends ConsumerWidget {
         return const ReadingPlanPanel();
       case ActiveTool.sermons:
         return const SermonsPanel();
+      case ActiveTool.notebooks:
+        return const NotebooksPanel();
       case ActiveTool.devotionals:
         return const DevotionalsPanel();
       case ActiveTool.topics:

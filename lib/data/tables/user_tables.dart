@@ -357,3 +357,73 @@ class EntityTags extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// A notebook: a titled folder that holds rich-text [NotebookPages]. Modeled on
+/// [Sermons] (synced Last-Writer-Wins) but adds a cover [colorHex]/[iconKey] and
+/// contains pages rather than being a document itself.
+@DataClassName('Notebook')
+class Notebooks extends Table {
+  TextColumn get id => text()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get title => text()();
+  // Cover color, same hex encoding as [Highlights.colorHex]. Null = default.
+  TextColumn get colorHex => text().nullable()();
+  // Key into the curated cover-icon map (see notebook_icons.dart). Stored as a
+  // stable string, not a raw IconData codePoint, so it survives icon
+  // tree-shaking. Null = default icon.
+  TextColumn get iconKey => text().nullable()();
+  // Pinned to the top of the list, synced like the other fields (LWW).
+  BoolColumn get pinned => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// A rich-text page inside a [Notebooks]. Content is Quill Delta JSON, matching
+/// [Sermons]; [contentPlain] is the derived plain-text projection used only for
+/// the FTS index. [position] orders pages within their notebook (drag-reorder).
+@DataClassName('NotebookPage')
+class NotebookPages extends Table {
+  TextColumn get id => text()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get notebookId => text()(); // the notebook this page belongs to
+  TextColumn get title => text()();
+  TextColumn get content => text()(); // Quill Delta JSON string
+  TextColumn get contentPlain => text().nullable()();
+  IntColumn get position => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// A point-in-time snapshot of a [NotebookPages] row. Mirrors [SermonRevisions]:
+/// a revision's content is never edited after creation — only created or
+/// tombstoned — so Last-Writer-Wins needs no special handling.
+@DataClassName('NotebookPageRevision')
+class NotebookPageRevisions extends Table {
+  TextColumn get id => text()(); // UUID of the revision
+  IntColumn get updatedAt => integer()(); // == createdAt; for the sync contract
+  TextColumn get deviceId => text()(); // device that captured the snapshot
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get pageId => text()(); // the page this snapshots
+  IntColumn get createdAt => integer()(); // epoch ms the snapshot was taken
+  TextColumn get title => text()(); // snapshot of the page title
+  TextColumn get content => text()(); // snapshot of the Delta JSON content
+  TextColumn get label => text().nullable()(); // optional user-supplied label
+  // 'manual' (user saved), 'conflict' (a remote edit overwrote local content),
+  // or 'restore' (auto-snapshot of the pre-restore state). Manual revisions are
+  // kept forever; the automatic kinds are capped per page.
+  TextColumn get kind => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

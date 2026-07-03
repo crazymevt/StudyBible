@@ -45,6 +45,8 @@ const List<ToolGroup> toolGroups = [
         railLabel: 'Highlights'),
     ToolItem(ActiveTool.scratch, Icons.edit_note, 'Scratch'),
     ToolItem(ActiveTool.sermons, Icons.co_present, 'Sermons'),
+    ToolItem(ActiveTool.notebooks, Icons.library_books, 'Notebooks',
+        railLabel: 'Notebooks'),
   ]),
   ToolGroup('Plans', [
     ToolItem(ActiveTool.readingPlans, Icons.event_note, 'Reading Plans',

@@ -8,13 +8,23 @@ Running list of known issues and follow-ups.
 
 - [ ] **Speech-to-Text Button.** Add a custom microphone button to input fields (like the Sermon Editor or Notes) that uses the `speech_to_text` package to programmatically trigger the OS native dictation feature. *(Note: This package does not support Linux natively, so hide or disable this button on Linux builds).*
 - [ ] **Expand Tags card in Explorer.** Expand the tags card to also cross reference people, places, events, and commentaries like the other cards do.
-- [ ] **Notebooks tool.** Add a notebooks tool that works similar to sermons, allowing users to create a notebook to store pages inside it (like a folder). It does not need presentation mode or the chain linking feature. Needs to include:
-  - **Organization:** Drag-and-drop reordering of pages, Notebook cover colors/icons.
-  - **Bible Integration:** Auto-linking typed verses (e.g., John 3:16), an "Insert Scripture" button, and side-by-side view with the Bible reader.
-  - **Rich Text:** Bold, italics, underline, lists, headers, highlighters, and blockquotes.
-  - **Cross-Referencing:** Entity linking tying back to the Explorer, and showing backlinks on Explorer pages.
-  - **Exporting:** PDF/Markdown export and a share sheet.
-  - **Tags:** General tagging support.
+- [~] **Notebooks tool.** Reader side tool (`ActiveTool.notebooks`) modeled on
+  sermons: notebooks (folders) hold rich-text pages. Shipped: data model
+  (`Notebooks`/`NotebookPages`/`NotebookPageRevisions`, schema v25), sync, FTS,
+  panel + detail + Quill page editor. Done sub-items below; **only Explorer
+  cross-referencing/backlinks remains.**
+  - **Organization:** Drag-and-drop reordering of pages, cover colors/icons. — DONE
+  - **Bible Integration:** verse auto-linking (reuses `reference_autolink`), an
+    "Insert Scripture" button, side-by-side with the reader (inline panel). — DONE
+  - **Rich Text:** default full Quill toolbar (bold/italic/underline/lists/
+    headers/highlight/blockquote). — DONE
+  - **Cross-Referencing:** Entity linking tying back to the Explorer, and
+    showing backlinks on Explorer pages. — **TODO** (deferred; the one net-new
+    subsystem).
+  - **Exporting:** PDF/Markdown/HTML/text export + share sheet
+    (`NotebookExporter`, new `deltaToMarkdown`). — DONE
+  - **Tags:** General tagging at notebook + page level (`entityType`
+    `notebook`/`notebookPage`), surfaced in tag results. — DONE
 
 - [ ] **Drag and drop verses.** Support dragging a verse from the reader and dropping it into the sermon editor or scratch space to copy the text.
 

@@ -16,6 +16,7 @@ enum ActiveTool {
   readingPlans,
   compare,
   sermons,
+  notebooks,
   devotionals,
   topics,
   places,

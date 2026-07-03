@@ -70,6 +70,13 @@ class _ExportDialogState extends State<ExportDialog> {
                   groupValue: _selectedFormat,
                   onChanged: (val) => setState(() => _selectedFormat = val!),
                 ),
+                RadioListTile<ExportFormat>(
+                  title: const Text('Export as Markdown'),
+                  subtitle: const Text('Headings, lists, bold/italic'),
+                  value: ExportFormat.markdown,
+                  groupValue: _selectedFormat,
+                  onChanged: (val) => setState(() => _selectedFormat = val!),
+                ),
               ],
             ),
       actions: [
