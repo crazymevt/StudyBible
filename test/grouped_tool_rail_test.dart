@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:study_bible/app/app_state.dart';
 import 'package:study_bible/app/shared_prefs.dart';
-import 'package:study_bible/ui/common/tool_groups.dart';
 import 'package:study_bible/ui/grouped_tool_rail.dart';
 
 void main() {
@@ -90,7 +89,7 @@ void main() {
   testWidgets('edit button opens dialog to edit pinned favorites', (
     tester,
   ) async {
-    final container = await pumpRail(tester);
+    await pumpRail(tester);
 
     await tester.tap(find.byIcon(Icons.edit));
     await tester.pumpAndSettle();
