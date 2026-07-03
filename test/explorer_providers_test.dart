@@ -17,6 +17,10 @@ import 'package:study_bible/domain/explorer/explorer_ref.dart';
 /// aggregates every dataset for one chapter, and the trail notifier drives
 /// breadcrumb navigation.
 void main() {
+  // One test spins up a second in-memory ContentStore (the "no dictionary
+  // installed" case), which drift otherwise warns about.
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+
   late ContentStore store;
   late ProviderContainer container;
 
@@ -138,6 +142,24 @@ void main() {
     await commentaryEntry(2, 1, '1 Samuel', 24, 1, 'On verse one');
     await commentaryEntry(3, 2, 'Genesis', 1, 1, 'Elsewhere');
 
+    // Dictionary: Easton's, keyed by headword. Powers the place/topic
+    // dictionary card. "Caves" matches the CAVES topic case-insensitively;
+    // "Ziph" tests parenthetical-qualifier stripping.
+    await store.into(store.dictionaries).insert(const DictionariesCompanion(
+        id: Value(1),
+        abbreviation: Value('EBD'),
+        name: Value("Easton's Bible Dictionary")));
+    Future<void> dictEntry(int id, int dict, String word, String def) =>
+        store.into(store.dictionaryEntries).insert(DictionaryEntriesCompanion(
+              id: Value(id),
+              dictionaryId: Value(dict),
+              word: Value(word),
+              definition: Value(def),
+            ));
+    await dictEntry(1, 1, 'Caves', '<p>Hollow places.</p>');
+    await dictEntry(2, 1, 'En Gedi', '<p>Spring of the goat.</p>');
+    await dictEntry(3, 1, 'Ziph', '<p>A city of Judah.</p>');
+
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
@@ -258,6 +280,44 @@ void main() {
           explorerPassageCommentariesProvider((book: 'Obadiah', chapter: 1))
               .future);
       expect(sections, isEmpty);
+    });
+  });
+
+  group('entity dictionary lookup', () {
+    test('matches a topic headword case-insensitively', () async {
+      final entries =
+          await container.read(explorerEntryDictionaryProvider('CAVES').future);
+      expect(entries.map((e) => e.entry.word).toList(), ['Caves']);
+      expect(entries.single.dictionary.name, "Easton's Bible Dictionary");
+    });
+
+    test('matches a place name', () async {
+      final entries = await container
+          .read(explorerEntryDictionaryProvider('En Gedi').future);
+      expect(entries.single.entry.word, 'En Gedi');
+    });
+
+    test('strips a trailing parenthetical qualifier', () async {
+      final entries = await container
+          .read(explorerEntryDictionaryProvider('Ziph (2)').future);
+      expect(entries.single.entry.word, 'Ziph');
+    });
+
+    test('no headword match returns empty', () async {
+      expect(
+          await container
+              .read(explorerEntryDictionaryProvider('Nowhere').future),
+          isEmpty);
+    });
+
+    test('no installed dictionary returns empty', () async {
+      final bare = ContentStore(NativeDatabase.memory());
+      addTearDown(bare.close);
+      final c = ProviderContainer(
+          overrides: [contentStoreProvider.overrideWithValue(bare)]);
+      addTearDown(c.dispose);
+      expect(await c.read(explorerEntryDictionaryProvider('Caves').future),
+          isEmpty);
     });
   });
 

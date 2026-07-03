@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
+import '../../app/content_providers.dart';
 import '../../app/explorer_providers.dart';
 import '../../app/people_providers.dart';
 import '../../app/topic_providers.dart';
@@ -332,6 +333,10 @@ class _PlacePage extends ConsumerWidget {
       error: (e, _) => _ErrorBody('Couldn\'t load this place: $e'),
       data: (d) {
         if (d == null) return const _ErrorBody('Place not found.');
+        final dictionary =
+            ref.watch(explorerEntryDictionaryProvider(d.place.name)).asData
+                    ?.value ??
+                const <DictionaryEntryWithDict>[];
         return _PageScroll(
           children: [
             _PageTitle(
@@ -345,6 +350,7 @@ class _PlacePage extends ConsumerWidget {
                   d.place.lng),
             ]),
             const SizedBox(height: 12),
+            if (dictionary.isNotEmpty) _DictionaryCard(entries: dictionary),
             if (d.events.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.flag_outlined,
@@ -506,12 +512,17 @@ class _TopicPage extends ConsumerWidget {
       error: (e, _) => _ErrorBody('Couldn\'t load this topic: $e'),
       data: (d) {
         if (d == null) return const _ErrorBody('Topic not found.');
+        final dictionary =
+            ref.watch(explorerEntryDictionaryProvider(d.topic.name)).asData
+                    ?.value ??
+                const <DictionaryEntryWithDict>[];
         return _PageScroll(
           children: [
             _PageTitle(
               title: d.topic.name,
               subtitle: 'Nave\'s Topical Bible',
             ),
+            if (dictionary.isNotEmpty) _DictionaryCard(entries: dictionary),
             for (final ev in d.entries)
               ExplorerFacetCard(
                 icon: Icons.notes,
@@ -746,6 +757,90 @@ class _CommentarySection extends StatelessWidget {
                     ),
                   ),
                 HtmlWidget(entry.textContent),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// The "Dictionary" facet card for a place or topic: the matching headword
+/// entry from every installed dictionary, grouped by module. Definitions are
+/// HTML (SWORD/MyBible), so they render through [HtmlWidget]. Only built when
+/// [entries] is non-empty, so a page with no dictionary hits shows no card.
+class _DictionaryCard extends StatelessWidget {
+  const _DictionaryCard({required this.entries});
+
+  final List<DictionaryEntryWithDict> entries;
+
+  @override
+  Widget build(BuildContext context) {
+    // Group by dictionary, preserving first-seen order.
+    final byDictionary = <int, List<DictionaryEntry>>{};
+    final dictionaries = <int, Dictionary>{};
+    for (final e in entries) {
+      dictionaries[e.dictionary.id] = e.dictionary;
+      byDictionary.putIfAbsent(e.dictionary.id, () => []).add(e.entry);
+    }
+    final single = byDictionary.length == 1;
+    return ExplorerFacetCard(
+      icon: Icons.book_outlined,
+      title: 'Dictionary',
+      child: Column(
+        children: [
+          for (final id in byDictionary.keys)
+            _DictionarySection(
+              dictionaryName: dictionaries[id]!.name,
+              entries: byDictionary[id]!,
+              initiallyExpanded: single,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One dictionary module's matching entries, collapsed behind the module name
+/// (auto-expanded when it's the only module) to mirror [_CommentarySection].
+class _DictionarySection extends StatelessWidget {
+  const _DictionarySection({
+    required this.dictionaryName,
+    required this.entries,
+    required this.initiallyExpanded,
+  });
+
+  final String dictionaryName;
+  final List<DictionaryEntry> entries;
+  final bool initiallyExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final count = entries.length;
+    return ExpansionTile(
+      dense: true,
+      tilePadding: EdgeInsets.zero,
+      initiallyExpanded: initiallyExpanded,
+      title: Text(dictionaryName),
+      subtitle: Text('$count ${count == 1 ? 'entry' : 'entries'}'),
+      children: [
+        for (final entry in entries)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text(
+                    entry.word,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+                HtmlWidget(entry.definition),
               ],
             ),
           ),
