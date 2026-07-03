@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.3+3",
+    "date": "2026-07-03",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "hide dictation mic on Windows (native crash)",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.3+2",
     "date": "2026-07-03",
     "features": [
