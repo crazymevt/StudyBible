@@ -64,7 +64,10 @@ class _SpeechInputButtonState extends State<SpeechInputButton> {
   Future<void> _toggle() async {
     if (_listening) {
       await _speech.stop();
-      if (mounted) setState(() => _listening = false);
+      if (mounted) {
+        setState(() => _listening = false);
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      }
       return;
     }
 
@@ -105,7 +108,16 @@ class _SpeechInputButtonState extends State<SpeechInputButton> {
           listenFor: const Duration(seconds: 60),
         ),
       );
-      if (mounted) setState(() => _listening = true);
+      if (mounted) {
+        setState(() => _listening = true);
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Listening...'),
+            duration: Duration(days: 1),
+          ),
+        );
+      }
     } catch (e, stack) {
       logError(e, stack, context: 'SpeechInputButton.listen');
       _showUnavailable();
@@ -118,11 +130,15 @@ class _SpeechInputButtonState extends State<SpeechInputButton> {
     final ended = status == 'done' || status == 'notListening';
     if (ended && mounted && _listening) {
       setState(() => _listening = false);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
     }
   }
 
   void _onError(String message) {
-    if (mounted && _listening) setState(() => _listening = false);
+    if (mounted && _listening) {
+      setState(() => _listening = false);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
   }
 
   void _showUnavailable() {
