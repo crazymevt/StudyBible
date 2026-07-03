@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:study_bible/app/app_state.dart';
+import 'package:study_bible/app/shared_prefs.dart';
 import 'package:study_bible/ui/common/tool_groups.dart';
 import 'package:study_bible/ui/grouped_tool_rail.dart';
 
 void main() {
   Future<ProviderContainer> pumpRail(WidgetTester tester) async {
-    final container = ProviderContainer();
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+    );
     addTearDown(container.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -25,16 +34,24 @@ void main() {
     return container;
   }
 
-  testWidgets('shows every tool with a divider between each group',
+  testWidgets('shows default pinned tools and an edit button',
       (tester) async {
     await pumpRail(tester);
 
-    for (final group in toolGroups) {
-      for (final item in group.items) {
-        expect(find.text(item.railLabel), findsOneWidget);
-      }
-    }
-    expect(find.byType(Divider), findsNWidgets(toolGroups.length - 1));
+    // Default pinned tools: notes, highlights, scratch, sermons, notebooks, commentaries, media
+    expect(find.text('Notes'), findsOneWidget);
+    expect(find.text('Highlights'), findsOneWidget);
+    expect(find.text('Scratch'), findsOneWidget);
+    expect(find.text('Sermons'), findsOneWidget);
+    expect(find.text('Notebooks'), findsOneWidget);
+    expect(find.text('Commentary'), findsOneWidget); // railLabel
+    expect(find.text('Media'), findsOneWidget);
+
+    // One divider before the edit button
+    expect(find.byType(Divider), findsOneWidget);
+
+    // Has edit button
+    expect(find.byIcon(Icons.edit), findsOneWidget);
   });
 
   testWidgets('tapping a tool selects it and tapping again closes it',
@@ -54,11 +71,8 @@ void main() {
       (tester) async {
     await pumpRail(tester);
 
-    // The rail lives in a scroll view for genuinely short windows, but its
-    // resting height must stay under a typical laptop window's content
-    // height (~750px on a 13" MacBook) or every user scrolls to reach the
-    // Explore group. Densified metrics put it around 690px; this guards
-    // against padding/label changes creeping back over the budget.
+    // With 7 default pinned tools and generous padding, it should still
+    // comfortably fit inside a typical laptop window (< 730px).
     final height = tester.getSize(find.byType(GroupedToolRail)).height;
     expect(height, lessThan(730));
   });
@@ -67,9 +81,36 @@ void main() {
       (tester) async {
     final container = await pumpRail(tester);
 
-    await tester.scrollUntilVisible(find.text('Devotionals'), 100);
-    await tester.tap(find.text('Devotionals'));
+    await tester.scrollUntilVisible(find.text('Media'), 100);
+    await tester.tap(find.text('Media'));
     await tester.pump();
-    expect(container.read(activeToolProvider), ActiveTool.devotionals);
+    expect(container.read(activeToolProvider), ActiveTool.media);
+  });
+
+  testWidgets('edit button opens dialog to edit pinned favorites',
+      (tester) async {
+    final container = await pumpRail(tester);
+
+    await tester.tap(find.byIcon(Icons.edit));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit Favorites'), findsOneWidget);
+    
+    // Toggle off Notes
+    await tester.tap(find.text('Notes').last);
+    await tester.pumpAndSettle();
+
+    // Toggle on Topics
+    final topicsFinder = find.text('Topics');
+    await tester.ensureVisible(topicsFinder);
+    await tester.pumpAndSettle();
+    await tester.tap(topicsFinder);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Notes'), findsNothing); // Removed
+    expect(find.text('Topics'), findsOneWidget); // Added
   });
 }

@@ -51,6 +51,51 @@ final activeToolProvider = NotifierProvider<ActiveToolNotifier, ActiveTool>(
   () => ActiveToolNotifier(),
 );
 
+const kDefaultPinnedTools = [
+  ActiveTool.notes,
+  ActiveTool.highlights,
+  ActiveTool.scratch,
+  ActiveTool.sermons,
+  ActiveTool.notebooks,
+  ActiveTool.commentaries,
+  ActiveTool.media,
+];
+
+class PinnedToolsNotifier extends Notifier<List<ActiveTool>> {
+  @override
+  List<ActiveTool> build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final stored = prefs.getStringList('pinnedTools');
+    if (stored != null) {
+      final tools = stored
+          .map((s) {
+            try {
+              return ActiveTool.values.firstWhere((t) => t.name == s);
+            } catch (_) {
+              return null;
+            }
+          })
+          .whereType<ActiveTool>()
+          .toList();
+      if (tools.isNotEmpty) return tools;
+    }
+    return kDefaultPinnedTools;
+  }
+
+  void setPinnedTools(List<ActiveTool> tools) {
+    state = tools;
+    ref.read(sharedPreferencesProvider).setStringList(
+          'pinnedTools',
+          tools.map((t) => t.name).toList(),
+        );
+  }
+}
+
+final pinnedToolsProvider =
+    NotifierProvider<PinnedToolsNotifier, List<ActiveTool>>(
+  () => PinnedToolsNotifier(),
+);
+
 enum AppModule {
   reader,
   journalsPrayers,

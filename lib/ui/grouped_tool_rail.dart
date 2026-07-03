@@ -4,34 +4,127 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/app_state.dart';
 import 'common/tool_groups.dart';
 
-/// The desktop tools rail: the reader's side tools in sections separated by
-/// dividers (see [toolGroups]). Hand-rolled to Material 3 rail metrics
-/// because [NavigationRail] has no notion of sections, which is what keeps
-/// 16 destinations scannable.
+/// The desktop tools rail: the reader's side tools.
+/// Shows pinned favorites with an edit button.
 class GroupedToolRail extends ConsumerWidget {
   const GroupedToolRail({super.key});
+
+  void _showEditDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const _EditFavoritesDialog();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTool = ref.watch(activeToolProvider);
+    final pinnedTools = ref.watch(pinnedToolsProvider);
 
-    // Deliberately denser than NavigationRail's 72px-per-destination: 17
-    // tools plus the group breaks must still fit a typical laptop window
-    // without scrolling (guarded by grouped_tool_rail_test).
     return SizedBox(
       width: 80,
       child: Column(
         children: [
-          const SizedBox(height: 5),
-          for (var i = 0; i < toolGroups.length; i++) ...[
-            if (i > 0)
-              const Divider(height: 15, indent: 16, endIndent: 16),
-            for (final item in toolGroups[i].items)
-              _RailItem(item: item, selected: activeTool == item.tool),
-          ],
-          const SizedBox(height: 5),
+          const SizedBox(height: 6),
+          for (final tool in pinnedTools)
+            if (allToolsMap.containsKey(tool))
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: _RailItem(
+                  item: allToolsMap[tool]!,
+                  selected: activeTool == tool,
+                ),
+              ),
+          const SizedBox(height: 8),
+          const Divider(indent: 16, endIndent: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => _showEditDialog(context, ref),
+              tooltip: 'Edit Favorites',
+            ),
+          ),
+          const SizedBox(height: 6),
         ],
       ),
+    );
+  }
+}
+
+class _EditFavoritesDialog extends ConsumerStatefulWidget {
+  const _EditFavoritesDialog();
+
+  @override
+  ConsumerState<_EditFavoritesDialog> createState() =>
+      _EditFavoritesDialogState();
+}
+
+class _EditFavoritesDialogState extends ConsumerState<_EditFavoritesDialog> {
+  late List<ActiveTool> _pinned;
+
+  @override
+  void initState() {
+    super.initState();
+    _pinned = List.of(ref.read(pinnedToolsProvider));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Edit Favorites'),
+      content: SizedBox(
+        width: 300,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final group in toolGroups) ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 16.0),
+                  child: Text(
+                    group.label.toUpperCase(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                for (final item in group.items)
+                  CheckboxListTile(
+                    title: Text(item.label),
+                    secondary: Icon(item.icon),
+                    value: _pinned.contains(item.tool),
+                    onChanged: (val) {
+                      setState(() {
+                        if (val == true) {
+                          _pinned.add(item.tool);
+                        } else {
+                          _pinned.remove(item.tool);
+                        }
+                      });
+                    },
+                  ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () {
+            ref.read(pinnedToolsProvider.notifier).setPinnedTools(_pinned);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Save'),
+        ),
+      ],
     );
   }
 }
@@ -61,34 +154,35 @@ class _RailItem extends ConsumerWidget {
       selected: selected,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        // setTool toggles: tapping the active tool closes its panel, same as
-        // the NavigationRail behaved.
         onTap: () => ref.read(activeToolProvider.notifier).setTool(item.tool),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 56,
-              height: 28,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: selected ? theme.colorScheme.secondaryContainer : null,
-                borderRadius: BorderRadius.circular(15),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 56,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: selected ? theme.colorScheme.secondaryContainer : null,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(item.icon, color: iconColor),
               ),
-              child: Icon(item.icon, color: iconColor),
-            ),
-            const SizedBox(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: Text(
-                item.railLabel,
-                style: labelStyle,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              const SizedBox(height: 2),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Text(
+                  item.railLabel,
+                  style: labelStyle,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

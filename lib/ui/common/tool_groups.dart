@@ -62,3 +62,9 @@ const List<ToolGroup> toolGroups = [
     ToolItem(ActiveTool.media, Icons.video_library, 'Media'),
   ]),
 ];
+
+/// A flat map of all available tools to their visual representation.
+final Map<ActiveTool, ToolItem> allToolsMap = {
+  for (final group in toolGroups)
+    for (final item in group.items) item.tool: item,
+};
