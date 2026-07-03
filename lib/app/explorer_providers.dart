@@ -2,13 +2,17 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content_store.dart';
+import '../data/user_store.dart';
 import '../domain/explorer/explorer_ref.dart';
 import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
 import 'people_providers.dart';
 import 'place_providers.dart';
 import 'reader_state.dart';
+import 'search_providers.dart';
+import 'tag_providers.dart';
 import 'topic_providers.dart';
+import 'user_providers.dart';
 
 /// All three bundled datasets the Explorer draws on (people, places, topics),
 /// imported into the DB. One thing for the screen to await.
@@ -111,18 +115,28 @@ class ExplorerSearchItem {
   ExplorerSearchItem(this.ref, [this.subtitle]);
 }
 
+/// A tag hit for search results and facet cards: the tag itself (name and
+/// colour) plus how many things are filed under it.
+class ExplorerTagHit {
+  final TagData tag;
+  final int itemCount;
+  ExplorerTagHit(this.tag, this.itemCount);
+}
+
 class ExplorerSearchResults {
   final ExplorerRef? passage;
   final List<ExplorerSearchItem> people;
   final List<ExplorerSearchItem> places;
   final List<ExplorerSearchItem> events;
   final List<ExplorerSearchItem> topics;
+  final List<ExplorerTagHit> tags;
   ExplorerSearchResults({
     this.passage,
     this.people = const [],
     this.places = const [],
     this.events = const [],
     this.topics = const [],
+    this.tags = const [],
   });
 
   bool get isEmpty =>
@@ -130,7 +144,8 @@ class ExplorerSearchResults {
       people.isEmpty &&
       places.isEmpty &&
       events.isEmpty &&
-      topics.isEmpty;
+      topics.isEmpty &&
+      tags.isEmpty;
 }
 
 const _kSearchLimitPerKind = 25;
@@ -266,6 +281,40 @@ final explorerSearchResultsProvider =
       .get();
   _rankByPrefix(topicRows, query, (t) => t.name, (_) => 0);
 
+  // Your tags: matched by name, with or without the leading '#' people type
+  // out of habit from the global search.
+  final tagQuery =
+      (query.startsWith('#') ? query.substring(1) : query).trim();
+  var tagHits = <ExplorerTagHit>[];
+  if (tagQuery.isNotEmpty) {
+    final userDb = ref.watch(userStoreProvider);
+    final tagRows = await userDb.customSelect(
+      'SELECT t.id AS id, t.name AS name, t.color_hex AS color_hex, '
+      '  COUNT(et.id) AS items '
+      'FROM tags t '
+      'LEFT JOIN entity_tags et ON et.tag_id = t.id AND et.deleted = 0 '
+      'WHERE t.deleted = 0 AND t.name LIKE ? '
+      'GROUP BY t.id, t.name, t.color_hex '
+      'ORDER BY items DESC LIMIT ?',
+      variables: [
+        Variable.withString('%$tagQuery%'),
+        Variable.withInt(_kSearchLimitPerKind),
+      ],
+    ).get();
+    tagHits = [
+      for (final r in tagRows)
+        ExplorerTagHit(
+          TagData(
+            id: r.read<String>('id'),
+            name: r.read<String>('name'),
+            colorHex: r.readNullable<String>('color_hex'),
+          ),
+          r.read<int>('items'),
+        ),
+    ];
+    _rankByPrefix(tagHits, tagQuery, (t) => t.tag.name, (t) => t.itemCount);
+  }
+
   return ExplorerSearchResults(
     passage: passage,
     people: [
@@ -294,6 +343,7 @@ final explorerSearchResultsProvider =
       for (final t in topicRows)
         ExplorerSearchItem(ExplorerRef.topic(t.id, t.name)),
     ],
+    tags: tagHits,
   );
 });
 
@@ -637,4 +687,273 @@ final explorerPassageOverviewProvider = FutureProvider.family<
         ExplorerTopicHit(r.read<int>('id'), r.read<String>('name')),
     ],
   );
+});
+
+// --- Tags (your own study data joined into the knowledge web) ---
+
+/// Everything filed under one tag, ready for the tag page: the tagged items
+/// split by kind, the distinct chapters the tagged verses fall in (the hop
+/// back into the knowledge web), and the tags that co-occur on the same
+/// items.
+class ExplorerTagDetail {
+  final TagData tag;
+  final List<SearchResult> verses;
+  final List<SearchResult> notes;
+  final List<SearchResult> sermons;
+  final List<SearchResult> journals;
+  final List<SearchResult> prayers;
+
+  /// Distinct chapters of [verses], in canonical order.
+  final List<({String book, int chapter})> passages;
+
+  /// Tags sharing at least one item with this one, most shared first.
+  final List<ExplorerTagHit> related;
+  ExplorerTagDetail({
+    required this.tag,
+    required this.verses,
+    required this.notes,
+    required this.sermons,
+    required this.journals,
+    required this.prayers,
+    required this.related,
+  }) : passages = _distinctChapters(verses);
+
+  bool get isEmpty =>
+      verses.isEmpty &&
+      notes.isEmpty &&
+      sermons.isEmpty &&
+      journals.isEmpty &&
+      prayers.isEmpty;
+
+  static List<({String book, int chapter})> _distinctChapters(
+      List<SearchResult> verses) {
+    final seen = <String>{};
+    return [
+      for (final v in verses)
+        if (v.book != null && v.chapter != null && seen.add('${v.book}|${v.chapter}'))
+          (book: v.book!, chapter: v.chapter!),
+    ];
+  }
+}
+
+/// Loads a tag's page. Null when the tag doesn't exist (or was deleted,
+/// possibly on another device, while sitting in the breadcrumb trail).
+final explorerTagDetailProvider =
+    FutureProvider.family<ExplorerTagDetail?, String>((ref, tagId) async {
+  final db = ref.watch(userStoreProvider);
+  final tagRow = await (db.select(db.tags)
+        ..where((t) => t.id.equals(tagId) & t.deleted.equals(false)))
+      .getSingleOrNull();
+  if (tagRow == null) return null;
+
+  final items = await ref.watch(entitiesForTagProvider(tagId).future);
+  List<SearchResult> ofType(String type) =>
+      [for (final i in items) if (i.type == type) i];
+  final verses = ofType('verse')
+    ..sort((a, b) {
+      final byBook = (a.bookOrder ?? 0).compareTo(b.bookOrder ?? 0);
+      if (byBook != 0) return byBook;
+      final byChapter = (a.chapter ?? 0).compareTo(b.chapter ?? 0);
+      if (byChapter != 0) return byChapter;
+      return (a.verse ?? 0).compareTo(b.verse ?? 0);
+    });
+
+  final relatedRows = await db.customSelect(
+    'SELECT t.id AS id, t.name AS name, t.color_hex AS color_hex, '
+    '  COUNT(DISTINCT other.entity_id) AS shared '
+    'FROM entity_tags mine '
+    'JOIN entity_tags other ON other.entity_id = mine.entity_id '
+    '  AND other.tag_id != mine.tag_id AND other.deleted = 0 '
+    'JOIN tags t ON t.id = other.tag_id AND t.deleted = 0 '
+    'WHERE mine.tag_id = ? AND mine.deleted = 0 '
+    'GROUP BY t.id, t.name, t.color_hex '
+    'ORDER BY shared DESC, t.name LIMIT 20',
+    variables: [Variable.withString(tagId)],
+  ).get();
+
+  return ExplorerTagDetail(
+    tag: TagData(id: tagRow.id, name: tagRow.name, colorHex: tagRow.colorHex),
+    verses: verses,
+    notes: ofType('note'),
+    sermons: ofType('sermon'),
+    journals: ofType('journal'),
+    prayers: ofType('prayer'),
+    related: [
+      for (final r in relatedRows)
+        ExplorerTagHit(
+          TagData(
+            id: r.read<String>('id'),
+            name: r.read<String>('name'),
+            colorHex: r.readNullable<String>('color_hex'),
+          ),
+          r.read<int>('shared'),
+        ),
+    ],
+  );
+});
+
+/// One tag used on a chapter's verses, with the verse numbers carrying it.
+class ExplorerPassageTag {
+  final TagData tag;
+  final List<int> verses;
+  ExplorerPassageTag(this.tag, this.verses);
+}
+
+/// Your tags on one chapter's verses, ordered by first tagged verse. Live, so
+/// tagging a verse in the reader shows up when you come back to the Explorer.
+final explorerPassageTagsProvider = StreamProvider.family<
+    List<ExplorerPassageTag>, ({String book, int chapter})>((ref, loc) {
+  final db = ref.watch(userStoreProvider);
+  final query = db.select(db.entityTags).join([
+    innerJoin(db.tags, db.tags.id.equalsExp(db.entityTags.tagId)),
+  ])
+    ..where(db.entityTags.entityType.equals('verse'))
+    ..where(db.entityTags.entityId.like('Verse:${loc.book}|${loc.chapter}|%'))
+    ..where(db.entityTags.deleted.equals(false))
+    ..where(db.tags.deleted.equals(false));
+  return query.watch().map((rows) {
+    final tagsById = <String, TagData>{};
+    final versesByTag = <String, Set<int>>{};
+    for (final row in rows) {
+      final et = row.readTable(db.entityTags);
+      final t = row.readTable(db.tags);
+      final verse = int.tryParse(et.entityId.split('|').last);
+      if (verse == null) continue;
+      tagsById[t.id] = TagData(id: t.id, name: t.name, colorHex: t.colorHex);
+      (versesByTag[t.id] ??= {}).add(verse);
+    }
+    return [
+      for (final id in tagsById.keys)
+        ExplorerPassageTag(tagsById[id]!, versesByTag[id]!.toList()..sort()),
+    ]..sort((a, b) {
+        final byVerse = a.verses.first.compareTo(b.verses.first);
+        if (byVerse != 0) return byVerse;
+        return a.tag.name.toLowerCase().compareTo(b.tag.name.toLowerCase());
+      });
+  });
+});
+
+/// The user's verse-anchored tag links as a live stream of parsed refs. The
+/// tagged verses are the small side of the entity-verses ∩ tagged-verses
+/// intersection, so entity pages filter this list in Dart instead of building
+/// thousand-variable IN clauses over a person's verse list.
+Stream<List<({TagData tag, String book, int chapter, int verse})>>
+    _taggedVerseStream(UserStore db) {
+  final query = db.select(db.entityTags).join([
+    innerJoin(db.tags, db.tags.id.equalsExp(db.entityTags.tagId)),
+  ])
+    ..where(db.entityTags.entityType.equals('verse'))
+    ..where(db.entityTags.deleted.equals(false))
+    ..where(db.tags.deleted.equals(false));
+  return query.watch().map((rows) {
+    final out = <({TagData tag, String book, int chapter, int verse})>[];
+    for (final row in rows) {
+      final et = row.readTable(db.entityTags);
+      final t = row.readTable(db.tags);
+      // entityId is 'Verse:Book|chapter|verse' (see verse_action_bar).
+      final sep = et.entityId.indexOf(':');
+      if (sep < 0) continue;
+      final parts = et.entityId.substring(sep + 1).split('|');
+      if (parts.length < 3) continue;
+      final chapter = int.tryParse(parts[1]);
+      final verse = int.tryParse(parts[2]);
+      if (chapter == null || verse == null) continue;
+      out.add((
+        tag: TagData(id: t.id, name: t.name, colorHex: t.colorHex),
+        book: parts[0],
+        chapter: chapter,
+        verse: verse,
+      ));
+    }
+    return out;
+  });
+}
+
+/// One of your tags that touches an entity's verses, with the shared refs in
+/// the entity's canonical order.
+class ExplorerEntityTag {
+  final TagData tag;
+  final List<({String book, int chapter, int verse})> refs;
+  ExplorerEntityTag(this.tag, this.refs);
+}
+
+/// Intersects the user's tagged verses with an entity's verse refs, grouping
+/// by tag: most shared verses first, refs in [refs]' (canonical) order.
+List<ExplorerEntityTag> _tagsOnVerses(
+  List<({TagData tag, String book, int chapter, int verse})> tagged,
+  List<({String book, int chapter, int verse})> refs,
+) {
+  if (tagged.isEmpty || refs.isEmpty) return const [];
+  final order = <String, int>{};
+  for (var i = 0; i < refs.length; i++) {
+    final r = refs[i];
+    order.putIfAbsent('${r.book}|${r.chapter}|${r.verse}', () => i);
+  }
+  final tagsById = <String, TagData>{};
+  final indicesByTag = <String, Set<int>>{};
+  for (final t in tagged) {
+    final idx = order['${t.book}|${t.chapter}|${t.verse}'];
+    if (idx == null) continue;
+    tagsById[t.tag.id] = t.tag;
+    (indicesByTag[t.tag.id] ??= {}).add(idx);
+  }
+  return [
+    for (final id in tagsById.keys)
+      ExplorerEntityTag(
+        tagsById[id]!,
+        [for (final i in indicesByTag[id]!.toList()..sort()) refs[i]],
+      ),
+  ]..sort((a, b) {
+      final byCount = b.refs.length.compareTo(a.refs.length);
+      if (byCount != 0) return byCount;
+      return a.tag.name.toLowerCase().compareTo(b.tag.name.toLowerCase());
+    });
+}
+
+/// Your tags on verses where a person appears. A stream (of the tag links)
+/// so tagging a verse in the reader shows up on the person's page; the
+/// person's own verse list is static content data, read once per emission.
+final explorerPersonTagsProvider =
+    StreamProvider.family<List<ExplorerEntityTag>, int>((ref, personId) {
+  final db = ref.watch(userStoreProvider);
+  return _taggedVerseStream(db).asyncMap((tagged) async {
+    if (tagged.isEmpty) return const <ExplorerEntityTag>[];
+    final d = await ref.read(personDetailProvider(personId).future);
+    if (d == null) return const <ExplorerEntityTag>[];
+    return _tagsOnVerses(tagged, [
+      for (final v in d.verses)
+        (book: v.bookName, chapter: v.chapter, verse: v.verse),
+    ]);
+  });
+});
+
+/// Your tags on verses that mention a place. See [explorerPersonTagsProvider].
+final explorerPlaceTagsProvider =
+    StreamProvider.family<List<ExplorerEntityTag>, int>((ref, placeId) {
+  final db = ref.watch(userStoreProvider);
+  return _taggedVerseStream(db).asyncMap((tagged) async {
+    if (tagged.isEmpty) return const <ExplorerEntityTag>[];
+    final d = await ref.read(explorerPlaceDetailProvider(placeId).future);
+    if (d == null) return const <ExplorerEntityTag>[];
+    return _tagsOnVerses(tagged, [
+      for (final v in d.verses)
+        (book: v.bookName, chapter: v.chapter, verse: v.verse),
+    ]);
+  });
+});
+
+/// Your tags on verses in an event's account. See
+/// [explorerPersonTagsProvider].
+final explorerEventTagsProvider =
+    StreamProvider.family<List<ExplorerEntityTag>, int>((ref, eventId) {
+  final db = ref.watch(userStoreProvider);
+  return _taggedVerseStream(db).asyncMap((tagged) async {
+    if (tagged.isEmpty) return const <ExplorerEntityTag>[];
+    final d = await ref.read(explorerEventDetailProvider(eventId).future);
+    if (d == null) return const <ExplorerEntityTag>[];
+    return _tagsOnVerses(tagged, [
+      for (final v in d.verses)
+        (book: v.bookName, chapter: v.chapter, verse: v.verse),
+    ]);
+  });
 });

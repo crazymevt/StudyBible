@@ -5,6 +5,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../../app/content_providers.dart';
 import '../../app/explorer_providers.dart';
 import '../../app/people_providers.dart';
+import '../../app/search_providers.dart';
 import '../../app/topic_providers.dart';
 import '../../app/user_providers.dart';
 import '../../data/content_store.dart';
@@ -28,6 +29,7 @@ class ExplorerEntityPage extends StatelessWidget {
       ExplorerEntityType.topic => _TopicPage(topicId: entry.id!),
       ExplorerEntityType.passage =>
         _PassagePage(book: entry.book!, chapter: entry.chapter!),
+      ExplorerEntityType.tag => _TagPage(tagId: entry.tagId!),
     };
   }
 }
@@ -166,6 +168,8 @@ class _PersonPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(personDetailProvider(personId));
     final placesAsync = ref.watch(explorerPersonPlacesProvider(personId));
+    final tags = ref.watch(explorerPersonTagsProvider(personId)).asData?.value ??
+        const <ExplorerEntityTag>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this person: $e'),
@@ -311,6 +315,7 @@ class _PersonPage extends ConsumerWidget {
                     (book: v.bookName, chapter: v.chapter, verse: v.verse),
                 ]),
               ),
+            if (tags.isNotEmpty) _EntityTagsCard(tags: tags),
           ],
         );
       },
@@ -328,6 +333,8 @@ class _PlacePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(explorerPlaceDetailProvider(placeId));
+    final tags = ref.watch(explorerPlaceTagsProvider(placeId)).asData?.value ??
+        const <ExplorerEntityTag>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this place: $e'),
@@ -397,6 +404,7 @@ class _PlacePage extends ConsumerWidget {
                     (book: v.bookName, chapter: v.chapter, verse: v.verse),
                 ]),
               ),
+            if (tags.isNotEmpty) _EntityTagsCard(tags: tags),
           ],
         );
       },
@@ -414,6 +422,8 @@ class _EventPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(explorerEventDetailProvider(eventId));
+    final tags = ref.watch(explorerEventTagsProvider(eventId)).asData?.value ??
+        const <ExplorerEntityTag>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this event: $e'),
@@ -481,6 +491,7 @@ class _EventPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (tags.isNotEmpty) _EntityTagsCard(tags: tags),
           ],
         );
       },
@@ -599,6 +610,11 @@ class _PassagePage extends ConsumerWidget {
             .asData
             ?.value ??
         const <Note>[];
+    final passageTags = ref
+            .watch(explorerPassageTagsProvider((book: book, chapter: chapter)))
+            .asData
+            ?.value ??
+        const <ExplorerPassageTag>[];
     return overviewAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this passage: $e'),
@@ -614,7 +630,10 @@ class _PassagePage extends ConsumerWidget {
                     context, ref, book, chapter, 1),
               ),
             ),
-            if (d.isEmpty && commentaries.isEmpty && notes.isEmpty)
+            if (d.isEmpty &&
+                commentaries.isEmpty &&
+                notes.isEmpty &&
+                passageTags.isEmpty)
               const _ErrorBody(
                   'The datasets don\'t tag anything in this chapter yet.'),
             if (d.people.isNotEmpty)
@@ -713,6 +732,22 @@ class _PassagePage extends ConsumerWidget {
                   children: [
                     for (final n in notes)
                       _PassageNoteTile(book: book, chapter: chapter, note: n),
+                  ],
+                ),
+              ),
+            if (passageTags.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.label_outline,
+                title: 'Your tags (${passageTags.length})',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final t in passageTags)
+                      ExplorerTagChip(
+                        t.tag,
+                        subtitle: 'v. ${t.verses.join(', ')}',
+                      ),
                   ],
                 ),
               ),
@@ -845,6 +880,182 @@ class _DictionarySection extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+// --- Tag ---
+
+class _TagPage extends ConsumerWidget {
+  const _TagPage({required this.tagId});
+
+  final String tagId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailAsync = ref.watch(explorerTagDetailProvider(tagId));
+    return detailAsync.when(
+      loading: () => const SkeletonList(),
+      error: (e, _) => _ErrorBody('Couldn\'t load this tag: $e'),
+      data: (d) {
+        if (d == null) {
+          // Tags are user data: unlike the bundled entities, one can vanish
+          // from under its breadcrumb (deleted here or on a synced device).
+          return const _ErrorBody(
+              'This tag no longer exists — it may have been deleted, '
+              'possibly on another device.');
+        }
+        return _PageScroll(
+          children: [
+            _PageTitle(
+              title: '#${d.tag.name}',
+              subtitle: 'Your tag',
+            ),
+            if (d.isEmpty)
+              const _ErrorBody('Nothing is filed under this tag yet.'),
+            if (d.verses.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.menu_book_outlined,
+                title: 'Tagged verses (${d.verses.length})',
+                child: Column(
+                  children: [
+                    for (final v in d.verses) _TaggedItemTile(item: v),
+                  ],
+                ),
+              ),
+            if (d.passages.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.travel_explore,
+                title: 'Explore their chapters',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final p in d.passages)
+                      ExplorerRefChip(ExplorerRef.passage(p.book, p.chapter)),
+                  ],
+                ),
+              ),
+            if (d.notes.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.edit_note_outlined,
+                title: 'Notes (${d.notes.length})',
+                child: Column(
+                  children: [
+                    for (final n in d.notes) _TaggedItemTile(item: n),
+                  ],
+                ),
+              ),
+            if (d.sermons.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.co_present_outlined,
+                title: 'Sermons (${d.sermons.length})',
+                child: Column(
+                  children: [
+                    for (final s in d.sermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
+            if (d.journals.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.edit_document,
+                title: 'Journals (${d.journals.length})',
+                child: Column(
+                  children: [
+                    for (final j in d.journals) _TaggedItemTile(item: j),
+                  ],
+                ),
+              ),
+            if (d.prayers.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.volunteer_activism_outlined,
+                title: 'Prayers (${d.prayers.length})',
+                child: Column(
+                  children: [
+                    for (final p in d.prayers) _TaggedItemTile(item: p),
+                  ],
+                ),
+              ),
+            if (d.related.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.label_outline,
+                title: 'Related tags',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final t in d.related)
+                      ExplorerTagChip(
+                        t.tag,
+                        subtitle:
+                            '${t.itemCount} shared ${t.itemCount == 1 ? 'item' : 'items'}',
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// One item filed under a tag; tapping opens it in its home module (reader,
+/// sermon editor, journal editor, or the Prayers tab).
+class _TaggedItemTile extends ConsumerWidget {
+  const _TaggedItemTile({required this.item});
+
+  final SearchResult item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Text(
+        item.title,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+      subtitle: item.textContent.trim().isEmpty
+          ? null
+          : Text(
+              item.textContent,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+      onTap: () => explorerOpenTaggedItem(context, ref, item),
+    );
+  }
+}
+
+/// The "Your tags" facet card on person/place/event pages: the tags you've
+/// put on verses where the entity appears, most shared verses first. Chips
+/// drill into the tag's page.
+class _EntityTagsCard extends StatelessWidget {
+  const _EntityTagsCard({required this.tags});
+
+  final List<ExplorerEntityTag> tags;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExplorerFacetCard(
+      icon: Icons.label_outline,
+      title: 'Your tags',
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          for (final t in tags)
+            ExplorerTagChip(
+              t.tag,
+              subtitle:
+                  '${t.refs.length} ${t.refs.length == 1 ? 'verse' : 'verses'}',
+            ),
+        ],
+      ),
     );
   }
 }

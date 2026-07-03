@@ -7,7 +7,16 @@ import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/explorer_providers.dart';
 import '../../app/reader_state.dart';
+import '../../app/search_providers.dart';
+import '../../app/sermon_providers.dart';
+import '../../app/tag_providers.dart';
+import '../../app/user_providers.dart';
 import '../../domain/explorer/explorer_ref.dart';
+import '../common/breakpoints.dart';
+import '../journals/journal_editor_panel.dart';
+import '../journals/journals_list_panel.dart';
+import '../sermons/sermon_editor_screen.dart';
+import '../tags/tag_palette.dart';
 
 /// Formats an ISO year for display: negative years are BC.
 String explorerYearLabel(int year) => year < 0 ? '${-year} BC' : 'AD $year';
@@ -18,6 +27,7 @@ IconData explorerEntityIcon(ExplorerEntityType type) => switch (type) {
       ExplorerEntityType.event => Icons.flag_outlined,
       ExplorerEntityType.topic => Icons.topic_outlined,
       ExplorerEntityType.passage => Icons.menu_book_outlined,
+      ExplorerEntityType.tag => Icons.label_outline,
     };
 
 /// Jump the reader to a verse and unwind back to the shell so it's visible.
@@ -38,6 +48,70 @@ void explorerOpenVerseInReader(
   ref.read(selectedVersesProvider.notifier).toggle(verse);
   ref.read(navigationControllerProvider).recordHistory(verse: verse);
   Navigator.of(context).popUntil((route) => route.isFirst);
+}
+
+/// Opens a tagged item from the tag page in its home module: verses and notes
+/// jump the reader, sermons open the sermon editor, journals the journal
+/// editor, prayers the Prayers tab. Like [explorerOpenVerseInReader], the
+/// Explorer route is unwound so the destination is visible.
+void explorerOpenTaggedItem(
+  BuildContext context,
+  WidgetRef ref,
+  SearchResult item,
+) {
+  final nav = Navigator.of(context);
+  final isPhone = MediaQuery.sizeOf(context).width <= Breakpoints.compact;
+  switch (item.type) {
+    case 'verse':
+    case 'note':
+      if (item.book == null || item.chapter == null) return;
+      final firstSelected = item.selectedVerses?.split(',').first.trim();
+      final verse = item.verse ?? int.tryParse(firstSelected ?? '') ?? 1;
+      explorerOpenVerseInReader(context, ref, item.book!, item.chapter!, verse);
+    case 'sermon':
+      if (isPhone) {
+        nav.popUntil((route) => route.isFirst);
+        nav.push(MaterialPageRoute(
+          builder: (_) => SermonEditorScreen(
+              sermonId: item.referenceId, isFullScreen: true),
+        ));
+      } else {
+        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+        ref.read(selectedSermonIdProvider.notifier).set(item.referenceId);
+        ref.read(activeToolProvider.notifier).setTool(ActiveTool.sermons);
+        nav.popUntil((route) => route.isFirst);
+      }
+    case 'journal':
+      ref.read(selectedJournalIdProvider.notifier).setId(item.referenceId);
+      final store = ref.read(userStoreProvider);
+      final dateNotifier = ref.read(selectedJournalDateProvider.notifier);
+      (store.select(store.journals)
+            ..where((j) => j.id.equals(item.referenceId)))
+          .getSingleOrNull()
+          .then((journal) {
+        if (journal != null) {
+          dateNotifier.setDate(
+              DateTime.fromMillisecondsSinceEpoch(journal.updatedAt).toLocal());
+        }
+      });
+      ref.read(journalsActiveTabProvider.notifier).setTab(
+          JournalsActiveTab.journals);
+      ref.read(appModuleProvider.notifier).setModule(AppModule.journalsPrayers);
+      nav.popUntil((route) => route.isFirst);
+      if (isPhone) {
+        nav.push(MaterialPageRoute(
+          builder: (_) => Scaffold(
+            appBar: AppBar(title: const Text('Journal Editor')),
+            body: const JournalEditorPanel(),
+          ),
+        ));
+      }
+    case 'prayer':
+      ref.read(journalsActiveTabProvider.notifier).setTab(
+          JournalsActiveTab.prayers);
+      ref.read(appModuleProvider.notifier).setModule(AppModule.journalsPrayers);
+      nav.popUntil((route) => route.isFirst);
+  }
 }
 
 /// One facet of an entity page: a card with an icon-and-title header and the
@@ -126,6 +200,48 @@ class ExplorerRefChip extends ConsumerWidget {
               ),
             ),
       onPressed: () => ref.read(explorerTrailProvider.notifier).open(target),
+    );
+  }
+}
+
+/// A chip that drills into a tag's Explorer page, tinted with the tag's
+/// colour like tag chips elsewhere in the app.
+class ExplorerTagChip extends ConsumerWidget {
+  const ExplorerTagChip(this.tag, {super.key, this.subtitle});
+
+  final TagData tag;
+
+  /// Optional qualifier rendered after the name, de-emphasized.
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final style = tagChipStyle(context, tag.colorHex);
+    return ActionChip(
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      backgroundColor: style.background,
+      side: BorderSide(color: style.border),
+      label: subtitle == null
+          ? Text('#${tag.name}',
+              style: TextStyle(color: style.foreground))
+          : Text.rich(
+              TextSpan(
+                text: '#${tag.name}',
+                style: TextStyle(color: style.foreground),
+                children: [
+                  TextSpan(
+                    text: '  $subtitle',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+      onPressed: () => ref
+          .read(explorerTrailProvider.notifier)
+          .open(ExplorerRef.tag(tag.id, '#${tag.name}')),
     );
   }
 }
