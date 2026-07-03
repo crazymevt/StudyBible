@@ -242,19 +242,40 @@ class _ScratchPanelState extends ConsumerState<ScratchPanel> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: QuillEditor.basic(
-                                controller: controller,
-                                config: QuillEditorConfig(
-                                  placeholder:
-                                      'Jot rough notes here. They stay on this '
-                                      'device and never sync. Promote to a sermon '
-                                      'when an idea is ready.',
-                                  customLinkPrefixes: referenceLinkPrefixes,
-                                  customRecognizerBuilder:
-                                      referenceRecognizerBuilder(ref, context),
-                                  onLaunchUrl: (url) =>
-                                      handleReferenceLaunch(ref, context, url),
-                                ),
+                              child: DragTarget<String>(
+                                onWillAcceptWithDetails: (_) => true,
+                                onAcceptWithDetails: (details) {
+                                  final text = details.data;
+                                  final offset = controller.selection.baseOffset;
+                                  // If no selection, append to the end. Quill documents always end with a newline.
+                                  final insertOffset = offset >= 0 ? offset : controller.document.length - 1;
+                                  controller.document.insert(insertOffset, text);
+                                  controller.updateSelection(
+                                    TextSelection.collapsed(offset: insertOffset + text.length),
+                                    ChangeSource.local,
+                                  );
+                                },
+                                builder: (context, candidateData, rejectedData) {
+                                  return Container(
+                                    color: candidateData.isNotEmpty
+                                        ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2)
+                                        : null,
+                                    child: QuillEditor.basic(
+                                      controller: controller,
+                                      config: QuillEditorConfig(
+                                        placeholder:
+                                            'Jot rough notes here. They stay on this '
+                                            'device and never sync. Promote to a sermon '
+                                            'when an idea is ready.',
+                                        customLinkPrefixes: referenceLinkPrefixes,
+                                        customRecognizerBuilder:
+                                            referenceRecognizerBuilder(ref, context),
+                                        onLaunchUrl: (url) =>
+                                            handleReferenceLaunch(ref, context, url),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),

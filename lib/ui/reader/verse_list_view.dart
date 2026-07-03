@@ -12,6 +12,7 @@ import 'chapter_navigation_footer.dart';
 import 'verse_text_builder.dart';
 import 'dictionary_panel.dart';
 import '../common/breakpoints.dart';
+import '../../app/verse_selection.dart';
 
 class VerseListView extends ConsumerStatefulWidget {
   final List<Verse> verses;
@@ -260,7 +261,7 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
         final verseSpacing = ref.watch(appVerseSpacingProvider);
         final verseSubheadings = widget.subheadings[verse.verse] ?? [];
 
-        return _VerseTile(
+        Widget tile = _VerseTile(
           key: ValueKey(verse.verse),
           verse: verse,
           bgColor: bgColor,
@@ -276,6 +277,31 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
           onStrongTap: widget.onStrongTap,
           onWordRightClick: _openDictionary,
         );
+
+        if (isSelected) {
+          tile = LongPressDraggable<String>(
+            data: () {
+              final sel = collectSelection(ref);
+              if (sel == null) return '';
+              return formatSelection(ref, sel);
+            }(),
+            feedback: Material(
+              elevation: 8.0,
+              borderRadius: BorderRadius.circular(8),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Text(
+                  'Dragging ${widget.selectedVerses.length} verse(s)',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+            ),
+            child: tile,
+          );
+        }
+
+        return tile;
       },
     );
   }

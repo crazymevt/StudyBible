@@ -5,12 +5,11 @@ import 'package:share_plus/share_plus.dart';
 import '../../app/reader_state.dart';
 import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
-import '../../app/content_providers.dart';
 import '../../app/highlight_palette.dart';
-import '../../data/importer/mybible_verse_parser.dart';
 import '../../domain/scripture/verse_share_format.dart';
 import '../../theme/app_themes.dart';
 import '../../domain/harmony/gospel_harmony.dart';
+import '../../app/verse_selection.dart';
 import 'note_editor.dart';
 import 'compare_panel.dart';
 import 'topics_panel.dart';
@@ -19,51 +18,7 @@ import 'verse_image_card.dart';
 import '../tags/tag_editor_dialog.dart';
 import '../common/breakpoints.dart';
 
-/// The selected verses gathered for copy/share, with text already cleaned of
-/// inline markup (see [[verse-textcontent-has-markup]]).
-typedef _Selection = ({
-  String book,
-  int chapter,
-  List<int> numbers,
-  List<ShareVerse> verses,
-  String? abbreviation,
-});
 
-/// Reads the current verse selection and the primary version's verse text,
-/// returning null when nothing usable is selected.
-_Selection? _collectSelection(WidgetRef ref) {
-  final versesMap = ref.read(parallelVersesProvider).value;
-  if (versesMap == null || versesMap.isEmpty) return null;
-  final verses = versesMap.values.first;
-
-  final selected = ref.read(selectedVersesProvider).toList()..sort();
-  final selectedModels =
-      verses.where((v) => selected.contains(v.verse)).toList()
-        ..sort((a, b) => a.verse.compareTo(b.verse));
-  if (selectedModels.isEmpty) return null;
-
-  final parser = MyBibleVerseParser();
-  final shareVerses = <ShareVerse>[
-    for (final v in selectedModels)
-      (
-        number: v.verse,
-        text: parser
-            .parseVerse(v.textContent)
-            .map((s) => s.text)
-            .join('')
-            .replaceAll(RegExp(r'\s+'), ' ')
-            .trim(),
-      ),
-  ];
-
-  return (
-    book: ref.read(selectedBookNameProvider),
-    chapter: ref.read(selectedChapterProvider),
-    numbers: selected,
-    verses: shareVerses,
-    abbreviation: ref.read(primaryVersionAbbreviationProvider),
-  );
-}
 
 class VerseActionBar extends ConsumerWidget {
   const VerseActionBar({super.key});
@@ -354,16 +309,9 @@ class VerseActionBar extends ConsumerWidget {
                 color: onBarColor,
                 showLabel: showLabels,
                 onTap: () async {
-                  final sel = _collectSelection(ref);
+                  final sel = collectSelection(ref);
                   if (sel == null) return;
-                  final format = ref.read(verseShareFormatProvider);
-                  final text = VerseShareFormatter.format(
-                    bookName: sel.book,
-                    chapter: sel.chapter,
-                    verses: sel.verses,
-                    versionAbbreviation: sel.abbreviation,
-                    format: format,
-                  );
+                  final text = formatSelection(ref, sel);
                   await Clipboard.setData(ClipboardData(text: text));
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -430,16 +378,10 @@ class VerseActionBar extends ConsumerWidget {
   }
 
   Future<void> _shareText(WidgetRef ref, Rect? origin) async {
-    final sel = _collectSelection(ref);
+    final sel = collectSelection(ref);
     if (sel == null) return;
-    final format = ref.read(verseShareFormatProvider);
-    final text = VerseShareFormatter.format(
-      bookName: sel.book,
-      chapter: sel.chapter,
-      verses: sel.verses,
-      versionAbbreviation: sel.abbreviation,
-      format: format,
-    );
+    final text = formatSelection(ref, sel);
+
     final subject = VerseShareFormatter.reference(
       bookName: sel.book,
       chapter: sel.chapter,
@@ -452,7 +394,7 @@ class VerseActionBar extends ConsumerWidget {
   }
 
   void _shareImage(BuildContext context, WidgetRef ref) {
-    final sel = _collectSelection(ref);
+    final sel = collectSelection(ref);
     if (sel == null) return;
     // The image always cites the version (when known) and flows the verse text
     // into a single quotable block, independent of the text-format preference.

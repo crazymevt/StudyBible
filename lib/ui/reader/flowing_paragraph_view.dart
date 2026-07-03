@@ -10,6 +10,7 @@ import 'dictionary_panel.dart';
 import 'verse_text_builder.dart';
 import '../../app/reader_state.dart';
 import '../common/breakpoints.dart';
+import '../../app/verse_selection.dart';
 
 class FlowingParagraphView extends ConsumerStatefulWidget {
   final List<Verse> verses;
@@ -282,21 +283,45 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
       );
     }).toList();
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (widget.headerWidget != null) widget.headerWidget!,
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 32.0,
+        Widget content = Text.rich(TextSpan(children: spans));
+        if (widget.selectedVerses.isNotEmpty) {
+          content = LongPressDraggable<String>(
+            data: () {
+              final sel = collectSelection(ref);
+              if (sel == null) return '';
+              return formatSelection(ref, sel);
+            }(),
+            feedback: Material(
+              elevation: 8.0,
+              borderRadius: BorderRadius.circular(8),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Text(
+                  'Dragging ${widget.selectedVerses.length} verse(s)',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
             ),
-            child: Text.rich(TextSpan(children: spans)),
+            child: content,
+          );
+        }
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.headerWidget != null) widget.headerWidget!,
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 32.0,
+                ),
+                child: content,
+              ),
+              if (widget.showFooter) const ChapterNavigationFooter(),
+            ],
           ),
-          if (widget.showFooter) const ChapterNavigationFooter(),
-        ],
-      ),
-    );
+        );
   }
 }

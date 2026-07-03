@@ -427,17 +427,37 @@ class _NotebookPageEditorScreenState
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: QuillEditor.basic(
-                    controller: _controller,
-                    config: QuillEditorConfig(
-                      customLinkPrefixes: referenceLinkPrefixes,
-                      customRecognizerBuilder: referenceRecognizerBuilder(
-                        ref,
-                        context,
-                      ),
-                      onLaunchUrl: (url) =>
-                          handleReferenceLaunch(ref, context, url),
-                    ),
+                  child: DragTarget<String>(
+                    onWillAcceptWithDetails: (_) => true,
+                    onAcceptWithDetails: (details) {
+                      final text = details.data;
+                      final offset = _controller.selection.baseOffset;
+                      final insertOffset = offset >= 0 ? offset : _controller.document.length - 1;
+                      _controller.document.insert(insertOffset, text);
+                      _controller.updateSelection(
+                        TextSelection.collapsed(offset: insertOffset + text.length),
+                        ChangeSource.local,
+                      );
+                    },
+                    builder: (context, candidateData, rejectedData) {
+                      return Container(
+                        color: candidateData.isNotEmpty
+                            ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2)
+                            : null,
+                        child: QuillEditor.basic(
+                          controller: _controller,
+                          config: QuillEditorConfig(
+                            customLinkPrefixes: referenceLinkPrefixes,
+                            customRecognizerBuilder: referenceRecognizerBuilder(
+                              ref,
+                              context,
+                            ),
+                            onLaunchUrl: (url) =>
+                                handleReferenceLaunch(ref, context, url),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),

@@ -12,6 +12,7 @@ import 'dictionary_panel.dart';
 import '../../theme/app_themes.dart';
 import '../../app/content_providers.dart';
 import '../common/breakpoints.dart';
+import '../../app/verse_selection.dart';
 
 class ParallelView extends ConsumerStatefulWidget {
   final Map<String, List<Verse>> versesMap;
@@ -304,7 +305,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                 );
               }).toList();
 
-              return _ParallelVerseRow(
+              Widget tile = _ParallelVerseRow(
                 key: ValueKey(verseNum),
                 verseNum: verseNum,
                 verses: rowVerses,
@@ -318,6 +319,31 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                 onStrongTap: widget.onStrongTap,
                 onWordRightClick: _openDictionary,
               );
+
+              if (isSelected) {
+                tile = LongPressDraggable<String>(
+                  data: () {
+                    final sel = collectSelection(ref);
+                    if (sel == null) return '';
+                    return formatSelection(ref, sel);
+                  }(),
+                  feedback: Material(
+                    elevation: 8.0,
+                    borderRadius: BorderRadius.circular(8),
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: Text(
+                        'Dragging ${widget.selectedVerses.length} verse(s)',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                    ),
+                  ),
+                  child: tile,
+                );
+              }
+
+              return tile;
             },
           ),
         ),
