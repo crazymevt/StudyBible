@@ -25,6 +25,14 @@ Control how copied and shared verses are formatted:
 
 A live preview shows exactly how your shared text will look.
 
+## Sync
+Keep your notes, highlights, sermons, and reading progress the same on every device:
+- **Google Drive:** Tap **Connect Google Drive** to sync through a private app folder in your Drive—the simplest option when your devices don't share a file system.
+- **Sync Folder:** Point the app at any shared folder (e.g. in iCloud Drive) and it syncs through files there.
+- **Auto sync:** Have the app sync by itself shortly after startup and then on a schedule you choose, instead of waiting for you to press the Sync button.
+
+See the **Backup & Restore** topic for the full story on syncing and backups.
+
 ## Maintenance & More
 - **Rebuild Search Index:** If search results ever look odd or contain stray formatting, rebuild the index here.
 - **Landing Page:** Choose what the app opens to—the Reader or the Dashboard.

@@ -1,6 +1,8 @@
 # Search
 
-The global search allows you to search across all downloaded Bibles, your personal journals, sermons, and notes simultaneously. It is blazing fast and runs entirely locally.
+The global search allows you to search across all downloaded Bibles, your personal journals, sermons, notes, and the people of the Bible simultaneously. It is blazing fast and runs entirely locally.
+
+Results are grouped into tabs by kind. The **People** tab matches Bible characters by name (alternate names included) and shows a snippet of their biography—tap a result to open the full profile.
 
 ## Tips for Searching
 - **Exact Match:** By default, search looks for exact phrase matches.

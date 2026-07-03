@@ -41,6 +41,11 @@ const _topics = [
     icon: Icons.view_sidebar,
   ),
   HelpTopic(
+    title: 'Explorer',
+    assetPath: 'assets/help/explorer.md',
+    icon: Icons.travel_explore,
+  ),
+  HelpTopic(
     title: 'Journals & Prayers',
     assetPath: 'assets/help/journals.md',
     icon: Icons.edit_document,

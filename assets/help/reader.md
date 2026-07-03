@@ -20,6 +20,9 @@ Ribbons are lightweight markers for a single verse—drop one to save your spot 
 - **See your markers:** A ribboned verse shows a small bookmark icon beside its verse number, next to the note and tag markers.
 - **Jump back:** Open the **Ribbons** panel (the icon in the app bar, next to History) for a list of every ribbon in Bible order. Tap one to jump straight to that verse; swipe it away or tap `✕` to remove it.
 
+## App Bar on Phones
+On narrow phone screens the Reader's app bar keeps **History** and **Tools** as buttons and tucks the rest—Audio, Read Aloud, Sync, Ribbons, Versions, and the layout toggle—into the `⋮` overflow menu, so every target stays comfortably tappable. On wider screens all the buttons appear in a row.
+
 ## Listen While You Read
 - **Read Aloud:** Have the current chapter read to you by your device's built-in voices, with adjustable speed. Because it uses your device's text-to-speech, **Read Aloud works completely offline**.
 - **Audio:** For professionally narrated audio Bibles, use the Audio tool (🌐 streamed). See the **Study Tools** topic for the difference between the two.

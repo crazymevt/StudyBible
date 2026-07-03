@@ -11,8 +11,11 @@ You can take a complete snapshot of your user data at any time.
 
 *Note: Importing a backup merges the data. Existing data on the device is updated if the backup has newer timestamps, and missing data is added. No data is hard-deleted during an import!*
 
+## Google Drive Sync
+The easiest way to sync across devices: open **Settings → Sync** and tap **Connect Google Drive**. Your notes, highlights, sermons, and reading progress sync through a private app folder in your Google Drive, shared by every device you connect with the same account. Tap **Disconnect** at any time to stop.
+
 ## Sync Folder
-For automatic syncing across devices (like between your Mac and iPhone), you can configure a **Sync Folder** in the Settings.
+Prefer to keep sync out of Google? Configure a **Sync Folder** in the Settings instead—any folder your devices share works.
 - If you set your Sync Folder to an iCloud Drive directory, StudyBible will automatically sync your changes seamlessly in the background!
 
 ## Auto Sync
