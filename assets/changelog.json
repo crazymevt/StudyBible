@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.7.3+2",
+    "date": "2026-07-03",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add speech-to-text dictation buttons to editors and notes",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "show notebook pages in search results",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add Notebooks tool (folders of rich-text pages)",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.3+1",
     "date": "2026-07-03",
     "features": [
