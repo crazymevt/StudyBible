@@ -203,11 +203,14 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                      .toList();
                  final topics = results.where((r) => r.type == 'topic').toList();
                  final people = results.where((r) => r.type == 'person').toList();
+                 final notebookPages = results
+                     .where((r) => r.type == 'notebookPage')
+                     .toList();
 
                  final combinedVerses = [...navigation, ...verses];
 
                  return DefaultTabController(
-                   length: 9,
+                   length: 10,
                    child: Column(
                      children: [
                        TabBar(
@@ -216,6 +219,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                            Tab(text: 'Verses (${combinedVerses.length})'),
                           Tab(text: 'Notes (${notes.length})'),
                           Tab(text: 'Sermons (${sermons.length})'),
+                          Tab(text: 'Notebooks (${notebookPages.length})'),
                           Tab(text: 'Journals (${journals.length})'),
                           Tab(text: 'Prayers (${prayers.length})'),
                           Tab(text: 'Comm. (${commentaries.length})'),
@@ -230,6 +234,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                             SearchResultsList(results: combinedVerses),
                             SearchResultsList(results: notes),
                             SearchResultsList(results: sermons),
+                            SearchResultsList(results: notebookPages),
                             SearchResultsList(results: journals),
                             SearchResultsList(results: prayers),
                             GroupedSearchResultsList(results: commentaries),
