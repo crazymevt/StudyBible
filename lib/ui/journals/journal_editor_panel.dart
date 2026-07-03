@@ -52,6 +52,15 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
   bool _conflictDetected = false;
   Journal? _incomingRemote;
 
+  /// Whether the current id's baseline was established from its real row. False
+  /// after a cold load — [_loadCurrentJournal] runs off the [journalsProvider]
+  /// list, which is empty until its stream warms up, so opening a journal
+  /// straight from the Explorer or global search can miss the row and seed an
+  /// empty baseline. The first [journalByIdProvider] emission then looks like a
+  /// remote edit. This flag lets [_onJournalChanged] treat that first emission
+  /// as the load it actually is instead of flagging a false conflict.
+  bool _baselineLoaded = false;
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +99,8 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
       _setDocument(Document());
       _lastSavedTitle = '';
       _lastSavedContent = _currentContentJson();
+      // A blank new-entry baseline is genuine, not a cold miss.
+      _baselineLoaded = true;
     } else {
       final journals = ref.read(journalsProvider).value ?? [];
       final journal = journals.where((j) => j.id == _currentId).firstOrNull;
@@ -98,11 +109,15 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
         _setDocument(documentFromStoredContent(journal.content));
         _lastSavedTitle = journal.title;
         _lastSavedContent = journal.content;
+        _baselineLoaded = true;
       } else {
         _titleController.clear();
         _setDocument(Document());
         _lastSavedTitle = '';
         _lastSavedContent = _currentContentJson();
+        // Cold miss: the list stream hasn't populated. The row's first
+        // arrival via journalByIdProvider is the real load, not a conflict.
+        _baselineLoaded = false;
       }
     }
     _conflictDetected = false;
@@ -115,6 +130,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
     _setDocument(documentFromStoredContent(j.content));
     _lastSavedTitle = j.title;
     _lastSavedContent = j.content;
+    _baselineLoaded = true;
   }
 
   @override
@@ -167,6 +183,19 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
   void _onJournalChanged(Journal? j) {
     if (j == null || _internalWrite || _conflictDetected) return;
     if (_currentId == null || j.id != _currentId || j.deleted) return;
+    // Cold-load completion: the editor opened before the journals list stream
+    // populated, so its baseline is an empty placeholder. This first real row
+    // is the load we were waiting for — adopt it instead of flagging a
+    // conflict. Only when the on-screen doc is still untouched, so a genuine
+    // remote edit that races an unsaved local edit still surfaces.
+    if (!_baselineLoaded) {
+      if (_isContentEmpty() && _titleController.text.isEmpty) {
+        setState(() => _applyJournal(j));
+      } else {
+        _baselineLoaded = true;
+      }
+      return;
+    }
     final externallyChanged =
         j.content != _lastSavedContent || j.title != _lastSavedTitle;
     if (!externallyChanged) return;
