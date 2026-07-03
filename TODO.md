@@ -23,6 +23,48 @@ Running list of known issues and follow-ups.
     (`commentaryEntriesProvider`), cross-references, and the user's own
     notes/sermons touching the chapter.
 
+- [ ] **Explorer — richer content on entity/passage pages.** Three enrichments
+  scoped from a data-source audit (2026-07-02). Ordered cheapest-first.
+  - **(a) Dictionary facet card for places & topics.** Easton's Bible Dictionary
+    is already bundled in `assets/content.db` (`dictionaries` id 1,
+    `dictionary_entries`) and is *already* the source of person bios in the
+    Theographic import. Surface the full Easton entry as a facet card on **place**
+    and **topic** pages too, keyed by entry name/slug.
+    - *Research notes:* place names come from OpenBible (`places.name`, no
+      description today); topic names from Nave's (`topics.name`, e.g. "AARON").
+      Easton headwords won't always match exactly — need a normalization/lookup
+      (case-fold, strip parentheticals, maybe an alias table) against
+      `dictionary_entries`. Person bios prove the join works; check how
+      `theographic_importer.dart` currently pairs a person to its Easton text and
+      reuse that matching. Add a provider in `lib/app/explorer_providers.dart`
+      (mirror `commentaryEntriesProvider`) and a card in `explorer_pages.dart`.
+      No new dataset — pure wiring.
+  - **(b) Fuller timeline events: summaries, end years, locations.** The
+    `timeline_events` table only stores `title`/`sortKey`/`startYear`; the
+    upstream Theographic dataset carries an event **description/summary**, an
+    **end year**, and a **location** (place link) that our importer drops.
+    - *Research notes:* re-widen the projection in `scripts/build_theographic.dart`
+      (downloads Airtable-export JSON from `robertrouse/theographic-bible-metadata`,
+      cached in `scratch/theographic/`) to keep those fields, regrow
+      `assets/data/theographic.json`, add columns in
+      `lib/data/tables/content_tables.dart` (`timeline_events`), extend
+      `theographic_importer.dart`, and run
+      `dart run build_runner build --delete-conflicting-outputs`. An explicit
+      event→place link would also let events stop bridging through shared verses.
+      Bundle the Theographic `periods` table at the same time for era buckets
+      (feeds a future timeline view). License unchanged (CC BY-SA 4.0).
+  - **(c) OpenBible.info place descriptions.** Places currently have only
+    `name`/`lat`/`lng` — no prose. OpenBible's Bible-Geocoding-Data carries
+    descriptive text and ancient/modern name variants we don't ingest.
+    - *Research notes:* `tool/build_places.dart` converts OpenBible
+      `ancient.jsonl` + `modern.jsonl` into `places.json`; extend it to keep the
+      description + name-variant fields, add columns to the `places` table,
+      update `places_importer.dart` and regenerate. Pairs naturally with (a) —
+      show OpenBible description + Easton entry together on the place page.
+      License CC-BY 4.0 (already in use). Verify the upstream jsonl actually
+      carries a description field before scoping (audit noted it as a gap, not
+      confirmed present).
+
 - [ ] **Import SWORD modules** (CrossWire format — translations, commentaries,
   dictionaries). Implementation lives in `lib/data/importer/sword/`. Phases
   1, 2, 4, and 5 are **DONE** and verified in the macOS app; **Phase 3 is the
