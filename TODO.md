@@ -6,6 +6,9 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
+- [ ] **Expand Tags card in Explorer.** Expand the tags card to also cross reference people, places, events, and commentaries like the other cards do.
+- [ ] **Notebooks tool.** Add a notebooks tool that works similar to sermons, allowing users to create a notebook to store pages inside it (like a folder). It does not need presentation mode or the chain linking feature, but it still needs tags.
+
 - [ ] **Drag and drop verses.** Support dragging a verse from the reader and dropping it into the sermon editor or scratch space to copy the text.
 
 ## Research
