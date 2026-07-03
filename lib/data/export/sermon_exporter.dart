@@ -13,6 +13,10 @@ import '../logging.dart';
 import 'print_service.dart';
 import 'document_pdf.dart';
 import 'delta_markdown.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'package:saf_stream/saf_stream.dart';
+import 'package:saf_util/saf_util.dart';
 import 'dart:io';
 
 enum ExportFormat { pdf, html, text, markdown }
@@ -69,6 +73,45 @@ class SermonExporter {
       }
 
       if (action == ExportAction.save) {
+        if (Platform.isAndroid) {
+          final tempDir = await getTemporaryDirectory();
+          final tempFile = File(p.join(tempDir.path, filename));
+          await tempFile.writeAsBytes(bytes);
+          
+          final dir = await SafUtil().pickDirectory(
+            writePermission: true,
+            persistablePermission: false,
+            initialUri: '',
+          );
+          if (dir != null) {
+            await SafStream().pasteLocalFile(
+              tempFile.path,
+              dir.uri,
+              filename,
+              mimeType,
+              overwrite: true,
+            );
+            if (!context.mounted) return;
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(content: Text('Saved successfully!')),
+            );
+          }
+          await tempFile.delete();
+          return;
+        }
+
+        if (Platform.isIOS) {
+          if (!context.mounted) return;
+          final box = context.findRenderObject() as RenderBox?;
+          await SharePlus.instance.share(
+            ShareParams(
+              files: [XFile.fromData(bytes, name: filename, mimeType: mimeType)],
+              sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+            ),
+          );
+          return;
+        }
+
         final saveLocation = await getSaveLocation(
           suggestedName: filename,
         );
@@ -76,6 +119,7 @@ class SermonExporter {
         if (path != null) {
           final file = File(path);
           await file.writeAsBytes(bytes);
+          if (!context.mounted) return;
           scaffoldMessenger.showSnackBar(
             SnackBar(content: Text('Saved to $path')),
           );
@@ -90,6 +134,7 @@ class SermonExporter {
       }
     } catch (e, stack) {
       logError(e, stack, context: 'SermonExporter.export');
+      if (!context.mounted) return;
       scaffoldMessenger.showSnackBar(
         SnackBar(content: Text('Failed to export: $e')),
       );
