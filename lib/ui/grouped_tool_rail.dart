@@ -15,21 +15,21 @@ class GroupedToolRail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTool = ref.watch(activeToolProvider);
 
-    // Deliberately denser than NavigationRail's 72px-per-destination: 16
+    // Deliberately denser than NavigationRail's 72px-per-destination: 17
     // tools plus the group breaks must still fit a typical laptop window
     // without scrolling (guarded by grouped_tool_rail_test).
     return SizedBox(
       width: 80,
       child: Column(
         children: [
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           for (var i = 0; i < toolGroups.length; i++) ...[
             if (i > 0)
-              const Divider(height: 17, indent: 16, endIndent: 16),
+              const Divider(height: 15, indent: 16, endIndent: 16),
             for (final item in toolGroups[i].items)
               _RailItem(item: item, selected: activeTool == item.tool),
           ],
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
         ],
       ),
     );
@@ -69,7 +69,7 @@ class _RailItem extends ConsumerWidget {
           children: [
             Container(
               width: 56,
-              height: 30,
+              height: 28,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: selected ? theme.colorScheme.secondaryContainer : null,

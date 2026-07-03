@@ -9,6 +9,7 @@ import '../../app/explorer_providers.dart';
 import '../../app/reader_state.dart';
 import '../../app/search_providers.dart';
 import '../../app/sermon_providers.dart';
+import '../../app/notebook_providers.dart';
 import '../../app/tag_providers.dart';
 import '../../app/user_providers.dart';
 import '../../domain/explorer/explorer_ref.dart';
@@ -16,6 +17,7 @@ import '../common/breakpoints.dart';
 import '../journals/journal_editor_panel.dart';
 import '../journals/journals_list_panel.dart';
 import '../sermons/sermon_editor_screen.dart';
+import '../notebooks/notebook_page_editor_screen.dart';
 import '../tags/tag_palette.dart';
 
 /// Formats an ISO year for display: negative years are BC.
@@ -110,6 +112,25 @@ void explorerOpenTaggedItem(
       ref.read(journalsActiveTabProvider.notifier).setTab(
           JournalsActiveTab.prayers);
       ref.read(appModuleProvider.notifier).setModule(AppModule.journalsPrayers);
+      nav.popUntil((route) => route.isFirst);
+    case 'notebookPage':
+      if (isPhone) {
+        nav.popUntil((route) => route.isFirst);
+        nav.push(MaterialPageRoute(
+          builder: (_) => NotebookPageEditorScreen(
+              pageId: item.referenceId, isFullScreen: true),
+        ));
+      } else {
+        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+        ref.read(selectedNotebookPageIdProvider.notifier).set(item.referenceId);
+        ref.read(activeToolProvider.notifier).setTool(ActiveTool.notebooks);
+        nav.popUntil((route) => route.isFirst);
+      }
+    case 'notebook':
+      ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+      ref.read(selectedNotebookPageIdProvider.notifier).set(null);
+      ref.read(selectedNotebookIdProvider.notifier).set(item.referenceId);
+      ref.read(activeToolProvider.notifier).setTool(ActiveTool.notebooks);
       nav.popUntil((route) => route.isFirst);
   }
 }

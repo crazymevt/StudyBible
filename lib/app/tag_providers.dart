@@ -289,6 +289,27 @@ final entitiesForTagProvider = FutureProvider.family<List<SearchResult>, String>
           title: 'Journal: ${journal.title}',
         ));
       }
+    } else if (link.entityType == 'notebookPage') {
+      final page = await (userDb.select(userDb.notebookPages)..where((t) => t.id.equals(link.entityId))).getSingleOrNull();
+      if (page != null && !page.deleted) {
+        results.add(SearchResult(
+          type: 'notebookPage',
+          referenceId: page.id,
+          // content is Delta JSON (rich text); show a plain-text snippet.
+          textContent: page.contentPlain ?? deltaToPlainText(page.content),
+          title: 'Notebook: ${page.title}',
+        ));
+      }
+    } else if (link.entityType == 'notebook') {
+      final notebook = await (userDb.select(userDb.notebooks)..where((t) => t.id.equals(link.entityId))).getSingleOrNull();
+      if (notebook != null && !notebook.deleted) {
+        results.add(SearchResult(
+          type: 'notebook',
+          referenceId: notebook.id,
+          textContent: '',
+          title: 'Notebook: ${notebook.title}',
+        ));
+      }
     }
   }
   

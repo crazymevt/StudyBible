@@ -30,6 +30,8 @@ class TagResultsList extends ConsumerWidget {
         final sermons = results.where((r) => r.type == 'sermon').toList();
         final journals = results.where((r) => r.type == 'journal').toList();
         final prayers = results.where((r) => r.type == 'prayer').toList();
+        final notebookPages =
+            results.where((r) => r.type == 'notebookPage').toList();
 
         final tabs = <Widget>[];
         final views = <Widget>[];
@@ -53,6 +55,10 @@ class TagResultsList extends ConsumerWidget {
         if (prayers.isNotEmpty) {
           tabs.add(Tab(text: 'Prayers (${prayers.length})'));
           views.add(SearchResultsList(results: prayers));
+        }
+        if (notebookPages.isNotEmpty) {
+          tabs.add(Tab(text: 'Notebook Pages (${notebookPages.length})'));
+          views.add(SearchResultsList(results: notebookPages));
         }
 
         if (tabs.isEmpty) {

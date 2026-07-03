@@ -10351,6 +10351,1783 @@ class EntityTagsCompanion extends UpdateCompanion<EntityTag> {
   }
 }
 
+class $NotebooksTable extends Notebooks
+    with TableInfo<$NotebooksTable, Notebook> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotebooksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta(
+    'deleted',
+  );
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colorHexMeta = const VerificationMeta(
+    'colorHex',
+  );
+  @override
+  late final GeneratedColumn<String> colorHex = GeneratedColumn<String>(
+    'color_hex',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _iconKeyMeta = const VerificationMeta(
+    'iconKey',
+  );
+  @override
+  late final GeneratedColumn<String> iconKey = GeneratedColumn<String>(
+    'icon_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pinnedMeta = const VerificationMeta('pinned');
+  @override
+  late final GeneratedColumn<bool> pinned = GeneratedColumn<bool>(
+    'pinned',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pinned" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    deviceId,
+    deleted,
+    title,
+    colorHex,
+    iconKey,
+    pinned,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notebooks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Notebook> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(
+        _deletedMeta,
+        deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('color_hex')) {
+      context.handle(
+        _colorHexMeta,
+        colorHex.isAcceptableOrUnknown(data['color_hex']!, _colorHexMeta),
+      );
+    }
+    if (data.containsKey('icon_key')) {
+      context.handle(
+        _iconKeyMeta,
+        iconKey.isAcceptableOrUnknown(data['icon_key']!, _iconKeyMeta),
+      );
+    }
+    if (data.containsKey('pinned')) {
+      context.handle(
+        _pinnedMeta,
+        pinned.isAcceptableOrUnknown(data['pinned']!, _pinnedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Notebook map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Notebook(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      deleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deleted'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      colorHex: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_hex'],
+      ),
+      iconKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon_key'],
+      ),
+      pinned: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pinned'],
+      )!,
+    );
+  }
+
+  @override
+  $NotebooksTable createAlias(String alias) {
+    return $NotebooksTable(attachedDatabase, alias);
+  }
+}
+
+class Notebook extends DataClass implements Insertable<Notebook> {
+  final String id;
+  final int createdAt;
+  final int updatedAt;
+  final String deviceId;
+  final bool deleted;
+  final String title;
+  final String? colorHex;
+  final String? iconKey;
+  final bool pinned;
+  const Notebook({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.deviceId,
+    required this.deleted,
+    required this.title,
+    this.colorHex,
+    this.iconKey,
+    required this.pinned,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['device_id'] = Variable<String>(deviceId);
+    map['deleted'] = Variable<bool>(deleted);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || colorHex != null) {
+      map['color_hex'] = Variable<String>(colorHex);
+    }
+    if (!nullToAbsent || iconKey != null) {
+      map['icon_key'] = Variable<String>(iconKey);
+    }
+    map['pinned'] = Variable<bool>(pinned);
+    return map;
+  }
+
+  NotebooksCompanion toCompanion(bool nullToAbsent) {
+    return NotebooksCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deviceId: Value(deviceId),
+      deleted: Value(deleted),
+      title: Value(title),
+      colorHex: colorHex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(colorHex),
+      iconKey: iconKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(iconKey),
+      pinned: Value(pinned),
+    );
+  }
+
+  factory Notebook.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Notebook(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      deleted: serializer.fromJson<bool>(json['deleted']),
+      title: serializer.fromJson<String>(json['title']),
+      colorHex: serializer.fromJson<String?>(json['colorHex']),
+      iconKey: serializer.fromJson<String?>(json['iconKey']),
+      pinned: serializer.fromJson<bool>(json['pinned']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'deleted': serializer.toJson<bool>(deleted),
+      'title': serializer.toJson<String>(title),
+      'colorHex': serializer.toJson<String?>(colorHex),
+      'iconKey': serializer.toJson<String?>(iconKey),
+      'pinned': serializer.toJson<bool>(pinned),
+    };
+  }
+
+  Notebook copyWith({
+    String? id,
+    int? createdAt,
+    int? updatedAt,
+    String? deviceId,
+    bool? deleted,
+    String? title,
+    Value<String?> colorHex = const Value.absent(),
+    Value<String?> iconKey = const Value.absent(),
+    bool? pinned,
+  }) => Notebook(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deviceId: deviceId ?? this.deviceId,
+    deleted: deleted ?? this.deleted,
+    title: title ?? this.title,
+    colorHex: colorHex.present ? colorHex.value : this.colorHex,
+    iconKey: iconKey.present ? iconKey.value : this.iconKey,
+    pinned: pinned ?? this.pinned,
+  );
+  Notebook copyWithCompanion(NotebooksCompanion data) {
+    return Notebook(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      title: data.title.present ? data.title.value : this.title,
+      colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
+      iconKey: data.iconKey.present ? data.iconKey.value : this.iconKey,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Notebook(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('title: $title, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('iconKey: $iconKey, ')
+          ..write('pinned: $pinned')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    deviceId,
+    deleted,
+    title,
+    colorHex,
+    iconKey,
+    pinned,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Notebook &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deviceId == this.deviceId &&
+          other.deleted == this.deleted &&
+          other.title == this.title &&
+          other.colorHex == this.colorHex &&
+          other.iconKey == this.iconKey &&
+          other.pinned == this.pinned);
+}
+
+class NotebooksCompanion extends UpdateCompanion<Notebook> {
+  final Value<String> id;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<String> deviceId;
+  final Value<bool> deleted;
+  final Value<String> title;
+  final Value<String?> colorHex;
+  final Value<String?> iconKey;
+  final Value<bool> pinned;
+  final Value<int> rowid;
+  const NotebooksCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.title = const Value.absent(),
+    this.colorHex = const Value.absent(),
+    this.iconKey = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NotebooksCompanion.insert({
+    required String id,
+    required int createdAt,
+    required int updatedAt,
+    required String deviceId,
+    this.deleted = const Value.absent(),
+    required String title,
+    this.colorHex = const Value.absent(),
+    this.iconKey = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId),
+       title = Value(title);
+  static Insertable<Notebook> custom({
+    Expression<String>? id,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<String>? deviceId,
+    Expression<bool>? deleted,
+    Expression<String>? title,
+    Expression<String>? colorHex,
+    Expression<String>? iconKey,
+    Expression<bool>? pinned,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (deleted != null) 'deleted': deleted,
+      if (title != null) 'title': title,
+      if (colorHex != null) 'color_hex': colorHex,
+      if (iconKey != null) 'icon_key': iconKey,
+      if (pinned != null) 'pinned': pinned,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NotebooksCompanion copyWith({
+    Value<String>? id,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<String>? deviceId,
+    Value<bool>? deleted,
+    Value<String>? title,
+    Value<String?>? colorHex,
+    Value<String?>? iconKey,
+    Value<bool>? pinned,
+    Value<int>? rowid,
+  }) {
+    return NotebooksCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deviceId: deviceId ?? this.deviceId,
+      deleted: deleted ?? this.deleted,
+      title: title ?? this.title,
+      colorHex: colorHex ?? this.colorHex,
+      iconKey: iconKey ?? this.iconKey,
+      pinned: pinned ?? this.pinned,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (colorHex.present) {
+      map['color_hex'] = Variable<String>(colorHex.value);
+    }
+    if (iconKey.present) {
+      map['icon_key'] = Variable<String>(iconKey.value);
+    }
+    if (pinned.present) {
+      map['pinned'] = Variable<bool>(pinned.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotebooksCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('title: $title, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('iconKey: $iconKey, ')
+          ..write('pinned: $pinned, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $NotebookPagesTable extends NotebookPages
+    with TableInfo<$NotebookPagesTable, NotebookPage> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotebookPagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta(
+    'deleted',
+  );
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _notebookIdMeta = const VerificationMeta(
+    'notebookId',
+  );
+  @override
+  late final GeneratedColumn<String> notebookId = GeneratedColumn<String>(
+    'notebook_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentPlainMeta = const VerificationMeta(
+    'contentPlain',
+  );
+  @override
+  late final GeneratedColumn<String> contentPlain = GeneratedColumn<String>(
+    'content_plain',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    deviceId,
+    deleted,
+    notebookId,
+    title,
+    content,
+    contentPlain,
+    position,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notebook_pages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotebookPage> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(
+        _deletedMeta,
+        deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('notebook_id')) {
+      context.handle(
+        _notebookIdMeta,
+        notebookId.isAcceptableOrUnknown(data['notebook_id']!, _notebookIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_notebookIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('content_plain')) {
+      context.handle(
+        _contentPlainMeta,
+        contentPlain.isAcceptableOrUnknown(
+          data['content_plain']!,
+          _contentPlainMeta,
+        ),
+      );
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NotebookPage map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotebookPage(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      deleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deleted'],
+      )!,
+      notebookId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notebook_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      contentPlain: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content_plain'],
+      ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $NotebookPagesTable createAlias(String alias) {
+    return $NotebookPagesTable(attachedDatabase, alias);
+  }
+}
+
+class NotebookPage extends DataClass implements Insertable<NotebookPage> {
+  final String id;
+  final int createdAt;
+  final int updatedAt;
+  final String deviceId;
+  final bool deleted;
+  final String notebookId;
+  final String title;
+  final String content;
+  final String? contentPlain;
+  final int position;
+  const NotebookPage({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.deviceId,
+    required this.deleted,
+    required this.notebookId,
+    required this.title,
+    required this.content,
+    this.contentPlain,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['device_id'] = Variable<String>(deviceId);
+    map['deleted'] = Variable<bool>(deleted);
+    map['notebook_id'] = Variable<String>(notebookId);
+    map['title'] = Variable<String>(title);
+    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || contentPlain != null) {
+      map['content_plain'] = Variable<String>(contentPlain);
+    }
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  NotebookPagesCompanion toCompanion(bool nullToAbsent) {
+    return NotebookPagesCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deviceId: Value(deviceId),
+      deleted: Value(deleted),
+      notebookId: Value(notebookId),
+      title: Value(title),
+      content: Value(content),
+      contentPlain: contentPlain == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contentPlain),
+      position: Value(position),
+    );
+  }
+
+  factory NotebookPage.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotebookPage(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      deleted: serializer.fromJson<bool>(json['deleted']),
+      notebookId: serializer.fromJson<String>(json['notebookId']),
+      title: serializer.fromJson<String>(json['title']),
+      content: serializer.fromJson<String>(json['content']),
+      contentPlain: serializer.fromJson<String?>(json['contentPlain']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'deleted': serializer.toJson<bool>(deleted),
+      'notebookId': serializer.toJson<String>(notebookId),
+      'title': serializer.toJson<String>(title),
+      'content': serializer.toJson<String>(content),
+      'contentPlain': serializer.toJson<String?>(contentPlain),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  NotebookPage copyWith({
+    String? id,
+    int? createdAt,
+    int? updatedAt,
+    String? deviceId,
+    bool? deleted,
+    String? notebookId,
+    String? title,
+    String? content,
+    Value<String?> contentPlain = const Value.absent(),
+    int? position,
+  }) => NotebookPage(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deviceId: deviceId ?? this.deviceId,
+    deleted: deleted ?? this.deleted,
+    notebookId: notebookId ?? this.notebookId,
+    title: title ?? this.title,
+    content: content ?? this.content,
+    contentPlain: contentPlain.present ? contentPlain.value : this.contentPlain,
+    position: position ?? this.position,
+  );
+  NotebookPage copyWithCompanion(NotebookPagesCompanion data) {
+    return NotebookPage(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      notebookId: data.notebookId.present
+          ? data.notebookId.value
+          : this.notebookId,
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+      contentPlain: data.contentPlain.present
+          ? data.contentPlain.value
+          : this.contentPlain,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotebookPage(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('notebookId: $notebookId, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('contentPlain: $contentPlain, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    deviceId,
+    deleted,
+    notebookId,
+    title,
+    content,
+    contentPlain,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotebookPage &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deviceId == this.deviceId &&
+          other.deleted == this.deleted &&
+          other.notebookId == this.notebookId &&
+          other.title == this.title &&
+          other.content == this.content &&
+          other.contentPlain == this.contentPlain &&
+          other.position == this.position);
+}
+
+class NotebookPagesCompanion extends UpdateCompanion<NotebookPage> {
+  final Value<String> id;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<String> deviceId;
+  final Value<bool> deleted;
+  final Value<String> notebookId;
+  final Value<String> title;
+  final Value<String> content;
+  final Value<String?> contentPlain;
+  final Value<int> position;
+  final Value<int> rowid;
+  const NotebookPagesCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.notebookId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.content = const Value.absent(),
+    this.contentPlain = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NotebookPagesCompanion.insert({
+    required String id,
+    required int createdAt,
+    required int updatedAt,
+    required String deviceId,
+    this.deleted = const Value.absent(),
+    required String notebookId,
+    required String title,
+    required String content,
+    this.contentPlain = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId),
+       notebookId = Value(notebookId),
+       title = Value(title),
+       content = Value(content);
+  static Insertable<NotebookPage> custom({
+    Expression<String>? id,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<String>? deviceId,
+    Expression<bool>? deleted,
+    Expression<String>? notebookId,
+    Expression<String>? title,
+    Expression<String>? content,
+    Expression<String>? contentPlain,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (deleted != null) 'deleted': deleted,
+      if (notebookId != null) 'notebook_id': notebookId,
+      if (title != null) 'title': title,
+      if (content != null) 'content': content,
+      if (contentPlain != null) 'content_plain': contentPlain,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NotebookPagesCompanion copyWith({
+    Value<String>? id,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<String>? deviceId,
+    Value<bool>? deleted,
+    Value<String>? notebookId,
+    Value<String>? title,
+    Value<String>? content,
+    Value<String?>? contentPlain,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return NotebookPagesCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deviceId: deviceId ?? this.deviceId,
+      deleted: deleted ?? this.deleted,
+      notebookId: notebookId ?? this.notebookId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      contentPlain: contentPlain ?? this.contentPlain,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (notebookId.present) {
+      map['notebook_id'] = Variable<String>(notebookId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (contentPlain.present) {
+      map['content_plain'] = Variable<String>(contentPlain.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotebookPagesCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('notebookId: $notebookId, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('contentPlain: $contentPlain, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $NotebookPageRevisionsTable extends NotebookPageRevisions
+    with TableInfo<$NotebookPageRevisionsTable, NotebookPageRevision> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotebookPageRevisionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta(
+    'deleted',
+  );
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _pageIdMeta = const VerificationMeta('pageId');
+  @override
+  late final GeneratedColumn<String> pageId = GeneratedColumn<String>(
+    'page_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    updatedAt,
+    deviceId,
+    deleted,
+    pageId,
+    createdAt,
+    title,
+    content,
+    label,
+    kind,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notebook_page_revisions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotebookPageRevision> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(
+        _deletedMeta,
+        deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('page_id')) {
+      context.handle(
+        _pageIdMeta,
+        pageId.isAcceptableOrUnknown(data['page_id']!, _pageIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NotebookPageRevision map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotebookPageRevision(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      deleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deleted'],
+      )!,
+      pageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}page_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      ),
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+    );
+  }
+
+  @override
+  $NotebookPageRevisionsTable createAlias(String alias) {
+    return $NotebookPageRevisionsTable(attachedDatabase, alias);
+  }
+}
+
+class NotebookPageRevision extends DataClass
+    implements Insertable<NotebookPageRevision> {
+  final String id;
+  final int updatedAt;
+  final String deviceId;
+  final bool deleted;
+  final String pageId;
+  final int createdAt;
+  final String title;
+  final String content;
+  final String? label;
+  final String kind;
+  const NotebookPageRevision({
+    required this.id,
+    required this.updatedAt,
+    required this.deviceId,
+    required this.deleted,
+    required this.pageId,
+    required this.createdAt,
+    required this.title,
+    required this.content,
+    this.label,
+    required this.kind,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['device_id'] = Variable<String>(deviceId);
+    map['deleted'] = Variable<bool>(deleted);
+    map['page_id'] = Variable<String>(pageId);
+    map['created_at'] = Variable<int>(createdAt);
+    map['title'] = Variable<String>(title);
+    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || label != null) {
+      map['label'] = Variable<String>(label);
+    }
+    map['kind'] = Variable<String>(kind);
+    return map;
+  }
+
+  NotebookPageRevisionsCompanion toCompanion(bool nullToAbsent) {
+    return NotebookPageRevisionsCompanion(
+      id: Value(id),
+      updatedAt: Value(updatedAt),
+      deviceId: Value(deviceId),
+      deleted: Value(deleted),
+      pageId: Value(pageId),
+      createdAt: Value(createdAt),
+      title: Value(title),
+      content: Value(content),
+      label: label == null && nullToAbsent
+          ? const Value.absent()
+          : Value(label),
+      kind: Value(kind),
+    );
+  }
+
+  factory NotebookPageRevision.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotebookPageRevision(
+      id: serializer.fromJson<String>(json['id']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      deleted: serializer.fromJson<bool>(json['deleted']),
+      pageId: serializer.fromJson<String>(json['pageId']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      title: serializer.fromJson<String>(json['title']),
+      content: serializer.fromJson<String>(json['content']),
+      label: serializer.fromJson<String?>(json['label']),
+      kind: serializer.fromJson<String>(json['kind']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'deleted': serializer.toJson<bool>(deleted),
+      'pageId': serializer.toJson<String>(pageId),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'title': serializer.toJson<String>(title),
+      'content': serializer.toJson<String>(content),
+      'label': serializer.toJson<String?>(label),
+      'kind': serializer.toJson<String>(kind),
+    };
+  }
+
+  NotebookPageRevision copyWith({
+    String? id,
+    int? updatedAt,
+    String? deviceId,
+    bool? deleted,
+    String? pageId,
+    int? createdAt,
+    String? title,
+    String? content,
+    Value<String?> label = const Value.absent(),
+    String? kind,
+  }) => NotebookPageRevision(
+    id: id ?? this.id,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deviceId: deviceId ?? this.deviceId,
+    deleted: deleted ?? this.deleted,
+    pageId: pageId ?? this.pageId,
+    createdAt: createdAt ?? this.createdAt,
+    title: title ?? this.title,
+    content: content ?? this.content,
+    label: label.present ? label.value : this.label,
+    kind: kind ?? this.kind,
+  );
+  NotebookPageRevision copyWithCompanion(NotebookPageRevisionsCompanion data) {
+    return NotebookPageRevision(
+      id: data.id.present ? data.id.value : this.id,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      pageId: data.pageId.present ? data.pageId.value : this.pageId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+      label: data.label.present ? data.label.value : this.label,
+      kind: data.kind.present ? data.kind.value : this.kind,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotebookPageRevision(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('pageId: $pageId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('label: $label, ')
+          ..write('kind: $kind')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    updatedAt,
+    deviceId,
+    deleted,
+    pageId,
+    createdAt,
+    title,
+    content,
+    label,
+    kind,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotebookPageRevision &&
+          other.id == this.id &&
+          other.updatedAt == this.updatedAt &&
+          other.deviceId == this.deviceId &&
+          other.deleted == this.deleted &&
+          other.pageId == this.pageId &&
+          other.createdAt == this.createdAt &&
+          other.title == this.title &&
+          other.content == this.content &&
+          other.label == this.label &&
+          other.kind == this.kind);
+}
+
+class NotebookPageRevisionsCompanion
+    extends UpdateCompanion<NotebookPageRevision> {
+  final Value<String> id;
+  final Value<int> updatedAt;
+  final Value<String> deviceId;
+  final Value<bool> deleted;
+  final Value<String> pageId;
+  final Value<int> createdAt;
+  final Value<String> title;
+  final Value<String> content;
+  final Value<String?> label;
+  final Value<String> kind;
+  final Value<int> rowid;
+  const NotebookPageRevisionsCompanion({
+    this.id = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.pageId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.title = const Value.absent(),
+    this.content = const Value.absent(),
+    this.label = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NotebookPageRevisionsCompanion.insert({
+    required String id,
+    required int updatedAt,
+    required String deviceId,
+    this.deleted = const Value.absent(),
+    required String pageId,
+    required int createdAt,
+    required String title,
+    required String content,
+    this.label = const Value.absent(),
+    required String kind,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId),
+       pageId = Value(pageId),
+       createdAt = Value(createdAt),
+       title = Value(title),
+       content = Value(content),
+       kind = Value(kind);
+  static Insertable<NotebookPageRevision> custom({
+    Expression<String>? id,
+    Expression<int>? updatedAt,
+    Expression<String>? deviceId,
+    Expression<bool>? deleted,
+    Expression<String>? pageId,
+    Expression<int>? createdAt,
+    Expression<String>? title,
+    Expression<String>? content,
+    Expression<String>? label,
+    Expression<String>? kind,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (deleted != null) 'deleted': deleted,
+      if (pageId != null) 'page_id': pageId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (title != null) 'title': title,
+      if (content != null) 'content': content,
+      if (label != null) 'label': label,
+      if (kind != null) 'kind': kind,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NotebookPageRevisionsCompanion copyWith({
+    Value<String>? id,
+    Value<int>? updatedAt,
+    Value<String>? deviceId,
+    Value<bool>? deleted,
+    Value<String>? pageId,
+    Value<int>? createdAt,
+    Value<String>? title,
+    Value<String>? content,
+    Value<String?>? label,
+    Value<String>? kind,
+    Value<int>? rowid,
+  }) {
+    return NotebookPageRevisionsCompanion(
+      id: id ?? this.id,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deviceId: deviceId ?? this.deviceId,
+      deleted: deleted ?? this.deleted,
+      pageId: pageId ?? this.pageId,
+      createdAt: createdAt ?? this.createdAt,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      label: label ?? this.label,
+      kind: kind ?? this.kind,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (pageId.present) {
+      map['page_id'] = Variable<String>(pageId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotebookPageRevisionsCompanion(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('pageId: $pageId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('label: $label, ')
+          ..write('kind: $kind, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$UserStore extends GeneratedDatabase {
   _$UserStore(QueryExecutor e) : super(e);
   $UserStoreManager get managers => $UserStoreManager(this);
@@ -10386,6 +12163,10 @@ abstract class _$UserStore extends GeneratedDatabase {
   late final $ActionItemsTable actionItems = $ActionItemsTable(this);
   late final $TagsTable tags = $TagsTable(this);
   late final $EntityTagsTable entityTags = $EntityTagsTable(this);
+  late final $NotebooksTable notebooks = $NotebooksTable(this);
+  late final $NotebookPagesTable notebookPages = $NotebookPagesTable(this);
+  late final $NotebookPageRevisionsTable notebookPageRevisions =
+      $NotebookPageRevisionsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10411,6 +12192,9 @@ abstract class _$UserStore extends GeneratedDatabase {
     actionItems,
     tags,
     entityTags,
+    notebooks,
+    notebookPages,
+    notebookPageRevisions,
   ];
 }
 
@@ -15609,6 +17393,889 @@ typedef $$EntityTagsTableProcessedTableManager =
       EntityTag,
       PrefetchHooks Function()
     >;
+typedef $$NotebooksTableCreateCompanionBuilder =
+    NotebooksCompanion Function({
+      required String id,
+      required int createdAt,
+      required int updatedAt,
+      required String deviceId,
+      Value<bool> deleted,
+      required String title,
+      Value<String?> colorHex,
+      Value<String?> iconKey,
+      Value<bool> pinned,
+      Value<int> rowid,
+    });
+typedef $$NotebooksTableUpdateCompanionBuilder =
+    NotebooksCompanion Function({
+      Value<String> id,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<String> deviceId,
+      Value<bool> deleted,
+      Value<String> title,
+      Value<String?> colorHex,
+      Value<String?> iconKey,
+      Value<bool> pinned,
+      Value<int> rowid,
+    });
+
+class $$NotebooksTableFilterComposer
+    extends Composer<_$UserStore, $NotebooksTable> {
+  $$NotebooksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get iconKey => $composableBuilder(
+    column: $table.iconKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get pinned => $composableBuilder(
+    column: $table.pinned,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NotebooksTableOrderingComposer
+    extends Composer<_$UserStore, $NotebooksTable> {
+  $$NotebooksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get iconKey => $composableBuilder(
+    column: $table.iconKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get pinned => $composableBuilder(
+    column: $table.pinned,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NotebooksTableAnnotationComposer
+    extends Composer<_$UserStore, $NotebooksTable> {
+  $$NotebooksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get colorHex =>
+      $composableBuilder(column: $table.colorHex, builder: (column) => column);
+
+  GeneratedColumn<String> get iconKey =>
+      $composableBuilder(column: $table.iconKey, builder: (column) => column);
+
+  GeneratedColumn<bool> get pinned =>
+      $composableBuilder(column: $table.pinned, builder: (column) => column);
+}
+
+class $$NotebooksTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $NotebooksTable,
+          Notebook,
+          $$NotebooksTableFilterComposer,
+          $$NotebooksTableOrderingComposer,
+          $$NotebooksTableAnnotationComposer,
+          $$NotebooksTableCreateCompanionBuilder,
+          $$NotebooksTableUpdateCompanionBuilder,
+          (Notebook, BaseReferences<_$UserStore, $NotebooksTable, Notebook>),
+          Notebook,
+          PrefetchHooks Function()
+        > {
+  $$NotebooksTableTableManager(_$UserStore db, $NotebooksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotebooksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NotebooksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NotebooksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> colorHex = const Value.absent(),
+                Value<String?> iconKey = const Value.absent(),
+                Value<bool> pinned = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotebooksCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                title: title,
+                colorHex: colorHex,
+                iconKey: iconKey,
+                pinned: pinned,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int createdAt,
+                required int updatedAt,
+                required String deviceId,
+                Value<bool> deleted = const Value.absent(),
+                required String title,
+                Value<String?> colorHex = const Value.absent(),
+                Value<String?> iconKey = const Value.absent(),
+                Value<bool> pinned = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotebooksCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                title: title,
+                colorHex: colorHex,
+                iconKey: iconKey,
+                pinned: pinned,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NotebooksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $NotebooksTable,
+      Notebook,
+      $$NotebooksTableFilterComposer,
+      $$NotebooksTableOrderingComposer,
+      $$NotebooksTableAnnotationComposer,
+      $$NotebooksTableCreateCompanionBuilder,
+      $$NotebooksTableUpdateCompanionBuilder,
+      (Notebook, BaseReferences<_$UserStore, $NotebooksTable, Notebook>),
+      Notebook,
+      PrefetchHooks Function()
+    >;
+typedef $$NotebookPagesTableCreateCompanionBuilder =
+    NotebookPagesCompanion Function({
+      required String id,
+      required int createdAt,
+      required int updatedAt,
+      required String deviceId,
+      Value<bool> deleted,
+      required String notebookId,
+      required String title,
+      required String content,
+      Value<String?> contentPlain,
+      Value<int> position,
+      Value<int> rowid,
+    });
+typedef $$NotebookPagesTableUpdateCompanionBuilder =
+    NotebookPagesCompanion Function({
+      Value<String> id,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<String> deviceId,
+      Value<bool> deleted,
+      Value<String> notebookId,
+      Value<String> title,
+      Value<String> content,
+      Value<String?> contentPlain,
+      Value<int> position,
+      Value<int> rowid,
+    });
+
+class $$NotebookPagesTableFilterComposer
+    extends Composer<_$UserStore, $NotebookPagesTable> {
+  $$NotebookPagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notebookId => $composableBuilder(
+    column: $table.notebookId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contentPlain => $composableBuilder(
+    column: $table.contentPlain,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NotebookPagesTableOrderingComposer
+    extends Composer<_$UserStore, $NotebookPagesTable> {
+  $$NotebookPagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notebookId => $composableBuilder(
+    column: $table.notebookId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contentPlain => $composableBuilder(
+    column: $table.contentPlain,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NotebookPagesTableAnnotationComposer
+    extends Composer<_$UserStore, $NotebookPagesTable> {
+  $$NotebookPagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get notebookId => $composableBuilder(
+    column: $table.notebookId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<String> get contentPlain => $composableBuilder(
+    column: $table.contentPlain,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$NotebookPagesTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $NotebookPagesTable,
+          NotebookPage,
+          $$NotebookPagesTableFilterComposer,
+          $$NotebookPagesTableOrderingComposer,
+          $$NotebookPagesTableAnnotationComposer,
+          $$NotebookPagesTableCreateCompanionBuilder,
+          $$NotebookPagesTableUpdateCompanionBuilder,
+          (
+            NotebookPage,
+            BaseReferences<_$UserStore, $NotebookPagesTable, NotebookPage>,
+          ),
+          NotebookPage,
+          PrefetchHooks Function()
+        > {
+  $$NotebookPagesTableTableManager(_$UserStore db, $NotebookPagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotebookPagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NotebookPagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NotebookPagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<String> notebookId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<String?> contentPlain = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotebookPagesCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                notebookId: notebookId,
+                title: title,
+                content: content,
+                contentPlain: contentPlain,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int createdAt,
+                required int updatedAt,
+                required String deviceId,
+                Value<bool> deleted = const Value.absent(),
+                required String notebookId,
+                required String title,
+                required String content,
+                Value<String?> contentPlain = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotebookPagesCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                notebookId: notebookId,
+                title: title,
+                content: content,
+                contentPlain: contentPlain,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NotebookPagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $NotebookPagesTable,
+      NotebookPage,
+      $$NotebookPagesTableFilterComposer,
+      $$NotebookPagesTableOrderingComposer,
+      $$NotebookPagesTableAnnotationComposer,
+      $$NotebookPagesTableCreateCompanionBuilder,
+      $$NotebookPagesTableUpdateCompanionBuilder,
+      (
+        NotebookPage,
+        BaseReferences<_$UserStore, $NotebookPagesTable, NotebookPage>,
+      ),
+      NotebookPage,
+      PrefetchHooks Function()
+    >;
+typedef $$NotebookPageRevisionsTableCreateCompanionBuilder =
+    NotebookPageRevisionsCompanion Function({
+      required String id,
+      required int updatedAt,
+      required String deviceId,
+      Value<bool> deleted,
+      required String pageId,
+      required int createdAt,
+      required String title,
+      required String content,
+      Value<String?> label,
+      required String kind,
+      Value<int> rowid,
+    });
+typedef $$NotebookPageRevisionsTableUpdateCompanionBuilder =
+    NotebookPageRevisionsCompanion Function({
+      Value<String> id,
+      Value<int> updatedAt,
+      Value<String> deviceId,
+      Value<bool> deleted,
+      Value<String> pageId,
+      Value<int> createdAt,
+      Value<String> title,
+      Value<String> content,
+      Value<String?> label,
+      Value<String> kind,
+      Value<int> rowid,
+    });
+
+class $$NotebookPageRevisionsTableFilterComposer
+    extends Composer<_$UserStore, $NotebookPageRevisionsTable> {
+  $$NotebookPageRevisionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pageId => $composableBuilder(
+    column: $table.pageId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NotebookPageRevisionsTableOrderingComposer
+    extends Composer<_$UserStore, $NotebookPageRevisionsTable> {
+  $$NotebookPageRevisionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pageId => $composableBuilder(
+    column: $table.pageId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NotebookPageRevisionsTableAnnotationComposer
+    extends Composer<_$UserStore, $NotebookPageRevisionsTable> {
+  $$NotebookPageRevisionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get pageId =>
+      $composableBuilder(column: $table.pageId, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+}
+
+class $$NotebookPageRevisionsTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $NotebookPageRevisionsTable,
+          NotebookPageRevision,
+          $$NotebookPageRevisionsTableFilterComposer,
+          $$NotebookPageRevisionsTableOrderingComposer,
+          $$NotebookPageRevisionsTableAnnotationComposer,
+          $$NotebookPageRevisionsTableCreateCompanionBuilder,
+          $$NotebookPageRevisionsTableUpdateCompanionBuilder,
+          (
+            NotebookPageRevision,
+            BaseReferences<
+              _$UserStore,
+              $NotebookPageRevisionsTable,
+              NotebookPageRevision
+            >,
+          ),
+          NotebookPageRevision,
+          PrefetchHooks Function()
+        > {
+  $$NotebookPageRevisionsTableTableManager(
+    _$UserStore db,
+    $NotebookPageRevisionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotebookPageRevisionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$NotebookPageRevisionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$NotebookPageRevisionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<String> pageId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<String?> label = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotebookPageRevisionsCompanion(
+                id: id,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                pageId: pageId,
+                createdAt: createdAt,
+                title: title,
+                content: content,
+                label: label,
+                kind: kind,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int updatedAt,
+                required String deviceId,
+                Value<bool> deleted = const Value.absent(),
+                required String pageId,
+                required int createdAt,
+                required String title,
+                required String content,
+                Value<String?> label = const Value.absent(),
+                required String kind,
+                Value<int> rowid = const Value.absent(),
+              }) => NotebookPageRevisionsCompanion.insert(
+                id: id,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                pageId: pageId,
+                createdAt: createdAt,
+                title: title,
+                content: content,
+                label: label,
+                kind: kind,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NotebookPageRevisionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $NotebookPageRevisionsTable,
+      NotebookPageRevision,
+      $$NotebookPageRevisionsTableFilterComposer,
+      $$NotebookPageRevisionsTableOrderingComposer,
+      $$NotebookPageRevisionsTableAnnotationComposer,
+      $$NotebookPageRevisionsTableCreateCompanionBuilder,
+      $$NotebookPageRevisionsTableUpdateCompanionBuilder,
+      (
+        NotebookPageRevision,
+        BaseReferences<
+          _$UserStore,
+          $NotebookPageRevisionsTable,
+          NotebookPageRevision
+        >,
+      ),
+      NotebookPageRevision,
+      PrefetchHooks Function()
+    >;
 
 class $UserStoreManager {
   final _$UserStore _db;
@@ -15652,4 +18319,10 @@ class $UserStoreManager {
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$EntityTagsTableTableManager get entityTags =>
       $$EntityTagsTableTableManager(_db, _db.entityTags);
+  $$NotebooksTableTableManager get notebooks =>
+      $$NotebooksTableTableManager(_db, _db.notebooks);
+  $$NotebookPagesTableTableManager get notebookPages =>
+      $$NotebookPagesTableTableManager(_db, _db.notebookPages);
+  $$NotebookPageRevisionsTableTableManager get notebookPageRevisions =>
+      $$NotebookPageRevisionsTableTableManager(_db, _db.notebookPageRevisions);
 }

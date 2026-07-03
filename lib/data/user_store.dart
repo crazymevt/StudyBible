@@ -31,13 +31,16 @@ part 'user_store.g.dart';
     ActionItems,
     Tags,
     EntityTags,
+    Notebooks,
+    NotebookPages,
+    NotebookPageRevisions,
   ],
 )
 class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 24;
+  int get schemaVersion => 25;
 
   @override
   MigrationStrategy get migration {
@@ -600,6 +603,16 @@ class UserStore extends _$UserStore {
           // safe); not FTS-indexed.
           await m.createTable(readingPositions);
         }
+        if (from < 25) {
+          // Notebooks tool: folders of rich-text pages. New tables only (drift
+          // emits CREATE TABLE IF NOT EXISTS, so a re-run after a rolled-back
+          // attempt is safe). Reinstall the FTS triggers so notebook_pages gets
+          // its maintenance triggers (the config below now includes it).
+          await m.createTable(notebooks);
+          await m.createTable(notebookPages);
+          await m.createTable(notebookPageRevisions);
+          await _installSearchTriggers();
+        }
       },
     );
   }
@@ -631,6 +644,17 @@ class UserStore extends _$UserStore {
     }
   }
 
+  /// Whether a table currently exists. Used by the FTS helpers so they can be
+  /// safely called from older migration heal steps that run before a
+  /// newer-schema table (e.g. notebook_pages) has been created.
+  Future<bool> _tableExists(String name) async {
+    final rows = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+      variables: [Variable.withString(name)],
+    ).get();
+    return rows.isNotEmpty;
+  }
+
   /// (Re)installs the FTS maintenance triggers for the user-content tables in
   /// their robust form: every INSERT/UPDATE first clears any stale index row
   /// for the id, then re-indexes only when the row is live. The unconditional
@@ -651,11 +675,22 @@ class UserStore extends _$UserStore {
         "new.title || ' ' || COALESCE(new.content_plain, '')",
       ],
       ['prayer', 'prayers', "new.name || ' ' || new.description"],
+      [
+        'notebookPage',
+        'notebook_pages',
+        "new.title || ' ' || COALESCE(new.content_plain, '')",
+      ],
     ];
     for (final c in configs) {
       final type = c[0];
       final table = c[1];
       final expr = c[2];
+      // This helper reflects the *current* schema, but it is also called from
+      // older heal blocks (e.g. from < 17) that run before newer tables like
+      // notebook_pages exist. Creating a trigger on a missing table throws, so
+      // skip any config whose table isn't present yet — the later migration
+      // block that creates the table calls this helper again.
+      if (!await _tableExists(table)) continue;
       // Drop every prior variant, including the v14-v16 *_soft_delete_au helpers.
       await customStatement('DROP TRIGGER IF EXISTS ${table}_ai;');
       await customStatement('DROP TRIGGER IF EXISTS ${table}_au;');
@@ -701,6 +736,14 @@ class UserStore extends _$UserStore {
     await customStatement(
       "INSERT INTO user_search(type, reference_id, text_content) SELECT 'prayer', id, name || ' ' || description FROM prayers WHERE deleted = 0;",
     );
+    // notebook_pages is created in the v25 block; this rebuild also runs from
+    // the v17 heal step, before that table exists — guard it (see
+    // _installSearchTriggers).
+    if (await _tableExists('notebook_pages')) {
+      await customStatement(
+        "INSERT INTO user_search(type, reference_id, text_content) SELECT 'notebookPage', id, title || ' ' || COALESCE(content_plain, '') FROM notebook_pages WHERE deleted = 0;",
+      );
+    }
     // Restore tag rows, which share (type, reference_id) with their content row.
     await customStatement('''
       INSERT INTO user_search(type, reference_id, text_content)

@@ -12,9 +12,10 @@ import '../user_store.dart';
 import '../logging.dart';
 import 'print_service.dart';
 import 'document_pdf.dart';
+import 'delta_markdown.dart';
 import 'dart:io';
 
-enum ExportFormat { pdf, html, text }
+enum ExportFormat { pdf, html, text, markdown }
 enum ExportAction { save, share, print }
 
 class SermonExporter {
@@ -58,6 +59,11 @@ class SermonExporter {
             bytes = await _generateText([sermon]);
             filename = '${sermon.title}.txt';
             mimeType = 'text/plain';
+            break;
+          case ExportFormat.markdown:
+            bytes = await _generateMarkdown([sermon]);
+            filename = '${sermon.title}.md';
+            mimeType = 'text/markdown';
             break;
         }
       }
@@ -110,8 +116,12 @@ class SermonExporter {
           fileBytes = await _generateText([sermon]);
           ext = '.txt';
           break;
+        case ExportFormat.markdown:
+          fileBytes = await _generateMarkdown([sermon]);
+          ext = '.md';
+          break;
       }
-      
+
       final safeTitle = sermon.title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
       archive.addFile(ArchiveFile('$safeTitle$ext', fileBytes.length, fileBytes));
     }
@@ -212,6 +222,27 @@ class SermonExporter {
       }
     }
 
+    return Uint8List.fromList(utf8.encode(buffer.toString()));
+  }
+
+  static Future<Uint8List> _generateMarkdown(List<Sermon> sermons) async {
+    final buffer = StringBuffer();
+    for (final sermon in sermons) {
+      buffer.writeln('# ${sermon.title}');
+      if (sermon.series != null && sermon.series!.isNotEmpty) {
+        buffer.writeln('*${sermon.series}*');
+      }
+      buffer.writeln();
+      try {
+        buffer.writeln(deltaToMarkdown(jsonDecode(sermon.content) as List));
+      } catch (e, stack) {
+        logError(e, stack, context: 'SermonExporter._generateMarkdown parse');
+        buffer.writeln(sermon.content);
+      }
+      if (sermon != sermons.last) {
+        buffer.writeln('\n---\n');
+      }
+    }
     return Uint8List.fromList(utf8.encode(buffer.toString()));
   }
 

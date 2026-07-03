@@ -7,6 +7,7 @@ import '../../app/content_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
 import '../../app/sermon_providers.dart';
+import '../../app/notebook_providers.dart';
 import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
 import 'notes_panel.dart';
@@ -16,6 +17,7 @@ import '../../app/topic_providers.dart';
 import '../../app/people_providers.dart';
 import '../../app/user_providers.dart';
 import '../sermons/sermon_editor_screen.dart';
+import '../notebooks/notebook_page_editor_screen.dart';
 import '../tags/tags_tab_view.dart';
 import '../journals/journals_list_panel.dart';
 import '../journals/journal_editor_panel.dart';
@@ -363,6 +365,21 @@ class SearchResultsList extends ConsumerWidget {
               } else {
                 ref.read(selectedSermonIdProvider.notifier).set(item.referenceId);
                 ref.read(activeToolProvider.notifier).setTool(ActiveTool.sermons);
+              }
+            } else if (item.type == 'notebookPage') {
+              if (MediaQuery.sizeOf(context).width <= Breakpoints.compact) {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => NotebookPageEditorScreen(
+                      pageId: item.referenceId, isFullScreen: true),
+                ));
+              } else {
+                ref
+                    .read(selectedNotebookPageIdProvider.notifier)
+                    .set(item.referenceId);
+                ref
+                    .read(activeToolProvider.notifier)
+                    .setTool(ActiveTool.notebooks);
               }
             } else if (item.type == 'dictionary') {
               ref

@@ -137,6 +137,13 @@ class SyncService {
       final localSermonRevisions = await _store
           .select(_store.sermonRevisions)
           .get();
+      final localNotebooks = await _store.select(_store.notebooks).get();
+      final localNotebookPages = await _store
+          .select(_store.notebookPages)
+          .get();
+      final localNotebookPageRevisions = await _store
+          .select(_store.notebookPageRevisions)
+          .get();
       final localPrayers = await _store.select(_store.prayers).get();
       final localActionItems = await _store.select(_store.actionItems).get();
       final localReadingprogresses = await _store
@@ -281,6 +288,62 @@ class SyncService {
               'createdAt': item.createdAt,
               'title': item.title,
               'series': item.series,
+              'content': item.content,
+              'label': item.label,
+              'kind': item.kind,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        localNotebooks.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'notebook',
+              'createdAt': item.createdAt,
+              'title': item.title,
+              'colorHex': item.colorHex,
+              'iconKey': item.iconKey,
+              'pinned': item.pinned,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        localNotebookPages.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'notebookPage',
+              'createdAt': item.createdAt,
+              'notebookId': item.notebookId,
+              'title': item.title,
+              // contentPlain is derived on download, so it's omitted here.
+              'content': item.content,
+              'position': item.position,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        localNotebookPageRevisions.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'notebookPageRevision',
+              'pageId': item.pageId,
+              'createdAt': item.createdAt,
+              'title': item.title,
               'content': item.content,
               'label': item.label,
               'kind': item.kind,
@@ -502,6 +565,7 @@ class SyncService {
       // prune those snapshots after the transaction.
       final conflictedSermonIds = <String>{};
       final conflictedJournalIds = <String>{};
+      final conflictedNotebookPageIds = <String>{};
       await _store.transaction(() async {
         for (final rec in merged) {
           final type = rec.payload['type'] as String?;
@@ -681,6 +745,90 @@ class SyncService {
             );
             await _store
                 .into(_store.sermonRevisions)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'notebook') {
+            final item = Notebook(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+              title: rec.payload['title'] as String,
+              colorHex: rec.payload['colorHex'] as String?,
+              iconKey: rec.payload['iconKey'] as String?,
+              pinned: (rec.payload['pinned'] as bool?) ?? false,
+            );
+            await _store
+                .into(_store.notebooks)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'notebookPage') {
+            final content = rec.payload['content'] as String;
+            // Same conflict failsafe as sermons: snapshot the local losing
+            // content before a cross-device version overwrites it.
+            final localPage = await (_store.select(
+              _store.notebookPages,
+            )..where((t) => t.id.equals(rec.id))).getSingleOrNull();
+            if (localPage != null &&
+                !localPage.deleted &&
+                localPage.content != content) {
+              final already =
+                  await (_store.select(_store.notebookPageRevisions)..where(
+                        (t) =>
+                            t.pageId.equals(rec.id) &
+                            t.deleted.equals(false) &
+                            t.content.equals(localPage.content),
+                      ))
+                      .getSingleOrNull();
+              if (already == null) {
+                await _store
+                    .into(_store.notebookPageRevisions)
+                    .insert(
+                      NotebookPageRevisionsCompanion.insert(
+                        id: const Uuid().v4(),
+                        updatedAt: DateTime.now().millisecondsSinceEpoch,
+                        deviceId: deviceId,
+                        createdAt: localPage.updatedAt,
+                        pageId: rec.id,
+                        title: localPage.title,
+                        content: localPage.content,
+                        label: const Value('Overwritten by another device'),
+                        kind: RevisionKind.conflict,
+                      ),
+                    );
+                conflictedNotebookPageIds.add(rec.id);
+              }
+            }
+            final item = NotebookPage(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+              notebookId: rec.payload['notebookId'] as String,
+              title: rec.payload['title'] as String,
+              content: content,
+              // content_plain is derived; recompute it locally for FTS.
+              contentPlain: deltaToPlainText(content),
+              position: (rec.payload['position'] as num?)?.toInt() ?? 0,
+            );
+            await _store
+                .into(_store.notebookPages)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'notebookPageRevision') {
+            final item = NotebookPageRevision(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              pageId: rec.payload['pageId'] as String,
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+              title: rec.payload['title'] as String,
+              content: rec.payload['content'] as String,
+              label: rec.payload['label'] as String?,
+              kind: rec.payload['kind'] as String,
+            );
+            await _store
+                .into(_store.notebookPageRevisions)
                 .insert(item, mode: InsertMode.replace);
           } else if (type == 'journalRevision') {
             final item = JournalRevision(
@@ -913,6 +1061,31 @@ class SyncService {
             _store.journalRevisions,
           )..where((t) => t.id.equals(stale.id))).write(
             JournalRevisionsCompanion(
+              deleted: const Value(true),
+              updatedAt: Value(pruneTs),
+            ),
+          );
+        }
+      }
+
+      for (final pageId in conflictedNotebookPageIds) {
+        final auto =
+            await (_store.select(_store.notebookPageRevisions)
+                  ..where(
+                    (t) =>
+                        t.pageId.equals(pageId) &
+                        t.deleted.equals(false) &
+                        t.kind.equals(RevisionKind.manual).not(),
+                  )
+                  ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+                .get();
+        if (auto.length <= kMaxAutoRevisions) continue;
+        final pruneTs = DateTime.now().millisecondsSinceEpoch;
+        for (final stale in auto.skip(kMaxAutoRevisions)) {
+          await (_store.update(
+            _store.notebookPageRevisions,
+          )..where((t) => t.id.equals(stale.id))).write(
+            NotebookPageRevisionsCompanion(
               deleted: const Value(true),
               updatedAt: Value(pruneTs),
             ),

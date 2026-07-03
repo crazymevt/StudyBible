@@ -407,12 +407,14 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
       n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses, n.deleted as note_deleted,
       s.title as sermon_title, s.series as sermon_series, s.deleted as sermon_deleted,
       j.title as journal_title, j.deleted as journal_deleted,
-      p.name as prayer_name, p.deleted as prayer_deleted
+      p.name as prayer_name, p.deleted as prayer_deleted,
+      np.title as page_title, np.deleted as page_deleted
     FROM user_search f
     LEFT JOIN notes n ON f.type = 'note' AND f.reference_id = n.id
     LEFT JOIN sermons s ON f.type = 'sermon' AND f.reference_id = s.id
     LEFT JOIN journals j ON f.type = 'journal' AND f.reference_id = j.id
     LEFT JOIN prayers p ON f.type = 'prayer' AND f.reference_id = p.id
+    LEFT JOIN notebook_pages np ON f.type = 'notebookPage' AND f.reference_id = np.id
     WHERE user_search MATCH ?
     ORDER BY rank
     LIMIT 100
@@ -523,6 +525,19 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
               referenceId: refId,
               textContent: text.trim(),
               title: 'Sermon: $displayTitle',
+            ),
+          );
+        } else if (type == 'notebookPage') {
+          final isDeleted = row.readNullable<bool>('page_deleted') ?? false;
+          if (isDeleted) continue;
+          final pgTitle =
+              row.readNullable<String>('page_title') ?? 'Notebook Page';
+          results.add(
+            SearchResult(
+              type: type,
+              referenceId: refId,
+              textContent: text.trim(),
+              title: 'Notebook: $pgTitle',
             ),
           );
         }

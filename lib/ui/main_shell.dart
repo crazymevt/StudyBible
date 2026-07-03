@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/app_state.dart';
 import '../app/auto_sync.dart';
 import '../app/sermon_providers.dart';
+import '../app/notebook_providers.dart';
 import 'reader/reader_screen.dart';
 import 'reader/cross_reference_panel.dart';
 import 'reader/commentary_panel.dart';
@@ -19,6 +20,7 @@ import 'reader/people_panel.dart';
 import 'reader/highlights_panel.dart';
 import 'reader/scratch_panel.dart';
 import '../ui/sermons/sermons_panel.dart';
+import '../ui/notebooks/notebooks_panel.dart';
 import '../app/reader_state.dart';
 import 'journals/journals_prayers_screen.dart';
 import 'dashboard/dashboard_screen.dart';
@@ -227,6 +229,17 @@ class _MainShellState extends ConsumerState<MainShell> {
         ref.read(selectedSermonIdProvider.notifier).set(null);
         return;
       }
+      // Notebooks nest one level deeper: page editor -> page list -> close.
+      if (tool == ActiveTool.notebooks) {
+        if (ref.read(selectedNotebookPageIdProvider) != null) {
+          ref.read(selectedNotebookPageIdProvider.notifier).set(null);
+          return;
+        }
+        if (ref.read(selectedNotebookIdProvider) != null) {
+          ref.read(selectedNotebookIdProvider.notifier).set(null);
+          return;
+        }
+      }
       if (tool == ActiveTool.devotionals &&
           ref.read(selectedDevotionalIdProvider) != null) {
         ref.read(selectedDevotionalIdProvider.notifier).set(null);
@@ -274,6 +287,9 @@ class _DesktopLayout extends ConsumerWidget {
                   }
                   if (activeTool == ActiveTool.sermons) {
                     return const SermonsPanel();
+                  }
+                  if (activeTool == ActiveTool.notebooks) {
+                    return const NotebooksPanel();
                   }
                   if (activeTool == ActiveTool.crossReference) {
                     return const CrossReferencePanel();
