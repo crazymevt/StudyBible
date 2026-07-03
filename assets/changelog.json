@@ -1,5 +1,16 @@
 [
   {
+    "version": "26.7.3+4",
+    "date": "2026-07-03",
+    "features": [
+      {
+        "title": "Minor bug fixes and improvements.",
+        "description": "",
+        "icon": "new_releases"
+      }
+    ]
+  },
+  {
     "version": "26.7.3+3",
     "date": "2026-07-03",
     "features": [
