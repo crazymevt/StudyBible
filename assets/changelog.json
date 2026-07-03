@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.7.3+1",
+    "date": "2026-07-03",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "stop a false journal sync-conflict when opening an entry cold",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "tags join the Explorer — tag pages, search, and Your-tags cards",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "show dictionary definitions on Explorer place and topic pages",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.2+5",
     "date": "2026-07-02",
     "features": [
