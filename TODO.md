@@ -20,6 +20,8 @@ Running list of known issues and follow-ups.
 
 ## Research
 
+- [ ] **Media Attachments.** Research the ability to upload and tag images and possibly PDFs that can be shown within the app. Crucially, these attachments must be included in the app's backup/restore functionality.
+
 - [ ] **Interactive Atlas / Geographic Tracker** (Advanced Map Tool)
   - *Context:* The app currently has a `PlacesPanel` (`lib/ui/reader/places_panel.dart`) that uses `flutter_map` and OpenBible data to plot places for the active chapter.
   - *Next Steps:* To elevate this to an advanced study tool, build a dedicated, full-screen interactive Atlas. It should allow tracking sequential events (like Paul's missionary journeys or David's flight) step-by-step, drawing animated paths between locations.
