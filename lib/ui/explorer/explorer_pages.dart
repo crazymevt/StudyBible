@@ -615,6 +615,17 @@ class _PassagePage extends ConsumerWidget {
             .asData
             ?.value ??
         const <ExplorerCommentarySection>[];
+    final crossRefGroups = ref
+            .watch(explorerPassageCrossReferencesProvider(
+                (book: book, chapter: chapter)))
+            .asData
+            ?.value ??
+        const <ExplorerCrossRefGroup>[];
+    final passageSermons = ref
+            .watch(explorerPassageSermonsProvider((book: book, chapter: chapter)))
+            .asData
+            ?.value ??
+        const <SearchResult>[];
     final notes = ref
             .watch(
                 chapterNotesFamilyProvider((bookName: book, chapter: chapter)))
@@ -650,6 +661,8 @@ class _PassagePage extends ConsumerWidget {
             ),
             if (d.isEmpty &&
                 commentaries.isEmpty &&
+                crossRefGroups.isEmpty &&
+                passageSermons.isEmpty &&
                 notes.isEmpty &&
                 passageTags.isEmpty &&
                 videoGroups.isEmpty &&
@@ -764,6 +777,29 @@ class _PassagePage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (crossRefGroups.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.compare_arrows_outlined,
+                title: 'Cross-references '
+                    '(${crossRefGroups.fold(0, (n, g) => n + g.refs.length)})',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final group in crossRefGroups)
+                      _CrossRefGroupTile(group: group),
+                  ],
+                ),
+              ),
+            if (passageSermons.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.co_present_outlined,
+                title: 'Your sermons (${passageSermons.length})',
+                child: Column(
+                  children: [
+                    for (final s in passageSermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
             if (notes.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.edit_note_outlined,
@@ -794,6 +830,51 @@ class _PassagePage extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// One source verse's cross-references, capped so a single heavily
+/// cross-referenced verse (common in Psalms/Gospels) can't dominate the card.
+class _CrossRefGroupTile extends StatelessWidget {
+  const _CrossRefGroupTile({required this.group});
+
+  final ExplorerCrossRefGroup group;
+
+  static const _maxShown = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    final shown = group.refs.take(_maxShown).toList();
+    final remaining = group.refs.length - shown.length;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('v. ${group.verse}',
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium
+                  ?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final xref in shown)
+                ExplorerVerseChip(
+                  book: xref.targetBookName,
+                  chapter: xref.targetChapter,
+                  verse: xref.targetVerse,
+                ),
+              if (remaining > 0)
+                Text('+$remaining more',
+                    style: Theme.of(context).textTheme.labelSmall),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

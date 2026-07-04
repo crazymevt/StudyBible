@@ -2,14 +2,17 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content_store.dart';
+import '../data/fts_text.dart';
 import '../data/user_store.dart';
 import '../domain/explorer/explorer_ref.dart';
+import '../domain/scripture/bible_reference_scanner.dart';
 import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
 import 'people_providers.dart';
 import 'place_providers.dart';
 import 'reader_state.dart';
 import 'search_providers.dart';
+import 'sermon_providers.dart';
 import 'tag_providers.dart';
 import 'topic_providers.dart';
 import 'user_providers.dart';
@@ -614,6 +617,74 @@ final explorerPassageCommentariesProvider = FutureProvider.family<
     ];
   },
 );
+
+/// A chapter's cross-references from one source verse, target-votes desc.
+class ExplorerCrossRefGroup {
+  final int verse;
+  final List<CrossReference> refs;
+  ExplorerCrossRefGroup(this.verse, this.refs);
+}
+
+/// Chapter cross-references across the whole `cross_references` dataset,
+/// grouped by source verse. The reader's Cross-References panel queries one
+/// verse at a time (on tap); this aggregates every verse in the chapter for
+/// the passage page.
+final explorerPassageCrossReferencesProvider = FutureProvider.family<
+    List<ExplorerCrossRefGroup>, ({String book, int chapter})>((ref, loc) async {
+  final store = ref.watch(contentStoreProvider);
+  final rows = await (store.select(store.crossReferences)
+        ..where((c) =>
+            c.sourceBookName.equals(loc.book) &
+            c.sourceChapter.equals(loc.chapter))
+        ..orderBy([
+          (c) => OrderingTerm.asc(c.sourceVerse),
+          (c) => OrderingTerm(expression: c.votes, mode: OrderingMode.desc),
+        ]))
+      .get();
+  if (rows.isEmpty) return const [];
+
+  final byVerse = <int, List<CrossReference>>{};
+  for (final r in rows) {
+    byVerse.putIfAbsent(r.sourceVerse, () => []).add(r);
+  }
+  return [
+    for (final verse in byVerse.keys.toList()..sort())
+      ExplorerCrossRefGroup(verse, byVerse[verse]!),
+  ];
+});
+
+/// The user's own sermons whose scripture citations touch this chapter
+/// (a chapter- or range-citation counts if it spans the chapter, not just an
+/// exact verse match). Scans plain text with the same [BibleReferenceScanner]
+/// the "Navigate Scriptures" sermon route uses, since there's no persisted
+/// reference index to query instead.
+final explorerPassageSermonsProvider = FutureProvider.family<List<SearchResult>,
+    ({String book, int chapter})>((ref, loc) async {
+  final sermons = await ref.watch(allSermonsProvider.future);
+  if (sermons.isEmpty) return const [];
+  final versions = ref.watch(activeVersionsProvider);
+  if (versions.isEmpty) return const [];
+  final books = await ref.watch(booksForVersionProvider(versions.first).future);
+  if (books.isEmpty) return const [];
+
+  final matches = <SearchResult>[];
+  for (final s in sermons) {
+    final text = s.contentPlain ?? deltaToPlainText(s.content);
+    final touches = BibleReferenceScanner.scan(text, books).any((m) =>
+        m.book.name == loc.book &&
+        m.chapter <= loc.chapter &&
+        (m.endChapter ?? m.chapter) >= loc.chapter);
+    if (touches) {
+      matches.add(SearchResult(
+        type: 'sermon',
+        referenceId: s.id,
+        title: s.title,
+        textContent: '',
+      ));
+    }
+  }
+  return matches;
+});
 
 class ExplorerPassageOverview {
   final List<PersonInPassage> people;

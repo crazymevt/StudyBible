@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_bible/app/content_providers.dart';
 import 'package:study_bible/app/people_providers.dart';
 import 'package:study_bible/app/place_providers.dart';
+import 'package:study_bible/app/sermon_providers.dart';
 import 'package:study_bible/app/shared_prefs.dart';
 import 'package:study_bible/app/app_state.dart';
 import 'package:study_bible/app/reader_state.dart';
@@ -167,6 +168,41 @@ void main() {
           chapter: Value(24),
           createdAt: Value(0),
         ));
+
+    // Two cross-references from 1 Samuel 24:1, votes-descending, for the
+    // passage page's Cross-references card.
+    await store.into(store.crossReferences).insert(const CrossReferencesCompanion(
+          id: Value(1),
+          sourceBookName: Value('1 Samuel'),
+          sourceChapter: Value(24),
+          sourceVerse: Value(1),
+          targetBookName: Value('Genesis'),
+          targetChapter: Value(1),
+          targetVerse: Value(1),
+          votes: Value(3),
+        ));
+    await store.into(store.crossReferences).insert(const CrossReferencesCompanion(
+          id: Value(2),
+          sourceBookName: Value('1 Samuel'),
+          sourceChapter: Value(24),
+          sourceVerse: Value(1),
+          targetBookName: Value('Psalms'),
+          targetChapter: Value(57),
+          targetVerse: Value(1),
+          votes: Value(1),
+        ));
+
+    // A sermon citing the chapter, for the passage page's Your-sermons card.
+    await userStore.into(userStore.sermons).insert(const SermonsCompanion(
+          id: Value('sermon-1'),
+          createdAt: Value(0),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('Sparing an Enemy'),
+          content: Value(''),
+          contentPlain:
+              Value('Turn with me to 1 Samuel 24:1, David and Saul.'),
+        ));
   });
 
   tearDown(() async {
@@ -179,6 +215,10 @@ void main() {
     SharedPreferences.setMockInitialValues({
       'selectedBookName': '1 Samuel',
       'selectedChapter': 24,
+      // Matches the seeded KJV/1-Samuel book so the passage-sermons provider
+      // (which scans sermon text against booksForVersionProvider) resolves
+      // without waiting on the active-versions self-heal correction.
+      'activeVersions': ['KJV'],
     });
     final prefs = await SharedPreferences.getInstance();
     final container = ProviderContainer(overrides: [
@@ -259,6 +299,54 @@ void main() {
     expect(find.text('Verse 2'), findsOneWidget);
     expect(
         find.text('Saul chooses three thousand men.'), findsOneWidget);
+  });
+
+  testWidgets(
+      'passage page shows cross-references and sermons citing the chapter',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final container = await pump(tester);
+
+    await tester.tap(find.textContaining('Explore 1 Samuel 24'));
+    await tester.pumpAndSettle();
+
+    // Cross-references, grouped under their source verse and votes-ordered.
+    expect(find.text('Cross-references (2)'), findsOneWidget);
+    expect(find.text('v. 1'), findsOneWidget);
+    expect(find.text('Genesis 1:1'), findsOneWidget);
+    expect(find.text('Psalms 57:1'), findsOneWidget);
+
+    // The sermon citing this chapter.
+    expect(find.text('Your sermons (1)'), findsOneWidget);
+    expect(find.text('Sparing an Enemy'), findsOneWidget);
+
+    // Tapping a cross-reference chip jumps the reader to its target (this
+    // pops the Explorer route back to the shell, per explorerOpenVerseInReader,
+    // so it runs last).
+    await tester.tap(find.text('Genesis 1:1'));
+    await tester.pumpAndSettle();
+    expect(container.read(selectedBookNameProvider), 'Genesis');
+    expect(container.read(selectedChapterProvider), 1);
+  });
+
+  testWidgets('tapping a sermon on the passage page opens it in the reader',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final container = await pump(tester);
+
+    await tester.tap(find.textContaining('Explore 1 Samuel 24'));
+    await tester.pumpAndSettle();
+
+    // Tapping it opens the sermon in the reader's sermon tool (desktop path).
+    await tester.tap(find.text('Sparing an Enemy'));
+    await tester.pumpAndSettle();
+    expect(container.read(appModuleProvider), AppModule.reader);
+    expect(container.read(activeToolProvider), ActiveTool.sermons);
+    expect(container.read(selectedSermonIdProvider), 'sermon-1');
   });
 
   testWidgets(

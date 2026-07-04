@@ -9,6 +9,7 @@ import 'package:study_bible/app/content_providers.dart';
 import 'package:study_bible/app/explorer_providers.dart';
 import 'package:study_bible/app/people_providers.dart';
 import 'package:study_bible/app/place_providers.dart';
+import 'package:study_bible/app/search_providers.dart';
 import 'package:study_bible/app/shared_prefs.dart';
 import 'package:study_bible/app/topic_providers.dart';
 import 'package:study_bible/app/user_providers.dart';
@@ -148,6 +149,25 @@ void main() {
     await commentaryEntry(2, 1, '1 Samuel', 24, 1, 'On verse one');
     await commentaryEntry(3, 2, 'Genesis', 1, 1, 'Elsewhere');
 
+    // Cross-references: two from 1 Samuel 24:1 (vote-ordered), one from
+    // 24:2, one from an unrelated chapter (scoping check).
+    Future<void> xref(int id, String srcBook, int srcCh, int srcV,
+            String tgtBook, int tgtCh, int tgtV, int? votes) =>
+        store.into(store.crossReferences).insert(CrossReferencesCompanion(
+              id: Value(id),
+              sourceBookName: Value(srcBook),
+              sourceChapter: Value(srcCh),
+              sourceVerse: Value(srcV),
+              targetBookName: Value(tgtBook),
+              targetChapter: Value(tgtCh),
+              targetVerse: Value(tgtV),
+              votes: Value(votes),
+            ));
+    await xref(1, '1 Samuel', 24, 1, 'Psalms', 57, 1, 2);
+    await xref(2, '1 Samuel', 24, 1, 'Genesis', 1, 1, 5);
+    await xref(3, '1 Samuel', 24, 2, 'Psalms', 57, 1, null);
+    await xref(4, 'Genesis', 1, 1, '1 Samuel', 24, 1, null);
+
     // Dictionary: Easton's, keyed by headword. Powers the place/topic
     // dictionary card. "Caves" matches the CAVES topic case-insensitively;
     // "Ziph" tests parenthetical-qualifier stripping.
@@ -249,6 +269,27 @@ void main() {
           title: Value('On Caves'),
           content: Value(''),
         ));
+    // Cites 1 Samuel 24 — should show up on that chapter's passage page.
+    await userStore.into(userStore.sermons).insert(const SermonsCompanion(
+          id: Value('sermon-2'),
+          createdAt: Value(0),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('Sparing an Enemy'),
+          content: Value(''),
+          contentPlain:
+              Value('Turn with me to 1 Samuel 24:1, David and Saul.'),
+        ));
+    // Cites Psalms 57 only — proves passage-sermon matching is chapter-scoped.
+    await userStore.into(userStore.sermons).insert(const SermonsCompanion(
+          id: Value('sermon-3'),
+          createdAt: Value(0),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('A Psalm of Refuge'),
+          content: Value(''),
+          contentPlain: Value("Let's look at Psalms 57 today."),
+        ));
     await userStore.into(userStore.journals).insert(const JournalsCompanion(
           id: Value('journal-1'),
           updatedAt: Value(0),
@@ -266,7 +307,14 @@ void main() {
           createdAt: Value(0),
         ));
 
-    SharedPreferences.setMockInitialValues({});
+    // Pins the reader's active version to the one seeded above so the
+    // passage-sermons provider (which resolves references against
+    // booksForVersionProvider(activeVersionsProvider.first)) doesn't have to
+    // wait on the self-heal listener that otherwise corrects a mismatched
+    // default (see the "universal search" group below for the same gotcha).
+    SharedPreferences.setMockInitialValues({
+      'activeVersions': ['KJV'],
+    });
     final prefs = await SharedPreferences.getInstance();
 
     container = ProviderContainer(overrides: [
@@ -401,6 +449,61 @@ void main() {
           explorerPassageCommentariesProvider((book: 'Obadiah', chapter: 1))
               .future);
       expect(sections, isEmpty);
+    });
+  });
+
+  group('passage cross-references', () {
+    test('groups by source verse, votes-descending within a verse, '
+        'scoped to the chapter', () async {
+      final groups = await container.read(
+          explorerPassageCrossReferencesProvider(
+              (book: '1 Samuel', chapter: 24)).future);
+      expect(groups.map((g) => g.verse).toList(), [1, 2]);
+      expect(
+          groups[0].refs.map((r) => '${r.targetBookName} ${r.votes}').toList(),
+          ['Genesis 5', 'Psalms 2']);
+      expect(groups[1].refs.single.targetBookName, 'Psalms');
+    });
+
+    test('chapter without cross-references returns empty', () async {
+      final groups = await container.read(
+          explorerPassageCrossReferencesProvider((book: 'Obadiah', chapter: 1))
+              .future);
+      expect(groups, isEmpty);
+    });
+  });
+
+  group('passage sermons', () {
+    // explorerPassageSermonsProvider watches allSermonsProvider, a plain
+    // StreamProvider backed by a Drift .watch() query — reading its .future
+    // cold (no active listener) never resolves, so every test in this group
+    // holds a throwaway listen for the duration of the read (same fix as the
+    // "universal search" group above).
+    Future<List<SearchResult>> sermonsFor(String book, int chapter) async {
+      final provider =
+          explorerPassageSermonsProvider((book: book, chapter: chapter));
+      final sub = container.listen(provider, (_, _) {});
+      try {
+        return await container.read(provider.future);
+      } finally {
+        sub.close();
+      }
+    }
+
+    test('sermon citing the chapter is included', () async {
+      final results = await sermonsFor('1 Samuel', 24);
+      expect(results.map((r) => r.title).toList(), ['Sparing an Enemy']);
+      expect(results.single.type, 'sermon');
+      expect(results.single.referenceId, 'sermon-2');
+    });
+
+    test('sermon citing a different chapter is excluded', () async {
+      final results = await sermonsFor('Psalms', 57);
+      expect(results.map((r) => r.title).toList(), ['A Psalm of Refuge']);
+    });
+
+    test('chapter with no citing sermon returns empty', () async {
+      expect(await sermonsFor('Obadiah', 1), isEmpty);
     });
   });
 

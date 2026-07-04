@@ -8650,6 +8650,10 @@ abstract class _$ContentStore extends GeneratedDatabase {
   late final $EventParticipantsTable eventParticipants =
       $EventParticipantsTable(this);
   late final $EventVersesTable eventVerses = $EventVersesTable(this);
+  late final Index idxCrossReferencesSource = Index(
+    'idx_cross_references_source',
+    'CREATE INDEX idx_cross_references_source ON cross_references (source_book_name, source_chapter)',
+  );
   late final Index idxTopicRefLocation = Index(
     'idx_topic_ref_location',
     'CREATE INDEX idx_topic_ref_location ON topic_references (book_name, chapter)',
@@ -8703,6 +8707,7 @@ abstract class _$ContentStore extends GeneratedDatabase {
     timelineEvents,
     eventParticipants,
     eventVerses,
+    idxCrossReferencesSource,
     idxTopicRefLocation,
     idxPlaceVerseLocation,
     idxPersonVerseLocation,

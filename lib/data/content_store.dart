@@ -42,7 +42,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration {
@@ -156,6 +156,12 @@ class ContentStore extends _$ContentStore {
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_event_participant_person '
             'ON event_participants (person_id)',
+          );
+        }
+        if (from < 12) {
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_cross_references_source '
+            'ON cross_references (source_book_name, source_chapter)',
           );
         }
       },

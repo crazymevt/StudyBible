@@ -33,14 +33,6 @@ Running list of known issues and follow-ups.
 
 ## Research
 
-- [ ] **Aggregated Passage / Exegetical Guide** — *largely covered by the
-  Explorer* (see Archive): its passage pages already aggregate people, places,
-  events, and topics for a chapter behind one search.
-  - *Remaining:* fold the module-based and user-authored sources into the
-    Explorer's passage page as further facet cards — commentaries
-    (`commentaryEntriesProvider`), cross-references, and the user's own
-    notes/sermons touching the chapter.
-
 - [ ] **Explorer — richer content on entity/passage pages.** Three enrichments
   scoped from a data-source audit (2026-07-02). Ordered cheapest-first.
   - **(a) Dictionary facet card for places & topics. — DONE** (commit 1e9821c).
@@ -186,6 +178,21 @@ Running list of known issues and follow-ups.
   `lib/domain/explorer/`, `lib/app/explorer_providers.dart`,
   `lib/ui/explorer/`. Deliberately *not* on the reader tool rail (at its
   height budget); a verse-action entry point is a possible follow-up.
+
+- [x] **Aggregated Passage / Exegetical Guide.** Closed out the last remaining
+  gap in the Explorer's passage page: it now aggregates every source for a
+  chapter behind one page — people, places, events, topics (native), plus
+  commentaries and the user's own notes (already shipped), and now
+  **cross-references** and the user's own **sermons touching the chapter**
+  (new). Cross-references group the `cross_references` dataset by source
+  verse, votes-descending, capped at 6 chips per verse
+  (`explorerPassageCrossReferencesProvider`, `_CrossRefGroupTile`); a new
+  `idx_cross_references_source` index (schema v12) keeps the chapter-wide scan
+  fast against the dataset's 513k rows. Sermons reuse the same
+  `BibleReferenceScanner` the "Navigate Scriptures" route already scans sermon
+  text with, matching a sermon if any citation's range touches the chapter
+  (`explorerPassageSermonsProvider`), and render via the existing
+  `_TaggedItemTile`/`explorerOpenTaggedItem` (no new navigation code needed).
 
 - [x] **Auto sync.** Settings → Sync → "Auto sync" switch (off by default)
   plus a frequency dropdown (5/15/30/60 min, default 15, prefs

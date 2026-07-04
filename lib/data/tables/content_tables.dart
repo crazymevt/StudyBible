@@ -31,6 +31,10 @@ class Verses extends Table {
   TextColumn get segments => text()(); // JSON string with rich segments
 }
 
+@TableIndex(
+  name: 'idx_cross_references_source',
+  columns: {#sourceBookName, #sourceChapter},
+)
 @DataClassName('CrossReference')
 class CrossReferences extends Table {
   IntColumn get id => integer().autoIncrement()();
