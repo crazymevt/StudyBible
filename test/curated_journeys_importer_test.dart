@@ -331,4 +331,28 @@ void main() {
     // to Ophrah, where Gideon's calling actually happens.
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Zedekiah's journey has the bundled enthronement plus all 6 curated "
+      "stops in chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final zedekiah = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('zedekiah_1950')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(zedekiah.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Jerusalem', // bundled: "Reign of Zedekiah" enthronement notice
+      'Jerusalem',
+      'Arabah',
+      'Jericho 1',
+      'Riblah 1',
+      'Riblah 1',
+      'Babylon 1',
+    ]);
+    // Nothing is superseded — the bundled event already resolves correctly
+    // to Jerusalem, where his reign begins.
+    expect(journey.unmappedEventCount, 0);
+  });
 }

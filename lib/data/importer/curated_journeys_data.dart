@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Zedekiah (`zedekiah_1950`)
 ///   - Rehoboam (`rehoboam_2412`)
 ///   - Jehoiakim (`jehoiakim_1085`)
 ///   - Abimelech (`abimelech_41`)
@@ -829,6 +828,65 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 8,
       verse: 32,
       placeName: 'Ophrah 2',
+    ),
+  ]),
+
+  // Like Ahab and Gideon, the bundled "Reign of Zedekiah" already resolves
+  // correctly — Jerusalem, via his enthronement notice (2 Kings 24:18) —
+  // and is kept as the opening waypoint. What follows is the fall of
+  // Jerusalem and his capture, one of the most dramatic single episodes in
+  // the Old Testament, but scattered across three near-identical parallel
+  // accounts (2 Kings 25, Jeremiah 39, Jeremiah 52) whose place tags
+  // frequently favor an incidental mention (the besieging army's origin or
+  // ultimate destination) over Zedekiah's own location at that moment.
+  CuratedPersonJourney(personSlug: 'zedekiah_1950', waypoints: [
+    CuratedWaypoint(
+      title: 'Besieged in Jerusalem by Nebuchadnezzar',
+      year: -588,
+      bookName: '2 Kings',
+      chapter: 25,
+      verse: 1,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Flees Jerusalem by night toward the plain',
+      year: -586,
+      bookName: '2 Kings',
+      chapter: 25,
+      verse: 4,
+      placeName: 'Arabah',
+    ),
+    CuratedWaypoint(
+      title: 'Captured in the plains of Jericho',
+      year: -586,
+      bookName: '2 Kings',
+      chapter: 25,
+      verse: 5,
+      placeName: 'Jericho 1',
+    ),
+    CuratedWaypoint(
+      title: 'Sentenced before Nebuchadnezzar at Riblah',
+      year: -586,
+      bookName: '2 Kings',
+      chapter: 25,
+      verse: 6,
+      placeName: 'Riblah 1',
+    ),
+    CuratedWaypoint(
+      title: 'Sons slain before his eyes at Riblah',
+      year: -586,
+      bookName: 'Jeremiah',
+      chapter: 39,
+      verse: 6,
+      placeName: 'Riblah 1',
+    ),
+    CuratedWaypoint(
+      title: 'Blinded and carried to Babylon',
+      year: -586,
+      bookName: 'Jeremiah',
+      chapter: 52,
+      verse: 11,
+      placeName: 'Babylon 1',
     ),
   ]),
 ];

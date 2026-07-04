@@ -258,6 +258,16 @@ const _eventsSupersededByCuratedJourney = {
 /// - 'Denied bread by the men of Succoth': Judges 8:5 names Succoth (where
 ///   Gideon actually is) and Midian (the kings he's pursuing, not a place he's
 ///   currently at) in the same verse; Midian has the lower id.
+/// - 'Besieged in Jerusalem by Nebuchadnezzar': 2 Kings 25:1 also names
+///   Babylon (Nebuchadnezzar's origin, not Zedekiah's location); Babylon has
+///   the lower id.
+/// - 'Captured in the plains of Jericho': 2 Kings 25:5 also names Arabah
+///   (the plain he fled across, this same event's *other* curated waypoint)
+///   and Chaldea (the pursuing army); both have lower ids than Jericho.
+/// - 'Sentenced before Nebuchadnezzar at Riblah' and 'Sons slain before his
+///   eyes at Riblah': 2 Kings 25:6 and Jeremiah 39:6 both also name Babylon
+///   (his eventual destination, not yet reached); Babylon has the lower id
+///   in both.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -291,6 +301,10 @@ const _eventPlaceOverrides = {
   'Rebuilds and settles at Shechem as his capital': 'Shechem',
   'Sets up the golden calf at Dan': 'Dan',
   'Denied bread by the men of Succoth': 'Succoth 1',
+  'Besieged in Jerusalem by Nebuchadnezzar': 'Jerusalem',
+  'Captured in the plains of Jericho': 'Jericho 1',
+  'Sentenced before Nebuchadnezzar at Riblah': 'Riblah 1',
+  'Sons slain before his eyes at Riblah': 'Riblah 1',
 };
 
 /// A person's dated events, each resolved to the first place named in its
