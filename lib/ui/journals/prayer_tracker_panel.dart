@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/journal_providers.dart';
 import '../../app/shared_prefs.dart';
 import '../tags/tag_editor_dialog.dart';
+import '../common/breakpoints.dart';
 import '../common/empty_state.dart';
 import '../common/skeleton.dart';
 
@@ -33,6 +34,7 @@ class PrayerTrackerPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prayersAsync = ref.watch(prayersProvider);
     final hideAnswered = ref.watch(hideAnsweredPrayersProvider);
+    final isPhone = MediaQuery.sizeOf(context).width <= Breakpoints.phone;
 
     return Column(
       children: [
@@ -41,19 +43,25 @@ class PrayerTrackerPanel extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Prayer Tracker',
-                style: Theme.of(context).textTheme.titleMedium,
+              Expanded(
+                child: Text(
+                  'Prayer Tracker',
+                  style: Theme.of(context).textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Hide Answered'),
-                  Switch(
-                    value: hideAnswered,
-                    onChanged: (val) => ref
-                        .read(hideAnsweredPrayersProvider.notifier)
-                        .setHide(val),
+                  if (!isPhone) const Text('Hide Answered'),
+                  Tooltip(
+                    message: 'Hide Answered',
+                    child: Switch(
+                      value: hideAnswered,
+                      onChanged: (val) => ref
+                          .read(hideAnsweredPrayersProvider.notifier)
+                          .setHide(val),
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
@@ -239,53 +247,104 @@ class PrayerTrackerPanel extends ConsumerWidget {
     String? initialName,
     String? initialDesc,
   }) {
-    final nameCtrl = TextEditingController(text: initialName);
-    final descCtrl = TextEditingController(text: initialDesc);
-
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(prayerId == null ? 'Add Prayer' : 'Edit Prayer'),
-          content: Column(
+      builder: (_) => _PrayerDialog(
+        prayerId: prayerId,
+        initialName: initialName,
+        initialDesc: initialDesc,
+      ),
+    );
+  }
+}
+
+/// Add/edit dialog. A [ConsumerStatefulWidget] so its controllers are disposed
+/// in [State.dispose] (after the route is fully removed) rather than the
+/// instant `showDialog` returns, which races the dismiss animation.
+class _PrayerDialog extends ConsumerStatefulWidget {
+  final String? prayerId;
+  final String? initialName;
+  final String? initialDesc;
+
+  const _PrayerDialog({this.prayerId, this.initialName, this.initialDesc});
+
+  @override
+  ConsumerState<_PrayerDialog> createState() => _PrayerDialogState();
+}
+
+class _PrayerDialogState extends ConsumerState<_PrayerDialog> {
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _descCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController(text: widget.initialName);
+    _descCtrl = TextEditingController(text: widget.initialDesc);
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _descCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final name = _nameCtrl.text.trim();
+    final desc = _descCtrl.text.trim();
+    if (name.isEmpty) return;
+    await ref.read(prayerActionProvider).savePrayer(
+          widget.prayerId,
+          name,
+          desc,
+        );
+    if (mounted) Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isPhone = screenWidth <= Breakpoints.phone;
+    return AlertDialog(
+      insetPadding: isPhone
+          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 24)
+          : const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+      title: Text(widget.prayerId == null ? 'Add Prayer' : 'Edit Prayer'),
+      content: SizedBox(
+        width: isPhone ? screenWidth - 32 : 400,
+        child: SingleChildScrollView(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: nameCtrl,
+                controller: _nameCtrl,
                 decoration: const InputDecoration(labelText: 'Name'),
               ),
               const SizedBox(height: 8),
               TextField(
-                controller: descCtrl,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
+                controller: _descCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  alignLabelWithHint: true,
+                ),
+                minLines: 5,
+                maxLines: 10,
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final name = nameCtrl.text.trim();
-                final desc = descCtrl.text.trim();
-                if (name.isNotEmpty) {
-                  await ref
-                      .read(prayerActionProvider)
-                      .savePrayer(prayerId, name, desc);
-                  if (context.mounted) Navigator.pop(context);
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    ).then((_) {
-      nameCtrl.dispose();
-      descCtrl.dispose();
-    });
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: _save,
+          child: const Text('Save'),
+        ),
+      ],
+    );
   }
 }
