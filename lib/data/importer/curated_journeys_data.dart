@@ -19,9 +19,20 @@
 /// a modern scholarly reconstruction). `bookName`/`chapter`/`verse` is the
 /// single verse each waypoint resolves its place from (and doubles as the
 /// "Read passage" link); `placeName` must match a `places.name` row exactly.
+///
+/// `year` is a `num`, not an `int`, so a waypoint can be interleaved *between*
+/// two Theographic events that round to the same whole year: those events'
+/// own `sortKey` is a fractional value derived from `theographic.json`'s `k`
+/// field (finer than the `y` field/`startYear` shown in the UI), and several
+/// of a single person's bundled events can land within 0.001 of each other —
+/// e.g. Moses's "Exodus from Egypt", "Wilderness Wanderings", and "Ten
+/// Commandments Given" are all dated 1490 BC, a few ten-thousandths apart.
+/// A curated stop that belongs between two such events needs a fractional
+/// year in that same gap (see Moses below); plain integers work everywhere
+/// else, same as before.
 class CuratedWaypoint {
   final String title;
-  final int year;
+  final num year;
   final String bookName;
   final int chapter;
   final int verse;
@@ -1103,6 +1114,99 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 15,
       verse: 15,
       placeName: 'Debir 1',
+    ),
+  ]),
+
+  // Moses already had a real multi-stop journey via auto-derivation (he has
+  // 8 dated Theographic events, not just one), so he was never on the
+  // single-dot priority list above — but two of those events are enormous
+  // blobs that still collapse to a single dot each: "Exodus from Egypt" (223
+  // verses, resolves to Egypt, where it starts) and "Wilderness Wanderings"
+  // (142 verses, resolves to the Red Sea via an existing override). Both are
+  // kept as their opening waypoint, and the real intermediate stops inside
+  // each — already narrated, just never surfaced — are added here. Also see
+  // the 'Death of Moses' fix in _eventPlaceOverrides above (Mount Nebo, not
+  // Gilead). "Tabernacle Built" (301 verses) is left alone: it's
+  // instructions, not travel, and Sinai really is the one location for all
+  // of it.
+  //
+  // The years below use fractional values for the same reason explained on
+  // [CuratedWaypoint.year]: "Exodus from Egypt", "Wilderness Wanderings", and
+  // "Ten Commandments Given" all round to 1490 BC but have distinct
+  // Theographic sortKeys within 0.0001 of each other, so stops that belong
+  // between two of them need a year in that same narrow gap.
+  CuratedPersonJourney(personSlug: 'moses_2108', waypoints: [
+    CuratedWaypoint(
+      title: 'Departs from Rameses',
+      year: -1489.9799,
+      bookName: 'Exodus',
+      chapter: 12,
+      verse: 37,
+      placeName: 'Rameses',
+    ),
+    CuratedWaypoint(
+      title: 'Arrives at Succoth',
+      year: -1489.9799,
+      bookName: 'Exodus',
+      chapter: 12,
+      verse: 37,
+      placeName: 'Succoth 2',
+    ),
+    CuratedWaypoint(
+      title: 'Camps at Etham on the edge of the wilderness',
+      year: -1489.9799,
+      bookName: 'Exodus',
+      chapter: 13,
+      verse: 20,
+      placeName: 'Etham',
+    ),
+    CuratedWaypoint(
+      title: 'Camps at Pi-hahiroth before crossing the Red Sea',
+      year: -1489.97984,
+      bookName: 'Exodus',
+      chapter: 14,
+      verse: 2,
+      placeName: 'Pi-hahiroth',
+    ),
+    CuratedWaypoint(
+      title: 'Passes through the wilderness of Shur',
+      year: -1489.97984,
+      bookName: 'Exodus',
+      chapter: 15,
+      verse: 22,
+      placeName: 'Shur',
+    ),
+    CuratedWaypoint(
+      title: 'Bitter water made sweet at Marah',
+      year: -1489.97984,
+      bookName: 'Exodus',
+      chapter: 15,
+      verse: 23,
+      placeName: 'Marah',
+    ),
+    CuratedWaypoint(
+      title: "Camps at Elim's twelve springs",
+      year: -1489.97984,
+      bookName: 'Exodus',
+      chapter: 15,
+      verse: 27,
+      placeName: 'Elim',
+    ),
+    CuratedWaypoint(
+      title: 'Manna given in the wilderness of Sin',
+      year: -1489.97984,
+      bookName: 'Exodus',
+      chapter: 16,
+      verse: 1,
+      placeName: 'Sin',
+    ),
+    CuratedWaypoint(
+      title: 'Water from the rock at Rephidim',
+      year: -1489.97984,
+      bookName: 'Exodus',
+      chapter: 17,
+      verse: 1,
+      placeName: 'Rephidim',
     ),
   ]),
 ];

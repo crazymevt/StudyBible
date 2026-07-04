@@ -447,4 +447,37 @@ void main() {
     // place_verses link) is superseded by these curated stops.
     expect(journey.unmappedEventCount, 1);
   });
+
+  test("Moses's journey fills in the real stops inside the Exodus and "
+      "Wilderness Wanderings blobs, and fixes his death location", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final moses = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('moses_2108')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(moses.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Nile', // bundled: "Birth of Moses"
+      'Egypt', // bundled: "Exodus from Egypt"
+      'Rameses',
+      'Succoth 2',
+      'Etham',
+      'Red Sea 1', // bundled: "Wilderness Wanderings"
+      'Pi-hahiroth',
+      'Shur',
+      'Marah',
+      'Elim',
+      'Sin',
+      'Rephidim',
+      'Wilderness of Sinai', // bundled: "Ten Commandments Given"
+      'Mount Sinai', // bundled: "Tabernacle Built"
+      'Mount Nebo', // bundled: "Death of Moses" (was Gilead — a false
+      // positive from the panoramic view God shows him, not his location)
+    ]);
+    // "Lifetime of Moses" and "The Transfiguration" have no place_verses
+    // links at all for their cited verses.
+    expect(journey.unmappedEventCount, 2);
+  });
 }

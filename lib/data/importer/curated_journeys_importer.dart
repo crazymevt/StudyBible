@@ -55,7 +55,7 @@ class CuratedJourneysImporter {
               TimelineEventsCompanion.insert(
                 title: waypoint.title,
                 sortKey: Value(waypoint.year.toDouble()),
-                startYear: Value(waypoint.year),
+                startYear: Value(waypoint.year.round()),
               ),
             );
         await store.into(store.eventParticipants).insert(

@@ -276,6 +276,26 @@ const _eventsSupersededByCuratedJourney = {
 ///   Egypt and Zoan, in a parenthetical aside dating Hebron's founding
 ///   ("Hebron was built seven years before Zoan in Egypt") — not the spies'
 ///   location; both have lower ids than Hebron.
+/// - 'Death of Moses': Deuteronomy 34:1 also names Gilead, Jericho, and Moab
+///   — all part of the panoramic view God shows him from the mountaintop
+///   ("the LORD shewed him all the land of Gilead, unto Dan... and all the
+///   land of Judah, unto the utmost sea"), not where Moses is standing
+///   (explicitly "the mountain of Nebo, to the top of Pisgah"); Gilead has
+///   the lowest id of the five names in that verse.
+/// - 'Arrives at Succoth' (Moses): Exodus 12:37 also names Rameses, this same
+///   event's *other* curated waypoint (their departure point); Rameses has
+///   the lower id.
+/// - 'Camps at Pi-hahiroth before crossing the Red Sea': Exodus 14:2 also
+///   names Migdol and Baal-zephon, both just landmarks for where to camp
+///   ("between Migdol and the sea, over against Baal-zephon"), not the camp
+///   itself; both have lower ids than Pi-hahiroth.
+/// - 'Passes through the wilderness of Shur': Exodus 15:22 also names the Red
+///   Sea, this same person's earlier curated waypoint (where they'd just
+///   come from); Red Sea has the lower id.
+/// - 'Manna given in the wilderness of Sin': Exodus 16:1 also names Egypt, a
+///   retrospective time reference ("since their departing out of... Egypt"),
+///   and Elim (just left) and Mount Sinai (still ahead); all three have
+///   lower ids than Sin.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -315,6 +335,11 @@ const _eventPlaceOverrides = {
   'Sons slain before his eyes at Riblah': 'Riblah 1',
   'Bound in fetters by Nebuchadnezzar at Jerusalem': 'Jerusalem',
   'Reaches Hebron and sees the sons of Anak': 'Hebron',
+  'Death of Moses': 'Mount Nebo',
+  'Arrives at Succoth': 'Succoth 2',
+  'Camps at Pi-hahiroth before crossing the Red Sea': 'Pi-hahiroth',
+  'Passes through the wilderness of Shur': 'Shur',
+  'Manna given in the wilderness of Sin': 'Sin',
 };
 
 /// A person's dated events, each resolved to the first place named in its
