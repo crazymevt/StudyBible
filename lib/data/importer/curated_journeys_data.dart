@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Caleb (`caleb_537`)
 ///   - Esau (`esau_1216`)
 ///   - Benjamin (`benjamin_463`)
 ///
@@ -1028,6 +1027,82 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 9,
       verse: 54,
       placeName: 'Thebez',
+    ),
+  ]),
+
+  // Caleb's only bundled event, "Birth of Caleb" (Numbers 13:6), doesn't
+  // resolve to any place at all — that verse is just his name in the spy
+  // roster, with no place_verses link — so today his journey shows zero
+  // waypoints, not even one wrong dot. Superseded entirely (added to
+  // _eventsSupersededByCuratedJourney) and replaced with his two real,
+  // well-documented episodes: the spy mission forty years before the
+  // conquest, and his personal claim on Hebron after it. One override
+  // needed: Numbers 13:22 also names Egypt and Zoan in a parenthetical
+  // aside dating Hebron's founding, not the spies' actual location.
+  CuratedPersonJourney(personSlug: 'caleb_537', waypoints: [
+    CuratedWaypoint(
+      title: 'Sent from Paran to spy out Canaan',
+      year: -1445,
+      bookName: 'Numbers',
+      chapter: 13,
+      verse: 3,
+      placeName: 'Paran',
+    ),
+    CuratedWaypoint(
+      title: 'Reaches Hebron and sees the sons of Anak',
+      year: -1445,
+      bookName: 'Numbers',
+      chapter: 13,
+      verse: 22,
+      placeName: 'Hebron',
+    ),
+    CuratedWaypoint(
+      title: 'Cuts a cluster of grapes in the Valley of Eshcol',
+      year: -1445,
+      bookName: 'Numbers',
+      chapter: 13,
+      verse: 23,
+      placeName: 'Valley of Eshcol',
+    ),
+    CuratedWaypoint(
+      title: 'Returns to Kadesh-barnea and urges Israel to advance',
+      year: -1445,
+      bookName: 'Numbers',
+      chapter: 13,
+      verse: 26,
+      placeName: 'Kadesh-barnea',
+    ),
+    CuratedWaypoint(
+      title: 'Comes to Joshua at Gilgal to claim his inheritance',
+      year: -1405,
+      bookName: 'Joshua',
+      chapter: 14,
+      verse: 6,
+      placeName: 'Gilgal 1',
+    ),
+    CuratedWaypoint(
+      title: 'Given Hebron for an inheritance',
+      year: -1405,
+      bookName: 'Joshua',
+      chapter: 14,
+      verse: 13,
+      placeName: 'Hebron',
+    ),
+    CuratedWaypoint(
+      title: 'Drives out the sons of Anak from Hebron',
+      year: -1405,
+      bookName: 'Joshua',
+      chapter: 15,
+      verse: 14,
+      placeName: 'Hebron',
+    ),
+    CuratedWaypoint(
+      title: 'Offers Achsah in marriage for the capture of Debir',
+      year: -1405,
+      bookName: 'Joshua',
+      chapter: 15,
+      verse: 15,
+      placeName: 'Debir 1',
     ),
   ]),
 ];

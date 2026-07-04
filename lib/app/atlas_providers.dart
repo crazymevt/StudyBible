@@ -151,6 +151,7 @@ const _eventsSupersededByCuratedJourney = {
   'Prophecies of Jeremiah',
   'Prophecies of Daniel',
   'Reign of Jeroboam I',
+  'Birth of Caleb',
 };
 
 /// Event → the place name that should win instead of whatever the default
@@ -271,6 +272,10 @@ const _eventsSupersededByCuratedJourney = {
 /// - 'Bound in fetters by Nebuchadnezzar at Jerusalem': 2 Chronicles 36:6
 ///   also names Babylon (where he's being taken, this same event's *other*
 ///   curated waypoint); Babylon has the lower id.
+/// - 'Reaches Hebron and sees the sons of Anak': Numbers 13:22 also names
+///   Egypt and Zoan, in a parenthetical aside dating Hebron's founding
+///   ("Hebron was built seven years before Zoan in Egypt") — not the spies'
+///   location; both have lower ids than Hebron.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -309,6 +314,7 @@ const _eventPlaceOverrides = {
   'Sentenced before Nebuchadnezzar at Riblah': 'Riblah 1',
   'Sons slain before his eyes at Riblah': 'Riblah 1',
   'Bound in fetters by Nebuchadnezzar at Jerusalem': 'Jerusalem',
+  'Reaches Hebron and sees the sons of Anak': 'Hebron',
 };
 
 /// A person's dated events, each resolved to the first place named in its

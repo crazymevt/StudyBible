@@ -422,4 +422,29 @@ void main() {
     // to Shechem, where his story begins.
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Caleb's journey has the spy mission and his claim on Hebron in "
+      "chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final caleb = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('caleb_537')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(caleb.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Paran',
+      'Hebron',
+      'Valley of Eshcol',
+      'Kadesh-barnea',
+      'Gilgal 1',
+      'Hebron',
+      'Hebron',
+      'Debir 1',
+    ]);
+    // "Birth of Caleb" (Numbers 13:6, just his name in the spy roster with no
+    // place_verses link) is superseded by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
 }
