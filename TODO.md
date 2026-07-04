@@ -6,16 +6,6 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [x] **Sidebar Redesign.** Possible redesign of the sidebar to make room for new tools.
-- [x] **Dictation Snackbar.** Make a snackbar appear when dictation is enabled.
-- [x] **Speech-to-Text Button.** DONE. Reusable `SpeechInputButton`
-  (`lib/ui/common/speech_input_button.dart`) using `speech_to_text`, wired into
-  all rich-text editors (Sermon, Notebook page, Journal, Scratch — inserts at
-  the cursor via `insertDictatedText`) and the Notes dialog. Auto-hides on
-  unsupported platforms — **Windows and Linux** (Linux has no backend; the
-  community `speech_to_text_windows` backend crashes natively on invocation).
-  Mic/speech permissions added to macOS entitlements+Info.plist, iOS Info.plist,
-  and AndroidManifest; macOS deployment target bumped 10.15 → 11.0 (plugin floor).
 - [~] **Expand Tags card in Explorer.** The Explorer tag page now cross-references
   its tagged verses into the bundled datasets — People / Places (with map) /
   Events cards, scoped to the exact verses carrying the tag
@@ -40,13 +30,6 @@ Running list of known issues and follow-ups.
     (`NotebookExporter`, new `deltaToMarkdown`). — DONE
   - **Tags:** General tagging at notebook + page level (`entityType`
     `notebook`/`notebookPage`), surfaced in tag results. — DONE
-
-- [x] **Drag and drop verses.** Selected verses can be dragged from all three
-  reading views (`flowing_paragraph_view`, `parallel_view`, `verse_list_view`)
-  and dropped into the sermon editor, notebook page editor, and scratch space
-  to copy their text. Shared drag payload/logic lives in
-  `lib/app/verse_selection.dart`; the drag handle replaces the old
-  verse-action-bar copy plumbing (`1a0f3b2`).
 
 ## Research
 
@@ -165,6 +148,33 @@ Running list of known issues and follow-ups.
   (`backup_restore_service.dart`) and sync (file/SAF/Google Drive backends via
   `sync_storage.dart`), with a follow-up fidelity/cleanup pass (`24fb9ff`) and an
   Android SAF export fix (`0c3ea3b`). Commits `89a2593`, `24fb9ff`, `0c3ea3b`.
+
+- [x] **Drag and drop verses.** Selected verses can be dragged from all three
+  reading views (`flowing_paragraph_view`, `parallel_view`, `verse_list_view`)
+  and dropped into the sermon editor, notebook page editor, and scratch space
+  to copy their text. Shared drag payload/logic lives in
+  `lib/app/verse_selection.dart`; the drag handle replaces the old
+  verse-action-bar copy plumbing (`1a0f3b2`).
+
+- [x] **Sidebar Redesign.** Reworked the desktop tools rail around pinned
+  favorites instead of a flat list: the rail shows favorited tools with an
+  edit (pencil) button to choose which tools are pinned (`91356e6`), plus a
+  **⋯ More Tools** overflow button above it for reaching non-favorite tools
+  without leaving the rail (`b34fd0f`).
+
+- [x] **Speech-to-Text Button.** Reusable `SpeechInputButton`
+  (`lib/ui/common/speech_input_button.dart`) using `speech_to_text`, wired into
+  all rich-text editors (Sermon, Notebook page, Journal, Scratch — inserts at
+  the cursor via `insertDictatedText`) and the Notes dialog. Auto-hides on
+  unsupported platforms — **Windows and Linux** (Linux has no backend; the
+  community `speech_to_text_windows` backend crashes natively on invocation).
+  Mic/speech permissions added to macOS entitlements+Info.plist, iOS Info.plist,
+  and AndroidManifest; macOS deployment target bumped 10.15 → 11.0 (plugin floor).
+
+- [x] **Dictation Snackbar.** A persistent "Listening..." snackbar appears
+  while dictation is active in any rich-text editor, so it stays clear
+  recording is still on; it dismisses automatically the moment listening stops
+  (`b9ea15d`).
 
 - [x] **Explorer (knowledge-web study tool).** Full-page browser over the
   bundled datasets, opened from the app drawer: one search across people,
