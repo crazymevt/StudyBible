@@ -252,4 +252,28 @@ void main() {
     // "Prophecies of Daniel" is superseded by these curated stops.
     expect(journey.unmappedEventCount, 1);
   });
+
+  test("Ahab's journey has the bundled succession notice plus all 6 "
+      "curated stops in chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final ahab = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('ahab_113')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(ahab.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Samaria 1', // bundled: "Reign of Ahab" succession notice
+      'Mount Carmel',
+      'Samaria 1',
+      'Aphek 3',
+      'Jezreel 2',
+      'Ramoth-gilead',
+      'Samaria 1',
+    ]);
+    // Unlike every prior person here, nothing is superseded — the bundled
+    // event was only a 3-verse succession notice, not a life-spanning blob.
+    expect(journey.unmappedEventCount, 0);
+  });
 }

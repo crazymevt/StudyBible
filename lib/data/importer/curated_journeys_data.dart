@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Ahab (`ahab_113`)
 ///   - Jeroboam (`jeroboam_872`)
 ///   - Gideon (`gideon_1314`)
 ///   - Zedekiah (`zedekiah_1950`)
@@ -594,6 +593,64 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 10,
       verse: 4,
       placeName: 'Tigris',
+    ),
+  ]),
+
+  // Ahab is different from every prior entry here: the bundled dataset's
+  // "Reign of Ahab" event isn't a life-spanning blob, it's just his 3-verse
+  // succession notice (1 Kings 16:28-30) — accurate, resolves cleanly to
+  // Samaria, and left alone. What's missing is everything after it: his
+  // entire 22-chapter reign (contest with Baal's prophets, two wars with
+  // Ben-hadad, Naboth's vineyard, death at Ramoth-gilead) had no dated
+  // waypoints at all. These fill that gap.
+  CuratedPersonJourney(personSlug: 'ahab_113', waypoints: [
+    CuratedWaypoint(
+      title: "Gathers Israel to Mount Carmel for Elijah's contest",
+      year: -863,
+      bookName: '1 Kings',
+      chapter: 18,
+      verse: 20,
+      placeName: 'Mount Carmel',
+    ),
+    CuratedWaypoint(
+      title: 'Besieged in Samaria by Ben-hadad',
+      year: -858,
+      bookName: '1 Kings',
+      chapter: 20,
+      verse: 1,
+      placeName: 'Samaria 1',
+    ),
+    CuratedWaypoint(
+      title: "Defeats Ben-hadad's second invasion at Aphek",
+      year: -857,
+      bookName: '1 Kings',
+      chapter: 20,
+      verse: 30,
+      placeName: 'Aphek 3',
+    ),
+    CuratedWaypoint(
+      title: "Seizes Naboth's vineyard at Jezreel",
+      year: -855,
+      bookName: '1 Kings',
+      chapter: 21,
+      verse: 1,
+      placeName: 'Jezreel 2',
+    ),
+    CuratedWaypoint(
+      title: 'Marches to Ramoth-gilead disguised',
+      year: -853,
+      bookName: '1 Kings',
+      chapter: 22,
+      verse: 29,
+      placeName: 'Ramoth-gilead',
+    ),
+    CuratedWaypoint(
+      title: 'Brought back to Samaria and buried',
+      year: -853,
+      bookName: '1 Kings',
+      chapter: 22,
+      verse: 37,
+      placeName: 'Samaria 1',
     ),
   ]),
 ];
