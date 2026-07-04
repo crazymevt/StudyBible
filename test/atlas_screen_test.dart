@@ -246,6 +246,31 @@ void main() {
     expect(find.text('Conversion'), findsNothing);
   });
 
+  testWidgets(
+      'playback bar sits above the system navigation bar/gesture inset',
+      (tester) async {
+    // Regression: the journey controls (step card + playback bar) were
+    // rendered directly in the body's Column with no SafeArea, so on a
+    // device with on-screen nav buttons/gesture bar (simulated here via the
+    // view's bottom padding) they were drawn underneath the system UI.
+    // view.padding is in physical pixels; use the test device's pixel ratio
+    // so the simulated inset is exactly 48 *logical* pixels.
+    const insetLogical = 48.0;
+    final dpr = tester.view.devicePixelRatio;
+    final originalPadding = tester.view.padding;
+    tester.view.padding = FakeViewPadding(bottom: insetLogical * dpr);
+    addTearDown(() => tester.view.padding = originalPadding);
+
+    await pump(tester, initialPersonId: 1);
+
+    final screenBottom =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    final controlsBottom =
+        tester.getBottomLeft(find.byKey(const Key('atlas-journey-controls'))).dy;
+
+    expect(screenBottom - controlsBottom, greaterThanOrEqualTo(insetLogical));
+  });
+
   testWidgets('a single-waypoint journey has no playback controls',
       (tester) async {
     await pump(tester, initialPersonId: 2);

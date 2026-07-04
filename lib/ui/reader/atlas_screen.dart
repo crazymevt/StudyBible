@@ -381,36 +381,49 @@ class _AtlasScreenState extends ConsumerState<AtlasScreen>
                       ],
               ),
             ),
-            _StepInfoCard(
-              waypoint: current,
-              onReadPassage: current.bookName == null
-                  ? null
-                  : () => _goToVerse(
-                      current.bookName!, current.chapter!, current.verse!),
+            SafeArea(
+              top: false,
+              child: Column(
+                key: const Key('atlas-journey-controls'),
+                children: [
+                  _StepInfoCard(
+                    waypoint: current,
+                    onReadPassage: current.bookName == null
+                        ? null
+                        : () => _goToVerse(current.bookName!,
+                            current.chapter!, current.verse!),
+                  ),
+                  if (excluded > 0)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      child: Text(
+                        '$excluded event${excluded == 1 ? '' : 's'} not shown '
+                        '(${journey.undatedEventCount} undated, '
+                        '${journey.unmappedEventCount} no mappable location).',
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall
+                            ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant),
+                      ),
+                    ),
+                  if (waypoints.length > 1)
+                    _PlaybackBar(
+                      position: _position,
+                      stepCount: waypoints.length,
+                      playing: _playing,
+                      onTogglePlay: () => _togglePlay(waypoints),
+                      onStepBack: () => _step(waypoints, -1),
+                      onStepForward: () => _step(waypoints, 1),
+                      onScrub: (v) => _scrubTo(waypoints, v),
+                    ),
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
-            if (excluded > 0)
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: Text(
-                  '$excluded event${excluded == 1 ? '' : 's'} not shown '
-                  '(${journey.undatedEventCount} undated, '
-                  '${journey.unmappedEventCount} no mappable location).',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant),
-                ),
-              ),
-            if (waypoints.length > 1)
-              _PlaybackBar(
-                position: _position,
-                stepCount: waypoints.length,
-                playing: _playing,
-                onTogglePlay: () => _togglePlay(waypoints),
-                onStepBack: () => _step(waypoints, -1),
-                onStepForward: () => _step(waypoints, 1),
-                onScrub: (v) => _scrubTo(waypoints, v),
-              ),
-            const SizedBox(height: 8),
           ],
         );
       },
