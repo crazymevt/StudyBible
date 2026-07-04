@@ -501,4 +501,24 @@ void main() {
     // superseded by these curated stops.
     expect(journey.unmappedEventCount, 1);
   });
+
+  test("Benjamin's journey has his birth at Ephrath (fixed from Bethel) and "
+      "his trip to Egypt, in chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final benjamin = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('benjamin_463')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(benjamin.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Ephrath', // bundled: "Rachel dies giving birth to Benjamin"
+      // (was Bethel — the place they'd just left, not where Rachel labors)
+      'Egypt',
+    ]);
+    // Nothing is superseded — the bundled event resolves correctly to
+    // Ephrath once overridden.
+    expect(journey.unmappedEventCount, 0);
+  });
 }

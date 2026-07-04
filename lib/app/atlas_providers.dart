@@ -297,6 +297,11 @@ const _eventsSupersededByCuratedJourney = {
 ///   retrospective time reference ("since their departing out of... Egypt"),
 ///   and Elim (just left) and Mount Sinai (still ahead); all three have
 ///   lower ids than Sin.
+/// - 'Rachel dies giving birth to Benjamin': Genesis 35:16 names Bethel,
+///   where they'd just departed from ("they journeyed from Bethel; and
+///   there was but a little way to come to Ephrath"), not where Rachel
+///   actually labors and dies (35:19, "in the way to Ephrath, which is
+///   Bethlehem"); Bethel has the lower id.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -341,6 +346,7 @@ const _eventPlaceOverrides = {
   'Camps at Pi-hahiroth before crossing the Red Sea': 'Pi-hahiroth',
   'Passes through the wilderness of Shur': 'Shur',
   'Manna given in the wilderness of Sin': 'Sin',
+  'Rachel dies giving birth to Benjamin': 'Ephrath',
 };
 
 /// A person's dated events, each resolved to the first place named in its

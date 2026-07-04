@@ -1,16 +1,14 @@
 /// Hand-curated Atlas journey waypoints for people whose entry in
 /// `theographic.json` collapses their entire, well-documented ministry into
 /// a single dated event — too coarse to ever produce a real multi-stop path
-/// through [PersonJourney] (see atlas_providers.dart). Elijah and Elisha are
-/// the first two; more can be appended here later without any code changes —
-/// just a new [CuratedPersonJourney] entry, following the same process:
-/// verify every waypoint against the real verse text and cross-check it
-/// against `places.json`'s own verse links for competing ties (see the
-/// `atlas-curated-journey-verification-process` memory).
-///
-/// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
-/// identified but not yet curated):
-///   - Benjamin (`benjamin_463`)
+/// through [PersonJourney] (see atlas_providers.dart). Elijah and Elisha were
+/// the first two; the original priority list (single/few-dot journey, ≥30
+/// verses) is now fully curated. More people can still be appended here
+/// without any code changes — just a new [CuratedPersonJourney] entry,
+/// following the same process: verify every waypoint against the real verse
+/// text and cross-check it against `places.json`'s own verse links for
+/// competing ties (see the `atlas-curated-journey-verification-process`
+/// memory).
 ///
 /// Years are approximate and sequential within each person's known ministry
 /// window, not literal text-given dates — the same convention the bundled
@@ -1251,6 +1249,28 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 36,
       verse: 8,
       placeName: 'Mount Seir 1',
+    ),
+  ]),
+
+  // Benjamin's only bundled event, "Rachel dies giving birth to Benjamin"
+  // (Genesis 35:16-27), already had a false-positive bug of its own — fixed
+  // above in _eventPlaceOverrides (Ephrath, not Bethel, the place they'd
+  // just left) — and is kept as the opening waypoint. His own adult
+  // narrative is otherwise thin on named locations: he's a background
+  // figure in Joseph's story, mostly acted upon rather than acting, and
+  // most of the scenes naming him (Joseph embracing him, the silver cup
+  // planted in his sack) have no place_verses link. The one clean exception
+  // is Genesis 43:15, which names him personally among those who "went down
+  // to Egypt" on the second trip — the one his brothers wouldn't make
+  // without him.
+  CuratedPersonJourney(personSlug: 'benjamin_463', waypoints: [
+    CuratedWaypoint(
+      title: 'Brought down to Egypt to appear before Joseph',
+      year: -1705,
+      bookName: 'Genesis',
+      chapter: 43,
+      verse: 15,
+      placeName: 'Egypt',
     ),
   ]),
 ];
