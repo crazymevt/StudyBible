@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.4+1",
+    "date": "2026-07-04",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "keep Atlas journey controls clear of the system navigation bar",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.3+5",
     "date": "2026-07-03",
     "features": [
