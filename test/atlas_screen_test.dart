@@ -3,6 +3,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:study_bible/app/atlas_providers.dart';
 import 'package:study_bible/app/content_providers.dart';
 import 'package:study_bible/app/people_providers.dart';
 import 'package:study_bible/app/place_providers.dart';
@@ -129,6 +130,10 @@ void main() {
           peopleReadyProvider.overrideWith((ref) async => true),
           placesReadyProvider.overrideWith((ref) async => true),
           topicalIndexReadyProvider.overrideWith((ref) async => true),
+          // This suite's synthetic DB has no Elijah/Elisha rows for the real
+          // curated importer to find — it's exercised for real in
+          // curated_journeys_importer_test.dart instead.
+          curatedJourneysReadyProvider.overrideWith((ref) async => true),
         ],
         child: MaterialApp(
           home: AtlasScreen(initialPersonId: initialPersonId),

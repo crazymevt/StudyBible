@@ -2,9 +2,25 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content_store.dart';
+import '../data/importer/curated_journeys_importer.dart';
 import 'content_providers.dart';
 import 'explorer_providers.dart';
 import 'place_providers.dart';
+
+final curatedJourneysImporterProvider = Provider<CuratedJourneysImporter>(
+  (ref) => CuratedJourneysImporter(ref.watch(contentStoreProvider)),
+);
+
+/// Hand-curated waypoints (see curated_journeys_data.dart) for people whose
+/// entire ministry collapses into one dated event in the bundled dataset —
+/// too coarse to ever produce a real journey. Layered on top of
+/// [explorerReadyProvider] since it needs people and places to already exist
+/// (curated waypoints are looked up by slug/name, not hardcoded id).
+final curatedJourneysReadyProvider = FutureProvider<bool>((ref) async {
+  await ref.watch(explorerReadyProvider.future);
+  await ref.watch(curatedJourneysImporterProvider).ensureLoaded();
+  return true;
+});
 
 /// All bundled places, name-ordered — the Atlas's general browse mode.
 final allPlacesProvider = FutureProvider<List<Place>>((ref) async {
@@ -119,6 +135,18 @@ const _eventsWithNoReliablePlace = {
   "Lydia's Conversion",
 };
 
+/// Bundled-dataset events superseded by hand-curated waypoints
+/// (curated_journeys_data.dart) for the same person. `theographic.json`
+/// collapses each of these people's entire ministry into one dated event —
+/// resolving to a real place, just one wildly out of place next to the
+/// granular curated stops that now cover the same ground in far more
+/// detail. Excluded here so the auto-derived blob doesn't surface as a
+/// redundant, oddly-timed extra waypoint alongside them.
+const _eventsSupersededByCuratedJourney = {
+  'Prophecies of Elijah',
+  'Prophecies of Elisha',
+};
+
 /// Event → the place name that should win instead of whatever the default
 /// "earliest verse, lowest place id" heuristic (below) picks. Each of these
 /// accounts already links the event to its true setting via `place_verses`
@@ -175,6 +203,20 @@ const _eventsWithNoReliablePlace = {
 ///   is Exodus 29:46's retrospective "brought them out of the land of
 ///   Egypt"; Mount Sinai, where the tabernacle was actually built, is named
 ///   later (31:18).
+///
+/// The last four are curated waypoints (curated_journeys_data.dart), not
+/// auto-derived ones — even a single hand-picked verse can still tie with
+/// an incidental place mention already in the bundled gazetteer:
+/// - 'Introduced as a prophet to Ahab': 1 Kings 17:1 also names Gilead
+///   (Elijah's home region); Tishbe, his actual town, has the higher id.
+/// - 'Fed by the widow of Zarephath': 1 Kings 17:9 also names Sidon
+///   (Zarephath belonged to it); Sidon has the lower id.
+/// - "Intercepts Ahaziah's messengers": 2 Kings 1:3 also names Ekron (the
+///   god the messengers were sent to consult) and Tishbe (Elijah's epithet,
+///   repeated here); Ekron has the lowest id of the three.
+/// - 'Returns to Samaria': 2 Kings 2:25 covers two stops in one summary
+///   verse ("...to Mount Carmel, and from there returned to Samaria"); Mount
+///   Carmel — this same event's *other* curated waypoint — has the lower id.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -193,6 +235,10 @@ const _eventPlaceOverrides = {
   'Wilderness Wanderings': 'Red Sea 1',
   'Ten Commandments Given': 'Wilderness of Sinai',
   'Tabernacle Built': 'Mount Sinai',
+  'Introduced as a prophet to Ahab': 'Tishbe',
+  'Fed by the widow of Zarephath': 'Zarephath',
+  "Intercepts Ahaziah's messengers": 'Samaria 1',
+  'Returns to Samaria': 'Samaria 1',
 };
 
 /// A person's dated events, each resolved to the first place named in its
@@ -202,7 +248,7 @@ const _eventPlaceOverrides = {
 /// waypoint per event instead of every place an account happens to mention.
 final personJourneyProvider =
     FutureProvider.family<PersonJourney?, int>((ref, personId) async {
-  await ref.watch(explorerReadyProvider.future);
+  await ref.watch(curatedJourneysReadyProvider.future);
   final store = ref.watch(contentStoreProvider);
 
   final person = await (store.select(store.biblePeople)
@@ -234,7 +280,8 @@ final personJourneyProvider =
   final datedEventIds = [
     for (final r in eventRows)
       if (r.readNullable<int>('start_year') != null &&
-          !_eventsWithNoReliablePlace.contains(r.read<String>('title')))
+          !_eventsWithNoReliablePlace.contains(r.read<String>('title')) &&
+          !_eventsSupersededByCuratedJourney.contains(r.read<String>('title')))
         r.read<int>('event_id'),
   ];
 
