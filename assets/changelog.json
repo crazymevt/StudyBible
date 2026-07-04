@@ -1,5 +1,35 @@
 [
   {
+    "version": "26.7.4+2",
+    "date": "2026-07-04",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "give the Explorer tag page full parity with the passage page",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "keep the right tool panel in sync when jumping in from Explorer",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "notebook pages can link back to Explorer entities, with backlink cards",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "finish the Explorer passage page with cross-references and sermons",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.4+1",
     "date": "2026-07-04",
     "features": [
