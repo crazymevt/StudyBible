@@ -8,7 +8,9 @@ import '../../app/place_providers.dart';
 import '../../app/reader_state.dart';
 import '../common/breakpoints.dart';
 import '../common/empty_state.dart';
+import '../common/place_marker_map.dart';
 import '../common/skeleton.dart';
+import 'atlas_screen.dart';
 
 /// Maps the geographic places mentioned in the active passage (OpenBible.info
 /// geocoding). Place data is bundled/offline; only the OSM tile background needs
@@ -22,7 +24,6 @@ class PlacesPanel extends ConsumerStatefulWidget {
 
 class _PlacesPanelState extends ConsumerState<PlacesPanel> {
   final MapController _map = MapController();
-  bool _tilesFailed = false;
 
   void _goToVerse(String book, int chapter, int verse) {
     ref.read(selectedBookNameProvider.notifier).set(book);
@@ -133,128 +134,15 @@ class _PlacesPanelState extends ConsumerState<PlacesPanel> {
 
   Widget _buildMap(
       BuildContext context, String book, int chapter, List<PlaceInPassage> places) {
-    final scheme = Theme.of(context).colorScheme;
-    final points = places.map((p) => LatLng(p.lat, p.lng)).toList();
-
-    // Only fit to the coordinates when they span a non-zero area. Multiple
-    // places sharing the same coordinate collapse to a single point, and
-    // CameraFit.coordinates can't derive a finite zoom from zero-area bounds
-    // (it asserts on `zoom.isFinite`). In that case fall back to initialZoom.
-    final distinctPoints = points.map((p) => (p.latitude, p.longitude)).toSet();
-
-    return Stack(
-      children: [
-        FlutterMap(
-          // Re-fit the camera whenever the passage changes.
-          key: ValueKey('$book|$chapter'),
-          mapController: _map,
-          options: MapOptions(
-            initialCameraFit: distinctPoints.length > 1
-                ? CameraFit.coordinates(
-                    coordinates: points,
-                    padding: const EdgeInsets.all(40),
-                  )
-                : null,
-            initialCenter: points.first,
-            initialZoom: 8,
-            interactionOptions: const InteractionOptions(
-              flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-            ),
-            backgroundColor: scheme.surfaceContainerHighest,
-          ),
-          children: [
-            // Label-free basemap so the only place names on the map are our
-            // English markers (the OSM standard style labels in local languages).
-            TileLayer(
-              urlTemplate:
-                  'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png',
-              subdomains: const ['a', 'b', 'c', 'd'],
-              userAgentPackageName: 'io.github.crazymevt.studybible',
-              errorTileCallback: (tile, error, stackTrace) {
-                if (!_tilesFailed && mounted) {
-                  WidgetsBinding.instance.addPostFrameCallback(
-                      (_) => setState(() => _tilesFailed = true));
-                }
-              },
-            ),
-            MarkerLayer(
-              markers: [
-                for (final p in places)
-                  Marker(
-                    point: LatLng(p.lat, p.lng),
-                    width: 140,
-                    height: 48,
-                    // Pin tip sits on the coordinate; the English label floats above.
-                    alignment: Alignment.bottomCenter,
-                    child: GestureDetector(
-                      onTap: () => _focusPlace(p),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: scheme.surface.withValues(alpha: 0.85),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              p.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                          ),
-                          Icon(
-                            Icons.location_on,
-                            color: scheme.error,
-                            size: 28,
-                            shadows: const [
-                              Shadow(blurRadius: 3, color: Colors.black54)
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const RichAttributionWidget(
-              attributions: [
-                TextSourceAttribution('OpenStreetMap contributors'),
-                TextSourceAttribution('CARTO'),
-              ],
-            ),
-          ],
-        ),
-        if (_tilesFailed)
-          Positioned(
-            left: 8,
-            top: 8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: scheme.errorContainer,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.cloud_off, size: 14, color: scheme.onErrorContainer),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Map background needs internet',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: scheme.onErrorContainer,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
+    return PlaceMarkerMap(
+      // Re-fit the camera whenever the passage changes.
+      key: ValueKey('$book|$chapter'),
+      mapController: _map,
+      points: [for (final p in places) MapPoint(p.id, p.name, p.lat, p.lng)],
+      onTapPoint: (mp) => _focusPlace(places.firstWhere((p) => p.id == mp.id)),
+      onExpand: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const AtlasScreen()),
+      ),
     );
   }
 

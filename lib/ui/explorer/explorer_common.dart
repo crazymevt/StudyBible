@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latlong2/latlong.dart';
 
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
@@ -14,8 +12,10 @@ import '../../app/tag_providers.dart';
 import '../../app/user_providers.dart';
 import '../../domain/explorer/explorer_ref.dart';
 import '../common/breakpoints.dart';
+import '../common/place_marker_map.dart';
 import '../journals/journal_editor_panel.dart';
 import '../journals/journals_list_panel.dart';
+import '../reader/atlas_screen.dart';
 import '../sermons/sermon_editor_screen.dart';
 import '../notebooks/notebook_page_editor_screen.dart';
 import '../tags/tag_palette.dart';
@@ -352,150 +352,47 @@ class ExplorerMapPlace {
   const ExplorerMapPlace(this.id, this.name, this.lat, this.lng);
 }
 
-/// Small embedded map for place/event pages, offline-tolerant like the Places
-/// panel: markers render even when the tile background can't load.
-class ExplorerMap extends ConsumerStatefulWidget {
-  const ExplorerMap({super.key, required this.places});
+/// Small embedded map for place/event/person pages, offline-tolerant like the
+/// Places panel: markers render even when the tile background can't load.
+/// Expandable to the fullscreen Atlas — by default seeded with these same
+/// points, or with [journeyPersonId]'s animated journey when set (used by the
+/// person page, where "expand" means "show their journey", not just these
+/// points).
+class ExplorerMap extends ConsumerWidget {
+  const ExplorerMap({super.key, required this.places, this.journeyPersonId});
 
   final List<ExplorerMapPlace> places;
 
-  @override
-  ConsumerState<ExplorerMap> createState() => _ExplorerMapState();
-}
-
-class _ExplorerMapState extends ConsumerState<ExplorerMap> {
-  bool _tilesFailed = false;
+  /// When set, expanding this map opens the Atlas directly in journey mode
+  /// for this person, instead of the generic points-seeded browse view.
+  final int? journeyPersonId;
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final points = [for (final p in widget.places) LatLng(p.lat, p.lng)];
-    if (points.isEmpty) return const SizedBox.shrink();
-    // CameraFit.coordinates asserts on zero-area bounds, so it needs at least
-    // two distinct coordinates (see PlacesPanel).
-    final distinct = points.map((p) => (p.latitude, p.longitude)).toSet();
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (places.isEmpty) return const SizedBox.shrink();
     return SizedBox(
       height: 220,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          children: [
-            FlutterMap(
-              key: ValueKey(
-                widget.places.map((p) => p.id).join(','),
-              ),
-              options: MapOptions(
-                initialCameraFit: distinct.length > 1
-                    ? CameraFit.coordinates(
-                        coordinates: points,
-                        padding: const EdgeInsets.all(40),
-                      )
-                    : null,
-                initialCenter: points.first,
-                initialZoom: 7,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-                ),
-                backgroundColor: scheme.surfaceContainerHighest,
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate:
-                      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png',
-                  subdomains: const ['a', 'b', 'c', 'd'],
-                  userAgentPackageName: 'io.github.crazymevt.studybible',
-                  errorTileCallback: (tile, error, stackTrace) {
-                    if (!_tilesFailed && mounted) {
-                      WidgetsBinding.instance.addPostFrameCallback(
-                          (_) => setState(() => _tilesFailed = true));
-                    }
-                  },
-                ),
-                MarkerLayer(
-                  markers: [
-                    for (final p in widget.places)
-                      Marker(
-                        point: LatLng(p.lat, p.lng),
-                        width: 140,
-                        height: 48,
-                        alignment: Alignment.bottomCenter,
-                        child: GestureDetector(
-                          onTap: () => ref
-                              .read(explorerTrailProvider.notifier)
-                              .open(ExplorerRef.place(p.id, p.name)),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color:
-                                      scheme.surface.withValues(alpha: 0.85),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  p.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall
-                                      ?.copyWith(fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                              Icon(
-                                Icons.location_on,
-                                color: scheme.error,
-                                size: 28,
-                                shadows: const [
-                                  Shadow(blurRadius: 3, color: Colors.black54)
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const RichAttributionWidget(
-                  attributions: [
-                    TextSourceAttribution('OpenStreetMap contributors'),
-                    TextSourceAttribution('CARTO'),
-                  ],
-                ),
-              ],
+        child: PlaceMarkerMap(
+          key: ValueKey(places.map((p) => p.id).join(',')),
+          points: [for (final p in places) MapPoint(p.id, p.name, p.lat, p.lng)],
+          initialZoom: 7,
+          onTapPoint: (mp) => ref
+              .read(explorerTrailProvider.notifier)
+              .open(ExplorerRef.place(mp.id, mp.name)),
+          onExpand: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => journeyPersonId != null
+                  ? AtlasScreen(initialPersonId: journeyPersonId)
+                  : AtlasScreen(
+                      initialPoints: [
+                        for (final p in places)
+                          MapPoint(p.id, p.name, p.lat, p.lng),
+                      ],
+                    ),
             ),
-            if (_tilesFailed)
-              Positioned(
-                left: 8,
-                top: 8,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: scheme.errorContainer,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.cloud_off,
-                          size: 14, color: scheme.onErrorContainer),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Map background needs internet',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(color: scheme.onErrorContainer),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
+          ),
         ),
       ),
     );

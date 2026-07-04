@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
+import '../../app/explorer_providers.dart';
 import '../../app/people_providers.dart';
 import '../../app/reader_state.dart';
 import '../../data/content_store.dart';
 import '../common/breakpoints.dart';
 import '../common/skeleton.dart';
+import '../explorer/explorer_common.dart';
 import 'people_timeline_screen.dart';
 
 /// Open [personId] in the People tool: the side panel on wide layouts, a
@@ -347,6 +349,9 @@ class _PersonDetailView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detail = ref.watch(personDetailProvider(personId));
+    final places =
+        ref.watch(explorerPersonPlacesProvider(personId)).asData?.value ??
+            const <Place>[];
     final scheme = Theme.of(context).colorScheme;
     return detail.when(
       loading: () => const SkeletonList(),
@@ -426,6 +431,17 @@ class _PersonDetailView extends ConsumerWidget {
                             e.verse!,
                           ),
                   ),
+              ],
+              if (places.isNotEmpty) ...[
+                const _SectionHeader('Places in their story'),
+                ExplorerMap(
+                  journeyPersonId: personId,
+                  places: [
+                    for (final pl in places)
+                      ExplorerMapPlace(pl.id, pl.name, pl.lat, pl.lng),
+                  ],
+                ),
+                const SizedBox(height: 8),
               ],
               if (d.verses.isNotEmpty) ...[
                 _SectionHeader(

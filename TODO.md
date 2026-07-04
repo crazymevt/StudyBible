@@ -50,11 +50,6 @@ Running list of known issues and follow-ups.
 
 ## Research
 
-- [ ] **Interactive Atlas / Geographic Tracker** (Advanced Map Tool)
-  - *Context:* The app currently has a `PlacesPanel` (`lib/ui/reader/places_panel.dart`) that uses `flutter_map` and OpenBible data to plot places for the active chapter.
-  - *Next Steps:* To elevate this to an advanced study tool, build a dedicated, full-screen interactive Atlas. It should allow tracking sequential events (like Paul's missionary journeys or David's flight) step-by-step, drawing animated paths between locations.
-  - *Data Integration:* Tie the existing Theographic timeline events (used in `people_timeline_screen.dart`) to geographic coordinates so users can scrub the timeline and watch events unfold on the map simultaneously.
-
 - [ ] **Aggregated Passage / Exegetical Guide** — *largely covered by the
   Explorer* (see Archive): its passage pages already aggregate people, places,
   events, and topics for a chapter behind one search.
@@ -140,6 +135,25 @@ Running list of known issues and follow-ups.
 ## Issues
 
 ## Archive
+
+- [x] **Interactive Atlas.** Fullscreen map (`atlas_screen.dart`) with a
+  general browse mode over every geocoded place, and a per-person "journey"
+  mode: a person's dated events, auto-derived (no curated journey data exists
+  in the bundled datasets) into an animated, playable path — the first place
+  named in each event's account, resolved through the same verse-coordinate
+  bridge the Explorer uses for events↔places, in `atlas_providers.dart`'s
+  `personJourneyProvider`. Undated/unmapped events are excluded from the path
+  but counted in a footnote rather than silently dropped. Every existing small
+  map (`PlacesPanel`, `ExplorerMap` on place/event/passage/tag/person pages,
+  and a new one added to the reader's People panel) keeps its current
+  behavior and gains an expand-to-fullscreen icon via a shared
+  `PlaceMarkerMap` widget (`lib/ui/common/place_marker_map.dart`) extracted
+  from the two near-duplicate map implementations. Fixed post-ship: a
+  keyboard-open camera-fit race when selecting a person from search, an
+  animation-pause state that could leave the traveler mid-leg while the info
+  card showed the wrong waypoint, and an Android-specific marker
+  desync traced to a `MapController` shared between browse and journey modes
+  (now separate, recreated fresh per person).
 
 - [x] **Media Attachments.** Upload, tag, and view images and PDFs in the app,
   fully included in backup/restore and sync. Shipped: an attachments data model

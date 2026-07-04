@@ -297,10 +297,13 @@ class _PersonPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ExplorerMap(places: [
-                      for (final pl in places)
-                        ExplorerMapPlace(pl.id, pl.name, pl.lat, pl.lng),
-                    ]),
+                    ExplorerMap(
+                      journeyPersonId: personId,
+                      places: [
+                        for (final pl in places)
+                          ExplorerMapPlace(pl.id, pl.name, pl.lat, pl.lng),
+                      ],
+                    ),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 6,
