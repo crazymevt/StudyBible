@@ -127,6 +127,39 @@ void main() {
     expect(journey.unmappedEventCount, 1);
   });
 
+  test("David's journey has all 15 curated stops interleaved with the "
+      "bundled dataset's own Goliath/death events", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final david = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('david_994')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(david.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Bethlehem 1', // curated: anointed by Samuel
+      'Azekah', // bundled: David Kills Goliath
+      'Nob',
+      'Gath 1',
+      'Adullam',
+      'Keilah',
+      'Engedi',
+      'Carmel 1',
+      'Ziklag',
+      'Hebron',
+      'City of David', // captures Jebus
+      'City of David', // brings up the Ark
+      'Rabbah 1',
+      'Mahanaim',
+      'Jerusalem', // returns after Absalom
+      'Jerusalem', // census/plague
+      'City of David', // bundled: Death of David
+    ]);
+    // "Reign of David" is superseded by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
+
   test('backfills the Abel-meholah / 1 Kings 19:19 place-verse link',
       () async {
     await container.read(curatedJourneysReadyProvider.future);

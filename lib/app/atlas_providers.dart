@@ -146,6 +146,7 @@ const _eventsSupersededByCuratedJourney = {
   'Prophecies of Elijah',
   'Prophecies of Elisha',
   'Reign of Solomon',
+  'Reign of David',
 };
 
 /// Event → the place name that should win instead of whatever the default
@@ -218,6 +219,11 @@ const _eventsSupersededByCuratedJourney = {
 /// - 'Returns to Samaria': 2 Kings 2:25 covers two stops in one summary
 ///   verse ("...to Mount Carmel, and from there returned to Samaria"); Mount
 ///   Carmel — this same event's *other* curated waypoint — has the lower id.
+/// - "Flees Absalom's rebellion to Mahanaim": 2 Samuel 17:24 also names the
+///   Jordan (which David crossed to get there); Jordan has the lower id.
+/// - "Returns to Jerusalem after Absalom's defeat": 2 Samuel 19:15 also
+///   names Gilgal (where the crossing back over the Jordan happened) and
+///   the Jordan itself; Gilgal has the lowest id of the three.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -240,6 +246,8 @@ const _eventPlaceOverrides = {
   'Fed by the widow of Zarephath': 'Zarephath',
   "Intercepts Ahaziah's messengers": 'Samaria 1',
   'Returns to Samaria': 'Samaria 1',
+  "Flees Absalom's rebellion to Mahanaim": 'Mahanaim',
+  "Returns to Jerusalem after Absalom's defeat": 'Jerusalem',
 };
 
 /// A person's dated events, each resolved to the first place named in its

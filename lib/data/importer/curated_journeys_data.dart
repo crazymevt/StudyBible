@@ -10,8 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - David (`david_994`) — 3 events, but "Reign of David" is one
-///     668-verse blob spanning his whole 40-year reign
 ///   - Isaiah (`isaiah_617`)
 ///   - Jeremiah (`jeremiah_853`)
 ///   - Daniel (`daniel_975`)
@@ -296,5 +294,138 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       verse: 15,
       placeName: 'Jerusalem',
     ),
+  ]),
+
+  // David's life between the two events the bundled dataset already gets
+  // right ("David Kills Goliath" at -1066, "Death of David" at -1014) —
+  // "Reign of David" in between is one 668-verse blob covering his entire
+  // 40-year reign, replaced here with the real stops it collapses. Two
+  // citations below aren't the first ones tried: 2 Samuel 11:1 (the Rabbah
+  // siege beginning) literally says "David remained at Jerusalem" while
+  // Joab besieged it — the siege David himself finished is 12:29, after
+  // Nathan's rebuke.
+  CuratedPersonJourney(personSlug: 'david_994', waypoints: [
+    CuratedWaypoint(
+      title: 'Anointed by Samuel at Bethlehem',
+      year: -1068,
+      bookName: '1 Samuel',
+      chapter: 16,
+      verse: 4,
+      placeName: 'Bethlehem 1',
+    ),
+    // -1066: "David Kills Goliath" (bundled dataset, unchanged) -> Azekah.
+    CuratedWaypoint(
+      title: 'Flees to the priest at Nob',
+      year: -1062,
+      bookName: '1 Samuel',
+      chapter: 21,
+      verse: 1,
+      placeName: 'Nob',
+    ),
+    CuratedWaypoint(
+      title: 'Feigns madness before Achish at Gath',
+      year: -1061,
+      bookName: '1 Samuel',
+      chapter: 21,
+      verse: 10,
+      placeName: 'Gath 1',
+    ),
+    CuratedWaypoint(
+      title: 'Gathers followers at the cave of Adullam',
+      year: -1060,
+      bookName: '1 Samuel',
+      chapter: 22,
+      verse: 1,
+      placeName: 'Adullam',
+    ),
+    CuratedWaypoint(
+      title: 'Rescues Keilah from the Philistines',
+      year: -1059,
+      bookName: '1 Samuel',
+      chapter: 23,
+      verse: 5,
+      placeName: 'Keilah',
+    ),
+    CuratedWaypoint(
+      title: "Spares Saul's life at En-gedi",
+      year: -1058,
+      bookName: '1 Samuel',
+      chapter: 24,
+      verse: 1,
+      placeName: 'Engedi',
+    ),
+    CuratedWaypoint(
+      title: 'Nabal and Abigail at Carmel',
+      year: -1057,
+      bookName: '1 Samuel',
+      chapter: 25,
+      verse: 2,
+      placeName: 'Carmel 1',
+    ),
+    CuratedWaypoint(
+      title: 'Given Ziklag by Achish',
+      year: -1056,
+      bookName: '1 Samuel',
+      chapter: 27,
+      verse: 6,
+      placeName: 'Ziklag',
+    ),
+    CuratedWaypoint(
+      title: 'Anointed king over Judah at Hebron',
+      year: -1054,
+      bookName: '2 Samuel',
+      chapter: 2,
+      verse: 1,
+      placeName: 'Hebron',
+    ),
+    CuratedWaypoint(
+      title: 'Captures Jebus; establishes the City of David',
+      year: -1047,
+      bookName: '2 Samuel',
+      chapter: 5,
+      verse: 7,
+      placeName: 'City of David',
+    ),
+    CuratedWaypoint(
+      title: 'Brings the Ark up to Jerusalem',
+      year: -1046,
+      bookName: '2 Samuel',
+      chapter: 6,
+      verse: 12,
+      placeName: 'City of David',
+    ),
+    CuratedWaypoint(
+      title: 'Finishes the siege of Rabbah',
+      year: -1035,
+      bookName: '2 Samuel',
+      chapter: 12,
+      verse: 29,
+      placeName: 'Rabbah 1',
+    ),
+    CuratedWaypoint(
+      title: "Flees Absalom's rebellion to Mahanaim",
+      year: -1023,
+      bookName: '2 Samuel',
+      chapter: 17,
+      verse: 24,
+      placeName: 'Mahanaim',
+    ),
+    CuratedWaypoint(
+      title: "Returns to Jerusalem after Absalom's defeat",
+      year: -1022,
+      bookName: '2 Samuel',
+      chapter: 19,
+      verse: 15,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Numbers the people; the plague at Jerusalem',
+      year: -1017,
+      bookName: '2 Samuel',
+      chapter: 24,
+      verse: 16,
+      placeName: 'Jerusalem',
+    ),
+    // -1014: "Death of David" (bundled dataset, unchanged) -> City of David.
   ]),
 ];
