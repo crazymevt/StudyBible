@@ -66,6 +66,26 @@ class PersonJourney {
   });
 }
 
+/// Events whose account only names places rhetorically (a comparison, a
+/// prophecy, a historical aside) rather than describing where the event
+/// itself took place, so no verse in the account is a reliable waypoint.
+/// `place_verses` links a place to every verse that names it, with no
+/// distinction between "this is the scene" and "this is being cited as an
+/// example" — for these events every match the heuristic below finds is the
+/// latter, so the event is left unmapped (already a counted, handled state)
+/// rather than risk plotting a stop at whichever aside sorts first.
+///
+/// - 'Blind and Dumb Demoniac and Following Discourse': the Beelzebul
+///   controversy / sign-of-Jonah teaching (Matthew 12:22-50, Mark 3:19-30,
+///   Luke 8:19-21, Luke 11:14-36). Jesus never leaves Galilee here, but the
+///   account cites Nineveh and the Queen of the South (Matthew 12:41-42,
+///   Luke 11:30-32) as examples of repentance/wisdom, and notes scribes who
+///   "came down from Jerusalem" (Mark 3:22) — three unrelated places, none of
+///   them the event's setting.
+const _eventsWithNoReliablePlace = {
+  'Blind and Dumb Demoniac and Following Discourse',
+};
+
 /// A person's dated events, each resolved to the first place named in its
 /// account (lowest `event_verses.ord`, tie-broken by lowest place id) — the
 /// same verse-coordinate bridge [explorerEventDetailProvider] uses to
@@ -104,7 +124,9 @@ final personJourneyProvider =
 
   final datedEventIds = [
     for (final r in eventRows)
-      if (r.readNullable<int>('start_year') != null) r.read<int>('event_id'),
+      if (r.readNullable<int>('start_year') != null &&
+          !_eventsWithNoReliablePlace.contains(r.read<String>('title')))
+        r.read<int>('event_id'),
   ];
 
   // Batch-resolve places for every dated event in one query, extending the

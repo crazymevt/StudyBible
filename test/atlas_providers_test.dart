@@ -104,7 +104,17 @@ void main() {
     // Event 4: no start year at all.
     await event(4, 'An undated event', sortKey: 1.0);
 
-    for (final eventId in [1, 2, 3, 4]) {
+    // Event 5: matches the curated no-reliable-place exclusion by title —
+    // every place its account names (Nineveh, the Queen of the South,
+    // Jerusalem) is a rhetorical aside, not the event's setting, so it
+    // should fall through to unmapped rather than plotting any of them.
+    await place(4, 'Nineveh', 36.36, 43.15);
+    await event(5, 'Blind and Dumb Demoniac and Following Discourse',
+        sortKey: 28.0, startYear: 28);
+    await eventVerse(5, 5, 0, 'Matthew', 12, 41);
+    await placeVerse(4, 4, 'Matthew', 12, 41);
+
+    for (final eventId in [1, 2, 3, 4, 5]) {
       await participant(eventId, eventId, 1);
     }
 
@@ -135,8 +145,17 @@ void main() {
       () async {
     final journey =
         await container.read(personJourneyProvider(1).future);
-    expect(journey!.unmappedEventCount, 1);
+    expect(journey!.unmappedEventCount, 2);
     expect(journey.undatedEventCount, 1);
+  });
+
+  test('an event on the no-reliable-place list is treated as unmapped',
+      () async {
+    final journey =
+        await container.read(personJourneyProvider(1).future);
+    expect(journey!.waypoints.map((w) => w.placeName), isNot(contains('Nineveh')));
+    expect(journey.waypoints.map((w) => w.eventId), isNot(contains(5)));
+    expect(journey.unmappedEventCount, 2);
   });
 
   test('a person with no events resolves to an empty journey', () async {
@@ -156,6 +175,7 @@ void main() {
 
   test('allPlacesProvider returns every place, name-ordered', () async {
     final places = await container.read(allPlacesProvider.future);
-    expect(places.map((p) => p.name), ['Antioch', 'Damascus', 'Iconium']);
+    expect(places.map((p) => p.name),
+        ['Antioch', 'Damascus', 'Iconium', 'Nineveh']);
   });
 }
