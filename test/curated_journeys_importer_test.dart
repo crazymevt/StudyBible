@@ -375,4 +375,26 @@ void main() {
     // to Jerusalem, where he flees and remains for the rest of his reign.
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Jehoiakim's journey has the bundled enthronement plus Nebuchadnezzar's "
+      "first deportation and the scroll-burning, in chronological order",
+      () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final jehoiakim = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('jehoiakim_1085')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(jehoiakim.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Jerusalem', // bundled: "Reign of Jehoiakim" enthronement notice
+      'Jerusalem',
+      'Babylon 1',
+      'Jerusalem',
+    ]);
+    // Nothing is superseded — the bundled event already resolves correctly
+    // to Jerusalem, where his reign begins.
+    expect(journey.unmappedEventCount, 0);
+  });
 }

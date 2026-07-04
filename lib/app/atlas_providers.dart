@@ -268,6 +268,9 @@ const _eventsSupersededByCuratedJourney = {
 ///   eyes at Riblah': 2 Kings 25:6 and Jeremiah 39:6 both also name Babylon
 ///   (his eventual destination, not yet reached); Babylon has the lower id
 ///   in both.
+/// - 'Bound in fetters by Nebuchadnezzar at Jerusalem': 2 Chronicles 36:6
+///   also names Babylon (where he's being taken, this same event's *other*
+///   curated waypoint); Babylon has the lower id.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -305,6 +308,7 @@ const _eventPlaceOverrides = {
   'Captured in the plains of Jericho': 'Jericho 1',
   'Sentenced before Nebuchadnezzar at Riblah': 'Riblah 1',
   'Sons slain before his eyes at Riblah': 'Riblah 1',
+  'Bound in fetters by Nebuchadnezzar at Jerusalem': 'Jerusalem',
 };
 
 /// A person's dated events, each resolved to the first place named in its

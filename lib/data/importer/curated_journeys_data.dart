@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Jehoiakim (`jehoiakim_1085`)
 ///   - Abimelech (`abimelech_41`)
 ///   - Caleb (`caleb_537`)
 ///   - Esau (`esau_1216`)
@@ -918,6 +917,46 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       bookName: '2 Chronicles',
       chapter: 12,
       verse: 5,
+      placeName: 'Jerusalem',
+    ),
+  ]),
+
+  // Like Rehoboam, the bundled "Reign of Jehoiakim" event (2 Kings 23:36-24:7)
+  // already resolves correctly to Jerusalem via its first placed verse
+  // (23:36, his enthronement notice) and is kept as-is. Added here: an
+  // earlier episode the 2 Kings summary telescopes past entirely —
+  // Nebuchadnezzar's first campaign against Judah, which carried Jehoiakim
+  // off to Babylon with some of the temple vessels (2 Chr 36:6-7; the same
+  // event Daniel 1:1-2 describes from Daniel's side) — and the scroll-burning
+  // incident (Jeremiah 36) a couple of years later, after he'd been
+  // reinstated as a tribute-paying vassal back in Jerusalem. Jeremiah's
+  // prophecy that he'd die and be buried "beyond the gates of Jerusalem"
+  // (Jer. 22:19) is deliberately excluded — it's a prophetic oracle spoken
+  // while Jehoiakim was still alive, not a narrated report of his actual
+  // death, and no other verse ties his death to a place.
+  CuratedPersonJourney(personSlug: 'jehoiakim_1085', waypoints: [
+    CuratedWaypoint(
+      title: 'Bound in fetters by Nebuchadnezzar at Jerusalem',
+      year: -605,
+      bookName: '2 Chronicles',
+      chapter: 36,
+      verse: 6,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Carried captive to Babylon with the temple vessels',
+      year: -605,
+      bookName: '2 Chronicles',
+      chapter: 36,
+      verse: 7,
+      placeName: 'Babylon 1',
+    ),
+    CuratedWaypoint(
+      title: "Baruch reads Jeremiah's scroll before the fast at Jerusalem",
+      year: -603,
+      bookName: 'Jeremiah',
+      chapter: 36,
+      verse: 9,
       placeName: 'Jerusalem',
     ),
   ]),
