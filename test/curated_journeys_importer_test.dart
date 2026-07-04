@@ -231,4 +231,25 @@ void main() {
     // "Prophecies of Jeremiah" is superseded by these curated stops.
     expect(journey.unmappedEventCount, 1);
   });
+
+  test("Daniel's journey has all 5 real stops in chronological order",
+      () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final daniel = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('daniel_975')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(daniel.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Jerusalem',
+      'Babylon 1',
+      'Babylon 1',
+      'Susa',
+      'Tigris',
+    ]);
+    // "Prophecies of Daniel" is superseded by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
 }

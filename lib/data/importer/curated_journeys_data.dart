@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Daniel (`daniel_975`)
 ///   - Ahab (`ahab_113`)
 ///   - Jeroboam (`jeroboam_872`)
 ///   - Gideon (`gideon_1314`)
@@ -540,6 +539,61 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 43,
       verse: 7,
       placeName: 'Tahpanhes',
+    ),
+  ]),
+
+  // Daniel's book is almost entirely court-set in Babylon, and — like
+  // Isaiah — several of its most narrative-sounding verses turn out to name
+  // somewhere other than Daniel's own location: 6:10's "windows... open
+  // toward Jerusalem" is the direction he prayed, not where he stood;
+  // 5:2-3's temple vessels are described by their Jerusalem origin, not
+  // Belshazzar's feast hall. The golden-image episode (ch. 3) and the
+  // lions'-den episode (ch. 6) are both skipped outright: Daniel isn't
+  // textually present at the former (only his three friends are), and no
+  // verse in the latter ties to any specific place at all. What's left is
+  // honest but includes two real, named excursions away from Babylon that
+  // are easy to miss: the ch. 8 vision at Susa and the ch. 10 vision by the
+  // Tigris.
+  CuratedPersonJourney(personSlug: 'daniel_975', waypoints: [
+    CuratedWaypoint(
+      title: 'Taken captive from Jerusalem',
+      year: -605,
+      bookName: 'Daniel',
+      chapter: 1,
+      verse: 1,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: "Brought into the king's court at Babylon",
+      year: -605,
+      bookName: 'Daniel',
+      chapter: 1,
+      verse: 3,
+      placeName: 'Babylon 1',
+    ),
+    CuratedWaypoint(
+      title: 'Made ruler over the province of Babylon',
+      year: -603,
+      bookName: 'Daniel',
+      chapter: 2,
+      verse: 48,
+      placeName: 'Babylon 1',
+    ),
+    CuratedWaypoint(
+      title: "Vision of the ram and goat at Susa",
+      year: -551,
+      bookName: 'Daniel',
+      chapter: 8,
+      verse: 2,
+      placeName: 'Susa',
+    ),
+    CuratedWaypoint(
+      title: 'Vision by the great river Tigris',
+      year: -536,
+      bookName: 'Daniel',
+      chapter: 10,
+      verse: 4,
+      placeName: 'Tigris',
     ),
   ]),
 ];

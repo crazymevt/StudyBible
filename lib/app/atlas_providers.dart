@@ -149,6 +149,7 @@ const _eventsSupersededByCuratedJourney = {
   'Reign of David',
   'Prophecies of Isaiah',
   'Prophecies of Jeremiah',
+  'Prophecies of Daniel',
 };
 
 /// Event → the place name that should win instead of whatever the default
@@ -242,6 +243,11 @@ const _eventsSupersededByCuratedJourney = {
 /// - 'Forcibly taken to Tahpanhes in Egypt': Jeremiah 43:7 names Egypt (the
 ///   country) and Tahpanhes (the specific city they settled in) in the same
 ///   verse; Egypt has the lower id.
+/// - 'Taken captive from Jerusalem': Daniel 1:1 also names Babylon
+///   (Nebuchadnezzar's home, not yet Daniel's); Babylon has the lower id.
+/// - 'Vision of the ram and goat at Susa': Daniel 8:2 names Elam (the
+///   province Susa is in) and the river Ulai alongside Susa itself, the
+///   named city ("I was at Shushan"); both have lower ids.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -270,6 +276,8 @@ const _eventPlaceOverrides = {
   'Released from his chains at Ramah': 'Ramah 1',
   'Stops at Geruth Chimham, fleeing toward Egypt': 'Geruth Chimham',
   'Forcibly taken to Tahpanhes in Egypt': 'Tahpanhes',
+  'Taken captive from Jerusalem': 'Jerusalem',
+  'Vision of the ram and goat at Susa': 'Susa',
 };
 
 /// A person's dated events, each resolved to the first place named in its
