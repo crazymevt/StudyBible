@@ -44,6 +44,31 @@ Creative Commons Attribution-ShareAlike 4.0 International License
 (https://creativecommons.org/licenses/by-sa/4.0/). Changes: converted to a
 compact JSON form by scripts/build_theographic.dart (record links resolved to
 array indexes, Easton's dictionary text flattened to plain text, verse ids
-decoded to book/chapter/verse references). As a derivative of that dataset,
-assets/data/theographic.json is itself licensed CC BY-SA 4.0; the application
-code remains under the Apache License 2.0.
+decoded to book/chapter/verse references); one corrected verse link ("Death of
+Moses" pointed to Genesis 34:1 upstream, a book/verse-ID collision, corrected
+to Deuteronomy 34:1). As a derivative of that dataset, assets/data/theographic.json
+is itself licensed CC BY-SA 4.0; the application code remains under the Apache
+License 2.0.
+
+------------------------------------------------------------------------------
+This application bundles a dataset (assets/data/places.json) derived from
+Bible-Geocoding-Data by OpenBible.info,
+https://github.com/openbibleinfo/Bible-Geocoding-Data, licensed under the
+Creative Commons Attribution 4.0 International License
+(https://creativecommons.org/licenses/by/4.0/). Changes: converted to a
+compact JSON form by tool/build_places.dart (one representative modern
+coordinate chosen per ancient place, verse ids decoded to book/chapter/verse
+references). As a derivative of that dataset, assets/data/places.json is
+itself licensed CC BY 4.0; the application code remains under the Apache
+License 2.0.
+
+------------------------------------------------------------------------------
+lib/data/importer/curated_journeys_data.dart contains hand-authored Atlas
+journey waypoints (people and places the bundled datasets above don't
+otherwise link with enough detail to plot a real route). It cross-references
+those datasets by their own identifiers (bible_people.slug from Theographic
+Bible Metadata, places.name from Bible-Geocoding-Data) for interoperability,
+but its content — which verse establishes each waypoint, and which place it
+resolves to — is independently researched against the source text, not
+copied or adapted from either bundled dataset. It is licensed under the
+Apache License 2.0 along with the rest of the application code.
