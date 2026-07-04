@@ -89,7 +89,16 @@ class _NotebooksPanelState extends ConsumerState<NotebooksPanel> {
     // notebook list.
     final activePageId = ref.watch(selectedNotebookPageIdProvider);
     if (activePageId != null) {
-      return NotebookPageEditorScreen(pageId: activePageId, isFullScreen: false);
+      // Keyed on the page id so switching to a different page (e.g. from an
+      // Explorer backlink while this panel is already open) mounts a fresh
+      // editor instead of reusing the old one's State — the editor only loads
+      // its content in initState(), so without this key it would keep
+      // showing the previous page.
+      return NotebookPageEditorScreen(
+        key: ValueKey(activePageId),
+        pageId: activePageId,
+        isFullScreen: false,
+      );
     }
     final activeNotebookId = ref.watch(selectedNotebookIdProvider);
     if (activeNotebookId != null) {

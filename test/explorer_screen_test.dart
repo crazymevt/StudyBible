@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_bible/app/content_providers.dart';
+import 'package:study_bible/app/notebook_providers.dart';
 import 'package:study_bible/app/people_providers.dart';
 import 'package:study_bible/app/place_providers.dart';
 import 'package:study_bible/app/sermon_providers.dart';
@@ -203,6 +206,52 @@ void main() {
           contentPlain:
               Value('Turn with me to 1 Samuel 24:1, David and Saul.'),
         ));
+
+    // A notebook page explicitly linked to Saul ("Link to Explorer") and
+    // separately citing the chapter in prose, for the "Your notebooks" cards
+    // on both the person page and the passage page.
+    await userStore.into(userStore.notebooks).insert(const NotebooksCompanion(
+          id: Value('notebook-1'),
+          createdAt: Value(0),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('Study Notes'),
+        ));
+    await userStore.into(userStore.notebookPages).insert(
+          NotebookPagesCompanion(
+            id: const Value('page-1'),
+            createdAt: const Value(0),
+            updatedAt: const Value(0),
+            deviceId: const Value('test-device'),
+            notebookId: const Value('notebook-1'),
+            title: const Value('On Saul'),
+            content: Value(jsonEncode([
+              {
+                'insert': 'Saul',
+                'attributes': {'link': 'sbent:person|1'},
+              },
+              {'insert': ' hides from David in 1 Samuel 24.\n'},
+            ])),
+            contentPlain:
+                const Value('Saul hides from David in 1 Samuel 24.'),
+          ),
+        );
+    // A second page citing the same chapter in prose (no explicit entity
+    // link), so the passage page's Your-notebooks card has two distinct
+    // pages to switch between.
+    await userStore.into(userStore.notebookPages).insert(
+          const NotebookPagesCompanion(
+            id: Value('page-2'),
+            createdAt: Value(0),
+            updatedAt: Value(0),
+            deviceId: Value('test-device'),
+            notebookId: Value('notebook-1'),
+            title: Value('On the Wilderness'),
+            content: Value(
+                '[{"insert":"Reflections on 1 Samuel 24 today.\\n"}]'),
+            contentPlain: Value('Reflections on 1 Samuel 24 today.'),
+          ),
+        );
   });
 
   tearDown(() async {
@@ -347,6 +396,77 @@ void main() {
     expect(container.read(appModuleProvider), AppModule.reader);
     expect(container.read(activeToolProvider), ActiveTool.sermons);
     expect(container.read(selectedSermonIdProvider), 'sermon-1');
+  });
+
+  testWidgets(
+      'tapping a sermon from Explorer keeps the sermons panel open even if '
+      'it was already open (regression: setTool toggled it closed)',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final container = await pump(tester);
+    // Simulate the sermons panel already being open before jumping in from
+    // Explorer — this is the state that used to trigger the bug.
+    container.read(activeToolProvider.notifier).openTool(ActiveTool.sermons);
+
+    await tester.tap(find.textContaining('Explore 1 Samuel 24'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sparing an Enemy'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(activeToolProvider), ActiveTool.sermons);
+    expect(container.read(selectedSermonIdProvider), 'sermon-1');
+  });
+
+  testWidgets(
+      'passage and person pages show the Your-notebooks card, linked back '
+      'to the reader-side notebook editor', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final container = await pump(tester);
+
+    await tester.tap(find.textContaining('Explore 1 Samuel 24'));
+    await tester.pumpAndSettle();
+    // Both pages cite the chapter; only "On Saul" explicitly links to him.
+    expect(find.text('Your notebooks (2)'), findsOneWidget);
+    expect(find.text('On Saul'), findsOneWidget);
+    expect(find.text('On the Wilderness'), findsOneWidget);
+
+    // Saul's own page carries the backlink too, since the notebook page
+    // explicitly links to him (not just cites the chapter in prose).
+    await tester.tap(find.textContaining('Saul', findRichText: true).first);
+    await tester.pumpAndSettle();
+    expect(find.text('Your notebooks (1)'), findsOneWidget);
+
+    // Tapping it opens the page in the reader's notebooks tool (desktop path).
+    await tester.tap(find.text('On Saul'));
+    await tester.pumpAndSettle();
+    expect(container.read(appModuleProvider), AppModule.reader);
+    expect(container.read(activeToolProvider), ActiveTool.notebooks);
+    expect(container.read(selectedNotebookPageIdProvider), 'page-1');
+  });
+
+  testWidgets(
+      'tapping a notebook page from Explorer keeps the notebooks panel open '
+      'even if it was already open (regression: setTool toggled it closed)',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final container = await pump(tester);
+    // Simulate the notebooks panel already being open before jumping in from
+    // Explorer — this is the state that used to trigger the bug.
+    container.read(activeToolProvider.notifier).openTool(ActiveTool.notebooks);
+
+    await tester.tap(find.textContaining('Explore 1 Samuel 24'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('On Saul'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(activeToolProvider), ActiveTool.notebooks);
+    expect(container.read(selectedNotebookPageIdProvider), 'page-1');
   });
 
   testWidgets(

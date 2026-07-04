@@ -342,7 +342,7 @@ class SearchResultsList extends ConsumerWidget {
                 
                 if (item.type == 'note') {
                   if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
-                    ref.read(activeToolProvider.notifier).setTool(ActiveTool.notes);
+                    ref.read(activeToolProvider.notifier).openTool(ActiveTool.notes);
                   } else {
                     showModalBottomSheet(
                       context: context,
@@ -369,7 +369,7 @@ class SearchResultsList extends ConsumerWidget {
                 ));
               } else {
                 ref.read(selectedSermonIdProvider.notifier).set(item.referenceId);
-                ref.read(activeToolProvider.notifier).setTool(ActiveTool.sermons);
+                ref.read(activeToolProvider.notifier).openTool(ActiveTool.sermons);
               }
             } else if (item.type == 'notebookPage') {
               if (MediaQuery.sizeOf(context).width <= Breakpoints.compact) {
@@ -384,7 +384,7 @@ class SearchResultsList extends ConsumerWidget {
                     .set(item.referenceId);
                 ref
                     .read(activeToolProvider.notifier)
-                    .setTool(ActiveTool.notebooks);
+                    .openTool(ActiveTool.notebooks);
               }
             } else if (item.type == 'dictionary') {
               ref
@@ -407,7 +407,7 @@ class SearchResultsList extends ConsumerWidget {
               } else {
                 ref
                     .read(activeToolProvider.notifier)
-                    .setTool(ActiveTool.dictionary);
+                    .openTool(ActiveTool.dictionary);
               }
             } else if (item.type == 'topic') {
               ref
@@ -428,7 +428,7 @@ class SearchResultsList extends ConsumerWidget {
                   ),
                 );
               } else {
-                ref.read(activeToolProvider.notifier).setTool(ActiveTool.topics);
+                ref.read(activeToolProvider.notifier).openTool(ActiveTool.topics);
               }
             } else if (item.type == 'person') {
               ref
@@ -449,7 +449,7 @@ class SearchResultsList extends ConsumerWidget {
                   ),
                 );
               } else {
-                ref.read(activeToolProvider.notifier).setTool(ActiveTool.people);
+                ref.read(activeToolProvider.notifier).openTool(ActiveTool.people);
               }
             } else if (item.type == 'journal') {
               ref.read(selectedJournalIdProvider.notifier).setId(item.referenceId);
@@ -507,7 +507,7 @@ class SearchResultsList extends ConsumerWidget {
               } else {
                 ref
                     .read(activeToolProvider.notifier)
-                    .setTool(ActiveTool.commentaries);
+                    .openTool(ActiveTool.commentaries);
               }
             }
           },
@@ -611,7 +611,7 @@ class GroupedSearchResultsList extends ConsumerWidget {
                   } else {
                     ref
                         .read(activeToolProvider.notifier)
-                        .setTool(ActiveTool.dictionary);
+                        .openTool(ActiveTool.dictionary);
                   }
                 } else if (item.type == 'commentary') {
                   if (item.book != null && item.book != 'General') {
@@ -641,7 +641,7 @@ class GroupedSearchResultsList extends ConsumerWidget {
                   } else {
                     ref
                         .read(activeToolProvider.notifier)
-                        .setTool(ActiveTool.commentaries);
+                        .openTool(ActiveTool.commentaries);
                   }
                 }
               },

@@ -87,7 +87,16 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
   Widget build(BuildContext context) {
     final activeSermonId = ref.watch(selectedSermonIdProvider);
     if (activeSermonId != null) {
-      return SermonEditorScreen(sermonId: activeSermonId, isFullScreen: false);
+      // Keyed on the sermon id so switching to a different sermon (e.g. from
+      // an Explorer backlink while this panel is already open) mounts a
+      // fresh editor instead of reusing the old one's State — the editor
+      // only loads its content in initState(), so without this key it would
+      // keep showing the previous sermon.
+      return SermonEditorScreen(
+        key: ValueKey(activeSermonId),
+        sermonId: activeSermonId,
+        isFullScreen: false,
+      );
     }
 
     final sermonsAsync = ref.watch(allSermonsProvider);

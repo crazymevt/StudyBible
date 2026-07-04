@@ -80,7 +80,7 @@ void explorerOpenTaggedItem(
       } else {
         ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
         ref.read(selectedSermonIdProvider.notifier).set(item.referenceId);
-        ref.read(activeToolProvider.notifier).setTool(ActiveTool.sermons);
+        ref.read(activeToolProvider.notifier).openTool(ActiveTool.sermons);
         nav.popUntil((route) => route.isFirst);
       }
     case 'journal':
@@ -123,14 +123,14 @@ void explorerOpenTaggedItem(
       } else {
         ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
         ref.read(selectedNotebookPageIdProvider.notifier).set(item.referenceId);
-        ref.read(activeToolProvider.notifier).setTool(ActiveTool.notebooks);
+        ref.read(activeToolProvider.notifier).openTool(ActiveTool.notebooks);
         nav.popUntil((route) => route.isFirst);
       }
     case 'notebook':
       ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
       ref.read(selectedNotebookPageIdProvider.notifier).set(null);
       ref.read(selectedNotebookIdProvider.notifier).set(item.referenceId);
-      ref.read(activeToolProvider.notifier).setTool(ActiveTool.notebooks);
+      ref.read(activeToolProvider.notifier).openTool(ActiveTool.notebooks);
       nav.popUntil((route) => route.isFirst);
   }
 }
