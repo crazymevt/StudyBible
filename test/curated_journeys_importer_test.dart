@@ -160,6 +160,37 @@ void main() {
     expect(journey.unmappedEventCount, 1);
   });
 
+  test("Isaiah's journey has both real stops (honestly short — his whole "
+      "biography is essentially one location)", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final isaiah = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('isaiah_617')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(isaiah.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName),
+        ['Jerusalem', 'Upper Pool']);
+    // "Prophecies of Isaiah" is superseded by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
+
+  test('backfills the Isaiah 6:1 / Jerusalem place-verse link', () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final jerusalem = await (store.select(store.places)
+          ..where((p) => p.name.equals('Jerusalem')))
+        .getSingle();
+    final link = await (store.select(store.placeVerses)
+          ..where((pv) =>
+              pv.placeId.equals(jerusalem.id) &
+              pv.bookName.equals('Isaiah') &
+              pv.chapter.equals(6) &
+              pv.verse.equals(1)))
+        .getSingleOrNull();
+    expect(link, isNotNull);
+  });
+
   test('backfills the Abel-meholah / 1 Kings 19:19 place-verse link',
       () async {
     await container.read(curatedJourneysReadyProvider.future);

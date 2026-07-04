@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Isaiah (`isaiah_617`)
 ///   - Jeremiah (`jeremiah_853`)
 ///   - Daniel (`daniel_975`)
 ///   - Ahab (`ahab_113`)
@@ -427,5 +426,33 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       placeName: 'Jerusalem',
     ),
     // -1014: "Death of David" (bundled dataset, unchanged) -> City of David.
+  ]),
+
+  // Isaiah's entire recorded biography, unlike every prior figure here, is
+  // essentially one-location: court prophet to four kings, all in
+  // Jerusalem. Most of the book's narrative-sounding episodes turn out on
+  // close reading to describe someone *else's* location, not his own — the
+  // Assyrian general reaching Ashdod (20:1), the Rabshakeh from Lachish
+  // (36:2), Babylonian envoys (39:1) — the same "names a place, but not the
+  // narrator's own" pattern documented elsewhere in this file. Kept honest
+  // and short rather than padded: two real stops, both effectively in or
+  // just outside Jerusalem.
+  CuratedPersonJourney(personSlug: 'isaiah_617', waypoints: [
+    CuratedWaypoint(
+      title: 'Called as a prophet in the Temple',
+      year: -758,
+      bookName: 'Isaiah',
+      chapter: 6,
+      verse: 1,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Meets Ahaz at the Upper Pool conduit',
+      year: -734,
+      bookName: 'Isaiah',
+      chapter: 7,
+      verse: 3,
+      placeName: 'Upper Pool',
+    ),
   ]),
 ];
