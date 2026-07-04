@@ -111,6 +111,22 @@ void main() {
     expect(journey.unmappedEventCount, 1);
   });
 
+  test("Solomon's journey has all 3 real stops in chronological order",
+      () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final solomon = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('solomon_2762')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(solomon.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName),
+        ['Gihon 2', 'Gibeon', 'Jerusalem']);
+    // "Reign of Solomon" is superseded by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
+
   test('backfills the Abel-meholah / 1 Kings 19:19 place-verse link',
       () async {
     await container.read(curatedJourneysReadyProvider.future);

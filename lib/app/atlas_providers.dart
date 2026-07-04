@@ -145,6 +145,7 @@ const _eventsWithNoReliablePlace = {
 const _eventsSupersededByCuratedJourney = {
   'Prophecies of Elijah',
   'Prophecies of Elisha',
+  'Reign of Solomon',
 };
 
 /// Event → the place name that should win instead of whatever the default

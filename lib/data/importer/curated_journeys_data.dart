@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Solomon (`solomon_2762`)
 ///   - David (`david_994`) — 3 events, but "Reign of David" is one
 ///     668-verse blob spanning his whole 40-year reign
 ///   - Isaiah (`isaiah_617`)
@@ -263,6 +262,39 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 8,
       verse: 7,
       placeName: 'Damascus',
+    ),
+  ]),
+
+  // Solomon's reign, ~1015-975 BC. Unlike Elijah/Elisha, Solomon was a
+  // stationary administrative king, not an itinerant one — his diplomatic
+  // and building activity (Tyre, Hazor, Megiddo, Gezer, Ezion-geber, the
+  // Queen of Sheba's visit) happened via envoys, workforces, or visitors
+  // coming to him, not Solomon personally traveling. His own real,
+  // text-confirmed movement is just this one early round trip.
+  CuratedPersonJourney(personSlug: 'solomon_2762', waypoints: [
+    CuratedWaypoint(
+      title: 'Anointed king at Gihon',
+      year: -1015,
+      bookName: '1 Kings',
+      chapter: 1,
+      verse: 38,
+      placeName: 'Gihon 2',
+    ),
+    CuratedWaypoint(
+      title: 'Sacrifices at Gibeon; asks for wisdom',
+      year: -1014,
+      bookName: '1 Kings',
+      chapter: 3,
+      verse: 4,
+      placeName: 'Gibeon',
+    ),
+    CuratedWaypoint(
+      title: 'Returns to Jerusalem to reign',
+      year: -1013,
+      bookName: '1 Kings',
+      chapter: 3,
+      verse: 15,
+      placeName: 'Jerusalem',
     ),
   ]),
 ];
