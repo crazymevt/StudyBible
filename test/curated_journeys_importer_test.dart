@@ -276,4 +276,31 @@ void main() {
     // event was only a 3-verse succession notice, not a life-spanning blob.
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Jeroboam's journey has all 9 real stops in chronological order",
+      () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final jeroboam = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('jeroboam_872')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(jeroboam.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Zeredah 1',
+      'Egypt',
+      'Egypt',
+      'Shechem',
+      'Shechem',
+      'Penuel',
+      'Bethel 1',
+      'Dan',
+      'Bethel 1',
+    ]);
+    // "Reign of Jeroboam I" (a false-positive resolution to Egypt via the
+    // gazetteer's own retrospective tagging of 1 Kings 12:20) is superseded
+    // by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
 }

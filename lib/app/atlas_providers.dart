@@ -150,6 +150,7 @@ const _eventsSupersededByCuratedJourney = {
   'Prophecies of Isaiah',
   'Prophecies of Jeremiah',
   'Prophecies of Daniel',
+  'Reign of Jeroboam I',
 };
 
 /// Event → the place name that should win instead of whatever the default
@@ -248,6 +249,12 @@ const _eventsSupersededByCuratedJourney = {
 /// - 'Vision of the ram and goat at Susa': Daniel 8:2 names Elam (the
 ///   province Susa is in) and the river Ulai alongside Susa itself, the
 ///   named city ("I was at Shushan"); both have lower ids.
+/// - 'Rebuilds and settles at Shechem as his capital': 1 Kings 12:25 names
+///   both Shechem ("built Shechem... and dwelt therein") and Penuel (built
+///   afterward, in the same verse); Penuel has the lower id.
+/// - 'Sets up the golden calf at Dan': 1 Kings 12:29 names both Bethel and
+///   Dan in the same verse (one calf at each); Bethel — this same event's
+///   *other* curated waypoint — has the lower id.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -278,6 +285,8 @@ const _eventPlaceOverrides = {
   'Forcibly taken to Tahpanhes in Egypt': 'Tahpanhes',
   'Taken captive from Jerusalem': 'Jerusalem',
   'Vision of the ram and goat at Susa': 'Susa',
+  'Rebuilds and settles at Shechem as his capital': 'Shechem',
+  'Sets up the golden calf at Dan': 'Dan',
 };
 
 /// A person's dated events, each resolved to the first place named in its

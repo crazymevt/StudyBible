@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Jeroboam (`jeroboam_872`)
 ///   - Gideon (`gideon_1314`)
 ///   - Zedekiah (`zedekiah_1950`)
 ///   - Rehoboam (`rehoboam_2412`)
@@ -651,6 +650,93 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 22,
       verse: 37,
       placeName: 'Samaria 1',
+    ),
+  ]),
+
+  // The bundled dataset's "Reign of Jeroboam I" resolves to Egypt via 1
+  // Kings 12:20 — but that verse's own text is "when all Israel heard that
+  // Jeroboam was come again... made him king", meaning he had *already*
+  // returned by then. It's the same retrospective-reference pattern found
+  // throughout this file, just from the gazetteer's own tagging rather than
+  // theographic.json's event data. Superseded here with real stops:
+  // 12:28's "brought thee up out of Egypt" and 11:29's "went out of
+  // Jerusalem" (where Ahijah, "the Shilonite", is found "in the way" — an
+  // unspecified location between the two, not actually Jerusalem or Shiloh)
+  // are both skipped for the same reason. So are 14:2 and 14:17: both
+  // describe his wife's errand to Shiloh and back to Tirzah, not Jeroboam's
+  // own location.
+  CuratedPersonJourney(personSlug: 'jeroboam_872', waypoints: [
+    CuratedWaypoint(
+      title: 'Introduced as an Ephraimite of Zeredah',
+      year: -990,
+      bookName: '1 Kings',
+      chapter: 11,
+      verse: 26,
+      placeName: 'Zeredah 1',
+    ),
+    CuratedWaypoint(
+      title: 'Flees to Egypt from Solomon',
+      year: -988,
+      bookName: '1 Kings',
+      chapter: 11,
+      verse: 40,
+      placeName: 'Egypt',
+    ),
+    CuratedWaypoint(
+      title: "Hears of Solomon's death while still in Egypt",
+      year: -975,
+      bookName: '1 Kings',
+      chapter: 12,
+      verse: 2,
+      placeName: 'Egypt',
+    ),
+    CuratedWaypoint(
+      title: 'Returns and is made king over Israel at Shechem',
+      year: -975,
+      bookName: '1 Kings',
+      chapter: 12,
+      verse: 1,
+      placeName: 'Shechem',
+    ),
+    CuratedWaypoint(
+      title: 'Rebuilds and settles at Shechem as his capital',
+      year: -974,
+      bookName: '1 Kings',
+      chapter: 12,
+      verse: 25,
+      placeName: 'Shechem',
+    ),
+    CuratedWaypoint(
+      title: 'Also fortifies Penuel',
+      year: -974,
+      bookName: '1 Kings',
+      chapter: 12,
+      verse: 25,
+      placeName: 'Penuel',
+    ),
+    CuratedWaypoint(
+      title: 'Sets up the golden calf at Bethel',
+      year: -973,
+      bookName: '1 Kings',
+      chapter: 12,
+      verse: 29,
+      placeName: 'Bethel 1',
+    ),
+    CuratedWaypoint(
+      title: 'Sets up the golden calf at Dan',
+      year: -973,
+      bookName: '1 Kings',
+      chapter: 12,
+      verse: 29,
+      placeName: 'Dan',
+    ),
+    CuratedWaypoint(
+      title: 'Confronted by the man of God from Judah at Bethel',
+      year: -973,
+      bookName: '1 Kings',
+      chapter: 13,
+      verse: 1,
+      placeName: 'Bethel 1',
     ),
   ]),
 ];
