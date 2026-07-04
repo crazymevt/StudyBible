@@ -55,6 +55,20 @@ const List<String> kBooks = [
   '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation',
 ];
 
+/// Known-bad verse links in the upstream dataset, corrected here so
+/// re-running this script doesn't silently reintroduce them. Keyed by
+/// (event title, 0-based book index, chapter, verse) since events don't
+/// have stable ids across re-imports.
+///
+/// - 'Death of Moses' -> Genesis 34:1 (Dinah's story, unrelated) instead of
+///   Deuteronomy 34:1 (Moses viewing the promised land before he dies) —
+///   almost certainly a book/verse-ID collision upstream, since both verses
+///   share the same chapter:verse "34:1". Left in, this sends "Read
+///   passage" to the wrong book entirely.
+const Set<(String, int, int, int)> _knownBadVerseLinks = {
+  ('Death of Moses', 0, 34, 1),
+};
+
 Future<void> main(List<String> args) async {
   String? srcDir;
   var outputPath = 'assets/data/theographic.json';
@@ -189,12 +203,16 @@ Future<void> main(List<String> args) async {
   for (final f in readJsonFields('events.json').values) {
     final title = (f['title'] as String?)?.trim();
     if (title == null || title.isEmpty) continue;
+    final verses = resolveVerses(f['verses'])
+        .where((v) => !_knownBadVerseLinks
+            .contains((title, v[0], v[1], v[2])))
+        .toList();
     events.add({
       't': title,
       if (f['sortKey'] is num) 'k': f['sortKey'],
       if (_year(f['startDate']) != null) 'y': _year(f['startDate']),
       'pt': indexesOfLinks(f['participants']),
-      'v': resolveVerses(f['verses']),
+      'v': verses,
     });
   }
   events.sort((a, b) => ((a['k'] as num?) ?? double.maxFinite)

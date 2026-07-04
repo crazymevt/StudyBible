@@ -81,6 +81,18 @@ void main() {
     expect((aaron['v'] as List).first, [1, 4, 14]);
   });
 
+  test("Death of Moses' first verse is Deuteronomy 34:1, not Genesis 34:1",
+      () {
+    // Regression: an upstream book/verse-ID collision (both "34:1") once
+    // linked this event to Dinah's story instead of Moses viewing the
+    // promised land — corrected in build_theographic.dart's
+    // _knownBadVerseLinks.
+    final deathOfMoses = events
+        .cast<Map<String, dynamic>>()
+        .firstWhere((e) => e['t'] == 'Death of Moses');
+    expect((deathOfMoses['v'] as List).first, [4, 34, 1]);
+  });
+
   test('events are in chronological order and start at creation', () {
     final first = events.first as Map<String, dynamic>;
     expect(first['t'], contains('Creation'));
