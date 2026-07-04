@@ -1098,6 +1098,10 @@ class _TagPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(explorerTagDetailProvider(tagId));
     final crossRefs = ref.watch(explorerTagCrossRefsProvider(tagId)).asData?.value;
+    final commentaries = ref.watch(explorerTagCommentariesProvider(tagId)).asData?.value ??
+        const <ExplorerCommentarySection>[];
+    final crossRefGroups = ref.watch(explorerTagCrossReferencesProvider(tagId)).asData?.value ??
+        const <ExplorerCrossRefGroup>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this tag: $e'),
@@ -1191,6 +1195,22 @@ class _TagPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (crossRefs != null && crossRefs.topics.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.topic_outlined,
+                title: 'Topics in these verses (${crossRefs.topics.length})',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final t in crossRefs.topics)
+                      ExplorerRefChip(
+                        ExplorerRef.topic(t.id, t.label),
+                        subtitle: _tagRefCountLabel(t.verseCount),
+                      ),
+                  ],
+                ),
+              ),
             if (d.passages.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.travel_explore,
@@ -1214,6 +1234,30 @@ class _TagPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (commentaries.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.import_contacts_outlined,
+                title: 'Commentaries (${commentaries.length})',
+                child: Column(
+                  children: [
+                    for (final section in commentaries)
+                      _CommentarySection(section: section),
+                  ],
+                ),
+              ),
+            if (crossRefGroups.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.compare_arrows_outlined,
+                title: 'Cross-references '
+                    '(${crossRefGroups.fold(0, (n, g) => n + g.refs.length)})',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final group in crossRefGroups)
+                      _CrossRefGroupTile(group: group),
+                  ],
+                ),
+              ),
             if (d.notes.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.edit_note_outlined,
@@ -1231,6 +1275,16 @@ class _TagPage extends ConsumerWidget {
                 child: Column(
                   children: [
                     for (final s in d.sermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
+            if (d.notebooks.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.library_books_outlined,
+                title: 'Notebooks (${d.notebooks.length})',
+                child: Column(
+                  children: [
+                    for (final n in d.notebooks) _TaggedItemTile(item: n),
                   ],
                 ),
               ),

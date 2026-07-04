@@ -6,14 +6,6 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [~] **Expand Tags card in Explorer.** The Explorer tag page now cross-references
-  its tagged verses into the bundled datasets — People / Places (with map) /
-  Events cards, scoped to the exact verses carrying the tag
-  (`explorerTagCrossRefsProvider`) — and shows a **Media** card of attachments
-  filed under the tag, opening the in-app image/PDF viewer. **Remaining:**
-  commentaries cross-reference (show installed-commentary entries on the tagged
-  verses, like the passage page's Commentaries card).
-
 ## Research
 
 - [ ] **Explorer — richer content on entity/passage pages.** Three enrichments
@@ -93,6 +85,26 @@ Running list of known issues and follow-ups.
 ## Issues
 
 ## Archive
+
+- [x] **Expand Tags card in Explorer.** Full parity with the passage page: on
+  top of the People / Places (with map) / Events cards and the Media card
+  already shipped, the tag page now also cross-references its tagged verses
+  into **Topics** (`explorerTagCrossRefsProvider`, extended with a `topics`
+  field — Nave's Topical Bible entries, counting a whole-chapter reference as
+  touching every tagged verse and a ranged reference by overlap),
+  **Commentaries** (`explorerTagCommentariesProvider` — installed-commentary
+  entries whose verse is one of the tagged verses; unlike the passage page,
+  whole-chapter entries with no verse are excluded since there's no specific
+  tagged verse to scope them to), and the bundled **Cross-references**
+  dataset (`explorerTagCrossReferencesProvider` — `cross_references` rows
+  sourced from a tagged verse, grouped by verse, votes-descending). All three
+  reuse a new shared `_tagVersesByChapter` helper (tagged verse numbers
+  grouped by chapter) so each chapter is queried once regardless of how many
+  verses are tagged in it. Also fixed a separate gap found along the way:
+  notebooks/notebook pages tagged directly were silently dropped by
+  `ExplorerTagDetail`'s `ofType` bucketing (unlike sermons/notes/journals/
+  prayers, which were already surfaced) — added a `notebooks` field and a
+  matching card.
 
 - [x] **Notebooks tool — Cross-Referencing (final sub-item).** Closes out the
   Notebooks tool: entity linking tying notebook pages back to the Explorer,

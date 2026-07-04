@@ -846,6 +846,9 @@ class ExplorerTagDetail {
   final List<SearchResult> journals;
   final List<SearchResult> prayers;
 
+  /// Notebooks/notebook pages directly filed under this tag.
+  final List<SearchResult> notebooks;
+
   /// Media attachments filed under this tag (images/PDFs), newest first.
   final List<MediaAttachment> media;
 
@@ -861,6 +864,7 @@ class ExplorerTagDetail {
     required this.sermons,
     required this.journals,
     required this.prayers,
+    required this.notebooks,
     required this.media,
     required this.related,
   }) : passages = _distinctChapters(verses);
@@ -871,6 +875,7 @@ class ExplorerTagDetail {
       sermons.isEmpty &&
       journals.isEmpty &&
       prayers.isEmpty &&
+      notebooks.isEmpty &&
       media.isEmpty;
 
   static List<({String book, int chapter})> _distinctChapters(
@@ -959,6 +964,7 @@ final explorerTagDetailProvider =
     sermons: ofType('sermon'),
     journals: ofType('journal'),
     prayers: ofType('prayer'),
+    notebooks: [...ofType('notebookPage'), ...ofType('notebook')],
     media: media,
     related: [
       for (final r in relatedRows)
@@ -995,24 +1001,41 @@ class ExplorerTagEntityHit {
   });
 }
 
-/// The dataset entities (people, places, events) mentioned in a tag's tagged
-/// verses — the same cross-referencing the passage page does, but scoped to the
-/// exact verses carrying the tag rather than whole chapters.
+/// Tagged verse numbers grouped by chapter, so a tag-scoped provider queries
+/// each chapter once instead of once per verse. Shared by every provider
+/// below that cross-references a tag's tagged verses into the bundled
+/// datasets or installed content.
+Map<({String book, int chapter}), Set<int>> _tagVersesByChapter(
+    List<SearchResult> verses) {
+  final versesByChapter = <({String book, int chapter}), Set<int>>{};
+  for (final v in verses) {
+    if (v.book == null || v.chapter == null || v.verse == null) continue;
+    (versesByChapter[(book: v.book!, chapter: v.chapter!)] ??= {}).add(v.verse!);
+  }
+  return versesByChapter;
+}
+
+/// The dataset entities (people, places, events, topics) mentioned in a tag's
+/// tagged verses — the same cross-referencing the passage page does, but
+/// scoped to the exact verses carrying the tag rather than whole chapters.
 class ExplorerTagCrossRefs {
   final List<ExplorerTagEntityHit> people;
   final List<ExplorerTagEntityHit> places;
   final List<ExplorerEventHit> events;
+  final List<ExplorerTagEntityHit> topics;
   ExplorerTagCrossRefs({
     required this.people,
     required this.places,
     required this.events,
+    this.topics = const [],
   });
 
-  bool get isEmpty => people.isEmpty && places.isEmpty && events.isEmpty;
+  bool get isEmpty =>
+      people.isEmpty && places.isEmpty && events.isEmpty && topics.isEmpty;
 }
 
 /// Cross-references a tag's tagged verses into the bundled datasets: the
-/// people, places, and events those verses mention. Derived from
+/// people, places, events, and topics those verses mention. Derived from
 /// [explorerTagDetailProvider]'s verse list, so it refreshes when the tag's
 /// verses change. Each distinct chapter is resolved through the existing
 /// passage lookups (cached) and then filtered down to the tagged verses.
@@ -1022,18 +1045,13 @@ final explorerTagCrossRefsProvider =
   const empty = <ExplorerTagEntityHit>[];
   if (detail == null || detail.verses.isEmpty) {
     return ExplorerTagCrossRefs(
-        people: empty, places: empty, events: const []);
+        people: empty, places: empty, events: const [], topics: empty);
   }
 
-  // Tagged verse numbers grouped by chapter, so each chapter is queried once.
-  final versesByChapter = <({String book, int chapter}), Set<int>>{};
-  for (final v in detail.verses) {
-    if (v.book == null || v.chapter == null || v.verse == null) continue;
-    (versesByChapter[(book: v.book!, chapter: v.chapter!)] ??= {}).add(v.verse!);
-  }
+  final versesByChapter = _tagVersesByChapter(detail.verses);
   if (versesByChapter.isEmpty) {
     return ExplorerTagCrossRefs(
-        people: empty, places: empty, events: const []);
+        people: empty, places: empty, events: const [], topics: empty);
   }
 
   await ref.watch(explorerReadyProvider.future);
@@ -1042,6 +1060,7 @@ final explorerTagCrossRefsProvider =
   final people = <int, ExplorerTagEntityHit>{};
   final places = <int, ExplorerTagEntityHit>{};
   final events = <int, ({ExplorerEventHit hit, int count})>{};
+  final topics = <int, ExplorerTagEntityHit>{};
 
   for (final entry in versesByChapter.entries) {
     final loc = entry.key;
@@ -1097,6 +1116,37 @@ final explorerTagCrossRefsProvider =
         count: (prev?.count ?? 0) + 1,
       );
     }
+
+    final topicRows = await store.customSelect(
+      'SELECT t.id AS id, t.name AS name, r.verse AS verse, '
+      '  r.verse_end AS verse_end '
+      'FROM topic_references r '
+      'JOIN topics t ON t.id = r.topic_id '
+      'WHERE r.book_name = ? AND r.chapter = ?',
+      variables: [
+        Variable.withString(loc.book),
+        Variable.withInt(loc.chapter),
+      ],
+    ).get();
+    for (final r in topicRows) {
+      final verse = r.readNullable<int>('verse');
+      // A null verse is a whole-chapter reference, so it touches every
+      // tagged verse in this chapter; otherwise count the tagged verses the
+      // (possibly ranged) reference actually overlaps.
+      final matched = verse == null
+          ? tagged.length
+          : tagged
+              .where((v) => v >= verse && v <= (r.readNullable<int>('verse_end') ?? verse))
+              .length;
+      if (matched == 0) continue;
+      final id = r.read<int>('id');
+      final prev = topics[id];
+      topics[id] = ExplorerTagEntityHit(
+        id: id,
+        label: r.read<String>('name'),
+        verseCount: (prev?.verseCount ?? 0) + matched,
+      );
+    }
   }
 
   int byCountThenLabel(ExplorerTagEntityHit a, ExplorerTagEntityHit b) {
@@ -1119,11 +1169,87 @@ final explorerTagCrossRefsProvider =
       return ay.compareTo(by);
     });
 
+  final topicsList = topics.values.toList()..sort(byCountThenLabel);
+
   return ExplorerTagCrossRefs(
     people: peopleList,
     places: placesList,
     events: [for (final e in eventsList) e.hit],
+    topics: topicsList,
   );
+});
+
+/// Installed-commentary entries for a tag's tagged verses (excludes
+/// whole-chapter commentary entries, which don't carry a specific verse to
+/// scope to) — the same content the passage page's Commentaries card shows,
+/// scoped to the exact verses carrying the tag.
+final explorerTagCommentariesProvider = FutureProvider.family<
+    List<ExplorerCommentarySection>, String>((ref, tagId) async {
+  final detail = await ref.watch(explorerTagDetailProvider(tagId).future);
+  if (detail == null || detail.verses.isEmpty) return const [];
+  final versesByChapter = _tagVersesByChapter(detail.verses);
+  if (versesByChapter.isEmpty) return const [];
+
+  final commentaries = await ref.watch(commentariesProvider.future);
+  if (commentaries.isEmpty) return const [];
+  final store = ref.watch(contentStoreProvider);
+
+  final byCommentary = <int, List<CommentaryEntry>>{};
+  for (final entry in versesByChapter.entries) {
+    final loc = entry.key;
+    final tagged = entry.value;
+    final rows = await (store.select(store.commentaryEntries)
+          ..where(
+            (c) => c.bookName.equals(loc.book) & c.chapter.equals(loc.chapter),
+          )
+          ..orderBy([(c) => OrderingTerm.asc(c.verse)]))
+        .get();
+    for (final r in rows) {
+      if (r.verse == null || !tagged.contains(r.verse)) continue;
+      byCommentary.putIfAbsent(r.commentaryId, () => []).add(r);
+    }
+  }
+  return [
+    for (final c in commentaries)
+      if (byCommentary[c.id] != null) ExplorerCommentarySection(c, byCommentary[c.id]!),
+  ];
+});
+
+/// The `cross_references` dataset entries whose source is one of a tag's
+/// tagged verses, grouped by source verse — the same content the passage
+/// page's Cross-references card shows, scoped to the exact verses carrying
+/// the tag rather than the whole chapter.
+final explorerTagCrossReferencesProvider =
+    FutureProvider.family<List<ExplorerCrossRefGroup>, String>((ref, tagId) async {
+  final detail = await ref.watch(explorerTagDetailProvider(tagId).future);
+  if (detail == null || detail.verses.isEmpty) return const [];
+  final versesByChapter = _tagVersesByChapter(detail.verses);
+  if (versesByChapter.isEmpty) return const [];
+
+  final store = ref.watch(contentStoreProvider);
+  final byVerse = <int, List<CrossReference>>{};
+  for (final entry in versesByChapter.entries) {
+    final loc = entry.key;
+    final tagged = entry.value;
+    final rows = await (store.select(store.crossReferences)
+          ..where(
+            (c) =>
+                c.sourceBookName.equals(loc.book) &
+                c.sourceChapter.equals(loc.chapter) &
+                c.sourceVerse.isIn(tagged),
+          )
+          ..orderBy([
+            (c) => OrderingTerm.asc(c.sourceVerse),
+            (c) => OrderingTerm(expression: c.votes, mode: OrderingMode.desc),
+          ]))
+        .get();
+    for (final r in rows) {
+      byVerse.putIfAbsent(r.sourceVerse, () => []).add(r);
+    }
+  }
+  return [
+    for (final verse in byVerse.keys.toList()..sort()) ExplorerCrossRefGroup(verse, byVerse[verse]!),
+  ];
 });
 
 /// One tag used on a chapter's verses, with the verse numbers carrying it.

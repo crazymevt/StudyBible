@@ -130,6 +130,15 @@ void main() {
         bookName: Value('1 Samuel'),
         chapter: Value(24),
         verse: Value(3)));
+    // A second reference to the same topic, on a verse tag-david/tag-caves
+    // actually tag (24:1) — for the tag page's topic cross-reference card.
+    await store.into(store.topicReferences).insert(const TopicReferencesCompanion(
+        id: Value(2),
+        topicId: Value(1),
+        entryId: Value(1),
+        bookName: Value('1 Samuel'),
+        chapter: Value(24),
+        verse: Value(1)));
 
     // Commentaries: Henry has entries in 1 Samuel 24, Scofield doesn't.
     await store.into(store.commentaries).insert(const CommentariesCompanion(
@@ -349,6 +358,9 @@ void main() {
             contentPlain: Value("Let's look at Psalms 57 today."),
           ),
         );
+    // Tags "On David" directly, for the tag page's own Notebooks card
+    // (distinct from the entity-link backlink tested above).
+    await link('tag-david', 'page-1', 'notebookPage');
 
     // Pins the reader's active version to the one seeded above so the
     // passage-sermons provider (which resolves references against
@@ -674,8 +686,8 @@ void main() {
       final plain = await search('dav');
       expect(plain.tags.single.tag.name, 'david');
       expect(plain.tags.single.tag.colorHex, '#1E88E5');
-      // Six live links; the deleted verse link doesn't count.
-      expect(plain.tags.single.itemCount, 6);
+      // Seven live links; the deleted verse link doesn't count.
+      expect(plain.tags.single.itemCount, 7);
 
       final hashed = await search('#dav');
       expect(hashed.tags.single.tag.name, 'david');
@@ -702,6 +714,7 @@ void main() {
       expect(d.sermons.single.title, 'Sermon: On Caves');
       expect(d.journals.single.textContent, 'Thinking about En Gedi.');
       expect(d.prayers.single.title, 'Prayer: For refuge');
+      expect(d.notebooks.single.title, 'Notebook: On David');
       expect(d.isEmpty, isFalse);
 
       expect(d.passages, [
@@ -725,6 +738,56 @@ void main() {
       expect(
           await container.read(explorerTagDetailProvider('tag-gone').future),
           isNull);
+    });
+  });
+
+  group('tag cross-references (parity with the passage page)', () {
+    test('topics: counts only the tagged verse a reference touches, not '
+        'every reference to that topic in the chapter', () async {
+      final crossRefs =
+          await container.read(explorerTagCrossRefsProvider('tag-david').future);
+      // CAVES references both 24:1 (tagged) and 24:3 (not tagged) — only the
+      // tagged one should count.
+      expect(crossRefs.topics.single.label, 'CAVES');
+      expect(crossRefs.topics.single.verseCount, 1);
+    });
+
+    test('untagged verses on a chapter-wide topic reference are excluded',
+        () async {
+      // tag-caves also tags 24:1 but not 24:3, so it sees the same single
+      // match — proves the scoping isn't accidentally chapter-wide.
+      final crossRefs =
+          await container.read(explorerTagCrossRefsProvider('tag-caves').future);
+      expect(crossRefs.topics.single.verseCount, 1);
+    });
+
+    test('commentaries: only entries on a tagged verse', () async {
+      final sections = await container
+          .read(explorerTagCommentariesProvider('tag-david').future);
+      // Matthew Henry has entries on both 24:1 (tagged) and 24:2 (not);
+      // Scofield has none in this chapter at all.
+      expect(sections.single.commentary.name, 'Matthew Henry');
+      expect(sections.single.entries.single.textContent, 'On verse one');
+    });
+
+    test('cross-references: only rows sourced from a tagged verse, '
+        'votes-descending', () async {
+      final groups = await container
+          .read(explorerTagCrossReferencesProvider('tag-david').future);
+      // Sourced from 24:1 (tagged); the 24:2-sourced row is excluded (that
+      // verse link is soft-deleted).
+      expect(groups.single.verse, 1);
+      expect(groups.single.refs.map((r) => r.targetBookName).toList(),
+          ['Genesis', 'Psalms']); // votes 5, then 2
+    });
+
+    test('a tag with no tagged verses returns empty for all three', () async {
+      expect((await container.read(explorerTagCrossRefsProvider('tag-gone').future)).isEmpty,
+          isTrue);
+      expect(await container.read(explorerTagCommentariesProvider('tag-gone').future),
+          isEmpty);
+      expect(await container.read(explorerTagCrossReferencesProvider('tag-gone').future),
+          isEmpty);
     });
   });
 

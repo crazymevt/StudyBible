@@ -138,6 +138,42 @@ void main() {
           entityType: Value('verse'),
         ));
 
+    // A tag scoped to 24:1 instead of 24:2, so its page's Topics/
+    // Commentaries/Cross-references cards (parity with the passage page)
+    // have real matches without disturbing tag-battles' existing assertions
+    // (the commentary, cross-references, and this second topic reference are
+    // all seeded on verse 1 above).
+    await store.into(store.verses).insert(const VersesCompanion(
+          id: Value(2),
+          bookId: Value(1),
+          chapter: Value(24),
+          verse: Value(1),
+          textContent: Value('David hid in the cave.'),
+          segments: Value('[]'),
+        ));
+    await store.into(store.topicReferences).insert(
+        const TopicReferencesCompanion(
+            id: Value(2),
+            topicId: Value(1),
+            entryId: Value(1),
+            bookName: Value('1 Samuel'),
+            chapter: Value(24),
+            verse: Value(1)));
+    await userStore.into(userStore.tags).insert(const TagsCompanion(
+          id: Value('tag-verse1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          name: Value('verse1'),
+        ));
+    await userStore.into(userStore.entityTags).insert(const EntityTagsCompanion(
+          id: Value('link-verse1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          tagId: Value('tag-verse1'),
+          entityId: Value('Verse:1 Samuel|24|1'),
+          entityType: Value('verse'),
+        ));
+
     // A media attachment filed under the same tag, so the tag page's Media
     // card has something to render.
     await userStore.into(userStore.mediaAttachments).insert(
@@ -520,6 +556,34 @@ void main() {
     expect(find.text('En Gedi photo'), findsOneWidget);
   });
 
+  testWidgets(
+      'tag page shows Topics/Commentaries/Cross-references, matching the '
+      'passage page (Expand Tags card in Explorer)', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await pump(tester);
+
+    await tester.enterText(find.byType(TextField), 'verse1');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('#verse1'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Topics in these verses (1)'), findsOneWidget);
+    expect(find.textContaining('CAVES', findRichText: true), findsOneWidget);
+
+    expect(find.text('Commentaries (1)'), findsOneWidget);
+    await tester.tap(find.text('Matthew Henry'));
+    await tester.pumpAndSettle();
+    expect(
+        find.textContaining('David in the wilderness', findRichText: true),
+        findsOneWidget);
+
+    expect(find.text('Cross-references (2)'), findsOneWidget);
+    expect(find.text('Genesis 1:1'), findsOneWidget);
+    expect(find.text('Psalms 57:1'), findsOneWidget);
+  });
+
   testWidgets('passage and person pages show the Your-tags card',
       (tester) async {
     tester.view.physicalSize = const Size(1000, 2400);
@@ -529,7 +593,8 @@ void main() {
 
     await tester.tap(find.textContaining('Explore 1 Samuel 24'));
     await tester.pumpAndSettle();
-    expect(find.text('Your tags (1)'), findsOneWidget);
+    // #battles (24:2) and #verse1 (24:1) both land in this chapter.
+    expect(find.text('Your tags (2)'), findsOneWidget);
     expect(find.textContaining('#battles', findRichText: true),
         findsOneWidget);
     // User-uploaded media anchored to this chapter shows on the passage page.
