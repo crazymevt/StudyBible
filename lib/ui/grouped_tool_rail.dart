@@ -22,6 +22,8 @@ class GroupedToolRail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTool = ref.watch(activeToolProvider);
     final pinnedTools = ref.watch(pinnedToolsProvider);
+    final pinnedSet = pinnedTools.toSet();
+    final hasMoreTools = allToolsMap.keys.any((t) => !pinnedSet.contains(t));
 
     return SizedBox(
       width: 80,
@@ -39,6 +41,11 @@ class GroupedToolRail extends ConsumerWidget {
               ),
           const SizedBox(height: 8),
           const Divider(indent: 16, endIndent: 16),
+          if (hasMoreTools)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: _MoreToolsButton(pinnedTools: pinnedSet),
+            ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: IconButton(
@@ -50,6 +57,65 @@ class GroupedToolRail extends ConsumerWidget {
           const SizedBox(height: 6),
         ],
       ),
+    );
+  }
+}
+
+/// Overflow menu for tools that aren't pinned to the rail, grouped the same
+/// way as the edit-favorites dialog so the layout stays familiar.
+class _MoreToolsButton extends ConsumerWidget {
+  final Set<ActiveTool> pinnedTools;
+
+  const _MoreToolsButton({required this.pinnedTools});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return PopupMenuButton<ActiveTool>(
+      icon: const Icon(Icons.more_horiz),
+      tooltip: 'More Tools',
+      onSelected: (tool) =>
+          ref.read(activeToolProvider.notifier).setTool(tool),
+      itemBuilder: (context) {
+        final entries = <PopupMenuEntry<ActiveTool>>[];
+        for (final group in toolGroups) {
+          final remaining = group.items.where(
+            (item) => !pinnedTools.contains(item.tool),
+          );
+          if (remaining.isEmpty) continue;
+          if (entries.isNotEmpty) entries.add(const PopupMenuDivider());
+          entries.add(
+            PopupMenuItem<ActiveTool>(
+              enabled: false,
+              height: 32,
+              child: Text(
+                group.label.toUpperCase(),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+          for (final item in remaining) {
+            entries.add(
+              PopupMenuItem<ActiveTool>(
+                value: item.tool,
+                child: Row(
+                  children: [
+                    Icon(item.icon, size: 20),
+                    const SizedBox(width: 12),
+                    Flexible(
+                      child: Text(item.label, overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        }
+        return entries;
+      },
     );
   }
 }

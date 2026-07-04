@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:study_bible/app/app_state.dart';
 import 'package:study_bible/app/shared_prefs.dart';
+import 'package:study_bible/ui/common/tool_groups.dart';
 import 'package:study_bible/ui/grouped_tool_rail.dart';
 
 void main() {
@@ -84,6 +85,53 @@ void main() {
     await tester.tap(find.text('Media'));
     await tester.pump();
     expect(container.read(activeToolProvider), ActiveTool.media);
+  });
+
+  testWidgets('shows a more-tools overflow button above the edit button', (
+    tester,
+  ) async {
+    await pumpRail(tester);
+
+    expect(find.byIcon(Icons.more_horiz), findsOneWidget);
+
+    // Overflow button sits above (smaller dy than) the edit button.
+    final moreY = tester.getCenter(find.byIcon(Icons.more_horiz)).dy;
+    final editY = tester.getCenter(find.byIcon(Icons.edit)).dy;
+    expect(moreY, lessThan(editY));
+  });
+
+  testWidgets('more-tools menu lists only non-favorite tools and selects one', (
+    tester,
+  ) async {
+    final container = await pumpRail(tester);
+
+    await tester.tap(find.byIcon(Icons.more_horiz));
+    await tester.pumpAndSettle();
+
+    // Default pinned tools shouldn't be duplicated into the overflow menu
+    // (the only "Notes" on screen is still the pinned rail item).
+    expect(find.text('Notes'), findsOneWidget);
+
+    // A non-pinned tool should be offered.
+    expect(find.text('Topics'), findsOneWidget);
+
+    await tester.tap(find.text('Topics'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(activeToolProvider), ActiveTool.topics);
+  });
+
+  testWidgets('more-tools button hides once every tool is pinned', (
+    tester,
+  ) async {
+    final container = await pumpRail(tester);
+
+    container
+        .read(pinnedToolsProvider.notifier)
+        .setPinnedTools(allToolsMap.keys.toList());
+    await tester.pump();
+
+    expect(find.byIcon(Icons.more_horiz), findsNothing);
   });
 
   testWidgets('edit button opens dialog to edit pinned favorites', (
