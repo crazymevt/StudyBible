@@ -128,7 +128,26 @@ void main() {
     await placeVerse(5, 5, 'Luke', 2, 2);
     await placeVerse(6, 6, 'Luke', 2, 4);
 
-    for (final eventId in [1, 2, 3, 4, 5, 6]) {
+    // Event 7: a second override case — Jerusalem (ord 0) is a retrospective
+    // mention ("made havoc in Jerusalem"), not where this account is set;
+    // the curated override picks Damascus (ord 1, an existing place) instead.
+    await place(7, 'Jerusalem', 31.78, 35.22);
+    await event(7, 'Saul proclaims Jesus', sortKey: 38.0, startYear: 38);
+    await eventVerse(8, 7, 0, 'Acts', 9, 21);
+    await eventVerse(9, 7, 1, 'Acts', 9, 22);
+    await placeVerse(7, 7, 'Acts', 9, 21);
+    await placeVerse(8, 1, 'Acts', 9, 22); // Damascus (place 1) again
+
+    // Event 8: a second no-reliable-place exclusion — its only place mention
+    // (Thyatira) is a person's hometown, not the event's setting, and no
+    // correct place is linked to this event at all, so it should fall
+    // through to unmapped rather than plotting Thyatira.
+    await place(8, 'Thyatira', 38.9, 27.8);
+    await event(8, "Lydia's Conversion", sortKey: 47.5, startYear: 47);
+    await eventVerse(10, 8, 0, 'Acts', 16, 14);
+    await placeVerse(9, 8, 'Acts', 16, 14);
+
+    for (final eventId in [1, 2, 3, 4, 5, 6, 7, 8]) {
       await participant(eventId, eventId, 1);
     }
 
@@ -151,8 +170,8 @@ void main() {
         await container.read(personJourneyProvider(1).future);
     expect(journey, isNotNull);
     expect(journey!.waypoints.map((w) => w.placeName),
-        ['Bethlehem 1', 'Damascus', 'Antioch']);
-    expect(journey.waypoints[2].eventId, 2);
+        ['Bethlehem 1', 'Damascus', 'Damascus', 'Antioch']);
+    expect(journey.waypoints[3].eventId, 2);
   });
 
   test('a curated place override wins over the earlier-mentioned place',
@@ -164,11 +183,20 @@ void main() {
     expect(journey.waypoints.map((w) => w.placeName), isNot(contains('Syria')));
   });
 
+  test(
+      'a second curated override wins over an earlier retrospective mention',
+      () async {
+    final journey =
+        await container.read(personJourneyProvider(1).future);
+    final proclaims = journey!.waypoints.firstWhere((w) => w.eventId == 7);
+    expect(proclaims.placeName, 'Damascus');
+  });
+
   test('dated-but-unmapped and undated events are counted, not silent',
       () async {
     final journey =
         await container.read(personJourneyProvider(1).future);
-    expect(journey!.unmappedEventCount, 2);
+    expect(journey!.unmappedEventCount, 3);
     expect(journey.undatedEventCount, 1);
   });
 
@@ -178,7 +206,16 @@ void main() {
         await container.read(personJourneyProvider(1).future);
     expect(journey!.waypoints.map((w) => w.placeName), isNot(contains('Nineveh')));
     expect(journey.waypoints.map((w) => w.eventId), isNot(contains(5)));
-    expect(journey.unmappedEventCount, 2);
+  });
+
+  test(
+      'a second no-reliable-place event (no correct candidate in its own '
+      'verses) is treated as unmapped', () async {
+    final journey =
+        await container.read(personJourneyProvider(1).future);
+    expect(
+        journey!.waypoints.map((w) => w.placeName), isNot(contains('Thyatira')));
+    expect(journey.waypoints.map((w) => w.eventId), isNot(contains(8)));
   });
 
   test('a person with no events resolves to an empty journey', () async {
@@ -203,8 +240,10 @@ void main() {
       'Bethlehem 1',
       'Damascus',
       'Iconium',
+      'Jerusalem',
       'Nineveh',
       'Syria',
+      'Thyatira',
     ]);
   });
 }

@@ -103,6 +103,9 @@ class PersonJourney {
 /// - 'Commandments and Tradition Discourse': every place mention in the
 ///   account (Matthew 15:1, Mark 7:1) is scribes/Pharisees who "came from
 ///   Jerusalem" to Jesus — his own location (Galilee) is never named.
+/// - "Lydia's Conversion": its only place mention is Acts 16:14, Lydia's
+///   hometown of Thyatira — the conversion itself happened in Philippi
+///   (Acts 16:12), which this event's own verse range doesn't extend back to.
 const _eventsWithNoReliablePlace = {
   'Blind and Dumb Demoniac and Following Discourse',
   'Sermon on the Mount',
@@ -113,6 +116,7 @@ const _eventsWithNoReliablePlace = {
   '3rd Tour of Galilee',
   'Woes and Parables with Pharisees',
   'Commandments and Tradition Discourse',
+  "Lydia's Conversion",
 };
 
 /// Event → the place name that should win instead of whatever the default
@@ -136,12 +140,40 @@ const _eventsWithNoReliablePlace = {
 /// - 'Bread of Life Sermon': John 6:59 explicitly places the sermon "in the
 ///   synagogue... at Capernaum"; Tiberias is only mentioned in passing
 ///   (other boats came from there) two verses earlier.
+/// - 'Saul proclaims Jesus': Acts 9:21 has the Damascus crowd recalling
+///   Saul's past "havoc in Jerusalem" — he's still in Damascus (9:22, where
+///   he actually did the proclaiming) when this is said.
+/// - 'First Missionary Journey': Acts 12:25, "returned from Jerusalem",
+///   describes where Barnabas and Saul had been, not the journey; it
+///   launches from Antioch (Acts 13:1).
+/// - 'Third Missionary Journey': Acts 18:24 names both Ephesus (where this
+///   is set) and Alexandria (Apollos's hometown) in the same verse; Alexandria
+///   just has the lower place id.
+/// - 'Paul arrested in the Temple': Acts 21:27's "Jews from Asia" describes
+///   the accusers' origin — the temple, and the riot, are in Jerusalem
+///   (21:31).
+/// - 'Paul gives his testimony': Acts 21:39 has Paul naming his own
+///   hometown, "Tarsus in Cilicia" — the testimony itself is delivered in
+///   Jerusalem (22:17-18).
+/// - 'Paul arrives at Rome': Acts 28:11 names the ship's home port,
+///   Alexandria; Rome itself, the event's namesake, is named repeatedly
+///   right after (28:14-16).
+/// - "Paul's First Roman imprisonment": Acts 28:17 has Paul recalling being
+///   "delivered as a prisoner from Jerusalem" — he's actually in Rome, named
+///   at 28:30 ("He lived there two whole years at his own expense").
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
   'Healing Canaanite Daughter': 'Tyre',
   'Jesus Teaches in Perea': 'Judea 1',
   'Bread of Life Sermon': 'Capernaum',
+  'Saul proclaims Jesus': 'Damascus',
+  'First Missionary Journey': 'Antioch 1',
+  'Third Missionary Journey': 'Ephesus',
+  'Paul arrested in the Temple': 'Jerusalem',
+  'Paul gives his testimony': 'Jerusalem',
+  'Paul arrives at Rome': 'Rome',
+  "Paul's First Roman imprisonment": 'Rome',
 };
 
 /// A person's dated events, each resolved to the first place named in its
