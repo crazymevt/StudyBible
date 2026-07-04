@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Jeremiah (`jeremiah_853`)
 ///   - Daniel (`daniel_975`)
 ///   - Ahab (`ahab_113`)
 ///   - Jeroboam (`jeroboam_872`)
@@ -453,6 +452,94 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 7,
       verse: 3,
       placeName: 'Upper Pool',
+    ),
+  ]),
+
+  // Jeremiah's ministry spans four kings' reigns and the fall of Jerusalem,
+  // ~627-585 BC — much more narrative than Isaiah, but several of its most
+  // "location-sounding" verses turn out to name someone *else's* location at
+  // that moment, not Jeremiah's own: 38:7's "gate of Benjamin" is where the
+  // king was sitting when Ebedmelech heard the news, not where the
+  // imprisoned Jeremiah was; 36:10's temple reading was done by Baruch,
+  // because Jeremiah had just said "I am shut up; I cannot go into the
+  // house of the LORD" (36:5). Both skipped. 38:6 (lowered into Malchiah's
+  // cistern) and 38:13 (drawn back out) aren't tagged to any place at all in
+  // the bundled gazetteer, so 38:28 ("remained in the court of the prison
+  // until Jerusalem was taken") stands in as the bookend for that whole
+  // imprisonment, the same way David's census/plague episode used 24:16
+  // instead of the untagged 24:18.
+  CuratedPersonJourney(personSlug: 'jeremiah_853', waypoints: [
+    CuratedWaypoint(
+      title: 'Called as a young prophet at Anathoth',
+      year: -627,
+      bookName: 'Jeremiah',
+      chapter: 1,
+      verse: 1,
+      placeName: 'Anathoth',
+    ),
+    CuratedWaypoint(
+      title: 'Smashes the potter\'s flask in the Valley of Hinnom',
+      year: -609,
+      bookName: 'Jeremiah',
+      chapter: 19,
+      verse: 2,
+      placeName: 'Valley of Hinnom',
+    ),
+    CuratedWaypoint(
+      title: 'Struck and put in the stocks by Pashhur',
+      year: -609,
+      bookName: 'Jeremiah',
+      chapter: 20,
+      verse: 2,
+      placeName: 'Benjamin Gate',
+    ),
+    CuratedWaypoint(
+      title: 'Arrested at the gate, accused of deserting to the Chaldeans',
+      year: -588,
+      bookName: 'Jeremiah',
+      chapter: 37,
+      verse: 13,
+      placeName: 'Benjamin Gate',
+    ),
+    CuratedWaypoint(
+      title: 'Remains imprisoned until Jerusalem falls',
+      year: -587,
+      bookName: 'Jeremiah',
+      chapter: 38,
+      verse: 28,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Released from his chains at Ramah',
+      year: -586,
+      bookName: 'Jeremiah',
+      chapter: 40,
+      verse: 1,
+      placeName: 'Ramah 1',
+    ),
+    CuratedWaypoint(
+      title: 'Goes to Gedaliah at Mizpah',
+      year: -586,
+      bookName: 'Jeremiah',
+      chapter: 40,
+      verse: 6,
+      placeName: 'Mizpah 3',
+    ),
+    CuratedWaypoint(
+      title: 'Stops at Geruth Chimham, fleeing toward Egypt',
+      year: -585,
+      bookName: 'Jeremiah',
+      chapter: 41,
+      verse: 17,
+      placeName: 'Geruth Chimham',
+    ),
+    CuratedWaypoint(
+      title: 'Forcibly taken to Tahpanhes in Egypt',
+      year: -585,
+      bookName: 'Jeremiah',
+      chapter: 43,
+      verse: 7,
+      placeName: 'Tahpanhes',
     ),
   ]),
 ];

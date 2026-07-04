@@ -206,4 +206,29 @@ void main() {
         .getSingleOrNull();
     expect(link, isNotNull);
   });
+
+  test("Jeremiah's journey has all 9 real stops in chronological order",
+      () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final jeremiah = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('jeremiah_853')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(jeremiah.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Anathoth',
+      'Valley of Hinnom',
+      'Benjamin Gate',
+      'Benjamin Gate',
+      'Jerusalem',
+      'Ramah 1',
+      'Mizpah 3',
+      'Geruth Chimham',
+      'Tahpanhes',
+    ]);
+    // "Prophecies of Jeremiah" is superseded by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
 }

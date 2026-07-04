@@ -148,6 +148,7 @@ const _eventsSupersededByCuratedJourney = {
   'Reign of Solomon',
   'Reign of David',
   'Prophecies of Isaiah',
+  'Prophecies of Jeremiah',
 };
 
 /// Event → the place name that should win instead of whatever the default
@@ -225,6 +226,22 @@ const _eventsSupersededByCuratedJourney = {
 /// - "Returns to Jerusalem after Absalom's defeat": 2 Samuel 19:15 also
 ///   names Gilgal (where the crossing back over the Jordan happened) and
 ///   the Jordan itself; Gilgal has the lowest id of the three.
+/// - "Smashes the potter's flask in the Valley of Hinnom": Jeremiah 19:2
+///   names the Potsherd Gate as the landmark for the direction to travel,
+///   not the destination itself ("go forth unto the valley of the son of
+///   Hinnom... by the entry of the [Potsherd] gate"); the gate has the
+///   lower id.
+/// - 'Released from his chains at Ramah': Jeremiah 40:1 names Ramah (where
+///   Jeremiah actually was, newly freed), Jerusalem, and Babylon (the
+///   captives' origin and destination) in the same verse; both Jerusalem
+///   and Babylon have lower ids.
+/// - 'Stops at Geruth Chimham, fleeing toward Egypt': Jeremiah 41:17 names
+///   Geruth Chimham itself, Bethlehem (just a proximity landmark, "by
+///   Bethlehem"), and Egypt (the destination they hadn't reached yet) in
+///   the same verse; both have lower ids.
+/// - 'Forcibly taken to Tahpanhes in Egypt': Jeremiah 43:7 names Egypt (the
+///   country) and Tahpanhes (the specific city they settled in) in the same
+///   verse; Egypt has the lower id.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -249,6 +266,10 @@ const _eventPlaceOverrides = {
   'Returns to Samaria': 'Samaria 1',
   "Flees Absalom's rebellion to Mahanaim": 'Mahanaim',
   "Returns to Jerusalem after Absalom's defeat": 'Jerusalem',
+  "Smashes the potter's flask in the Valley of Hinnom": 'Valley of Hinnom',
+  'Released from his chains at Ramah': 'Ramah 1',
+  'Stops at Geruth Chimham, fleeing toward Egypt': 'Geruth Chimham',
+  'Forcibly taken to Tahpanhes in Egypt': 'Tahpanhes',
 };
 
 /// A person's dated events, each resolved to the first place named in its
