@@ -67,13 +67,14 @@ class PersonJourney {
 }
 
 /// Events whose account only names places rhetorically (a comparison, a
-/// prophecy, a historical aside) rather than describing where the event
-/// itself took place, so no verse in the account is a reliable waypoint.
-/// `place_verses` links a place to every verse that names it, with no
-/// distinction between "this is the scene" and "this is being cited as an
-/// example" — for these events every match the heuristic below finds is the
-/// latter, so the event is left unmapped (already a counted, handled state)
-/// rather than risk plotting a stop at whichever aside sorts first.
+/// prophecy, a historical aside, a parable's fictional setting) rather than
+/// describing where the event itself took place, so no verse in the account
+/// is a reliable waypoint. `place_verses` links a place to every verse that
+/// names it, with no distinction between "this is the scene" and "this is
+/// being cited as an example" — for these events every match the heuristic
+/// below finds is the latter, so the event is left unmapped (already a
+/// counted, handled state) rather than risk plotting a stop at whichever
+/// aside sorts first.
 ///
 /// - 'Blind and Dumb Demoniac and Following Discourse': the Beelzebul
 ///   controversy / sign-of-Jonah teaching (Matthew 12:22-50, Mark 3:19-30,
@@ -82,8 +83,65 @@ class PersonJourney {
 ///   Luke 11:30-32) as examples of repentance/wisdom, and notes scribes who
 ///   "came down from Jerusalem" (Mark 3:22) — three unrelated places, none of
 ///   them the event's setting.
+/// - 'Sermon on the Mount': delivered on an unnamed Galilee hillside, but its
+///   only place mention is Matthew 5:35's aside on oaths ("nor by Jerusalem,
+///   for it is the city of the great King").
+/// - 'The Transfiguation': happened on an unnamed mountain; its only mention
+///   is Luke 9:31, Moses and Elijah foretelling the death Jesus would
+///   accomplish "at Jerusalem".
+/// - '70 Sent Out' and 'Discourse on the Kingdom and Other Parables': each
+///   cites Sodom (Luke 10:12; Luke 17:29, the story of Lot) as a rhetorical
+///   comparison, not a place visited.
+/// - 'Good Samaritan Parable Taught': Jericho (Luke 10:30) is the parable's
+///   fictional setting, not where Jesus was standing when he told it.
+/// - '3rd Tour of Galilee': its own title says Galilee, but the only place
+///   mention is Matthew 10:15's Sodom-and-Gomorrah warning in the
+///   mission discourse.
+/// - 'Woes and Parables with Pharisees': Luke 13:1 reports news about "the
+///   Galileans" Pilate had killed — Jesus himself was travelling toward
+///   Jerusalem through Judea at the time, not in Galilee.
+/// - 'Commandments and Tradition Discourse': every place mention in the
+///   account (Matthew 15:1, Mark 7:1) is scribes/Pharisees who "came from
+///   Jerusalem" to Jesus — his own location (Galilee) is never named.
 const _eventsWithNoReliablePlace = {
   'Blind and Dumb Demoniac and Following Discourse',
+  'Sermon on the Mount',
+  'The Transfiguation',
+  '70 Sent Out',
+  'Discourse on the Kingdom and Other Parables',
+  'Good Samaritan Parable Taught',
+  '3rd Tour of Galilee',
+  'Woes and Parables with Pharisees',
+  'Commandments and Tradition Discourse',
+};
+
+/// Event → the place name that should win instead of whatever the default
+/// "earliest verse, lowest place id" heuristic (below) picks. Each of these
+/// accounts already links the event to its true setting via `place_verses`
+/// — the heuristic just ranks a different, incidental place first, usually
+/// because a verse names both where someone *came from* and where they
+/// arrived, and the tie-break (or an earlier throwaway verse) favors the
+/// former.
+///
+/// - 'Birth of Jesus': Luke 2:2 ("governor of Syria") sorts one verse ahead
+///   of 2:4, which names Bethlehem as the actual birthplace.
+/// - 'John Baptizes Jesus': Matthew 3:13, "Jesus came from Galilee to the
+///   Jordan" — same verse, but the baptism happened at the Jordan, not in
+///   Galilee.
+/// - 'Healing Canaanite Daughter': Matthew 15:21/Mark 7:24 both place this in
+///   "the district of Tyre and Sidon"; Galilee (where Jesus came *from*) just
+///   has a lower place id.
+/// - 'Jesus Teaches in Perea': Matthew 19:1, "went away from Galilee" into
+///   Judea beyond the Jordan — the event's own title says Perea.
+/// - 'Bread of Life Sermon': John 6:59 explicitly places the sermon "in the
+///   synagogue... at Capernaum"; Tiberias is only mentioned in passing
+///   (other boats came from there) two verses earlier.
+const _eventPlaceOverrides = {
+  'Birth of Jesus': 'Bethlehem 1',
+  'John Baptizes Jesus': 'Jordan',
+  'Healing Canaanite Daughter': 'Tyre',
+  'Jesus Teaches in Perea': 'Judea 1',
+  'Bread of Life Sermon': 'Capernaum',
 };
 
 /// A person's dated events, each resolved to the first place named in its
@@ -129,6 +187,10 @@ final personJourneyProvider =
         r.read<int>('event_id'),
   ];
 
+  final eventTitleById = {
+    for (final r in eventRows) r.read<int>('event_id'): r.read<String>('title'),
+  };
+
   // Batch-resolve places for every dated event in one query, extending the
   // event↔place verse-coordinate bridge with `ev.ord` so the place tied to
   // the account's earliest verse — the scene-setter — sorts first per event.
@@ -148,16 +210,22 @@ final personJourneyProvider =
     ).get();
     for (final r in placeRows) {
       final eventId = r.read<int>('event_id');
-      // First row per event_id wins (already ordered by ord, place.id).
-      placesByEvent.putIfAbsent(
-        eventId,
-        () => (
-          placeId: r.read<int>('place_id'),
-          placeName: r.read<String>('place_name'),
-          lat: r.read<double>('lat'),
-          lng: r.read<double>('lng'),
-        ),
+      final placeName = r.read<String>('place_name');
+      final resolved = (
+        placeId: r.read<int>('place_id'),
+        placeName: placeName,
+        lat: r.read<double>('lat'),
+        lng: r.read<double>('lng'),
       );
+      final override = _eventPlaceOverrides[eventTitleById[eventId]];
+      if (override != null) {
+        // Only the overridden place name may win for this event, regardless
+        // of ord/place-id order — replace, don't just fill an empty slot.
+        if (placeName == override) placesByEvent[eventId] = resolved;
+        continue;
+      }
+      // First row per event_id wins (already ordered by ord, place.id).
+      placesByEvent.putIfAbsent(eventId, () => resolved);
     }
   }
 

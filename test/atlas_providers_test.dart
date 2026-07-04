@@ -11,8 +11,10 @@ import 'package:study_bible/data/content_store.dart';
 
 /// Exercises the Atlas's journey derivation: a person's dated events become
 /// waypoints resolved through the event↔place verse bridge, the first place
-/// named in a multi-place account wins, and undated/unmapped events are
-/// excluded from the path but counted rather than silently dropped.
+/// named in a multi-place account wins, undated/unmapped events are excluded
+/// from the path but counted rather than silently dropped, curated
+/// no-reliable-place titles are always treated as unmapped, and curated
+/// place overrides win over whatever the default heuristic would pick.
 void main() {
   late ContentStore store;
   late ProviderContainer container;
@@ -114,7 +116,19 @@ void main() {
     await eventVerse(5, 5, 0, 'Matthew', 12, 41);
     await placeVerse(4, 4, 'Matthew', 12, 41);
 
-    for (final eventId in [1, 2, 3, 4, 5]) {
+    // Event 6: matches a curated place override by title — Syria (ord 0, the
+    // governor mentioned in the census) would normally win, but the account's
+    // real setting, Bethlehem (ord 1), is the curated override for this
+    // title so it should win instead.
+    await place(5, 'Syria', 34.8, 38.9);
+    await place(6, 'Bethlehem 1', 31.7, 35.2);
+    await event(6, 'Birth of Jesus', sortKey: -3.0, startYear: -3);
+    await eventVerse(6, 6, 0, 'Luke', 2, 2);
+    await eventVerse(7, 6, 1, 'Luke', 2, 4);
+    await placeVerse(5, 5, 'Luke', 2, 2);
+    await placeVerse(6, 6, 'Luke', 2, 4);
+
+    for (final eventId in [1, 2, 3, 4, 5, 6]) {
       await participant(eventId, eventId, 1);
     }
 
@@ -137,8 +151,17 @@ void main() {
         await container.read(personJourneyProvider(1).future);
     expect(journey, isNotNull);
     expect(journey!.waypoints.map((w) => w.placeName),
-        ['Damascus', 'Antioch']);
-    expect(journey.waypoints[1].eventId, 2);
+        ['Bethlehem 1', 'Damascus', 'Antioch']);
+    expect(journey.waypoints[2].eventId, 2);
+  });
+
+  test('a curated place override wins over the earlier-mentioned place',
+      () async {
+    final journey =
+        await container.read(personJourneyProvider(1).future);
+    final birth = journey!.waypoints.firstWhere((w) => w.eventId == 6);
+    expect(birth.placeName, 'Bethlehem 1');
+    expect(journey.waypoints.map((w) => w.placeName), isNot(contains('Syria')));
   });
 
   test('dated-but-unmapped and undated events are counted, not silent',
@@ -175,7 +198,13 @@ void main() {
 
   test('allPlacesProvider returns every place, name-ordered', () async {
     final places = await container.read(allPlacesProvider.future);
-    expect(places.map((p) => p.name),
-        ['Antioch', 'Damascus', 'Iconium', 'Nineveh']);
+    expect(places.map((p) => p.name), [
+      'Antioch',
+      'Bethlehem 1',
+      'Damascus',
+      'Iconium',
+      'Nineveh',
+      'Syria',
+    ]);
   });
 }
