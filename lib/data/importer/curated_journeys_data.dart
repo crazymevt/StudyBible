@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Esau (`esau_1216`)
 ///   - Benjamin (`benjamin_463`)
 ///
 /// Years are approximate and sequential within each person's known ministry
@@ -1207,6 +1206,51 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 17,
       verse: 1,
       placeName: 'Rephidim',
+    ),
+  ]),
+
+  // Like Caleb, Esau's only bundled event ("Birth of Jacob and Esau",
+  // Genesis 25:24-26) doesn't resolve to any place — those verses are just
+  // the twins' birth notice, with no place_verses link. Superseded entirely.
+  // Esau's own narrative is thinner on named locations than most of the
+  // people curated so far: the birthright sale, the stolen blessing, and
+  // both marriages all go unmentioned in places.json (no verse ties them to
+  // anywhere), so only his later, more settled chapters are curatable — the
+  // reconciliation with Jacob, burying Isaac, and his final move to Edom.
+  // No overrides needed: every citation here ties singly, or (Genesis 35:27)
+  // already resolves to the lower-id name for the same site.
+  CuratedPersonJourney(personSlug: 'esau_1216', waypoints: [
+    CuratedWaypoint(
+      title: 'Reconciles with Jacob and returns to Seir',
+      year: -1736,
+      bookName: 'Genesis',
+      chapter: 33,
+      verse: 16,
+      placeName: 'Mount Seir 1',
+    ),
+    CuratedWaypoint(
+      title: 'Buries Isaac at Hebron with Jacob',
+      year: -1715,
+      bookName: 'Genesis',
+      chapter: 35,
+      verse: 27,
+      placeName: 'Hebron',
+    ),
+    CuratedWaypoint(
+      title: 'Departs Canaan for Edom',
+      year: -1714,
+      bookName: 'Genesis',
+      chapter: 36,
+      verse: 6,
+      placeName: 'Canaan',
+    ),
+    CuratedWaypoint(
+      title: 'Settles permanently in Mount Seir',
+      year: -1714,
+      bookName: 'Genesis',
+      chapter: 36,
+      verse: 8,
+      placeName: 'Mount Seir 1',
     ),
   ]),
 ];

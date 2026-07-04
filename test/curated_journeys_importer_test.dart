@@ -480,4 +480,25 @@ void main() {
     // links at all for their cited verses.
     expect(journey.unmappedEventCount, 2);
   });
+
+  test("Esau's journey has his reconciliation with Jacob, Isaac's burial, "
+      "and his move to Edom in chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final esau = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('esau_1216')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(esau.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Mount Seir 1',
+      'Hebron',
+      'Canaan',
+      'Mount Seir 1',
+    ]);
+    // "Birth of Jacob and Esau" (Genesis 25:24-26, no place_verses link) is
+    // superseded by these curated stops.
+    expect(journey.unmappedEventCount, 1);
+  });
 }

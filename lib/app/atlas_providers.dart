@@ -152,6 +152,7 @@ const _eventsSupersededByCuratedJourney = {
   'Prophecies of Daniel',
   'Reign of Jeroboam I',
   'Birth of Caleb',
+  'Birth of Jacob and Esau',
 };
 
 /// Event → the place name that should win instead of whatever the default
