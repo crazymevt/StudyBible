@@ -2,7 +2,30 @@
 /// `theographic.json` collapses their entire, well-documented ministry into
 /// a single dated event — too coarse to ever produce a real multi-stop path
 /// through [PersonJourney] (see atlas_providers.dart). Elijah and Elisha are
-/// the first two; more can be appended here later without any code changes.
+/// the first two; more can be appended here later without any code changes —
+/// just a new [CuratedPersonJourney] entry, following the same process:
+/// verify every waypoint against the real verse text and cross-check it
+/// against `places.json`'s own verse links for competing ties (see the
+/// `atlas-curated-journey-verification-process` memory).
+///
+/// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
+/// identified but not yet curated):
+///   - Solomon (`solomon_2762`)
+///   - David (`david_994`) — 3 events, but "Reign of David" is one
+///     668-verse blob spanning his whole 40-year reign
+///   - Isaiah (`isaiah_617`)
+///   - Jeremiah (`jeremiah_853`)
+///   - Daniel (`daniel_975`)
+///   - Ahab (`ahab_113`)
+///   - Jeroboam (`jeroboam_872`)
+///   - Gideon (`gideon_1314`)
+///   - Zedekiah (`zedekiah_1950`)
+///   - Rehoboam (`rehoboam_2412`)
+///   - Jehoiakim (`jehoiakim_1085`)
+///   - Abimelech (`abimelech_41`)
+///   - Caleb (`caleb_537`)
+///   - Esau (`esau_1216`)
+///   - Benjamin (`benjamin_463`)
 ///
 /// Years are approximate and sequential within each person's known ministry
 /// window, not literal text-given dates — the same convention the bundled
