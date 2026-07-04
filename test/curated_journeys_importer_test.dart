@@ -355,4 +355,24 @@ void main() {
     // to Jerusalem, where his reign begins.
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Rehoboam's journey has Shechem, the bundled Jerusalem flight, and "
+      "Shishak's invasion in chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final rehoboam = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('rehoboam_2412')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(rehoboam.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Shechem',
+      'Jerusalem', // bundled: "Reign of Rehoboam" flight after Adoram's death
+      'Jerusalem',
+    ]);
+    // Nothing is superseded — the bundled event already resolves correctly
+    // to Jerusalem, where he flees and remains for the rest of his reign.
+    expect(journey.unmappedEventCount, 0);
+  });
 }

@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Rehoboam (`rehoboam_2412`)
 ///   - Jehoiakim (`jehoiakim_1085`)
 ///   - Abimelech (`abimelech_41`)
 ///   - Caleb (`caleb_537`)
@@ -887,6 +886,39 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 52,
       verse: 11,
       placeName: 'Babylon 1',
+    ),
+  ]),
+
+  // Unlike the prophets and warrior-judges above, Rehoboam's own narrative
+  // barely moves: he goes to Shechem to be confirmed king, flees back to
+  // Jerusalem when the ten tribes revolt, and stays there for the rest of
+  // his reign — including when Shishak's invasion catches up with him five
+  // years later. The bundled "Reign of Rehoboam" event (1 Kings 12:17-24)
+  // already resolves correctly to Jerusalem via its first placed verse
+  // (12:18, fleeing there after Adoram is stoned) and is kept as-is. Added
+  // here: the Shechem confrontation that precedes it, and the Shishak
+  // episode that follows — both single-place verses with no competing tie
+  // in places.json, so neither needs an override. (The fortified-cities
+  // list in 2 Chr 11:5-10 is deliberately excluded — it's an administrative
+  // summary of what he built, not a narrated personal itinerary, and each
+  // verse there ties 3 cities at once with no way to tell which he actually
+  // visited himself.)
+  CuratedPersonJourney(personSlug: 'rehoboam_2412', waypoints: [
+    CuratedWaypoint(
+      title: 'Goes to Shechem to be made king',
+      year: -975,
+      bookName: '1 Kings',
+      chapter: 12,
+      verse: 1,
+      placeName: 'Shechem',
+    ),
+    CuratedWaypoint(
+      title: 'Humbled at Jerusalem before Shishak\'s invasion',
+      year: -970,
+      bookName: '2 Chronicles',
+      chapter: 12,
+      verse: 5,
+      placeName: 'Jerusalem',
     ),
   ]),
 ];
