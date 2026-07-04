@@ -16,7 +16,13 @@ Running list of known issues and follow-ups.
   community `speech_to_text_windows` backend crashes natively on invocation).
   Mic/speech permissions added to macOS entitlements+Info.plist, iOS Info.plist,
   and AndroidManifest; macOS deployment target bumped 10.15 → 11.0 (plugin floor).
-- [ ] **Expand Tags card in Explorer.** Expand the tags card to also cross reference people, places, events, and commentaries like the other cards do.
+- [~] **Expand Tags card in Explorer.** The Explorer tag page now cross-references
+  its tagged verses into the bundled datasets — People / Places (with map) /
+  Events cards, scoped to the exact verses carrying the tag
+  (`explorerTagCrossRefsProvider`) — and shows a **Media** card of attachments
+  filed under the tag, opening the in-app image/PDF viewer. **Remaining:**
+  commentaries cross-reference (show installed-commentary entries on the tagged
+  verses, like the passage page's Commentaries card).
 - [~] **Notebooks tool.** Reader side tool (`ActiveTool.notebooks`) modeled on
   sermons: notebooks (folders) hold rich-text pages. Shipped: data model
   (`Notebooks`/`NotebookPages`/`NotebookPageRevisions`, schema v25), sync, FTS,
@@ -35,12 +41,14 @@ Running list of known issues and follow-ups.
   - **Tags:** General tagging at notebook + page level (`entityType`
     `notebook`/`notebookPage`), surfaced in tag results. — DONE
 
-- [ ] **Drag and drop verses.** Support dragging a verse from the reader and dropping it into the sermon editor or scratch space to copy the text.
+- [x] **Drag and drop verses.** Selected verses can be dragged from all three
+  reading views (`flowing_paragraph_view`, `parallel_view`, `verse_list_view`)
+  and dropped into the sermon editor, notebook page editor, and scratch space
+  to copy their text. Shared drag payload/logic lives in
+  `lib/app/verse_selection.dart`; the drag handle replaces the old
+  verse-action-bar copy plumbing (`1a0f3b2`).
 
 ## Research
-
-- [ ] **Media Attachments.** Research the ability to upload and tag images and possibly PDFs that can be shown within the app. Crucially, these attachments must be included in the app's backup/restore functionality.
-  - *Note on PDFs:* Aim to render PDFs internally (using packages like `syncfusion_flutter_pdfviewer` or `pdfx`) to keep users in the app and allow side-by-side study, rather than kicking them out to an external viewer.
 
 - [ ] **Interactive Atlas / Geographic Tracker** (Advanced Map Tool)
   - *Context:* The app currently has a `PlacesPanel` (`lib/ui/reader/places_panel.dart`) that uses `flutter_map` and OpenBible data to plot places for the active chapter.
@@ -132,6 +140,17 @@ Running list of known issues and follow-ups.
 ## Issues
 
 ## Archive
+
+- [x] **Media Attachments.** Upload, tag, and view images and PDFs in the app,
+  fully included in backup/restore and sync. Shipped: an attachments data model
+  (`user_tables.dart`, regen'd `user_store.g.dart`), a reader Media panel
+  (`media_panel.dart`) with an attach/config dialog (`attachment_config_dialog.dart`),
+  in-app viewers for images (`image_viewer_dialog.dart`) and PDFs rendered
+  internally (`pdf_viewer_dialog.dart`) for side-by-side study, and providers in
+  `media_providers.dart`. Binary files ride the backup/restore path
+  (`backup_restore_service.dart`) and sync (file/SAF/Google Drive backends via
+  `sync_storage.dart`), with a follow-up fidelity/cleanup pass (`24fb9ff`) and an
+  Android SAF export fix (`0c3ea3b`). Commits `89a2593`, `24fb9ff`, `0c3ea3b`.
 
 - [x] **Explorer (knowledge-web study tool).** Full-page browser over the
   bundled datasets, opened from the app drawer: one search across people,

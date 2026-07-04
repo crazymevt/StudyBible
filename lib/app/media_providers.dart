@@ -80,13 +80,16 @@ final chapterMediaProvider =
       );
     });
 
-// Provider for user-uploaded media attachments for a specific book and chapter
-final chapterAttachmentsProvider = FutureProvider.family<
+// Provider for user-uploaded media attachments for a specific book and chapter.
+// A live stream so title/reference edits (e.g. from the reader's Media panel)
+// reflect immediately wherever attachments are shown — the reader and the
+// Explorer passage page.
+final chapterAttachmentsProvider = StreamProvider.family<
   List<MediaAttachment>,
   ({String book, int chapter})
->((ref, args) async {
+>((ref, args) {
   final store = ref.watch(userStoreProvider);
-  
+
   final query = store.select(store.attachmentReferences).join([
     innerJoin(
       store.mediaAttachments,
@@ -99,11 +102,14 @@ final chapterAttachmentsProvider = FutureProvider.family<
       store.mediaAttachments.deleted.equals(false),
     );
 
-
-  final results = await query.get();
-  // Use a Set to deduplicate attachments that have multiple references (e.g. verse ranges) in the same chapter
-  final attachments = results.map((row) => row.readTable(store.mediaAttachments)).toSet().toList();
-  return attachments;
+  return query.watch().map((results) {
+    // Deduplicate attachments referenced multiple times (e.g. verse ranges) in
+    // the same chapter.
+    return results
+        .map((row) => row.readTable(store.mediaAttachments))
+        .toSet()
+        .toList();
+  });
 });
 
 // Provider for all user-uploaded media attachments

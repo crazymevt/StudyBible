@@ -133,6 +133,40 @@ void main() {
           entityId: Value('Verse:1 Samuel|24|2'),
           entityType: Value('verse'),
         ));
+
+    // A media attachment filed under the same tag, so the tag page's Media
+    // card has something to render.
+    await userStore.into(userStore.mediaAttachments).insert(
+        const MediaAttachmentsCompanion(
+          id: Value('media-1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('En Gedi photo'),
+          filename: Value('engedi.jpg'),
+          mimeType: Value('image/jpeg'),
+          sizeBytes: Value(2048),
+          createdAt: Value(0),
+        ));
+    await userStore.into(userStore.entityTags).insert(const EntityTagsCompanion(
+          id: Value('link-media'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          tagId: Value('tag-battles'),
+          entityId: Value('media-1'),
+          entityType: Value('media_attachment'),
+        ));
+    // ...and anchored to 1 Samuel 24 so the passage page's "Your media" card
+    // has something to render.
+    await userStore.into(userStore.attachmentReferences).insert(
+        const AttachmentReferencesCompanion(
+          id: Value('ref-media-1'),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          attachmentId: Value('media-1'),
+          bookName: Value('1 Samuel'),
+          chapter: Value(24),
+          createdAt: Value(0),
+        ));
   });
 
   tearDown(() async {
@@ -270,6 +304,12 @@ void main() {
     // The hop back into the knowledge web: the tagged verse's chapter.
     expect(find.text('Explore their chapters'), findsOneWidget);
     expect(find.text('1 Samuel 24'), findsOneWidget);
+    // The tag's verses are cross-referenced into the datasets: Saul is named
+    // in 1 Samuel 24:2 (the tagged verse), so he surfaces on a People card.
+    expect(find.text('People in these verses (1)'), findsOneWidget);
+    // Tagged media is filed under its own card.
+    expect(find.text('Media (1)'), findsOneWidget);
+    expect(find.text('En Gedi photo'), findsOneWidget);
   });
 
   testWidgets('passage and person pages show the Your-tags card',
@@ -284,6 +324,9 @@ void main() {
     expect(find.text('Your tags (1)'), findsOneWidget);
     expect(find.textContaining('#battles', findRichText: true),
         findsOneWidget);
+    // User-uploaded media anchored to this chapter shows on the passage page.
+    expect(find.text('Your media (1)'), findsOneWidget);
+    expect(find.text('En Gedi photo'), findsOneWidget);
 
     // Saul appears in 24:2, the tagged verse, so his page carries the tag
     // too — tap through the People facet chip.

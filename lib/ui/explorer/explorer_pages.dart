@@ -1,17 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:path/path.dart' as p;
 
 import '../../app/content_providers.dart';
 import '../../app/explorer_providers.dart';
+import '../../app/media_providers.dart';
 import '../../app/people_providers.dart';
 import '../../app/search_providers.dart';
 import '../../app/topic_providers.dart';
 import '../../app/user_providers.dart';
+import '../../data/app_paths.dart';
 import '../../data/content_store.dart';
 import '../../data/user_store.dart';
 import '../../domain/explorer/explorer_ref.dart';
 import '../common/skeleton.dart';
+import '../reader/image_viewer_dialog.dart';
+import '../reader/media_video_list.dart';
+import '../reader/pdf_viewer_dialog.dart';
 import 'explorer_common.dart';
 
 /// The page body for one trail entry — dispatches on the entity type.
@@ -615,6 +623,13 @@ class _PassagePage extends ConsumerWidget {
             .asData
             ?.value ??
         const <ExplorerPassageTag>[];
+    final videoGroups =
+        ref.watch(chapterMediaProvider((book: book, chapter: chapter)));
+    final attachments = ref
+            .watch(chapterAttachmentsProvider((book: book, chapter: chapter)))
+            .asData
+            ?.value ??
+        const <MediaAttachment>[];
     return overviewAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this passage: $e'),
@@ -633,7 +648,9 @@ class _PassagePage extends ConsumerWidget {
             if (d.isEmpty &&
                 commentaries.isEmpty &&
                 notes.isEmpty &&
-                passageTags.isEmpty)
+                passageTags.isEmpty &&
+                videoGroups.isEmpty &&
+                attachments.isEmpty)
               const _ErrorBody(
                   'The datasets don\'t tag anything in this chapter yet.'),
             if (d.people.isNotEmpty)
@@ -710,6 +727,26 @@ class _PassagePage extends ConsumerWidget {
                   children: [
                     for (final t in d.topics)
                       ExplorerRefChip(ExplorerRef.topic(t.id, t.name)),
+                  ],
+                ),
+              ),
+            for (final group in videoGroups)
+              ExplorerFacetCard(
+                icon: Icons.play_circle_outline,
+                title: '${group.collection.name} (${group.items.length})',
+                child: Column(
+                  children: [
+                    for (final item in group.items) MediaVideoTile(item: item),
+                  ],
+                ),
+              ),
+            if (attachments.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.attachment_outlined,
+                title: 'Your media (${attachments.length})',
+                child: Column(
+                  children: [
+                    for (final a in attachments) _AttachmentTile(attachment: a),
                   ],
                 ),
               ),
@@ -894,6 +931,7 @@ class _TagPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(explorerTagDetailProvider(tagId));
+    final crossRefs = ref.watch(explorerTagCrossRefsProvider(tagId)).asData?.value;
     return detailAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this tag: $e'),
@@ -923,6 +961,70 @@ class _TagPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (crossRefs != null && crossRefs.people.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.person_outline,
+                title: 'People in these verses (${crossRefs.people.length})',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final p in crossRefs.people)
+                      ExplorerRefChip(
+                        ExplorerRef.person(p.id, p.label),
+                        subtitle: _tagRefCountLabel(p.verseCount),
+                      ),
+                  ],
+                ),
+              ),
+            if (crossRefs != null && crossRefs.places.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.place_outlined,
+                title: 'Places in these verses (${crossRefs.places.length})',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ExplorerMap(places: [
+                      for (final p in crossRefs.places)
+                        ExplorerMapPlace(p.id, p.label, p.lat!, p.lng!),
+                    ]),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (final p in crossRefs.places)
+                          ExplorerRefChip(
+                            ExplorerRef.place(p.id, p.label),
+                            subtitle: _tagRefCountLabel(p.verseCount),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            if (crossRefs != null && crossRefs.events.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.flag_outlined,
+                title: 'Events in these verses (${crossRefs.events.length})',
+                child: Column(
+                  children: [
+                    for (final e in crossRefs.events)
+                      ListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(e.title),
+                        subtitle: e.startYear == null
+                            ? null
+                            : Text(explorerYearLabel(e.startYear!)),
+                        trailing: const Icon(Icons.chevron_right, size: 18),
+                        onTap: () => ref
+                            .read(explorerTrailProvider.notifier)
+                            .open(ExplorerRef.event(e.id, e.title)),
+                      ),
+                  ],
+                ),
+              ),
             if (d.passages.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.travel_explore,
@@ -933,6 +1035,16 @@ class _TagPage extends ConsumerWidget {
                   children: [
                     for (final p in d.passages)
                       ExplorerRefChip(ExplorerRef.passage(p.book, p.chapter)),
+                  ],
+                ),
+              ),
+            if (d.media.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.attachment_outlined,
+                title: 'Media (${d.media.length})',
+                child: Column(
+                  children: [
+                    for (final m in d.media) _AttachmentTile(attachment: m),
                   ],
                 ),
               ),
@@ -1027,6 +1139,70 @@ class _TaggedItemTile extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
             ),
       onTap: () => explorerOpenTaggedItem(context, ref, item),
+    );
+  }
+}
+
+/// Subtitle for a person/place chip on the tag page: how many of the tag's
+/// verses mention that entity.
+String _tagRefCountLabel(int count) =>
+    '$count ${count == 1 ? 'verse' : 'verses'}';
+
+/// A user-uploaded media attachment (image/PDF), shown on the tag and passage
+/// pages. Tapping opens the same in-app image or PDF viewer the reader's Media
+/// panel uses (only images/PDFs are attachable, so no external-handler fallback
+/// is needed).
+class _AttachmentTile extends StatelessWidget {
+  const _AttachmentTile({required this.attachment});
+
+  final MediaAttachment attachment;
+
+  Future<File> _resolveFile() async {
+    final dir = await appDataDir();
+    return File(p.join(dir.path, 'media_attachments', attachment.filename));
+  }
+
+  Future<void> _open(BuildContext context) async {
+    final file = await _resolveFile();
+    if (!await file.exists()) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content:
+              Text('File not found locally. It may still be syncing.'),
+        ));
+      }
+      return;
+    }
+    if (!context.mounted) return;
+    final title = attachment.title ?? attachment.filename;
+    if (attachment.mimeType.startsWith('image/')) {
+      showDialog(
+        context: context,
+        builder: (_) => ImageViewerDialog(title: title, file: file),
+      );
+    } else if (attachment.mimeType == 'application/pdf') {
+      showDialog(
+        context: context,
+        builder: (_) => PdfViewerDialog(title: title, file: file),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isImage = attachment.mimeType.startsWith('image/');
+    final sizeKb = (attachment.sizeBytes / 1024).toStringAsFixed(1);
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        isImage ? Icons.image_outlined : Icons.picture_as_pdf_outlined,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      title: Text(attachment.title ?? attachment.filename),
+      subtitle: Text('$sizeKb KB'),
+      trailing: const Icon(Icons.chevron_right, size: 18),
+      onTap: () => _open(context),
     );
   }
 }

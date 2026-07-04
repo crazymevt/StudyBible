@@ -13,8 +13,7 @@ import '../../app/user_providers.dart';
 import '../../data/user_store.dart';
 import '../../data/app_paths.dart';
 import 'dart:io';
-import 'media_player_dialog.dart';
-import 'web_player_dialog.dart';
+import 'media_video_list.dart';
 import 'pdf_viewer_dialog.dart';
 import 'image_viewer_dialog.dart';
 import 'attachment_config_dialog.dart';
@@ -304,81 +303,7 @@ class MediaPanel extends ConsumerWidget {
                           ),
 
                           // Collection Items
-                          ...group.items.map((item) {
-                            return ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              leading: Container(
-                                width: 80,
-                                height: 45,
-                                decoration: BoxDecoration(
-                                  color: Colors.black12,
-                                  borderRadius: BorderRadius.circular(4),
-                                  image: item.id != null
-                                      ? DecorationImage(
-                                          image: NetworkImage(
-                                            'https://img.youtube.com/vi/${item.id}/hqdefault.jpg',
-                                          ),
-                                          fit: BoxFit.cover,
-                                          onError: (exception, stackTrace) {
-                                            // Ignore image loading errors
-                                          },
-                                        )
-                                      : null,
-                                ),
-                                child: const Icon(
-                                  Icons.play_circle_outline,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              title: Text(item.title),
-                              subtitle: item.description != null
-                                  ? Text(
-                                      item.description!,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  : null,
-                              trailing: Text(
-                                item.duration ?? '',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              onTap: () {
-                                if (item.id != null) {
-                                  if (Platform.isWindows || Platform.isLinux) {
-                                    launchUrl(
-                                      Uri.parse('https://www.youtube.com/watch?v=${item.id}'),
-                                      mode: LaunchMode.externalApplication,
-                                    );
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) =>
-                                          MediaPlayerDialog(videoId: item.id!),
-                                    );
-                                  }
-                                } else if (item.url != null) {
-                                  if (Platform.isWindows || Platform.isLinux) {
-                                    launchUrl(
-                                      Uri.parse(item.url!),
-                                      mode: LaunchMode.externalApplication,
-                                    );
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) =>
-                                          WebPlayerDialog(url: item.url!),
-                                    );
-                                  }
-                                }
-                              },
-                            );
-                          }),
+                          ...group.items.map((item) => MediaVideoTile(item: item)),
                           const Divider(height: 32),
                         ],
                       );

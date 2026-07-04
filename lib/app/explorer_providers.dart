@@ -703,6 +703,9 @@ class ExplorerTagDetail {
   final List<SearchResult> journals;
   final List<SearchResult> prayers;
 
+  /// Media attachments filed under this tag (images/PDFs), newest first.
+  final List<MediaAttachment> media;
+
   /// Distinct chapters of [verses], in canonical order.
   final List<({String book, int chapter})> passages;
 
@@ -715,6 +718,7 @@ class ExplorerTagDetail {
     required this.sermons,
     required this.journals,
     required this.prayers,
+    required this.media,
     required this.related,
   }) : passages = _distinctChapters(verses);
 
@@ -723,7 +727,8 @@ class ExplorerTagDetail {
       notes.isEmpty &&
       sermons.isEmpty &&
       journals.isEmpty &&
-      prayers.isEmpty;
+      prayers.isEmpty &&
+      media.isEmpty;
 
   static List<({String book, int chapter})> _distinctChapters(
       List<SearchResult> verses) {
@@ -735,6 +740,36 @@ class ExplorerTagDetail {
     ];
   }
 }
+
+/// Media attachments filed under a tag, newest first. A live Drift stream so a
+/// title (or other) edit in the reader's Media panel reflects on the tag page
+/// without a manual refresh. Media is typed data (filename + mime are needed to
+/// open the viewer), so it's fetched here rather than through the SearchResult
+/// path in [entitiesForTagProvider].
+final explorerTagMediaProvider =
+    StreamProvider.family<List<MediaAttachment>, String>((ref, tagId) {
+  final db = ref.watch(userStoreProvider);
+  final query = db.select(db.mediaAttachments).join([
+    innerJoin(
+      db.entityTags,
+      db.entityTags.entityId.equalsExp(db.mediaAttachments.id),
+    ),
+  ])
+    ..where(db.entityTags.tagId.equals(tagId))
+    ..where(db.entityTags.entityType.equals('media_attachment'))
+    ..where(db.entityTags.deleted.equals(false))
+    ..where(db.mediaAttachments.deleted.equals(false));
+  return query.watch().map((rows) {
+    final seen = <String>{};
+    final media = <MediaAttachment>[];
+    for (final row in rows) {
+      final a = row.readTable(db.mediaAttachments);
+      if (seen.add(a.id)) media.add(a);
+    }
+    media.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return media;
+  });
+});
 
 /// Loads a tag's page. Null when the tag doesn't exist (or was deleted,
 /// possibly on another device, while sitting in the breadcrumb trail).
@@ -749,6 +784,9 @@ final explorerTagDetailProvider =
   final items = await ref.watch(entitiesForTagProvider(tagId).future);
   List<SearchResult> ofType(String type) =>
       [for (final i in items) if (i.type == type) i];
+
+  // Watched (not one-shot) so an attachment edit re-runs the page.
+  final media = await ref.watch(explorerTagMediaProvider(tagId).future);
   final verses = ofType('verse')
     ..sort((a, b) {
       final byBook = (a.bookOrder ?? 0).compareTo(b.bookOrder ?? 0);
@@ -778,6 +816,7 @@ final explorerTagDetailProvider =
     sermons: ofType('sermon'),
     journals: ofType('journal'),
     prayers: ofType('prayer'),
+    media: media,
     related: [
       for (final r in relatedRows)
         ExplorerTagHit(
@@ -789,6 +828,158 @@ final explorerTagDetailProvider =
           r.read<int>('shared'),
         ),
     ],
+  );
+});
+
+/// A dataset entity (person/place) surfaced from a tag's tagged verses, with
+/// the count of tagged verses that mention it.
+class ExplorerTagEntityHit {
+  final int id;
+  final String label;
+
+  /// Optional coordinates (places only) so the tag page can pin a map.
+  final double? lat;
+  final double? lng;
+
+  /// How many of the tag's tagged verses mention this entity.
+  final int verseCount;
+  ExplorerTagEntityHit({
+    required this.id,
+    required this.label,
+    required this.verseCount,
+    this.lat,
+    this.lng,
+  });
+}
+
+/// The dataset entities (people, places, events) mentioned in a tag's tagged
+/// verses — the same cross-referencing the passage page does, but scoped to the
+/// exact verses carrying the tag rather than whole chapters.
+class ExplorerTagCrossRefs {
+  final List<ExplorerTagEntityHit> people;
+  final List<ExplorerTagEntityHit> places;
+  final List<ExplorerEventHit> events;
+  ExplorerTagCrossRefs({
+    required this.people,
+    required this.places,
+    required this.events,
+  });
+
+  bool get isEmpty => people.isEmpty && places.isEmpty && events.isEmpty;
+}
+
+/// Cross-references a tag's tagged verses into the bundled datasets: the
+/// people, places, and events those verses mention. Derived from
+/// [explorerTagDetailProvider]'s verse list, so it refreshes when the tag's
+/// verses change. Each distinct chapter is resolved through the existing
+/// passage lookups (cached) and then filtered down to the tagged verses.
+final explorerTagCrossRefsProvider =
+    FutureProvider.family<ExplorerTagCrossRefs, String>((ref, tagId) async {
+  final detail = await ref.watch(explorerTagDetailProvider(tagId).future);
+  const empty = <ExplorerTagEntityHit>[];
+  if (detail == null || detail.verses.isEmpty) {
+    return ExplorerTagCrossRefs(
+        people: empty, places: empty, events: const []);
+  }
+
+  // Tagged verse numbers grouped by chapter, so each chapter is queried once.
+  final versesByChapter = <({String book, int chapter}), Set<int>>{};
+  for (final v in detail.verses) {
+    if (v.book == null || v.chapter == null || v.verse == null) continue;
+    (versesByChapter[(book: v.book!, chapter: v.chapter!)] ??= {}).add(v.verse!);
+  }
+  if (versesByChapter.isEmpty) {
+    return ExplorerTagCrossRefs(
+        people: empty, places: empty, events: const []);
+  }
+
+  await ref.watch(explorerReadyProvider.future);
+  final store = ref.watch(contentStoreProvider);
+
+  final people = <int, ExplorerTagEntityHit>{};
+  final places = <int, ExplorerTagEntityHit>{};
+  final events = <int, ({ExplorerEventHit hit, int count})>{};
+
+  for (final entry in versesByChapter.entries) {
+    final loc = entry.key;
+    final tagged = entry.value;
+
+    final chapterPeople = await ref.watch(peopleForPassageProvider(loc).future);
+    for (final p in chapterPeople) {
+      final matched = p.verses.where(tagged.contains).length;
+      if (matched == 0) continue;
+      final prev = people[p.id];
+      people[p.id] = ExplorerTagEntityHit(
+        id: p.id,
+        label: p.displayTitle,
+        verseCount: (prev?.verseCount ?? 0) + matched,
+      );
+    }
+
+    final chapterPlaces = await ref.watch(placesForPassageProvider(loc).future);
+    for (final pl in chapterPlaces) {
+      final matched = pl.verses.where(tagged.contains).length;
+      if (matched == 0) continue;
+      final prev = places[pl.id];
+      places[pl.id] = ExplorerTagEntityHit(
+        id: pl.id,
+        label: pl.name,
+        lat: pl.lat,
+        lng: pl.lng,
+        verseCount: (prev?.verseCount ?? 0) + matched,
+      );
+    }
+
+    final eventRows = await store.customSelect(
+      'SELECT e.id AS id, e.title AS title, e.start_year AS start_year, '
+      '  ev.verse AS verse '
+      'FROM event_verses ev '
+      'JOIN timeline_events e ON e.id = ev.event_id '
+      'WHERE ev.book_name = ? AND ev.chapter = ?',
+      variables: [
+        Variable.withString(loc.book),
+        Variable.withInt(loc.chapter),
+      ],
+    ).get();
+    for (final r in eventRows) {
+      if (!tagged.contains(r.read<int>('verse'))) continue;
+      final id = r.read<int>('id');
+      final prev = events[id];
+      events[id] = (
+        hit: ExplorerEventHit(
+          id,
+          r.read<String>('title'),
+          r.readNullable<int>('start_year'),
+        ),
+        count: (prev?.count ?? 0) + 1,
+      );
+    }
+  }
+
+  int byCountThenLabel(ExplorerTagEntityHit a, ExplorerTagEntityHit b) {
+    final byCount = b.verseCount.compareTo(a.verseCount);
+    if (byCount != 0) return byCount;
+    return a.label.toLowerCase().compareTo(b.label.toLowerCase());
+  }
+
+  final peopleList = people.values.toList()..sort(byCountThenLabel);
+  final placesList = places.values.toList()..sort(byCountThenLabel);
+  final eventsList = events.values.toList()
+    ..sort((a, b) {
+      // Chronological, undated last — matching the passage page's ordering.
+      final ay = a.hit.startYear, by = b.hit.startYear;
+      if (ay == null && by == null) {
+        return a.hit.title.toLowerCase().compareTo(b.hit.title.toLowerCase());
+      }
+      if (ay == null) return 1;
+      if (by == null) return -1;
+      return ay.compareTo(by);
+    });
+
+  return ExplorerTagCrossRefs(
+    people: peopleList,
+    places: placesList,
+    events: [for (final e in eventsList) e.hit],
   );
 });
 
