@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.4+3",
+    "date": "2026-07-04",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "sermons can link back to Explorer people/places/events/topics",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.4+2",
     "date": "2026-07-04",
     "features": [
