@@ -302,6 +302,17 @@ const _eventsSupersededByCuratedJourney = {
 ///   there was but a little way to come to Ephrath"), not where Rachel
 ///   actually labors and dies (35:19, "in the way to Ephrath, which is
 ///   Bethlehem"); Bethel has the lower id.
+/// - 'Comes to Shechem and pitches his tent': Genesis 33:18 also names
+///   Canaan and Paddan-aram, both retrospective ("in the land of Canaan,
+///   when he came from Padan-aram"), not his specific location — explicitly
+///   "a city of Shechem"; both have lower ids than Shechem.
+/// - 'Rachel dies near Ephrath giving birth to Benjamin' (Jacob's own
+///   curated waypoint for the same event as Benjamin's, above): same
+///   Genesis 35:16 tie, same fix.
+/// - 'Embalmed and buried at Machpelah near Hebron': Genesis 50:13 also
+///   names Canaan (the general region carried to) and Mamre (the
+///   surrounding grove); the actual tomb is "the cave of the field of
+///   Machpelah... before Mamre" — both other names have lower ids.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -347,6 +358,9 @@ const _eventPlaceOverrides = {
   'Passes through the wilderness of Shur': 'Shur',
   'Manna given in the wilderness of Sin': 'Sin',
   'Rachel dies giving birth to Benjamin': 'Ephrath',
+  'Comes to Shechem and pitches his tent': 'Shechem',
+  'Rachel dies near Ephrath giving birth to Benjamin': 'Ephrath',
+  'Embalmed and buried at Machpelah near Hebron': 'Machpelah',
 };
 
 /// A person's dated events, each resolved to the first place named in its

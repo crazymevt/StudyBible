@@ -521,4 +521,35 @@ void main() {
     // Ephrath once overridden.
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Jacob's journey covers Beersheba to Haran and back, Peniel, and "
+      "Egypt, in chronological order (he had zero dated events before)",
+      () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final jacob = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('jacob_683')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(jacob.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Beersheba 2',
+      'Bethel 1',
+      'Haran',
+      'Gilead 1',
+      'Mahanaim',
+      'Jabbok',
+      'Penuel',
+      'Succoth 1',
+      'Shechem',
+      'Bethel 1',
+      'Ephrath',
+      'Hebron',
+      'Beersheba 2',
+      'Goshen 1',
+      'Machpelah',
+    ]);
+    expect(journey.unmappedEventCount, 0);
+  });
 }
