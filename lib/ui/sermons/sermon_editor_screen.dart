@@ -12,7 +12,10 @@ import '../../app/user_providers.dart';
 import '../../data/export/sermon_exporter.dart';
 import '../../data/logging.dart';
 import '../../data/user_store.dart';
+import '../../domain/explorer/entity_link.dart';
+import '../common/entity_autolink.dart';
 import 'export_dialog.dart';
+import '../notebooks/insert_entity_link_dialog.dart';
 import 'sermon_presentation_screen.dart';
 import 'sermon_revisions_dialog.dart';
 import '../common/breakpoints.dart';
@@ -23,7 +26,7 @@ import '../tags/tag_editor_dialog.dart';
 /// Actions collapsed into the editor's overflow menu when the header is too
 /// narrow for a full icon row (phones, and the inline panel beside the
 /// reader); wider full-screen layouts show each as its own button.
-enum _SermonAction { export, print, tags, revisions, outline }
+enum _SermonAction { export, print, linkEntity, tags, revisions, outline }
 
 class SermonEditorScreen extends ConsumerStatefulWidget {
   final String sermonId;
@@ -355,6 +358,25 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     });
   }
 
+  Future<void> _linkEntity(BuildContext context) async {
+    final chosen = await InsertEntityLinkDialog.show(context);
+    if (chosen == null || !mounted) return;
+    final offset = _controller.selection.baseOffset;
+    final insertOffset =
+        offset >= 0 ? offset : _controller.document.length - 1;
+    final label = chosen.label;
+    _controller.document.insert(insertOffset, label);
+    _controller.updateSelection(
+      TextSelection.collapsed(offset: insertOffset + label.length),
+      ChangeSource.local,
+    );
+    _controller.formatText(
+      insertOffset,
+      label.length,
+      LinkAttribute(buildEntityLinkUrl(chosen)),
+    );
+  }
+
   void _manageTags(BuildContext context) {
     showDialog(
       context: context,
@@ -371,6 +393,8 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         _exportSermon(context);
       case _SermonAction.print:
         _printSermon(context, ref);
+      case _SermonAction.linkEntity:
+        _linkEntity(context);
       case _SermonAction.tags:
         _manageTags(context);
       case _SermonAction.revisions:
@@ -400,6 +424,14 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
           child: ListTile(
             leading: Icon(Icons.print),
             title: Text('Print'),
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem(
+          value: _SermonAction.linkEntity,
+          child: ListTile(
+            leading: Icon(Icons.travel_explore),
+            title: Text('Link to Explorer'),
             contentPadding: EdgeInsets.zero,
           ),
         ),
@@ -543,11 +575,23 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                         child: QuillEditor.basic(
                           controller: _controller,
                           config: QuillEditorConfig(
-                            customLinkPrefixes: referenceLinkPrefixes,
-                            customRecognizerBuilder:
-                                referenceRecognizerBuilder(ref, context),
+                            customLinkPrefixes: [
+                              ...referenceLinkPrefixes,
+                              ...entityLinkPrefixes,
+                            ],
+                            customRecognizerBuilder: (attribute, leaf) =>
+                                referenceRecognizerBuilder(ref, context)(
+                                  attribute,
+                                  leaf,
+                                ) ??
+                                entityRecognizerBuilder(ref, context)(
+                                  attribute,
+                                  leaf,
+                                ),
                             onLaunchUrl: (url) =>
-                                handleReferenceLaunch(ref, context, url),
+                                parseEntityLinkUrl(url) != null
+                                    ? handleEntityLinkLaunch(ref, context, url)
+                                    : handleReferenceLaunch(ref, context, url),
                           ),
                         ),
                       );
@@ -594,6 +638,11 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                 icon: const Icon(Icons.print),
                 tooltip: 'Print',
                 onPressed: () => _printSermon(context, ref),
+              ),
+              IconButton(
+                icon: const Icon(Icons.travel_explore),
+                tooltip: 'Link to Explorer',
+                onPressed: () => _linkEntity(context),
               ),
               IconButton(
                 icon: const Icon(Icons.label),

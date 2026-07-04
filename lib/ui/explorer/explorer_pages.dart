@@ -184,6 +184,12 @@ class _PersonPage extends ConsumerWidget {
       data: (d) {
         if (d == null) return const _ErrorBody('Person not found.');
         final p = d.person;
+        final sermons = ref
+                .watch(explorerSermonsProvider(
+                    ExplorerRef.person(p.id, p.displayTitle)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         final notebookPages = ref
                 .watch(explorerNotebookPagesProvider(
                     ExplorerRef.person(p.id, p.displayTitle)))
@@ -332,6 +338,16 @@ class _PersonPage extends ConsumerWidget {
                     (book: v.bookName, chapter: v.chapter, verse: v.verse),
                 ]),
               ),
+            if (sermons.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.co_present_outlined,
+                title: 'Your sermons (${sermons.length})',
+                child: Column(
+                  children: [
+                    for (final s in sermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
             if (notebookPages.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.library_books_outlined,
@@ -371,6 +387,12 @@ class _PlacePage extends ConsumerWidget {
             ref.watch(explorerEntryDictionaryProvider(d.place.name)).asData
                     ?.value ??
                 const <DictionaryEntryWithDict>[];
+        final sermons = ref
+                .watch(explorerSermonsProvider(
+                    ExplorerRef.place(d.place.id, d.place.name)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         final notebookPages = ref
                 .watch(explorerNotebookPagesProvider(
                     ExplorerRef.place(d.place.id, d.place.name)))
@@ -437,6 +459,16 @@ class _PlacePage extends ConsumerWidget {
                     (book: v.bookName, chapter: v.chapter, verse: v.verse),
                 ]),
               ),
+            if (sermons.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.co_present_outlined,
+                title: 'Your sermons (${sermons.length})',
+                child: Column(
+                  children: [
+                    for (final s in sermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
             if (notebookPages.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.library_books_outlined,
@@ -472,6 +504,12 @@ class _EventPage extends ConsumerWidget {
       error: (e, _) => _ErrorBody('Couldn\'t load this event: $e'),
       data: (d) {
         if (d == null) return const _ErrorBody('Event not found.');
+        final sermons = ref
+                .watch(explorerSermonsProvider(
+                    ExplorerRef.event(d.event.id, d.event.title)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         final notebookPages = ref
                 .watch(explorerNotebookPagesProvider(
                     ExplorerRef.event(d.event.id, d.event.title)))
@@ -540,6 +578,16 @@ class _EventPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (sermons.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.co_present_outlined,
+                title: 'Your sermons (${sermons.length})',
+                child: Column(
+                  children: [
+                    for (final s in sermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
             if (notebookPages.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.library_books_outlined,
@@ -586,6 +634,12 @@ class _TopicPage extends ConsumerWidget {
             ref.watch(explorerEntryDictionaryProvider(d.topic.name)).asData
                     ?.value ??
                 const <DictionaryEntryWithDict>[];
+        final sermons = ref
+                .watch(explorerSermonsProvider(
+                    ExplorerRef.topic(d.topic.id, d.topic.name)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         final notebookPages = ref
                 .watch(explorerNotebookPagesProvider(
                     ExplorerRef.topic(d.topic.id, d.topic.name)))
@@ -644,6 +698,16 @@ class _TopicPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (sermons.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.co_present_outlined,
+                title: 'Your sermons (${sermons.length})',
+                child: Column(
+                  children: [
+                    for (final s in sermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
             if (notebookPages.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.library_books_outlined,
@@ -686,7 +750,7 @@ class _PassagePage extends ConsumerWidget {
             ?.value ??
         const <ExplorerCrossRefGroup>[];
     final passageSermons = ref
-            .watch(explorerPassageSermonsProvider((book: book, chapter: chapter)))
+            .watch(explorerSermonsProvider(ExplorerRef.passage(book, chapter)))
             .asData
             ?.value ??
         const <SearchResult>[];

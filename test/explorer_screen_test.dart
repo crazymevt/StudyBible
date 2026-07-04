@@ -243,6 +243,25 @@ void main() {
               Value('Turn with me to 1 Samuel 24:1, David and Saul.'),
         ));
 
+    // A second sermon explicitly linked to Saul ("Link to Explorer"), for the
+    // "Your sermons" card on his person page.
+    await userStore.into(userStore.sermons).insert(
+          SermonsCompanion(
+            id: const Value('sermon-2'),
+            createdAt: const Value(0),
+            updatedAt: const Value(0),
+            deviceId: const Value('test-device'),
+            title: const Value('The Reluctant King'),
+            content: Value(jsonEncode([
+              {
+                'insert': 'Saul',
+                'attributes': {'link': 'sbent:person|1'},
+              },
+              {'insert': ' hides among the baggage.\n'},
+            ])),
+          ),
+        );
+
     // A notebook page explicitly linked to Saul ("Link to Explorer") and
     // separately citing the chapter in prose, for the "Your notebooks" cards
     // on both the person page and the passage page.
@@ -482,6 +501,33 @@ void main() {
     expect(container.read(appModuleProvider), AppModule.reader);
     expect(container.read(activeToolProvider), ActiveTool.notebooks);
     expect(container.read(selectedNotebookPageIdProvider), 'page-1');
+  });
+
+  testWidgets(
+      'person page shows the Your-sermons card, linked back to the '
+      'reader-side sermon editor', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final container = await pump(tester);
+
+    await tester.enterText(find.byType(TextField), 'Saul');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Saul'));
+    await tester.pumpAndSettle();
+
+    // Only "The Reluctant King" explicitly links to Saul; "Sparing an Enemy"
+    // merely mentions him in prose and must not show up here.
+    expect(find.text('Your sermons (1)'), findsOneWidget);
+    expect(find.text('The Reluctant King'), findsOneWidget);
+    expect(find.text('Sparing an Enemy'), findsNothing);
+
+    // Tapping it opens the sermon in the reader's sermon tool (desktop path).
+    await tester.tap(find.text('The Reluctant King'));
+    await tester.pumpAndSettle();
+    expect(container.read(appModuleProvider), AppModule.reader);
+    expect(container.read(activeToolProvider), ActiveTool.sermons);
+    expect(container.read(selectedSermonIdProvider), 'sermon-2');
   });
 
   testWidgets(

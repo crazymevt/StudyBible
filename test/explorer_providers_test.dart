@@ -300,6 +300,24 @@ void main() {
           content: Value(''),
           contentPlain: Value("Let's look at Psalms 57 today."),
         ));
+    // Explicitly links David (via "Link to Explorer"), for the person
+    // backlink card — mirrors notebook page-1 below.
+    await userStore.into(userStore.sermons).insert(
+          SermonsCompanion(
+            id: const Value('sermon-4'),
+            createdAt: const Value(0),
+            updatedAt: const Value(0),
+            deviceId: const Value('test-device'),
+            title: const Value('David\'s Restraint'),
+            content: Value(jsonEncode([
+              {
+                'insert': 'David',
+                'attributes': {'link': 'sbent:person|1'},
+              },
+              {'insert': ' shows restraint.\n'},
+            ])),
+          ),
+        );
     await userStore.into(userStore.journals).insert(const JournalsCompanion(
           id: Value('journal-1'),
           updatedAt: Value(0),
@@ -529,14 +547,14 @@ void main() {
   });
 
   group('passage sermons', () {
-    // explorerPassageSermonsProvider watches allSermonsProvider, a plain
+    // explorerSermonsProvider watches allSermonsProvider, a plain
     // StreamProvider backed by a Drift .watch() query — reading its .future
     // cold (no active listener) never resolves, so every test in this group
     // holds a throwaway listen for the duration of the read (same fix as the
     // "universal search" group above).
     Future<List<SearchResult>> sermonsFor(String book, int chapter) async {
       final provider =
-          explorerPassageSermonsProvider((book: book, chapter: chapter));
+          explorerSermonsProvider(ExplorerRef.passage(book, chapter));
       final sub = container.listen(provider, (_, _) {});
       try {
         return await container.read(provider.future);
@@ -559,6 +577,38 @@ void main() {
 
     test('chapter with no citing sermon returns empty', () async {
       expect(await sermonsFor('Obadiah', 1), isEmpty);
+    });
+  });
+
+  group('sermon entity backlinks', () {
+    // Same cold-read gotcha as the group above.
+    Future<List<SearchResult>> sermonsFor(ExplorerRef target) async {
+      final provider = explorerSermonsProvider(target);
+      final sub = container.listen(provider, (_, _) {});
+      try {
+        return await container.read(provider.future);
+      } finally {
+        sub.close();
+      }
+    }
+
+    test('person match requires an explicit Link-to-Explorer, not prose',
+        () async {
+      final results = await sermonsFor(const ExplorerRef.person(1, 'David'));
+      expect(results.map((r) => r.title).toList(), ['David\'s Restraint']);
+      expect(results.single.type, 'sermon');
+      expect(results.single.referenceId, 'sermon-4');
+
+      // Saul is mentioned nowhere via an explicit link.
+      expect(await sermonsFor(const ExplorerRef.person(2, 'Saul')), isEmpty);
+    });
+
+    test('place/event/topic with no linked sermon returns empty', () async {
+      expect(await sermonsFor(const ExplorerRef.place(1, 'En Gedi')), isEmpty);
+      expect(await sermonsFor(const ExplorerRef.event(1, 'Some event')),
+          isEmpty);
+      expect(await sermonsFor(const ExplorerRef.topic(1, 'Some topic')),
+          isEmpty);
     });
   });
 

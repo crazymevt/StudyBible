@@ -667,28 +667,54 @@ final explorerPassageCrossReferencesProvider = FutureProvider.family<
   ];
 });
 
-/// The user's own sermons whose scripture citations touch this chapter
-/// (a chapter- or range-citation counts if it spans the chapter, not just an
-/// exact verse match). Scans plain text with the same [BibleReferenceScanner]
-/// the "Navigate Scriptures" sermon route uses, since there's no persisted
-/// reference index to query instead.
-final explorerPassageSermonsProvider = FutureProvider.family<List<SearchResult>,
-    ({String book, int chapter})>((ref, loc) async {
+/// The user's own sermons that reference an Explorer entity — the "Your
+/// sermons" backlink card on person/place/event/topic/passage pages.
+///
+/// A passage match is scanned live with the same [BibleReferenceScanner] the
+/// "Navigate Scriptures" sermon route uses (a chapter- or range-citation
+/// counts if it spans the chapter, not just an exact verse match) — there's
+/// no persisted reference index to query instead. A person/place/event/topic
+/// match is looked up exactly, from the `sbent:` links the sermon editor's
+/// "Link to Explorer" action stores, for the same collision reason
+/// [explorerNotebookPagesProvider] does: free-text dataset names are too
+/// collision-prone to detect by scanning prose.
+final explorerSermonsProvider =
+    FutureProvider.family<List<SearchResult>, ExplorerRef>((ref, target) async {
   final sermons = await ref.watch(allSermonsProvider.future);
   if (sermons.isEmpty) return const [];
-  final versions = ref.watch(activeVersionsProvider);
-  if (versions.isEmpty) return const [];
-  final books = await ref.watch(booksForVersionProvider(versions.first).future);
-  if (books.isEmpty) return const [];
 
+  if (target.type == ExplorerEntityType.passage) {
+    final versions = ref.watch(activeVersionsProvider);
+    if (versions.isEmpty) return const [];
+    final books = await ref.watch(booksForVersionProvider(versions.first).future);
+    if (books.isEmpty) return const [];
+
+    final matches = <SearchResult>[];
+    for (final s in sermons) {
+      final text = s.contentPlain ?? deltaToPlainText(s.content);
+      final touches = BibleReferenceScanner.scan(text, books).any((m) =>
+          m.book.name == target.book &&
+          m.chapter <= target.chapter! &&
+          (m.endChapter ?? m.chapter) >= target.chapter!);
+      if (touches) {
+        matches.add(SearchResult(
+          type: 'sermon',
+          referenceId: s.id,
+          title: s.title,
+          textContent: '',
+        ));
+      }
+    }
+    return matches;
+  }
+
+  final id = target.id;
+  if (id == null) return const [];
   final matches = <SearchResult>[];
   for (final s in sermons) {
-    final text = s.contentPlain ?? deltaToPlainText(s.content);
-    final touches = BibleReferenceScanner.scan(text, books).any((m) =>
-        m.book.name == loc.book &&
-        m.chapter <= loc.chapter &&
-        (m.endChapter ?? m.chapter) >= loc.chapter);
-    if (touches) {
+    final linked = extractEntityLinksFromDelta(s.content)
+        .any((l) => l.type == target.type && l.id == id);
+    if (linked) {
       matches.add(SearchResult(
         type: 'sermon',
         referenceId: s.id,
@@ -703,7 +729,7 @@ final explorerPassageSermonsProvider = FutureProvider.family<List<SearchResult>,
 /// The user's own notebook pages that reference an Explorer entity — the
 /// "Your notebooks" backlink card on person/place/event/topic/passage pages.
 ///
-/// A passage match is scanned live the same way [explorerPassageSermonsProvider]
+/// A passage match is scanned live the same way [explorerSermonsProvider]
 /// scans sermons (there's no persisted reference index for scripture
 /// citations). A person/place/event/topic match is looked up exactly, from the
 /// `sbent:` links the notebook editor's "Link to Explorer" action stores —
