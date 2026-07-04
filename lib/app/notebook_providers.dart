@@ -19,6 +19,18 @@ final allNotebooksProvider = StreamProvider<List<Notebook>>((ref) {
       .watch();
 });
 
+/// All non-deleted notebook pages across every notebook, unordered. Used by
+/// the Explorer's "Your notebooks" backlink cards, which need to scan every
+/// page's content regardless of which notebook it's filed under. Deleting a
+/// notebook cascades to soft-delete its pages, so filtering on `deleted` alone
+/// (no join to `notebooks`) is enough to exclude pages of a deleted notebook.
+final allNotebookPagesProvider = StreamProvider<List<NotebookPage>>((ref) {
+  final store = ref.watch(userStoreProvider);
+  return (store.select(store.notebookPages)
+        ..where((t) => t.deleted.equals(false)))
+      .watch();
+});
+
 /// Tags for every notebook at once, as `notebookId -> tags` (each list sorted by
 /// name). Mirrors [sermonTagsProvider].
 final notebookTagsProvider = StreamProvider<Map<String, List<TagData>>>((ref) {

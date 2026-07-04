@@ -13,23 +13,6 @@ Running list of known issues and follow-ups.
   filed under the tag, opening the in-app image/PDF viewer. **Remaining:**
   commentaries cross-reference (show installed-commentary entries on the tagged
   verses, like the passage page's Commentaries card).
-- [~] **Notebooks tool.** Reader side tool (`ActiveTool.notebooks`) modeled on
-  sermons: notebooks (folders) hold rich-text pages. Shipped: data model
-  (`Notebooks`/`NotebookPages`/`NotebookPageRevisions`, schema v25), sync, FTS,
-  panel + detail + Quill page editor. Done sub-items below; **only Explorer
-  cross-referencing/backlinks remains.**
-  - **Organization:** Drag-and-drop reordering of pages, cover colors/icons. — DONE
-  - **Bible Integration:** verse auto-linking (reuses `reference_autolink`), an
-    "Insert Scripture" button, side-by-side with the reader (inline panel). — DONE
-  - **Rich Text:** default full Quill toolbar (bold/italic/underline/lists/
-    headers/highlight/blockquote). — DONE
-  - **Cross-Referencing:** Entity linking tying back to the Explorer, and
-    showing backlinks on Explorer pages. — **TODO** (deferred; the one net-new
-    subsystem).
-  - **Exporting:** PDF/Markdown/HTML/text export + share sheet
-    (`NotebookExporter`, new `deltaToMarkdown`). — DONE
-  - **Tags:** General tagging at notebook + page level (`entityType`
-    `notebook`/`notebookPage`), surfaced in tag results. — DONE
 
 ## Research
 
@@ -110,6 +93,29 @@ Running list of known issues and follow-ups.
 ## Issues
 
 ## Archive
+
+- [x] **Notebooks tool — Cross-Referencing (final sub-item).** Closes out the
+  Notebooks tool: entity linking tying notebook pages back to the Explorer,
+  and backlink cards on Explorer pages. Scripture citations already
+  auto-linked (`reference_autolink`); people/places/events/topics didn't,
+  since dataset names are too collision-prone (a person named "Grace", a
+  topic named "Love") to detect by scanning prose safely — so instead of
+  auto-detection, the editor gained an explicit **"Link to Explorer"** action
+  (`insert_entity_link_dialog.dart`, reusing the Explorer's own universal
+  search) that inserts a real link, stored as an ordinary Quill `link`
+  attribute carrying a custom `sbent:<type>|<id>` URL
+  (`lib/domain/explorer/entity_link.dart`) — the same trick
+  `reference_autolink` already uses for `sbref:` scripture links, so no schema
+  change was needed. Tap handling (`lib/ui/common/entity_autolink.dart`)
+  opens the Explorer straight to that entity. Backlinks read this precisely:
+  `explorerNotebookPagesProvider` (`explorer_providers.dart`) resolves a
+  person/place/event/topic ref by scanning every notebook page's stored
+  `sbent:` links for an exact match, and a passage ref the same way sermons
+  already do it — a live `BibleReferenceScanner` scan over `contentPlain`,
+  since there's no persisted reference index for citations either. A "Your
+  notebooks" facet card (reusing the existing `_TaggedItemTile`/
+  `explorerOpenTaggedItem` plumbing already built for the Sermons card) now
+  appears on person/place/event/topic/passage Explorer pages.
 
 - [x] **Interactive Atlas.** Fullscreen map (`atlas_screen.dart`) with a
   general browse mode over every geocoded place, and a per-person "journey"

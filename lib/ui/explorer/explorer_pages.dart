@@ -184,6 +184,12 @@ class _PersonPage extends ConsumerWidget {
       data: (d) {
         if (d == null) return const _ErrorBody('Person not found.');
         final p = d.person;
+        final notebookPages = ref
+                .watch(explorerNotebookPagesProvider(
+                    ExplorerRef.person(p.id, p.displayTitle)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         final years = <String>[
           if (p.birthYear != null && p.deathYear != null)
             '${explorerYearLabel(p.birthYear!)} – ${explorerYearLabel(p.deathYear!)}'
@@ -326,6 +332,16 @@ class _PersonPage extends ConsumerWidget {
                     (book: v.bookName, chapter: v.chapter, verse: v.verse),
                 ]),
               ),
+            if (notebookPages.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.library_books_outlined,
+                title: 'Your notebooks (${notebookPages.length})',
+                child: Column(
+                  children: [
+                    for (final n in notebookPages) _TaggedItemTile(item: n),
+                  ],
+                ),
+              ),
             if (tags.isNotEmpty) _EntityTagsCard(tags: tags),
           ],
         );
@@ -355,6 +371,12 @@ class _PlacePage extends ConsumerWidget {
             ref.watch(explorerEntryDictionaryProvider(d.place.name)).asData
                     ?.value ??
                 const <DictionaryEntryWithDict>[];
+        final notebookPages = ref
+                .watch(explorerNotebookPagesProvider(
+                    ExplorerRef.place(d.place.id, d.place.name)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         return _PageScroll(
           children: [
             _PageTitle(
@@ -415,6 +437,16 @@ class _PlacePage extends ConsumerWidget {
                     (book: v.bookName, chapter: v.chapter, verse: v.verse),
                 ]),
               ),
+            if (notebookPages.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.library_books_outlined,
+                title: 'Your notebooks (${notebookPages.length})',
+                child: Column(
+                  children: [
+                    for (final n in notebookPages) _TaggedItemTile(item: n),
+                  ],
+                ),
+              ),
             if (tags.isNotEmpty) _EntityTagsCard(tags: tags),
           ],
         );
@@ -440,6 +472,12 @@ class _EventPage extends ConsumerWidget {
       error: (e, _) => _ErrorBody('Couldn\'t load this event: $e'),
       data: (d) {
         if (d == null) return const _ErrorBody('Event not found.');
+        final notebookPages = ref
+                .watch(explorerNotebookPagesProvider(
+                    ExplorerRef.event(d.event.id, d.event.title)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         return _PageScroll(
           children: [
             _PageTitle(
@@ -502,6 +540,16 @@ class _EventPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (notebookPages.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.library_books_outlined,
+                title: 'Your notebooks (${notebookPages.length})',
+                child: Column(
+                  children: [
+                    for (final n in notebookPages) _TaggedItemTile(item: n),
+                  ],
+                ),
+              ),
             if (tags.isNotEmpty) _EntityTagsCard(tags: tags),
           ],
         );
@@ -538,6 +586,12 @@ class _TopicPage extends ConsumerWidget {
             ref.watch(explorerEntryDictionaryProvider(d.topic.name)).asData
                     ?.value ??
                 const <DictionaryEntryWithDict>[];
+        final notebookPages = ref
+                .watch(explorerNotebookPagesProvider(
+                    ExplorerRef.topic(d.topic.id, d.topic.name)))
+                .asData
+                ?.value ??
+            const <SearchResult>[];
         return _PageScroll(
           children: [
             _PageTitle(
@@ -590,6 +644,16 @@ class _TopicPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (notebookPages.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.library_books_outlined,
+                title: 'Your notebooks (${notebookPages.length})',
+                child: Column(
+                  children: [
+                    for (final n in notebookPages) _TaggedItemTile(item: n),
+                  ],
+                ),
+              ),
           ],
         );
       },
@@ -623,6 +687,12 @@ class _PassagePage extends ConsumerWidget {
         const <ExplorerCrossRefGroup>[];
     final passageSermons = ref
             .watch(explorerPassageSermonsProvider((book: book, chapter: chapter)))
+            .asData
+            ?.value ??
+        const <SearchResult>[];
+    final passageNotebookPages = ref
+            .watch(explorerNotebookPagesProvider(
+                ExplorerRef.passage(book, chapter)))
             .asData
             ?.value ??
         const <SearchResult>[];
@@ -663,6 +733,7 @@ class _PassagePage extends ConsumerWidget {
                 commentaries.isEmpty &&
                 crossRefGroups.isEmpty &&
                 passageSermons.isEmpty &&
+                passageNotebookPages.isEmpty &&
                 notes.isEmpty &&
                 passageTags.isEmpty &&
                 videoGroups.isEmpty &&
@@ -797,6 +868,17 @@ class _PassagePage extends ConsumerWidget {
                 child: Column(
                   children: [
                     for (final s in passageSermons) _TaggedItemTile(item: s),
+                  ],
+                ),
+              ),
+            if (passageNotebookPages.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.library_books_outlined,
+                title: 'Your notebooks (${passageNotebookPages.length})',
+                child: Column(
+                  children: [
+                    for (final n in passageNotebookPages)
+                      _TaggedItemTile(item: n),
                   ],
                 ),
               ),

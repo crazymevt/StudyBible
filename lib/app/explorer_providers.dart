@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/content_store.dart';
 import '../data/fts_text.dart';
 import '../data/user_store.dart';
+import '../domain/explorer/entity_link.dart';
 import '../domain/explorer/explorer_ref.dart';
 import '../domain/scripture/bible_reference_scanner.dart';
 import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
+import 'notebook_providers.dart';
 import 'people_providers.dart';
 import 'place_providers.dart';
 import 'reader_state.dart';
@@ -216,9 +218,21 @@ void _rankByPrefix<T>(
 
 /// Fans one query out across every entity kind: a scripture-reference parse
 /// plus name searches over people, places, events, and topics.
-final explorerSearchResultsProvider =
-    FutureProvider<ExplorerSearchResults>((ref) async {
-  final query = ref.watch(explorerSearchQueryProvider).trim();
+///
+/// A `.family` keyed on the query string itself, rather than reading it off
+/// [explorerSearchQueryProvider] directly, so a second search surface (the
+/// notebook editor's "Link to Explorer" picker) can reuse this fan-out logic
+/// against its own local query without sharing state with the Explorer's
+/// home-screen search box.
+final explorerSearchResultsProvider = FutureProvider<ExplorerSearchResults>(
+  (ref) => ref.watch(
+    explorerSearchResultsForProvider(ref.watch(explorerSearchQueryProvider)).future,
+  ),
+);
+
+final explorerSearchResultsForProvider =
+    FutureProvider.family<ExplorerSearchResults, String>((ref, rawQuery) async {
+  final query = rawQuery.trim();
   if (query.length < 2) return ExplorerSearchResults();
   await ref.watch(explorerReadyProvider.future);
   final store = ref.watch(contentStoreProvider);
@@ -679,6 +693,64 @@ final explorerPassageSermonsProvider = FutureProvider.family<List<SearchResult>,
         type: 'sermon',
         referenceId: s.id,
         title: s.title,
+        textContent: '',
+      ));
+    }
+  }
+  return matches;
+});
+
+/// The user's own notebook pages that reference an Explorer entity — the
+/// "Your notebooks" backlink card on person/place/event/topic/passage pages.
+///
+/// A passage match is scanned live the same way [explorerPassageSermonsProvider]
+/// scans sermons (there's no persisted reference index for scripture
+/// citations). A person/place/event/topic match is looked up exactly, from the
+/// `sbent:` links the notebook editor's "Link to Explorer" action stores —
+/// unlike scripture citations, dataset names are too collision-prone (a
+/// person named "Grace", a topic named "Love") to detect by scanning prose,
+/// so those links are the only source of truth.
+final explorerNotebookPagesProvider =
+    FutureProvider.family<List<SearchResult>, ExplorerRef>((ref, target) async {
+  final pages = await ref.watch(allNotebookPagesProvider.future);
+  if (pages.isEmpty) return const [];
+
+  if (target.type == ExplorerEntityType.passage) {
+    final versions = ref.watch(activeVersionsProvider);
+    if (versions.isEmpty) return const [];
+    final books = await ref.watch(booksForVersionProvider(versions.first).future);
+    if (books.isEmpty) return const [];
+
+    final matches = <SearchResult>[];
+    for (final p in pages) {
+      final text = p.contentPlain ?? deltaToPlainText(p.content);
+      final touches = BibleReferenceScanner.scan(text, books).any((m) =>
+          m.book.name == target.book &&
+          m.chapter <= target.chapter! &&
+          (m.endChapter ?? m.chapter) >= target.chapter!);
+      if (touches) {
+        matches.add(SearchResult(
+          type: 'notebookPage',
+          referenceId: p.id,
+          title: p.title,
+          textContent: '',
+        ));
+      }
+    }
+    return matches;
+  }
+
+  final id = target.id;
+  if (id == null) return const [];
+  final matches = <SearchResult>[];
+  for (final p in pages) {
+    final linked = extractEntityLinksFromDelta(p.content)
+        .any((l) => l.type == target.type && l.id == id);
+    if (linked) {
+      matches.add(SearchResult(
+        type: 'notebookPage',
+        referenceId: p.id,
+        title: p.title,
         textContent: '',
       ));
     }

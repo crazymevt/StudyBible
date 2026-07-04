@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
@@ -307,6 +308,48 @@ void main() {
           createdAt: Value(0),
         ));
 
+    await userStore.into(userStore.notebooks).insert(const NotebooksCompanion(
+          id: Value('notebook-1'),
+          createdAt: Value(0),
+          updatedAt: Value(0),
+          deviceId: Value('test-device'),
+          title: Value('Study Notes'),
+        ));
+    // Explicitly links David (via "Link to Explorer") and separately cites
+    // 1 Samuel 24 in prose, for the person/passage backlink cards.
+    await userStore.into(userStore.notebookPages).insert(
+          NotebookPagesCompanion(
+            id: const Value('page-1'),
+            createdAt: const Value(0),
+            updatedAt: const Value(0),
+            deviceId: const Value('test-device'),
+            notebookId: const Value('notebook-1'),
+            title: const Value('On David'),
+            content: Value(jsonEncode([
+              {
+                'insert': 'David',
+                'attributes': {'link': 'sbent:person|1'},
+              },
+              {'insert': ' hid in 1 Samuel 24:1.\n'},
+            ])),
+            contentPlain: const Value('David hid in 1 Samuel 24:1.'),
+          ),
+        );
+    // Cites Psalms 57 only, and links no entity — proves both matchers are
+    // scoped correctly (chapter for passages, exact id for entities).
+    await userStore.into(userStore.notebookPages).insert(
+          const NotebookPagesCompanion(
+            id: Value('page-2'),
+            createdAt: Value(0),
+            updatedAt: Value(0),
+            deviceId: Value('test-device'),
+            notebookId: Value('notebook-1'),
+            title: Value('On Refuge'),
+            content: Value('[{"insert":"Let\'s look at Psalms 57 today.\\n"}]'),
+            contentPlain: Value("Let's look at Psalms 57 today."),
+          ),
+        );
+
     // Pins the reader's active version to the one seeded above so the
     // passage-sermons provider (which resolves references against
     // booksForVersionProvider(activeVersionsProvider.first)) doesn't have to
@@ -504,6 +547,53 @@ void main() {
 
     test('chapter with no citing sermon returns empty', () async {
       expect(await sermonsFor('Obadiah', 1), isEmpty);
+    });
+  });
+
+  group('notebook backlinks', () {
+    // explorerNotebookPagesProvider watches allNotebookPagesProvider, a plain
+    // StreamProvider backed by a Drift .watch() query — same cold-read gotcha
+    // as the sermons group above.
+    Future<List<SearchResult>> notebooksFor(ExplorerRef target) async {
+      final provider = explorerNotebookPagesProvider(target);
+      final sub = container.listen(provider, (_, _) {});
+      try {
+        return await container.read(provider.future);
+      } finally {
+        sub.close();
+      }
+    }
+
+    test('passage match scans prose like sermons, chapter-scoped', () async {
+      final results =
+          await notebooksFor(ExplorerRef.passage('1 Samuel', 24));
+      expect(results.map((r) => r.title).toList(), ['On David']);
+      expect(results.single.type, 'notebookPage');
+      expect(results.single.referenceId, 'page-1');
+
+      expect(
+        (await notebooksFor(ExplorerRef.passage('Psalms', 57)))
+            .map((r) => r.title),
+        ['On Refuge'],
+      );
+      expect(await notebooksFor(ExplorerRef.passage('Obadiah', 1)), isEmpty);
+    });
+
+    test('person match requires an explicit Link-to-Explorer, not prose',
+        () async {
+      final results = await notebooksFor(const ExplorerRef.person(1, 'David'));
+      expect(results.map((r) => r.title).toList(), ['On David']);
+
+      // Saul is mentioned nowhere via an explicit link.
+      expect(await notebooksFor(const ExplorerRef.person(2, 'Saul')), isEmpty);
+    });
+
+    test('place/event/topic with no linked page returns empty', () async {
+      expect(await notebooksFor(const ExplorerRef.place(1, 'En Gedi')), isEmpty);
+      expect(await notebooksFor(const ExplorerRef.event(1, 'Some event')),
+          isEmpty);
+      expect(await notebooksFor(const ExplorerRef.topic(1, 'Some topic')),
+          isEmpty);
     });
   });
 

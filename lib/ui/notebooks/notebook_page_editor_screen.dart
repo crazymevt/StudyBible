@@ -9,18 +9,21 @@ import '../../app/revision_common.dart';
 import '../../app/user_providers.dart';
 import '../../data/logging.dart';
 import '../../data/user_store.dart';
+import '../../domain/explorer/entity_link.dart';
 import '../common/breakpoints.dart';
+import '../common/entity_autolink.dart';
 import '../common/quill_dictation.dart';
 import '../common/reference_autolink.dart';
 import '../common/speech_input_button.dart';
 import '../tags/tag_editor_dialog.dart';
+import 'insert_entity_link_dialog.dart';
 import 'insert_scripture_dialog.dart';
 import 'notebook_export_dialog.dart';
 import 'notebook_page_revisions_dialog.dart';
 
 /// Secondary actions collapsed into the editor's overflow menu on narrow
 /// layouts (phones, the inline panel beside the reader).
-enum _PageAction { insertScripture, tags, revisions, export }
+enum _PageAction { insertScripture, linkEntity, tags, revisions, export }
 
 /// Rich-text editor for a single [NotebookPage]. A close clone of
 /// SermonEditorScreen (autosave, reference auto-linking, remote-conflict banner,
@@ -284,6 +287,25 @@ class _NotebookPageEditorScreenState
     _controller.compose(delta, _controller.selection, ChangeSource.local);
   }
 
+  Future<void> _linkEntity() async {
+    final chosen = await InsertEntityLinkDialog.show(context);
+    if (chosen == null || !mounted) return;
+    final offset = _controller.selection.baseOffset;
+    final insertOffset =
+        offset >= 0 ? offset : _controller.document.length - 1;
+    final label = chosen.label;
+    _controller.document.insert(insertOffset, label);
+    _controller.updateSelection(
+      TextSelection.collapsed(offset: insertOffset + label.length),
+      ChangeSource.local,
+    );
+    _controller.formatText(
+      insertOffset,
+      label.length,
+      LinkAttribute(buildEntityLinkUrl(chosen)),
+    );
+  }
+
   Future<void> _exportPage() async {
     final store = ref.read(userStoreProvider);
     final page = await (store.select(
@@ -309,6 +331,8 @@ class _NotebookPageEditorScreenState
     switch (action) {
       case _PageAction.insertScripture:
         _insertScripture();
+      case _PageAction.linkEntity:
+        _linkEntity();
       case _PageAction.tags:
         _manageTags();
       case _PageAction.revisions:
@@ -328,6 +352,14 @@ class _NotebookPageEditorScreenState
           child: ListTile(
             leading: Icon(Icons.menu_book),
             title: Text('Insert Scripture'),
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem(
+          value: _PageAction.linkEntity,
+          child: ListTile(
+            leading: Icon(Icons.travel_explore),
+            title: Text('Link to Explorer'),
             contentPadding: EdgeInsets.zero,
           ),
         ),
@@ -447,13 +479,23 @@ class _NotebookPageEditorScreenState
                         child: QuillEditor.basic(
                           controller: _controller,
                           config: QuillEditorConfig(
-                            customLinkPrefixes: referenceLinkPrefixes,
-                            customRecognizerBuilder: referenceRecognizerBuilder(
-                              ref,
-                              context,
-                            ),
+                            customLinkPrefixes: [
+                              ...referenceLinkPrefixes,
+                              ...entityLinkPrefixes,
+                            ],
+                            customRecognizerBuilder: (attribute, leaf) =>
+                                referenceRecognizerBuilder(ref, context)(
+                                  attribute,
+                                  leaf,
+                                ) ??
+                                entityRecognizerBuilder(ref, context)(
+                                  attribute,
+                                  leaf,
+                                ),
                             onLaunchUrl: (url) =>
-                                handleReferenceLaunch(ref, context, url),
+                                parseEntityLinkUrl(url) != null
+                                    ? handleEntityLinkLaunch(ref, context, url)
+                                    : handleReferenceLaunch(ref, context, url),
                           ),
                         ),
                       );
@@ -479,6 +521,12 @@ class _NotebookPageEditorScreenState
               tooltip: 'Insert Scripture',
               onPressed: _insertScripture,
             ),
+            if (!context.isPhone)
+              IconButton(
+                icon: const Icon(Icons.travel_explore),
+                tooltip: 'Link to Explorer',
+                onPressed: _linkEntity,
+              ),
             if (context.isPhone)
               _buildOverflowMenu()
             else ...[
