@@ -161,6 +161,20 @@ const _eventsWithNoReliablePlace = {
 /// - "Paul's First Roman imprisonment": Acts 28:17 has Paul recalling being
 ///   "delivered as a prisoner from Jerusalem" — he's actually in Rome, named
 ///   at 28:30 ("He lived there two whole years at his own expense").
+/// - 'Abraham goes to Egypt': Genesis 12:10, "there was a famine in the land
+///   [Canaan], and Abram went down to Egypt" — same verse names both, but
+///   the event's own title says Egypt.
+/// - 'Abraham and Lot Separate': Genesis 13:1, "Abram went up from Egypt...
+///   into the Negeb" describes where he'd been; the separation itself
+///   happens back at Bethel (13:3-4).
+/// - 'Wilderness Wanderings': Exodus 13:18 names both Egypt (just left) and
+///   the Red Sea (where this account heads); Egypt has the lower place id.
+/// - 'Ten Commandments Given': Exodus 19:1 names both Egypt (just left) and
+///   the Wilderness of Sinai — where the commandments were actually given.
+/// - 'Tabernacle Built': its only mention in the first ~200 (of 300) verses
+///   is Exodus 29:46's retrospective "brought them out of the land of
+///   Egypt"; Mount Sinai, where the tabernacle was actually built, is named
+///   later (31:18).
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -174,6 +188,11 @@ const _eventPlaceOverrides = {
   'Paul gives his testimony': 'Jerusalem',
   'Paul arrives at Rome': 'Rome',
   "Paul's First Roman imprisonment": 'Rome',
+  'Abraham goes to Egypt': 'Egypt',
+  'Abraham and Lot Separate': 'Bethel 1',
+  'Wilderness Wanderings': 'Red Sea 1',
+  'Ten Commandments Given': 'Wilderness of Sinai',
+  'Tabernacle Built': 'Mount Sinai',
 };
 
 /// A person's dated events, each resolved to the first place named in its
