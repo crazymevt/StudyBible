@@ -16,12 +16,12 @@ Each page is a set of cards showing everything the datasets know, and every entr
 - **Topics** — the topic's entries from Nave's Topical Bible with their passages, plus dictionary definitions.
 - **Passages** — the people, places (with a map), events, and topics found in a chapter, alongside every installed commentary's entries for it, **your own notes** anchored there, and **your tags** on its verses.
 
-Tap any verse chip to jump straight to that passage in the Reader.
+Tap any verse chip to jump straight to that passage in the Reader. Any map you find on a page has an expand icon that opens it as the full-screen, interactive **Atlas**—see the **Study Tools** help topic (under People → Atlas) for what it can do, including tracing a person's journey.
 
 ## Your Tags in the Web
 Tags (see **Notes, Highlights & Sharing**) weave your own study into the Explorer:
 
-- **Tag pages** — open a tag to see everything filed under it: tagged verses with their text, plus your notes, sermons, journals, and prayers. Tap a verse to read it, or tap any other item to open it right where it lives (the sermon editor, the journal editor, the Prayers tab). An **Explore their chapters** card links each tagged verse's chapter back into the knowledge web, and a **Related tags** card surfaces tags that share items with this one.
+- **Tag pages** — open a tag to see everything filed under it: tagged verses with their text, plus your notes, sermons, journals, and prayers. Tap a verse to read it, or tap any other item to open it right where it lives (the sermon editor, the journal editor, the Prayers tab). The page also cross-references what's *in* those tagged verses—**People**, **Places** (with a map you can expand into the full-screen Atlas), and **Events** cards drawn from the tagged passages—plus a **Media** card for any of your own photo/PDF attachments (see **Study Tools**) that you've filed directly under this tag. An **Explore their chapters** card links each tagged verse's chapter back into the knowledge web, and a **Related tags** card surfaces tags that share items with this one.
 - **Your tags cards** — person, place, and event pages show the tags you've put on verses where that entity appears; passage pages show the tags in that chapter. So Elijah's page can remind you that you tagged his showdown at Carmel `#prayer`—and one tap later you're looking at everything else you filed there.
 
 The Explorer never edits your tags—rename, recolor, or delete them from the **Tags** view.

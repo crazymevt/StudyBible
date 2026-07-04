@@ -1,6 +1,6 @@
 # Search
 
-The global search allows you to search across all downloaded Bibles, your personal journals, sermons, notes, and the people of the Bible simultaneously. It is blazing fast and runs entirely locally.
+The global search allows you to search across all downloaded Bibles, your personal journals, sermons, notebooks, notes, and the people of the Bible simultaneously. It is blazing fast and runs entirely locally.
 
 Results are grouped into tabs by kind. The **People** tab matches Bible characters by name (alternate names included) and shows a snippet of their biography—tap a result to open the full profile.
 
@@ -11,7 +11,7 @@ Results are grouped into tabs by kind. The **People** tab matches Bible characte
 - **Navigation (Goto):** You can enter a book reference directly into the search bar to jump straight there! For example, typing "John 3:16" or "1 Cor 13" will instantly take you to that chapter in the Reader.
 
 ## Tag Search
-Start your query with `#` to search your tags directly. For example, `#advent` finds everything—verses, notes, journals, sermons—filed under a matching tag. As you type, the search bar suggests tag names, so you don't have to remember exact spelling.
+Start your query with `#` to search your tags directly. For example, `#advent` finds everything—verses, notes, journals, sermons, notebooks—filed under a matching tag. As you type, the search bar suggests tag names, so you don't have to remember exact spelling.
 
 A tag search stays focused on tags: it ignores the scripture and note full-text search, the reference shortcut, and the testament/book scopes, and shows a dismissible `#tag` chip so you can see the filter that's active. Tap the chip to clear it and return to a normal search.
 

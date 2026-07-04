@@ -14,6 +14,7 @@ Tap **Add Note** to attach a personal note to the selected verse or verses. Note
 
 - A small marker appears beside any verse that has a note, so you can spot your notes while reading.
 - Open the **My Notes** tool in the side panel to read, print, or delete every note in the current chapter.
+- A microphone button beside the note editor lets you dictate instead of type. (Not available on Windows or Linux desktop.)
 
 ## Tagging
 Tap **Tag** to file a verse under one or more tags (e.g. `#faith`, `#promises`). Tags are shared across the whole app—the same tag can group verses, notes, journals, sermons, and prayers together. Browse everything under a tag from the **Tags** view, or search for it in the global search bar. Tags also get their own pages in the **Explorer**, cross-linked with the people, places, and events of the Bible—see the **Explorer** help topic.

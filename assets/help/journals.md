@@ -4,7 +4,7 @@ The Journals tab lets you track your daily walk with God, write your personal th
 
 ## Journals
 - **Daily Entries:** Tap a date on the calendar to write a journal entry for that day.
-- **Distraction-free Writing:** A clean, full-height editor for capturing your thoughts. Entries save automatically as you write.
+- **Distraction-free Writing:** A clean, full-height editor for capturing your thoughts. Entries save automatically as you write. A microphone button beside the toolbar lets you dictate instead of type (not available on Windows or Linux desktop).
 - **Revision History:** Every entry keeps past versions—tap the history icon to look back at or restore an earlier draft.
 - **Tagging:** Use tags to categorize your journals (e.g. `#gratitude`, `#struggles`). You can search for tags using the global search.
 

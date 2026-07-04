@@ -10,11 +10,12 @@ A handful of features pull in resources from the internet—downloading new cont
 ## Core Features
 
 - **Reader:** Read multiple Bible translations side-by-side, highlight and note verses, and explore Greek and Hebrew roots using Strong's definitions.
-- **Study Tools:** Access Commentaries, Cross-References, Dictionaries, People (with an interactive timeline), the Gospel Harmony, Reading Plans, Devotionals, Media, and offline **Read Aloud** narration from the side panel.
-- **Explorer:** Search the people, places, events, and topics of the Bible and follow the links between them—every page cross-references the others, entirely offline.
+- **Study Tools:** Access Commentaries, Cross-References, Dictionaries, People (with an interactive timeline and a full-screen Atlas), the Gospel Harmony, Reading Plans, Devotionals, Media (including your own photo/PDF attachments), and offline **Read Aloud** narration—all pinned to your favorites or one tap away in the overflow menu.
+- **Explorer:** Search the people, places, events, topics, and tags of the Bible and follow the links between them—every page cross-references the others, entirely offline.
 - **Search:** Quickly find words, phrases, or topics across all your Bibles and notes instantly.
 - **Journals & Prayers:** Record your thoughts in dated entries with revision history, and track your active prayers.
 - **Sermons:** Write structured outlines, present them full-screen, and export or print them.
+- **Notebooks:** Organize longer studies into folders of rich-text pages you can reorder, tag, and export.
 - **Home Dashboard:** Track reading streaks, time, achievements, and your daily verse at a glance.
 - **Content Manager:** Download new Bibles, dictionaries, commentaries, and devotionals from several large, free libraries.
 

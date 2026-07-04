@@ -56,6 +56,11 @@ const _topics = [
     icon: Icons.co_present,
   ),
   HelpTopic(
+    title: 'Notebooks',
+    assetPath: 'assets/help/notebooks.md',
+    icon: Icons.library_books,
+  ),
+  HelpTopic(
     title: 'Home & Dashboard',
     assetPath: 'assets/help/dashboard.md',
     icon: Icons.dashboard_outlined,

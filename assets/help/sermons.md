@@ -8,7 +8,7 @@ The Sermons tool is a full writing studio for structured sermon notes and outlin
 1. Open the Sermons panel from the Study Tools menu, or the Sermons section from the App Drawer.
 2. Tap the `+` button to create a new sermon.
 3. Give it a title (e.g., "Sunday Morning: The Beatitudes") and an optional series name.
-4. Write your notes using the rich text editor—headings, bold, italics, lists, and more.
+4. Write your notes using the rich text editor—headings, bold, italics, lists, and more. A microphone button beside the toolbar lets you dictate instead of type (not available on Windows or Linux desktop).
 
 ## Outline Generator
 Tap **Outline** to scaffold a sermon instantly. Choose how many points you want, and the app drops in an Introduction, numbered points (each with a Reference and Application line), and a Conclusion for you to fill in.
@@ -43,12 +43,14 @@ The Sermons panel has its own controls for working through a large collection:
 Every sermon keeps a history of past versions. Tap **Revision History** to look back at—and restore—an earlier draft, so you never lose work.
 
 ## Exporting & Printing
-- **Export** a single sermon or all of them at once as:
-  - **PDF** — a clean plain-text layout.
-  - **HTML** — retains all of your rich formatting.
-  - **Plain Text** — raw, unformatted text.
-- **Print** sends the sermon straight to a connected printer.
+Export a single sermon or all of them at once as:
+- **PDF** — a clean plain-text layout.
+- **HTML** — retains all of your rich formatting.
+- **Markdown** — headings, lists, and bold/italic preserved.
+- **Plain Text** — raw, unformatted text.
 
-> 💡 **Tip:** To quote Scripture in a sermon, copy a verse from the Reader (select it and tap **Copy**) and paste it into your notes. See **Notes, Highlights & Sharing**.
+Then choose **Save to Folder** to write the file to disk (on Android this opens the system folder picker; on iOS it opens the Share sheet instead), **Print** to send it straight to a connected printer, or **Share** to hand it to another app.
+
+> 💡 **Tip:** To quote Scripture in a sermon, copy a verse from the Reader (select it and tap **Copy**) and paste it into your notes, or select the verses and drag them straight in. See **Notes, Highlights & Sharing**.
 
 > 🔗 **Auto-linking:** Type a Bible reference with its verse—like `John 3:16` or `Rom 8:28-30`—and it turns into a link automatically. Tap the link to jump straight to that passage in the Reader—including from **Presentation Mode**. Capitalize the book name (`John`, not `john`) so it's recognized.

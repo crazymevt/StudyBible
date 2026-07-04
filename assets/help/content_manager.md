@@ -11,6 +11,7 @@ The Content Manager has tabs for each source:
 - **ph4.org Catalog** — a broad collection of Bibles, commentaries, dictionaries, and devotionals.
 - **OSIS Catalog** — translations organized by language, so you can find Scripture in the language you need.
 - **CrossWire Catalog** — the classic, massive CrossWire/SWORD library.
+- **User Content** — every photo/PDF attachment you've added from the Media tool, across the whole Bible in one list, so you can review, retag, or delete them without hunting down the chapter you attached them to. See **Study Tools → Media → Your Own Attachments**.
 
 ## Downloading Modules
 1. Open the **Content Manager** from the hamburger menu (App Drawer).
