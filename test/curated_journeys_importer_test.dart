@@ -303,4 +303,32 @@ void main() {
     // by these curated stops.
     expect(journey.unmappedEventCount, 1);
   });
+
+  test("Gideon's journey has the bundled calling plus all 10 curated stops "
+      "in chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final gideon = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('gideon_1314')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(gideon.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Ophrah 2', // bundled: "Deliverance by Gideon" calling
+      'Harod 1',
+      'Jordan',
+      'Succoth 1',
+      'Penuel',
+      'Jogbehah',
+      'Heres',
+      'Succoth 1',
+      'Penuel',
+      'Ophrah 2',
+      'Ophrah 2',
+    ]);
+    // Nothing is superseded — the bundled event already resolves correctly
+    // to Ophrah, where Gideon's calling actually happens.
+    expect(journey.unmappedEventCount, 0);
+  });
 }

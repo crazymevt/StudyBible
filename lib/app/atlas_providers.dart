@@ -255,6 +255,9 @@ const _eventsSupersededByCuratedJourney = {
 /// - 'Sets up the golden calf at Dan': 1 Kings 12:29 names both Bethel and
 ///   Dan in the same verse (one calf at each); Bethel — this same event's
 ///   *other* curated waypoint — has the lower id.
+/// - 'Denied bread by the men of Succoth': Judges 8:5 names Succoth (where
+///   Gideon actually is) and Midian (the kings he's pursuing, not a place he's
+///   currently at) in the same verse; Midian has the lower id.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -287,6 +290,7 @@ const _eventPlaceOverrides = {
   'Vision of the ram and goat at Susa': 'Susa',
   'Rebuilds and settles at Shechem as his capital': 'Shechem',
   'Sets up the golden calf at Dan': 'Dan',
+  'Denied bread by the men of Succoth': 'Succoth 1',
 };
 
 /// A person's dated events, each resolved to the first place named in its

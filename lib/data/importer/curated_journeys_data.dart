@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Gideon (`gideon_1314`)
 ///   - Zedekiah (`zedekiah_1950`)
 ///   - Rehoboam (`rehoboam_2412`)
 ///   - Jehoiakim (`jehoiakim_1085`)
@@ -737,6 +736,99 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 13,
       verse: 1,
       placeName: 'Bethel 1',
+    ),
+  ]),
+
+  // Unlike Jeroboam, the bundled "Deliverance by Gideon" resolves correctly
+  // — Ophrah (Judges 6:11), where his calling actually happens — so it's
+  // kept as the opening waypoint here, not superseded. What's missing is
+  // the rest of the campaign's real geography. Several tempting verses
+  // along the way describe someone/something *else's* location, not
+  // Gideon's own, and are skipped: 6:33 is the Midianite/Amalekite muster
+  // in the Valley of Jezreel; 7:22, 7:24, and 7:25 describe the fleeing
+  // army's route and the Ephraimites seizing the fords, all before Gideon's
+  // own crossing at 8:4 (which restates the same crossing already implied
+  // by 7:25, so only 8:4 is kept, to avoid citing the same crossing twice).
+  CuratedPersonJourney(personSlug: 'gideon_1314', waypoints: [
+    CuratedWaypoint(
+      title: 'Camps at the well of Harod before the battle',
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 7,
+      verse: 1,
+      placeName: 'Harod 1',
+    ),
+    CuratedWaypoint(
+      title: 'Crosses the Jordan in pursuit of Zebah and Zalmunna',
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 4,
+      placeName: 'Jordan',
+    ),
+    CuratedWaypoint(
+      title: 'Denied bread by the men of Succoth',
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 5,
+      placeName: 'Succoth 1',
+    ),
+    CuratedWaypoint(
+      title: 'Denied again at Penuel',
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 8,
+      placeName: 'Penuel',
+    ),
+    CuratedWaypoint(
+      title: "Surprises the kings' camp near Jogbehah",
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 11,
+      placeName: 'Jogbehah',
+    ),
+    CuratedWaypoint(
+      title: 'Returns from battle by the ascent of Heres',
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 13,
+      placeName: 'Heres',
+    ),
+    CuratedWaypoint(
+      title: 'Punishes the elders of Succoth',
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 16,
+      placeName: 'Succoth 1',
+    ),
+    CuratedWaypoint(
+      title: 'Beats down the tower of Penuel',
+      year: -1249,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 17,
+      placeName: 'Penuel',
+    ),
+    CuratedWaypoint(
+      title: 'Sets up the ephod at Ophrah',
+      year: -1248,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 27,
+      placeName: 'Ophrah 2',
+    ),
+    CuratedWaypoint(
+      title: 'Dies and is buried at Ophrah',
+      year: -1210,
+      bookName: 'Judges',
+      chapter: 8,
+      verse: 32,
+      placeName: 'Ophrah 2',
     ),
   ]),
 ];
