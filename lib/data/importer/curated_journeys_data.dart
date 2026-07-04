@@ -10,7 +10,6 @@
 ///
 /// TODO: remaining priority list (single/few-dot journey today, ≥30 verses,
 /// identified but not yet curated):
-///   - Abimelech (`abimelech_41`)
 ///   - Caleb (`caleb_537`)
 ///   - Esau (`esau_1216`)
 ///   - Benjamin (`benjamin_463`)
@@ -958,6 +957,77 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       chapter: 36,
       verse: 9,
       placeName: 'Jerusalem',
+    ),
+  ]),
+
+  // Unlike Ahab/Gideon/Zedekiah/Rehoboam/Jehoiakim above, Abimelech's single
+  // bundled event ("Usurpation by Abimelech", Judges 8:29-9:57) isn't a thin
+  // succession notice — it's the entire, genuinely multi-stop story of his
+  // rise and fall, already spanning real places (Shechem, Ophrah, Arumah,
+  // Mount Zalmon, Thebez) that just all collapse to one dot (Shechem, via
+  // his birth notice at 8:31) under today's "first placed verse wins"
+  // resolution. Kept as the opening waypoint since Shechem genuinely is
+  // where his story starts — proclaimed king there in 9:6 — and every stop
+  // below is a real, distinct place his own narrative puts him. No overrides
+  // were needed: only one citation (9:41) ties another place at all
+  // (Shechem, where he isn't currently standing), and Arumah already has the
+  // lower id.
+  CuratedPersonJourney(personSlug: 'abimelech_41', waypoints: [
+    CuratedWaypoint(
+      title: 'Murders his seventy brothers at Ophrah',
+      year: -1216,
+      bookName: 'Judges',
+      chapter: 9,
+      verse: 5,
+      placeName: 'Ophrah 2',
+    ),
+    CuratedWaypoint(
+      title: 'Dwells at Arumah as Shechem revolts',
+      year: -1214,
+      bookName: 'Judges',
+      chapter: 9,
+      verse: 41,
+      placeName: 'Arumah',
+    ),
+    CuratedWaypoint(
+      title: 'Storms the gate of Shechem',
+      year: -1214,
+      bookName: 'Judges',
+      chapter: 9,
+      verse: 44,
+      placeName: 'Shechem',
+    ),
+    CuratedWaypoint(
+      title: "Cuts wood on Mount Zalmon for the tower's fire",
+      year: -1214,
+      bookName: 'Judges',
+      chapter: 9,
+      verse: 48,
+      placeName: 'Mount Zalmon',
+    ),
+    CuratedWaypoint(
+      title: 'Burns the tower of Shechem',
+      year: -1214,
+      bookName: 'Judges',
+      chapter: 9,
+      verse: 49,
+      placeName: 'Tower of Shechem',
+    ),
+    CuratedWaypoint(
+      title: 'Besieges and takes Thebez',
+      year: -1214,
+      bookName: 'Judges',
+      chapter: 9,
+      verse: 50,
+      placeName: 'Thebez',
+    ),
+    CuratedWaypoint(
+      title: 'Struck by a millstone and dies at Thebez',
+      year: -1214,
+      bookName: 'Judges',
+      chapter: 9,
+      verse: 54,
+      placeName: 'Thebez',
     ),
   ]),
 ];

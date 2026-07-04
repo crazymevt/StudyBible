@@ -397,4 +397,29 @@ void main() {
     // to Jerusalem, where his reign begins.
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Abimelech's journey has the bundled kingship at Shechem plus his "
+      "whole rise-and-fall story in chronological order", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final abimelech = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('abimelech_41')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(abimelech.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Shechem', // bundled: "Usurpation by Abimelech" (his birth notice)
+      'Ophrah 2',
+      'Arumah',
+      'Shechem',
+      'Mount Zalmon',
+      'Tower of Shechem',
+      'Thebez',
+      'Thebez',
+    ]);
+    // Nothing is superseded — the bundled event already resolves correctly
+    // to Shechem, where his story begins.
+    expect(journey.unmappedEventCount, 0);
+  });
 }
