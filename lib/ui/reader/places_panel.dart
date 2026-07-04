@@ -141,7 +141,13 @@ class _PlacesPanelState extends ConsumerState<PlacesPanel> {
       points: [for (final p in places) MapPoint(p.id, p.name, p.lat, p.lng)],
       onTapPoint: (mp) => _focusPlace(places.firstWhere((p) => p.id == mp.id)),
       onExpand: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const AtlasScreen()),
+        MaterialPageRoute(
+          builder: (_) => AtlasScreen(
+            initialPoints: [
+              for (final p in places) MapPoint(p.id, p.name, p.lat, p.lng),
+            ],
+          ),
+        ),
       ),
     );
   }

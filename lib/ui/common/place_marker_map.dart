@@ -46,17 +46,18 @@ class PlaceMarkerMap extends StatefulWidget {
     this.mapController,
     this.initialZoom = 8,
     this.extraLayers = const [],
-    this.cameraFitPoints,
+    this.autoFitOnPointsChange = true,
   });
 
   final List<MapPoint> points;
   final PlaceMarkerStyle style;
 
-  /// Points the initial camera fits to, if different from [points] — e.g. the
-  /// Atlas's general browse mode plots every place but should open centered on
-  /// wherever the caller expanded from, not a world view over all of them.
-  /// Defaults to [points] when omitted.
-  final List<MapPoint>? cameraFitPoints;
+  /// Whether a later change to [points] (e.g. the Atlas's "show all places"
+  /// toggle swapping in a different marker set) should refit the camera.
+  /// Default true — e.g. the Places panel re-fitting when the passage
+  /// changes. Set false when the caller wants to swap markers in place
+  /// without disturbing the user's current pan/zoom.
+  final bool autoFitOnPointsChange;
 
   /// Called when a marker is tapped.
   final void Function(MapPoint point)? onTapPoint;
@@ -106,8 +107,8 @@ class _PlaceMarkerMapState extends State<PlaceMarkerMap> {
   @override
   void didUpdateWidget(covariant PlaceMarkerMap oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!listEquals(oldWidget.points, widget.points) ||
-        !listEquals(oldWidget.cameraFitPoints, widget.cameraFitPoints)) {
+    if (widget.autoFitOnPointsChange &&
+        !listEquals(oldWidget.points, widget.points)) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _fitCameraIfNeeded());
     }
   }
@@ -118,10 +119,8 @@ class _PlaceMarkerMapState extends State<PlaceMarkerMap> {
     super.dispose();
   }
 
-  List<LatLng> _fitLatLngs() {
-    final fitPoints = widget.cameraFitPoints ?? widget.points;
-    return [for (final p in fitPoints) LatLng(p.lat, p.lng)];
-  }
+  List<LatLng> _fitLatLngs() =>
+      [for (final p in widget.points) LatLng(p.lat, p.lng)];
 
   void _fitCameraIfNeeded() {
     if (!mounted) return;

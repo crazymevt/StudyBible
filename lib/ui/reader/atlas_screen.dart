@@ -50,6 +50,9 @@ class _AtlasScreenState extends ConsumerState<AtlasScreen>
   MapController _journeyMap = MapController();
   late final AnimationController _controller;
   int? _personId;
+  /// Browse mode starts scoped to [AtlasScreen.initialPoints] (the places the
+  /// caller expanded from) when given; this flips it to every geocoded place.
+  bool _showAllPlaces = false;
   /// The waypoint currently at rest (0..waypoints.length-1). While playing,
   /// the animation runs the leg from [_position] to [_position] + 1, then
   /// [_position] advances once that leg completes.
@@ -276,12 +279,23 @@ class _AtlasScreenState extends ConsumerState<AtlasScreen>
               tooltip: 'Back to browse',
               onPressed: _backToBrowse,
             )
-          else
+          else ...[
+            if (widget.initialPoints != null)
+              IconButton(
+                icon: Icon(
+                    _showAllPlaces ? Icons.center_focus_strong : Icons.public),
+                tooltip: _showAllPlaces
+                    ? "Show this passage's places"
+                    : 'Show all places',
+                onPressed: () =>
+                    setState(() => _showAllPlaces = !_showAllPlaces),
+              ),
             IconButton(
               icon: const Icon(Icons.person_search),
               tooltip: "Follow a person's journey",
               onPressed: _openPersonSearch,
             ),
+          ],
           IconButton(
             icon: const Icon(Icons.help_outline),
             tooltip: 'About the Atlas',
@@ -294,7 +308,23 @@ class _AtlasScreenState extends ConsumerState<AtlasScreen>
   }
 
   Widget _buildBrowse() {
+    // Watched unconditionally (even while showing only the passage's
+    // points) so it's already warm by the time "show all places" is
+    // pressed — otherwise that first toggle briefly shows a loading widget
+    // in the map's spot, which unmounts/remounts the map and undoes the
+    // "keep the current zoom" behavior autoFitOnPointsChange is there for.
     final placesAsync = ref.watch(allPlacesProvider);
+    final initialPoints = widget.initialPoints;
+    if (initialPoints != null && !_showAllPlaces) {
+      return PlaceMarkerMap(
+        mapController: _browseMap,
+        points: initialPoints,
+        style: PlaceMarkerStyle.labeledPin,
+        initialZoom: 8,
+        autoFitOnPointsChange: false,
+        onTapPoint: _showPlaceSheet,
+      );
+    }
     return placesAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => Center(child: Text('Could not load places: $e')),
@@ -310,9 +340,9 @@ class _AtlasScreenState extends ConsumerState<AtlasScreen>
           points: [
             for (final p in places) MapPoint(p.id, p.name, p.lat, p.lng),
           ],
-          cameraFitPoints: widget.initialPoints,
           style: PlaceMarkerStyle.dot,
           initialZoom: 5,
+          autoFitOnPointsChange: false,
           onTapPoint: _showPlaceSheet,
         );
       },
