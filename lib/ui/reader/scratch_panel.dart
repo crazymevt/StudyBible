@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
+import '../../app/notebook_providers.dart';
 import '../../app/scratch_providers.dart';
 import '../../app/user_providers.dart';
 import '../common/quill_content.dart';
@@ -18,6 +20,19 @@ class ScratchPanel extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ScratchPanel> createState() => _ScratchPanelState();
+}
+
+/// Result of the "Promote to notebook page" dialog: either an existing
+/// notebook id, or (when null) a title for a new notebook to create first.
+class _NotebookPromotion {
+  final String? notebookId;
+  final String newNotebookTitle;
+  final String pageTitle;
+  _NotebookPromotion({
+    required this.notebookId,
+    required this.newNotebookTitle,
+    required this.pageTitle,
+  });
 }
 
 class _ScratchPanelState extends ConsumerState<ScratchPanel> {
@@ -164,6 +179,127 @@ class _ScratchPanelState extends ConsumerState<ScratchPanel> {
     );
   }
 
+  Future<void> _promoteToNotebook() async {
+    final controller = _controller;
+    if (controller == null || _isEmpty()) return;
+
+    // Default the page title to the pad's first non-empty line.
+    final firstLine = controller.document
+        .toPlainText()
+        .split('\n')
+        .map((l) => l.trim())
+        .firstWhere((l) => l.isNotEmpty, orElse: () => '');
+    final pageTitleController = TextEditingController(text: firstLine);
+    final newNotebookTitleController = TextEditingController();
+    String? selectedNotebookId; // null = create a new notebook
+
+    // Query the list once rather than watching it live: creating a notebook
+    // inside this same flow would otherwise emit a stream update while the
+    // dialog is closing, rebuilding it after its controllers are disposed.
+    final store = ref.read(userStoreProvider);
+    final notebooks = await (store.select(store.notebooks)
+          ..where((t) => t.deleted.equals(false))
+          ..orderBy([(t) => drift.OrderingTerm.desc(t.updatedAt)]))
+        .get();
+    if (!mounted) return;
+
+    final result = await showDialog<_NotebookPromotion>(
+      context: context,
+      builder: (c) => StatefulBuilder(
+        builder: (c, setState) => AlertDialog(
+          title: const Text('Promote to notebook page'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DropdownButtonFormField<String?>(
+                  initialValue: selectedNotebookId,
+                  decoration: const InputDecoration(labelText: 'Notebook'),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('New notebook…'),
+                    ),
+                    ...notebooks.map(
+                      (n) => DropdownMenuItem(
+                        value: n.id,
+                        child: Text(n.title),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) => setState(() => selectedNotebookId = v),
+                ),
+                if (selectedNotebookId == null) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: newNotebookTitleController,
+                    autofocus: notebooks.isEmpty,
+                    decoration: const InputDecoration(
+                      labelText: 'New notebook title',
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                TextField(
+                  controller: pageTitleController,
+                  autofocus: notebooks.isNotEmpty,
+                  decoration: const InputDecoration(labelText: 'Page title'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(c),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(
+                c,
+                _NotebookPromotion(
+                  notebookId: selectedNotebookId,
+                  newNotebookTitle: newNotebookTitleController.text.trim(),
+                  pageTitle: pageTitleController.text.trim(),
+                ),
+              ),
+              child: const Text('Create page'),
+            ),
+          ],
+        ),
+      ),
+    );
+    pageTitleController.dispose();
+    newNotebookTitleController.dispose();
+    if (result == null || !mounted) return;
+
+    final content = jsonEncode(controller.document.toDelta().toJson());
+    var notebookId = result.notebookId;
+    if (notebookId == null) {
+      final notebook = await ref.read(notebookActionProvider).createNotebook(
+            result.newNotebookTitle.isEmpty
+                ? 'Untitled Notebook'
+                : result.newNotebookTitle,
+          );
+      notebookId = notebook.id;
+    }
+    await ref.read(scratchActionProvider).promoteToNotebookPage(
+          notebookId,
+          result.pageTitle.isEmpty ? 'Untitled Page' : result.pageTitle,
+          content,
+        );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Promoted to notebook page — find it in the Notebooks panel. '
+          'The scratch pad is unchanged.',
+        ),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -189,6 +325,11 @@ class _ScratchPanelState extends ConsumerState<ScratchPanel> {
                   icon: const Icon(Icons.co_present),
                   tooltip: 'Promote to sermon',
                   onPressed: _promote,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.menu_book),
+                  tooltip: 'Promote to notebook page',
+                  onPressed: _promoteToNotebook,
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline),

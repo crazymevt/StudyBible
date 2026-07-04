@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_bible/app/achievement_service.dart';
+import 'package:study_bible/app/notebook_providers.dart';
 import 'package:study_bible/app/scratch_providers.dart';
 import 'package:study_bible/app/shared_prefs.dart';
 import 'package:study_bible/app/sync_service.dart';
@@ -75,6 +76,33 @@ void main() {
           ..where((s) => s.deleted.equals(false)))
         .get();
     expect(sermons, hasLength(1));
+    // ...and the pad is left as-is.
+    expect((await rows()).single.content, delta);
+  });
+
+  test(
+      'promoteToNotebookPage creates a page with the pad content, pad untouched',
+      () async {
+    final action = container.read(scratchActionProvider);
+    const delta = '[{"insert":"notebook seed\\n"}]';
+    await action.save(delta);
+
+    final notebook =
+        await container.read(notebookActionProvider).createNotebook('Ideas');
+    final page = await action.promoteToNotebookPage(
+      notebook.id,
+      'My Page',
+      delta,
+    );
+    expect(page.title, 'My Page');
+    expect(page.content, delta);
+    expect(page.notebookId, notebook.id);
+
+    // A real, non-deleted page row exists...
+    final pages = await (store.select(store.notebookPages)
+          ..where((p) => p.deleted.equals(false)))
+        .get();
+    expect(pages, hasLength(1));
     // ...and the pad is left as-is.
     expect((await rows()).single.content, delta);
   });

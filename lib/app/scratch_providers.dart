@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/user_store.dart';
+import 'notebook_providers.dart';
 import 'sermon_providers.dart';
 import 'user_providers.dart';
 
@@ -48,5 +49,18 @@ class ScratchAction {
     return ref
         .read(sermonActionProvider)
         .createSermon(title, content: content);
+  }
+
+  /// Creates a page from the pad's current [content] (verbatim, since both
+  /// store Quill Delta) inside notebook [notebookId] and returns it. The pad
+  /// is left untouched — the caller decides whether to clear it.
+  Future<NotebookPage> promoteToNotebookPage(
+    String notebookId,
+    String pageTitle,
+    String content,
+  ) {
+    return ref
+        .read(notebookActionProvider)
+        .createPage(notebookId, title: pageTitle, content: content);
   }
 }
