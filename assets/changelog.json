@@ -1,5 +1,77 @@
 [
   {
+    "version": "26.7.3+5",
+    "date": "2026-07-03",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add overflow menu for non-favorite tools in the desktop rail",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add a fullscreen interactive Atlas with auto-derived person journeys",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "cross-reference tagged verses into people/places/events/media on Explorer tag pages",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "media attachment sync fidelity and cleanup",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "export button saving on android using SAF",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "media attachments implementation",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "make selected verses drag-and-droppable into editors",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "actually remove unused imports and variables in test",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "resolve github quality gate lint and formatting issues",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "redesign sidebar with pinned favorites",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "persistent dictation snackbar while listening",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.3+4",
     "date": "2026-07-03",
     "features": [
