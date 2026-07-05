@@ -161,6 +161,15 @@ const _eventsSupersededByCuratedJourney = {
   'Joseph and Mary return from Egypt',
   'Joseph and Mary return to Nazareth',
 
+  // Superseded by Jesus's CuratedPersonJourney (final approach to
+  // Jerusalem): both are Synoptic-sourced and sort ahead of "Lazarus Raised
+  // from the Dead" / "Jesus Withdraws to Ephraim" (John 11) purely from the
+  // book-number sort-key quirk, even though Jericho — where both of these
+  // happen — is on the final road to Jerusalem, after the Ephraim
+  // withdrawal. See the doc comment on jesus_905's CuratedPersonJourney.
+  'Healing Blind Bartimaeus',
+  'Zaccheus Converted and Parable of the Pounds',
+
   // Superseded by Paul's CuratedPersonJourney
   'Saul persecutes the church',
   'Saul is converted',

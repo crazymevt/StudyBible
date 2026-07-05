@@ -1507,6 +1507,24 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
   // destination here instead of Theographic's own resolution: its cited
   // verses are Matthew 2:22-23, and 2:22 (Galilee/Judea, the region they
   // feared, not their destination) sorts ahead of 2:23's Nazareth by ord.
+  //
+  // Same quirk again at the other end of the ministry: Theographic's
+  // "Healing Blind Bartimaeus" (first cited verse Matthew 20:29, k=
+  // 30.40020029) and "Zaccheus Converted and Parable of the Pounds" (Luke
+  // 19:1, k=30.42019001) both sort *before* "Lazarus Raised from the Dead"
+  // (John 11:1, k=30.43011001) and "Jesus Withdraws to Ephraim" (John
+  // 11:54, k=30.43011054) — but Bartimaeus and Zacchaeus both happen in
+  // Jericho, on Jesus's final approach to Jerusalem for the last Passover,
+  // which every harmony places *after* the Ephraim withdrawal (John 11:54-57
+  // has him staying there "until the Jews' Passover was nigh", then John
+  // 12:1 has him arriving at Bethany six days before it — Jericho is on that
+  // same final road). Unlike the sprawling, mutually-overlapping "Jesus
+  // Teaches in Perea" / "Lepers Healed" / "Teaching and Healing in Perea to
+  // Jerusalem" blocks that precede this (which genuinely can't be untangled
+  // without relitigating disputed Gospel harmonization, so they're left
+  // alone), this one has a clean, undisputed textual anchor. Both are
+  // superseded here and replaced with waypoints dated between the Ephraim
+  // withdrawal and the Bethany anointing.
   CuratedPersonJourney(
     personSlug: 'jesus_905',
     waypoints: [
@@ -1531,6 +1549,25 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         chapter: 2,
         verse: 23,
         placeName: 'Nazareth',
+      ),
+      CuratedWaypoint(
+        // Deliberately distinct from Theographic's own "Healing Blind
+        // Bartimaeus" title — see the comment above and
+        // _eventsSupersededByCuratedJourney in atlas_providers.dart.
+        title: 'Restores sight to blind Bartimaeus near Jericho',
+        year: 30.44,
+        bookName: 'Luke',
+        chapter: 18,
+        verse: 35,
+        placeName: 'Jericho 2',
+      ),
+      CuratedWaypoint(
+        title: 'Zacchaeus the tax collector receives Jesus in Jericho',
+        year: 30.445,
+        bookName: 'Luke',
+        chapter: 19,
+        verse: 1,
+        placeName: 'Jericho 2',
       ),
       CuratedWaypoint(
         title: 'Anointed by Mary at Bethany six days before Passover',
