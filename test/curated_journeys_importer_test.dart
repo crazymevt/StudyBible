@@ -34,11 +34,6 @@ void main() {
     final importer = CuratedJourneysImporter(store);
     // Depends on people/places already being loaded, same as production.
     await container.read(curatedJourneysReadyProvider.future);
-
-    final totalWaypoints = curatedPersonJourneys.fold<int>(
-      0,
-      (sum, j) => sum + j.waypoints.length,
-    );
     final events = await store.select(store.timelineEvents).get();
     final curatedTitles = {
       for (final j in curatedPersonJourneys)
@@ -73,11 +68,6 @@ void main() {
         .insert(TimelineEventsCompanion.insert(title: sentinelTitle));
 
     await CuratedJourneysImporter(store).ensureLoaded();
-
-    final totalWaypoints = curatedPersonJourneys.fold<int>(
-      0,
-      (sum, j) => sum + j.waypoints.length,
-    );
     final curatedTitles = {
       for (final j in curatedPersonJourneys)
         for (final w in j.waypoints) w.title,
