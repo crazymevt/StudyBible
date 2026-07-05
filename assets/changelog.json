@@ -1,5 +1,173 @@
 [
   {
+    "version": "26.7.4+4",
+    "date": "2026-07-04",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "curated journeys importer never re-ran on a device that had loaded once",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Jacob",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Benjamin, closing the priority list",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Esau",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Moses's death location, and expand his Exodus/Wilderness blobs",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Caleb",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Abimelech",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "prayer add/edit dialog crash, layout overflow, and mobile width",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Jehoiakim",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Rehoboam",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Zedekiah",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Gideon",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Jeroboam",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Ahab",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Daniel",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Jeremiah",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Isaiah",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for David",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journey for Solomon",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "hand-curated Atlas journeys for Elijah and Elisha",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct upstream Death of Moses verse-ID collision",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct Atlas journey false positives for Abraham and Moses",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct Atlas journey false positives for Paul",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct more Atlas journey false positives for Jesus",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Atlas journeys skip discourse events with no reliable place",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "Places fullscreen expand opens zoomed to the passage, not the world",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "scratch pad can be promoted to a notebook page",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.4+3",
     "date": "2026-07-04",
     "features": [
