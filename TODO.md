@@ -6,7 +6,7 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [ ] **Hand-curate missing major Biblical journeys.** The auto-generated maps for several major figures suffer from low resolution because `theographic.json` events are heavily bundled (e.g., "Second Missionary Journey") or rely on regional mentions without specific city coordinates.
+- [x] **Hand-curate missing major Biblical journeys.** The auto-generated maps for several major figures suffer from low resolution because `theographic.json` events are heavily bundled (e.g., "Second Missionary Journey") or rely on regional mentions without specific city coordinates.
   - **Early Church**: Peter (Simon) is the most glaring omission (34 events, all undated or bundled), along with Luke, Silas, Barnabas, Timothy, and Philip the Evangelist.
   - **Patriarchs**: Abraham, Joseph, and Isaac have massive multi-national journeys that resolve poorly under the auto-derived heuristic.
   - **Exodus/Conquest**: Joshua's conquest is currently lost in generic event blocks.
