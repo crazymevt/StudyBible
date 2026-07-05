@@ -1,5 +1,41 @@
 [
   {
+    "version": "26.7.5+2",
+    "date": "2026-07-05",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "perf: stop rescanning content_search on every Explorer/People/Topics open",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "perf: replace Explorer backlink content scans with a persisted reference index",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "perf: add missing database indexes for faster loads with large libraries",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct title collisions in curated journeys and add missing tests",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct verse citations, remove vision waypoints, and clean up TODO comments",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.5+1",
     "date": "2026-07-05",
     "features": [
@@ -386,7 +422,7 @@
       },
       {
         "category": "New Features",
-        "title": "tags join the Explorer \u2014 tag pages, search, and Your-tags cards",
+        "title": "tags join the Explorer — tag pages, search, and Your-tags cards",
         "description": "",
         "icon": "star"
       },
@@ -410,7 +446,7 @@
       },
       {
         "category": "New Features",
-        "title": "Explorer \u2014 searchable, cross-linked pages for people, places, events, topics, and passages",
+        "title": "Explorer — searchable, cross-linked pages for people, places, events, topics, and passages",
         "description": "",
         "icon": "star"
       },
@@ -518,13 +554,13 @@
       },
       {
         "category": "New Features",
-        "title": "scratch space \u2014 device-local rich-text pad, promotable to a sermon",
+        "title": "scratch space — device-local rich-text pad, promotable to a sermon",
         "description": "",
         "icon": "star"
       },
       {
         "category": "New Features",
-        "title": "bible ribbons \u2014 quick single-verse return markers",
+        "title": "bible ribbons — quick single-verse return markers",
         "description": "",
         "icon": "star"
       }
@@ -1341,7 +1377,7 @@
       {
         "category": "New Features",
         "title": "Install Bibles, commentaries & dictionaries from CrossWire",
-        "description": "A new CrossWire Catalog in the Content Manager downloads and installs SWORD modules \u2014 Bibles, commentaries, and dictionaries \u2014 directly in the app.",
+        "description": "A new CrossWire Catalog in the Content Manager downloads and installs SWORD modules — Bibles, commentaries, and dictionaries — directly in the app.",
         "icon": "star"
       },
       {
