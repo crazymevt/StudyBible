@@ -1,5 +1,21 @@
 [
   {
+    "version": "26.7.5+1",
+    "date": "2026-07-05",
+    "features": [
+      {
+        "title": "Expanded Biblical Journeys",
+        "description": "We've vastly expanded the Atlas! Over 45 major biblical figures (including Moses, David, Jacob, and more) now have fully mapped, accurate, and chronologically ordered journeys on the map.",
+        "icon": "map"
+      },
+      {
+        "title": "Enhanced Map Accuracy",
+        "description": "We've meticulously audited our mapping data to improve the geographical accuracy of several locations across both the Old and New Testaments.",
+        "icon": "my_location"
+      }
+    ]
+  },
+  {
     "version": "26.7.4+5",
     "date": "2026-07-04",
     "features": [
@@ -370,7 +386,7 @@
       },
       {
         "category": "New Features",
-        "title": "tags join the Explorer — tag pages, search, and Your-tags cards",
+        "title": "tags join the Explorer \u2014 tag pages, search, and Your-tags cards",
         "description": "",
         "icon": "star"
       },
@@ -394,7 +410,7 @@
       },
       {
         "category": "New Features",
-        "title": "Explorer — searchable, cross-linked pages for people, places, events, topics, and passages",
+        "title": "Explorer \u2014 searchable, cross-linked pages for people, places, events, topics, and passages",
         "description": "",
         "icon": "star"
       },
@@ -502,13 +518,13 @@
       },
       {
         "category": "New Features",
-        "title": "scratch space — device-local rich-text pad, promotable to a sermon",
+        "title": "scratch space \u2014 device-local rich-text pad, promotable to a sermon",
         "description": "",
         "icon": "star"
       },
       {
         "category": "New Features",
-        "title": "bible ribbons — quick single-verse return markers",
+        "title": "bible ribbons \u2014 quick single-verse return markers",
         "description": "",
         "icon": "star"
       }
@@ -1325,7 +1341,7 @@
       {
         "category": "New Features",
         "title": "Install Bibles, commentaries & dictionaries from CrossWire",
-        "description": "A new CrossWire Catalog in the Content Manager downloads and installs SWORD modules — Bibles, commentaries, and dictionaries — directly in the app.",
+        "description": "A new CrossWire Catalog in the Content Manager downloads and installs SWORD modules \u2014 Bibles, commentaries, and dictionaries \u2014 directly in the app.",
         "icon": "star"
       },
       {
