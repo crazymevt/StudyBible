@@ -168,6 +168,52 @@ final booksForVersionProvider = FutureProvider.family<List<Book>, String>((
       .get();
 });
 
+/// Approximate installed size, in bytes, of a Bible version's verse text
+/// (see [ContentStore.versionSizeBytes] for why this is an estimate).
+final versionSizeBytesProvider = FutureProvider.family<int, String>((
+  ref,
+  versionId,
+) {
+  final store = ref.watch(contentStoreProvider);
+  return store.versionSizeBytes(versionId);
+});
+
+/// Approximate installed size, in bytes, of a subheading source.
+final subheadingSourceSizeBytesProvider = FutureProvider.family<int, String>((
+  ref,
+  versionId,
+) {
+  final store = ref.watch(contentStoreProvider);
+  return store.subheadingSourceSizeBytes(versionId);
+});
+
+/// Approximate installed size, in bytes, of a commentary.
+final commentarySizeBytesProvider = FutureProvider.family<int, int>((
+  ref,
+  id,
+) {
+  final store = ref.watch(contentStoreProvider);
+  return store.commentarySizeBytes(id);
+});
+
+/// Approximate installed size, in bytes, of a dictionary.
+final dictionarySizeBytesProvider = FutureProvider.family<int, int>((
+  ref,
+  id,
+) {
+  final store = ref.watch(contentStoreProvider);
+  return store.dictionarySizeBytes(id);
+});
+
+/// Approximate installed size, in bytes, of a devotional.
+final devotionalSizeBytesProvider = FutureProvider.family<int, int>((
+  ref,
+  id,
+) {
+  final store = ref.watch(contentStoreProvider);
+  return store.devotionalSizeBytes(id);
+});
+
 final chapterCountProvider = FutureProvider.family<int, int>((
   ref,
   bookId,

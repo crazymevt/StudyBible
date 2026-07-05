@@ -222,6 +222,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
     );
   }
 
+  Widget _installedSubtitle(String label, AsyncValue<int> sizeAsync) {
+    final sizeText = sizeAsync.maybeWhen(
+      data: (bytes) => _formatBytes(bytes),
+      orElse: () => null,
+    );
+    return Text(sizeText == null ? label : '$label • $sizeText');
+  }
+
   Widget _buildInstalledTab() {
     final versionsAsync = ref.watch(versionsProvider);
     final commentariesAsync = ref.watch(commentariesProvider);
@@ -419,7 +427,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...bibles.map((v) => ListTile(
             onTap: () {},
             title: Text(v.name),
-            subtitle: Text(v.id),
+            subtitle: _installedSubtitle(v.id, ref.watch(versionSizeBytesProvider(v.id))),
             trailing: buildInstalledTrailing(v.id, v.name, v.about, () async {
               await ref.read(contentStoreProvider).deleteVersion(v.id);
               ref.read(versionsProvider.notifier).reload();
@@ -440,7 +448,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...subheadings.map((v) => ListTile(
             onTap: () {},
             title: Text(v.name),
-            subtitle: Text(v.id),
+            subtitle: _installedSubtitle(v.id, ref.watch(subheadingSourceSizeBytesProvider(v.id))),
             trailing: buildInstalledTrailing(v.id, v.name, v.about, () async {
               await ref.read(contentStoreProvider).deleteVersion(v.id);
               ref.read(versionsProvider.notifier).reload();
@@ -460,7 +468,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...commentaries.map((c) => ListTile(
             onTap: () {},
             title: Text(c.abbreviation),
-            subtitle: const Text('Commentary'),
+            subtitle: _installedSubtitle('Commentary', ref.watch(commentarySizeBytesProvider(c.id))),
             trailing: buildInstalledTrailing(c.abbreviation, c.name, c.about, () async {
               await ref.read(contentStoreProvider).deleteCommentary(c.id);
               ref.read(commentariesProvider.notifier).reload();
@@ -482,7 +490,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...dictionaries.map((d) => ListTile(
             onTap: () {},
             title: Text(d.abbreviation),
-            subtitle: const Text('Dictionary'),
+            subtitle: _installedSubtitle('Dictionary', ref.watch(dictionarySizeBytesProvider(d.id))),
             trailing: buildInstalledTrailing(d.abbreviation, d.name, d.about, () async {
               await ref.read(contentStoreProvider).deleteDictionary(d.id);
               ref.read(dictionariesProvider.notifier).reload();
@@ -505,7 +513,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
           ...devotionals.map((d) => ListTile(
             onTap: () {},
             title: Text(d.name),
-            subtitle: Text(d.abbreviation),
+            subtitle: _installedSubtitle(d.abbreviation, ref.watch(devotionalSizeBytesProvider(d.id))),
             trailing: buildInstalledTrailing(d.abbreviation, d.name, d.about, () async {
               await ref.read(contentStoreProvider).deleteDevotional(d.id);
               ref.read(devotionalsProvider.notifier).reload();
@@ -1220,4 +1228,16 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
       },
     );
   }
+}
+
+String _formatBytes(int bytes) {
+  if (bytes <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  var value = bytes.toDouble();
+  var unitIndex = 0;
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex++;
+  }
+  return '${value.toStringAsFixed(unitIndex == 0 ? 0 : 1)} ${units[unitIndex]}';
 }

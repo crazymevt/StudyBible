@@ -354,6 +354,68 @@ class ContentStore extends _$ContentStore {
     });
   }
 
+  /// Approximate on-disk size of a Bible version's verse text, in bytes.
+  /// All modules share one `content.db`, so this sums the length (as BLOB,
+  /// to count UTF-8 bytes rather than characters) of the columns that hold
+  /// the bulk of a version's data rather than reporting a file size.
+  Future<int> versionSizeBytes(String versionId) async {
+    final row = await customSelect(
+      'SELECT COALESCE(SUM(LENGTH(CAST(text_content AS BLOB)) + LENGTH(CAST(segments AS BLOB))), 0) AS total '
+      'FROM verses WHERE book_id IN (SELECT id FROM books WHERE version_id = ?)',
+      variables: [Variable.withString(versionId)],
+      readsFrom: {verses, books},
+    ).getSingle();
+    return row.read<int>('total');
+  }
+
+  /// Approximate size of a subheading source's text, in bytes. See
+  /// [versionSizeBytes] for why this is an estimate rather than a file size.
+  Future<int> subheadingSourceSizeBytes(String versionId) async {
+    final row = await customSelect(
+      'SELECT COALESCE(SUM(LENGTH(CAST(text_content AS BLOB)) + LENGTH(CAST(COALESCE(about, \'\') AS BLOB))), 0) AS total '
+      'FROM subheadings WHERE version_id = ?',
+      variables: [Variable.withString(versionId)],
+      readsFrom: {subheadings},
+    ).getSingle();
+    return row.read<int>('total');
+  }
+
+  /// Approximate size of a commentary's entries, in bytes. See
+  /// [versionSizeBytes] for why this is an estimate rather than a file size.
+  Future<int> commentarySizeBytes(int id) async {
+    final row = await customSelect(
+      'SELECT COALESCE(SUM(LENGTH(CAST(text_content AS BLOB))), 0) AS total '
+      'FROM commentary_entries WHERE commentary_id = ?',
+      variables: [Variable.withInt(id)],
+      readsFrom: {commentaryEntries},
+    ).getSingle();
+    return row.read<int>('total');
+  }
+
+  /// Approximate size of a dictionary's entries, in bytes. See
+  /// [versionSizeBytes] for why this is an estimate rather than a file size.
+  Future<int> dictionarySizeBytes(int id) async {
+    final row = await customSelect(
+      'SELECT COALESCE(SUM(LENGTH(CAST(word AS BLOB)) + LENGTH(CAST(definition AS BLOB))), 0) AS total '
+      'FROM dictionary_entries WHERE dictionary_id = ?',
+      variables: [Variable.withInt(id)],
+      readsFrom: {dictionaryEntries},
+    ).getSingle();
+    return row.read<int>('total');
+  }
+
+  /// Approximate size of a devotional's entries, in bytes. See
+  /// [versionSizeBytes] for why this is an estimate rather than a file size.
+  Future<int> devotionalSizeBytes(int id) async {
+    final row = await customSelect(
+      'SELECT COALESCE(SUM(LENGTH(CAST(text_content AS BLOB))), 0) AS total '
+      'FROM devotional_entries WHERE devotional_id = ?',
+      variables: [Variable.withInt(id)],
+      readsFrom: {devotionalEntries},
+    ).getSingle();
+    return row.read<int>('total');
+  }
+
   /// Indexes a freshly-imported HTML content type ('commentary' or
   /// 'devotional') into the search index with markup stripped. [table] and
   /// [fkColumn] are internal constants, never user input.
