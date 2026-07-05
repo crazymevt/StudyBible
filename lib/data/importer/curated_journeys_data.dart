@@ -2444,13 +2444,16 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         verse: 1,
         placeName: 'Lystra',
       ),
+      // Timothy's presence at Philippi is inferred: Acts 16:3 says Paul took
+      // him along, and 16:12 says "we" arrived in Philippi, but the "we"
+      // narrator is Luke. Timothy isn't named again until 17:14 (Berea).
       CuratedWaypoint(
         title: 'Travels to Philippi',
         year: 47.0,
         bookName: 'Acts',
         chapter: 16,
         verse: 12,
-        placeName: 'Philippi', // Inferred presence
+        placeName: 'Philippi', // Inferred from Acts 16:3 "took him along"
       ),
       CuratedWaypoint(
         title: 'Stays in Berea with Silas',
@@ -2484,14 +2487,17 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         verse: 5,
         placeName: 'Troas',
       ),
-      // Mentions in Epistles (Rome) - Inferred location based on Colossians 1:1, Philemon 1:1
+      // Colossians 1:1 names Timothy as co-sender. Traditionally the letter
+      // was written from Rome during Paul's first imprisonment (Acts 28:16-31),
+      // though Ephesus and Caesarea have also been proposed. Using the majority
+      // scholarly view (Rome).
       CuratedWaypoint(
-        title: 'With Paul in Rome',
+        title: 'With Paul in Rome (co-sender of Colossians)',
         year: 60.0,
         bookName: 'Colossians',
         chapter: 1,
         verse: 1,
-        placeName: 'Rome',
+        placeName: 'Rome', // Traditional: written from Rome during Acts 28 imprisonment
       ),
     ],
   ),
@@ -2570,9 +2576,8 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
 
   // Philip the Evangelist
   CuratedPersonJourney(
-    personSlug: 'philip_2347',
+    personSlug: 'philip_2347', // Verified: Acts 6:5 — one of the seven
     waypoints: [
-      // Need to verify slug
       CuratedWaypoint(
         title: 'Chosen as one of the seven in Jerusalem',
         year: 32.0,
@@ -2732,7 +2737,7 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         placeName: 'Shechem',
       ),
       CuratedWaypoint(
-        title: 'Buried in Timnath-serah',
+        title: 'Buried in Timnath-heres',
         year: -1385,
         bookName: 'Joshua',
         chapter: 24,
@@ -2799,14 +2804,10 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         verse: 15,
         placeName: 'Tel-abib',
       ),
-      CuratedWaypoint(
-        title: 'Vision of Jerusalem (spiritual transport)',
-        year: -592,
-        bookName: 'Ezekiel',
-        chapter: 8,
-        verse: 3,
-        placeName: 'Jerusalem', // Included to represent the vision narrative
-      ),
+      // Ezekiel 8:3 — "the Spirit lifted me up ... and brought me in visions
+      // of God to Jerusalem" — excluded because it's a spiritual vision, not
+      // physical travel. Ezekiel remained in Babylon throughout. Contrast with
+      // Daniel's Susa/Tigris entries, where Daniel physically traveled there.
     ],
   ),
 
@@ -3120,9 +3121,8 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
 
   // James (brother of John)
   CuratedPersonJourney(
-    personSlug: 'james_717',
+    personSlug: 'james_717', // Verified: Matt 4:21 — son of Zebedee
     waypoints: [
-      // Verify slug matches the son of Zebedee
       CuratedWaypoint(
         title: 'Called by Jesus at the Sea of Galilee',
         year: 27.0,
@@ -3139,14 +3139,9 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         verse: 29,
         placeName: 'Capernaum',
       ),
-      CuratedWaypoint(
-        title: 'Witnesses the Transfiguration',
-        year: 29.0,
-        bookName: 'Matthew',
-        chapter: 17,
-        verse: 1,
-        placeName: 'Mount Hermon', // Or Mount Tabor
-      ),
+      // Transfiguration (Matt 17:1) excluded: the text says only "a high
+      // mountain" with no name. Tradition identifies Mount Hermon or Mount
+      // Tabor, but we cannot derive a place from the verse text alone.
       CuratedWaypoint(
         title: 'With Jesus in Gethsemane',
         year: 30.0,
@@ -3170,8 +3165,11 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
   CuratedPersonJourney(
     personSlug: 'andrew_264',
     waypoints: [
+      // John 1:44 identifies Andrew's hometown, not a narrated travel event.
+      // Included as the starting point of his journey since it establishes
+      // his base location before Jesus's ministry.
       CuratedWaypoint(
-        title: 'Originally from Bethsaida',
+        title: 'Hometown of Bethsaida',
         year: 26.0,
         bookName: 'John',
         chapter: 1,
@@ -3349,6 +3347,12 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       ),
     ],
   ),
+  // Years for the patriarchs (Abraham, Isaac, Joseph) are sequential sort
+  // keys, not historically calibrated dates. Their real chronology spans
+  // decades-to-centuries (Abraham lived 175 years, Isaac 180, Joseph 110),
+  // but the years here only need to be monotonically increasing so the
+  // waypoints sort correctly on the timeline. The absolute values are
+  // approximate anchors within the traditional dating window.
   CuratedPersonJourney(
     personSlug: 'abraham_58',
     waypoints: [
@@ -3483,8 +3487,8 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         year: -1900,
         bookName: 'Genesis',
         chapter: 21,
-        verse: 14,
-        placeName: 'Beersheba 1', // Inferred from Abraham's prior location
+        verse: 3,
+        placeName: 'Beersheba 1', // Inferred from Abraham's prior location (Gen 21:31-33)
       ),
       CuratedWaypoint(
         title: 'Isaac taken to Moriah',
