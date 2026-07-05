@@ -583,4 +583,41 @@ void main() {
     ]);
     expect(journey.unmappedEventCount, 0);
   });
+
+  test("Jesus's journey fills in the Passion Week and beyond, which "
+      "Theographic leaves entirely undated", () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final jesus = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('jesus_905')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(jesus.id).future);
+    expect(journey, isNotNull);
+    // The curated Passion Week block is appended after everything else
+    // (see the doc comment in curated_journeys_data.dart on why it isn't
+    // perfectly interleaved with the handful of already-out-of-order
+    // late-ministry events that precede it).
+    expect(journey!.waypoints.map((w) => w.placeName).toList().sublist(
+        journey.waypoints.length - 18), [
+      'Bethany 1', // Anointed by Mary
+      'Bethphage',
+      'Jerusalem', // Triumphal Entry
+      'Bethany 1', // Curses the fig tree
+      'Jerusalem', // Cleanses the Temple
+      'Jerusalem', // Debates in the Temple
+      'Mount of Olives', // Olivet Discourse
+      'Jerusalem', // Last Supper
+      'Mount of Olives', // Departs for the Mount of Olives
+      'Gethsemane',
+      'Jerusalem', // Sent to Herod
+      'Gabbatha', // Condemned by Pilate
+      'Golgotha', // Crucified
+      'Emmaus',
+      'Jerusalem', // Returns to Jerusalem
+      'Galilee 1', // Appears in Galilee
+      'Jerusalem', // Commands the apostles to wait
+      'Bethany 1', // Ascends to heaven
+    ]);
+  });
 }

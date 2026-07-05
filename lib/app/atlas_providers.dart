@@ -313,6 +313,10 @@ const _eventsSupersededByCuratedJourney = {
 ///   names Canaan (the general region carried to) and Mamre (the
 ///   surrounding grove); the actual tomb is "the cave of the field of
 ///   Machpelah... before Mamre" — both other names have lower ids.
+/// - 'Sent to Herod at Jerusalem' (Jesus's curated Passion Week waypoint):
+///   Luke 23:7 also names Galilee — Pilate learning Jesus was a Galilean,
+///   under Herod's jurisdiction, not Jesus's current location — which
+///   otherwise has the lower id.
 const _eventPlaceOverrides = {
   'Birth of Jesus': 'Bethlehem 1',
   'John Baptizes Jesus': 'Jordan',
@@ -361,6 +365,7 @@ const _eventPlaceOverrides = {
   'Comes to Shechem and pitches his tent': 'Shechem',
   'Rachel dies near Ephrath giving birth to Benjamin': 'Ephrath',
   'Embalmed and buried at Machpelah near Hebron': 'Machpelah',
+  'Sent to Herod at Jerusalem': 'Jerusalem',
 };
 
 /// A person's dated events, each resolved to the first place named in its

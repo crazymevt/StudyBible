@@ -1404,4 +1404,181 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       placeName: 'Machpelah',
     ),
   ]),
+
+  // Unlike everyone else in this file, Jesus already has a rich, mostly
+  // auto-derived journey (100+ dated events) — his early ministry doesn't
+  // need curation. But Theographic leaves the entire Passion Week and
+  // everything after it *undated* (no `y`/start_year at all on "Triumphal
+  // Entry", "The Last Supper", "Crucifixion and Burial", etc.), so
+  // personJourneyProvider's dated-events-only resolution silently drops all
+  // of it — the most geographically significant week of his life shows
+  // nothing on the map today. These waypoints fill that gap.
+  //
+  // Years: 30.45-30.484, deliberately placed *after* every existing dated
+  // event for Jesus (highest existing `k`/sortKey is 30.44001006, "Jesus
+  // ascends to Heaven") but still under 30.5 so they round to year 30, not
+  // 31, in the UI. Theographic's own sortKey isn't true calendar
+  // time — it's `book.chapter.verse` encoded as a decimal, so events cited
+  // from different Gospels covering the same week don't interleave
+  // correctly (e.g. "Lazarus Raised" (John 11, k=30.43011) already sorts
+  // *after* "Resurrection and Ascension" (Matthew 28, k=30.40028) today,
+  // even though it narratively happens weeks earlier — a pre-existing
+  // quirk, not something introduced here). Rather than fight that scheme,
+  // this whole block sorts as one unit after everything else; it's
+  // internally in the correct order, just not perfectly threaded between
+  // the handful of already-out-of-order late-ministry events that precede
+  // it (Zaccheus, Lazarus, the Ephraim withdrawal).
+  //
+  // Deliberately excluded for lack of a citation naming *his* location:
+  // Judas's suicide at Akeldama (that's Judas's location, not Jesus's, and
+  // Jesus was elsewhere on trial at the same time), the Jewish trial before
+  // Caiaphas (its only place-tagged verses are about Peter being recognized
+  // as a Galilean, not Jesus), and the specific burial site (no verse ties
+  // the garden tomb itself to a place — it's folded into the Golgotha stop).
+  CuratedPersonJourney(personSlug: 'jesus_905', waypoints: [
+    CuratedWaypoint(
+      title: 'Anointed by Mary at Bethany six days before Passover',
+      year: 30.45,
+      bookName: 'John',
+      chapter: 12,
+      verse: 1,
+      placeName: 'Bethany 1',
+    ),
+    CuratedWaypoint(
+      title: 'Sends two disciples ahead from Bethphage',
+      year: 30.452,
+      bookName: 'Matthew',
+      chapter: 21,
+      verse: 1,
+      placeName: 'Bethphage',
+    ),
+    CuratedWaypoint(
+      title: 'Triumphal Entry into Jerusalem',
+      year: 30.454,
+      bookName: 'Matthew',
+      chapter: 21,
+      verse: 10,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Curses the fig tree leaving Bethany',
+      year: 30.456,
+      bookName: 'Mark',
+      chapter: 11,
+      verse: 12,
+      placeName: 'Bethany 1',
+    ),
+    CuratedWaypoint(
+      title: 'Cleanses the Temple',
+      year: 30.458,
+      bookName: 'Mark',
+      chapter: 11,
+      verse: 15,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Debates the religious leaders in the Temple',
+      year: 30.46,
+      bookName: 'Mark',
+      chapter: 11,
+      verse: 27,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Olivet Discourse on the Mount of Olives',
+      year: 30.462,
+      bookName: 'Matthew',
+      chapter: 24,
+      verse: 3,
+      placeName: 'Mount of Olives',
+    ),
+    CuratedWaypoint(
+      title: 'Prepares the Passover and eats the Last Supper in Jerusalem',
+      year: 30.464,
+      bookName: 'Mark',
+      chapter: 14,
+      verse: 13,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Departs after supper for the Mount of Olives',
+      year: 30.466,
+      bookName: 'Matthew',
+      chapter: 26,
+      verse: 30,
+      placeName: 'Mount of Olives',
+    ),
+    CuratedWaypoint(
+      title: 'Prays and is betrayed in Gethsemane',
+      year: 30.468,
+      bookName: 'Matthew',
+      chapter: 26,
+      verse: 36,
+      placeName: 'Gethsemane',
+    ),
+    CuratedWaypoint(
+      title: 'Sent to Herod at Jerusalem',
+      year: 30.47,
+      bookName: 'Luke',
+      chapter: 23,
+      verse: 7,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: "Condemned by Pilate at the Pavement",
+      year: 30.472,
+      bookName: 'John',
+      chapter: 19,
+      verse: 13,
+      placeName: 'Gabbatha',
+    ),
+    CuratedWaypoint(
+      title: 'Crucified at Golgotha',
+      year: 30.474,
+      bookName: 'Luke',
+      chapter: 23,
+      verse: 33,
+      placeName: 'Golgotha',
+    ),
+    CuratedWaypoint(
+      title: 'Risen Jesus meets two disciples on the road to Emmaus',
+      year: 30.476,
+      bookName: 'Luke',
+      chapter: 24,
+      verse: 13,
+      placeName: 'Emmaus',
+    ),
+    CuratedWaypoint(
+      title: 'Returns to Jerusalem and appears to the disciples',
+      year: 30.478,
+      bookName: 'Luke',
+      chapter: 24,
+      verse: 33,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Appears to the disciples in Galilee',
+      year: 30.48,
+      bookName: 'Matthew',
+      chapter: 28,
+      verse: 16,
+      placeName: 'Galilee 1',
+    ),
+    CuratedWaypoint(
+      title: 'Commands the apostles to wait in Jerusalem',
+      year: 30.482,
+      bookName: 'Acts',
+      chapter: 1,
+      verse: 4,
+      placeName: 'Jerusalem',
+    ),
+    CuratedWaypoint(
+      title: 'Ascends to heaven from Bethany',
+      year: 30.484,
+      bookName: 'Luke',
+      chapter: 24,
+      verse: 50,
+      placeName: 'Bethany 1',
+    ),
+  ]),
 ];
