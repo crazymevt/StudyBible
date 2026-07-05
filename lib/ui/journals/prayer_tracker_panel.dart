@@ -313,6 +313,7 @@ class _PrayerDialogState extends ConsumerState<_PrayerDialog> {
       title: Text(widget.prayerId == null ? 'Add Prayer' : 'Edit Prayer'),
       content: SizedBox(
         width: isPhone ? screenWidth - 32 : 400,
+        height: 320,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,

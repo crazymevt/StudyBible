@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../app/action_providers.dart';
 import '../../app/shared_prefs.dart';
 import '../../data/user_store.dart';
+import '../common/breakpoints.dart';
 import '../common/empty_state.dart';
 import '../common/skeleton.dart';
 
@@ -36,6 +37,7 @@ class ActionItemsPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final actionsAsync = ref.watch(actionItemsProvider);
     final hideCompleted = ref.watch(hideCompletedActionsProvider);
+    final isPhone = MediaQuery.sizeOf(context).width <= Breakpoints.phone;
 
     return Column(
       children: [
@@ -44,16 +46,25 @@ class ActionItemsPanel extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Actions', style: Theme.of(context).textTheme.titleMedium),
+              Expanded(
+                child: Text(
+                  'Actions',
+                  style: Theme.of(context).textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Hide Completed'),
-                  Switch(
-                    value: hideCompleted,
-                    onChanged: (val) => ref
-                        .read(hideCompletedActionsProvider.notifier)
-                        .setHide(val),
+                  if (!isPhone) const Text('Hide Completed'),
+                  Tooltip(
+                    message: 'Hide Completed',
+                    child: Switch(
+                      value: hideCompleted,
+                      onChanged: (val) => ref
+                          .read(hideCompletedActionsProvider.notifier)
+                          .setHide(val),
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
@@ -282,43 +293,54 @@ class _ActionDialogState extends ConsumerState<_ActionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isPhone = screenWidth <= Breakpoints.phone;
     return AlertDialog(
+      insetPadding: isPhone
+          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 24)
+          : const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
       title: Text(widget.action == null ? 'Add Action' : 'Edit Action'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _titleCtrl,
-              autofocus: true,
-              decoration: const InputDecoration(labelText: 'Action'),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.event),
-              title: const Text('Due date & time'),
-              subtitle: Text(
-                _due == null
-                    ? 'Not set — tap to add'
-                    : ActionItemsPanel.formatDue(_due!.millisecondsSinceEpoch),
+      content: SizedBox(
+        width: isPhone ? screenWidth - 32 : 400,
+        height: 320,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _titleCtrl,
+                autofocus: true,
+                decoration: const InputDecoration(labelText: 'Action'),
               ),
-              trailing: _due != null
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      tooltip: 'Clear due date',
-                      onPressed: () => setState(() => _due = null),
-                    )
-                  : const Icon(Icons.chevron_right),
-              onTap: _pickDue,
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _descCtrl,
-              decoration: const InputDecoration(labelText: 'Description'),
-              maxLines: 3,
-            ),
-          ],
+              const SizedBox(height: 8),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.event),
+                title: const Text('Due date & time'),
+                subtitle: Text(
+                  _due == null
+                      ? 'Not set — tap to add'
+                      : ActionItemsPanel.formatDue(
+                          _due!.millisecondsSinceEpoch,
+                        ),
+                ),
+                trailing: _due != null
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        tooltip: 'Clear due date',
+                        onPressed: () => setState(() => _due = null),
+                      )
+                    : const Icon(Icons.chevron_right),
+                onTap: _pickDue,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _descCtrl,
+                decoration: const InputDecoration(labelText: 'Description'),
+                maxLines: 3,
+              ),
+            ],
+          ),
         ),
       ),
       actions: [
