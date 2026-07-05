@@ -2216,15 +2216,16 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         verse: 11,
         placeName: 'Antioch 1',
       ),
-      // Note: 1 Peter 5:13 mentions "Babylon". Many scholars believe this is a cryptic reference to Rome.
-      // Depending on the gazetteer, this might be linked to Babylon 1 or Rome.
+      // Note: 1 Peter 5:13 mentions "Babylon". Nearly all scholars recognize this as a
+      // cryptogram for Rome, as literal Babylon was largely desolate and all early 
+      // church tradition places Peter in Rome at the end of his life.
       CuratedWaypoint(
-        title: 'Writes his epistle from Babylon (Rome?)',
+        title: 'Writes his epistle from Rome (referred to as Babylon)',
         year: 62.0,
         bookName: '1 Peter',
         chapter: 5,
         verse: 13,
-        placeName: 'Babylon 1',
+        placeName: 'Rome',
       ),
     ],
   ),
