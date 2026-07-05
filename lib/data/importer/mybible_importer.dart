@@ -131,8 +131,8 @@ class MyBibleImporter {
       );
 
       for (final row in booksQuery) {
-        if (row['book_number'] == null) continue;
-        final bookNumber = num.parse(row['book_number'].toString()).toInt();
+        final bookNumber = _parseIntOrNull(row['book_number']);
+        if (bookNumber == null) continue;
 
         final isNT = bookNumber >= 470;
 
@@ -163,14 +163,12 @@ class MyBibleImporter {
 
       await store.batch((batch) {
         for (final row in versesQuery) {
-          if (row['book_number'] == null ||
-              row['chapter'] == null ||
-              row['verse'] == null) {
+          final bookNumber = _parseIntOrNull(row['book_number']);
+          final chapter = _parseIntOrNull(row['chapter']);
+          final verse = _parseIntOrNull(row['verse']);
+          if (bookNumber == null || chapter == null || verse == null) {
             continue;
           }
-          final bookNumber = num.parse(row['book_number'].toString()).toInt();
-          final chapter = num.parse(row['chapter'].toString()).toInt();
-          final verse = num.parse(row['verse'].toString()).toInt();
           final text = row['text']?.toString() ?? '';
 
           final bookId = bookIdMap[bookNumber];
@@ -217,18 +215,13 @@ class MyBibleImporter {
 
         await store.batch((batch) {
           for (final row in storiesQuery) {
-            if (row['book_number'] == null ||
-                row['chapter'] == null ||
-                row['verse'] == null) {
+            final bookNumber = _parseIntOrNull(row['book_number']);
+            final chapter = _parseIntOrNull(row['chapter']);
+            final verse = _parseIntOrNull(row['verse']);
+            if (bookNumber == null || chapter == null || verse == null) {
               continue;
             }
-
-            final bookNumber = num.parse(row['book_number'].toString()).toInt();
-            final chapter = num.parse(row['chapter'].toString()).toInt();
-            final verse = num.parse(row['verse'].toString()).toInt();
-            final orderIfSeveral = row['order_if_several'] != null
-                ? num.parse(row['order_if_several'].toString()).toInt()
-                : 0;
+            final orderIfSeveral = _parseIntOrNull(row['order_if_several']) ?? 0;
             final title = row['title']?.toString() ?? '';
 
             if (title.isNotEmpty) {
@@ -329,18 +322,13 @@ class MyBibleImporter {
 
         await store.batch((batch) {
           for (final row in storiesQuery) {
-            if (row['book_number'] == null ||
-                row['chapter'] == null ||
-                row['verse'] == null) {
+            final bookNumber = _parseIntOrNull(row['book_number']);
+            final chapter = _parseIntOrNull(row['chapter']);
+            final verse = _parseIntOrNull(row['verse']);
+            if (bookNumber == null || chapter == null || verse == null) {
               continue;
             }
-
-            final bookNumber = num.parse(row['book_number'].toString()).toInt();
-            final chapter = num.parse(row['chapter'].toString()).toInt();
-            final verse = num.parse(row['verse'].toString()).toInt();
-            final orderIfSeveral = row['order_if_several'] != null
-                ? num.parse(row['order_if_several'].toString()).toInt()
-                : 0;
+            final orderIfSeveral = _parseIntOrNull(row['order_if_several']) ?? 0;
             final title = row['title']?.toString() ?? '';
 
             if (title.isNotEmpty) {
@@ -365,15 +353,12 @@ class MyBibleImporter {
 
         await store.batch((batch) {
           for (final row in subheadingsQuery) {
-            if (row['book_number'] == null ||
-                row['chapter'] == null ||
-                row['verse'] == null) {
+            final bookNumber = _parseIntOrNull(row['book_number']);
+            final chapter = _parseIntOrNull(row['chapter']);
+            final verse = _parseIntOrNull(row['verse']);
+            if (bookNumber == null || chapter == null || verse == null) {
               continue;
             }
-
-            final bookNumber = num.parse(row['book_number'].toString()).toInt();
-            final chapter = num.parse(row['chapter'].toString()).toInt();
-            final verse = num.parse(row['verse'].toString()).toInt();
             final title = row['subheading']?.toString() ?? '';
 
             if (title.isNotEmpty) {
@@ -424,14 +409,10 @@ class MyBibleImporter {
 
       await store.batch((batch) {
         for (final row in entriesQuery) {
-          if (row['book_number'] == null) continue;
-          final bookNumber = num.parse(row['book_number'].toString()).toInt();
-          final chapter = row['chapter_number_from'] != null
-              ? num.parse(row['chapter_number_from'].toString()).toInt()
-              : null;
-          final verse = row['verse_number_from'] != null
-              ? num.parse(row['verse_number_from'].toString()).toInt()
-              : null;
+          final bookNumber = _parseIntOrNull(row['book_number']);
+          if (bookNumber == null) continue;
+          final chapter = _parseIntOrNull(row['chapter_number_from']);
+          final verse = _parseIntOrNull(row['verse_number_from']);
           final text = row['text']?.toString() ?? '';
 
           batch.insert(
@@ -542,7 +523,7 @@ class MyBibleImporter {
 
       await store.batch((batch) {
         for (final row in entriesQuery) {
-          final day = row['day'] != null ? num.parse(row['day'].toString()).toInt() : 0;
+          final day = _parseIntOrNull(row['day']) ?? 0;
           final devotion = row['devotion']?.toString() ?? '';
 
           batch.insert(
@@ -570,6 +551,16 @@ class MyBibleImporter {
 
   String _bookNumberToName(int number) {
     return mybibleBookMap[number] ?? 'Book $number';
+  }
+
+  /// Parses a MyBible integer column, tolerating the malformed rows some
+  /// modules ship (e.g. a stray header row, or a numeric-looking column
+  /// storing text) instead of throwing and aborting the whole import.
+  /// `num.tryParse` (not `int.tryParse`) so columns stored as "40.0" still
+  /// resolve. Returns null for anything else, so callers can skip the row.
+  int? _parseIntOrNull(Object? value) {
+    if (value == null) return null;
+    return num.tryParse(value.toString())?.toInt();
   }
 
   /// Replaces a footnote segment's marker (e.g. "[1]") with the resolved
@@ -638,14 +629,12 @@ class MyBibleImporter {
 
       final map = <String, String>{};
       for (final row in rows) {
-        if (row['book_number'] == null ||
-            row['chapter_number_from'] == null ||
-            row['verse_number_from'] == null) {
+        final book = _parseIntOrNull(row['book_number']);
+        final chapter = _parseIntOrNull(row['chapter_number_from']);
+        final verse = _parseIntOrNull(row['verse_number_from']);
+        if (book == null || chapter == null || verse == null) {
           continue;
         }
-        final book = num.parse(row['book_number'].toString()).toInt();
-        final chapter = num.parse(row['chapter_number_from'].toString()).toInt();
-        final verse = num.parse(row['verse_number_from'].toString()).toInt();
         final marker = row['marker'].toString().trim();
         final text = renderMyBibleCrossRef(row['text']?.toString() ?? '');
         if (marker.isEmpty || text.isEmpty) continue;
