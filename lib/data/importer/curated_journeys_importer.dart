@@ -66,27 +66,43 @@ class CuratedJourneysImporter {
                 ),
               );
         }
-        await store
-            .into(store.eventParticipants)
-            .insert(
-              mode: InsertMode.insertOrIgnore,
-              EventParticipantsCompanion.insert(
-                eventId: eventId,
-                personId: person.id,
-              ),
-            );
-        await store
-            .into(store.eventVerses)
-            .insert(
-              mode: InsertMode.insertOrIgnore,
-              EventVersesCompanion.insert(
-                eventId: eventId,
-                ord: 0,
-                bookName: waypoint.bookName,
-                chapter: waypoint.chapter,
-                verse: waypoint.verse,
-              ),
-            );
+        final participantExists =
+            await (store.select(store.eventParticipants)
+                  ..where(
+                    (ep) =>
+                        ep.eventId.equals(eventId) &
+                        ep.personId.equals(person.id),
+                  )
+                  ..limit(1))
+                .getSingleOrNull();
+        if (participantExists == null) {
+          await store
+              .into(store.eventParticipants)
+              .insert(
+                EventParticipantsCompanion.insert(
+                  eventId: eventId,
+                  personId: person.id,
+                ),
+              );
+        }
+        final verseExists =
+            await (store.select(store.eventVerses)
+                  ..where((ev) => ev.eventId.equals(eventId) & ev.ord.equals(0))
+                  ..limit(1))
+                .getSingleOrNull();
+        if (verseExists == null) {
+          await store
+              .into(store.eventVerses)
+              .insert(
+                EventVersesCompanion.insert(
+                  eventId: eventId,
+                  ord: 0,
+                  bookName: waypoint.bookName,
+                  chapter: waypoint.chapter,
+                  verse: waypoint.verse,
+                ),
+              );
+        }
 
         // Backfill the place↔verse link if the bundled gazetteer doesn't
         // already have it (e.g. Abel-meholah isn't linked to 1 Kings 19:19,

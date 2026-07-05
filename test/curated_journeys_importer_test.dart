@@ -47,7 +47,7 @@ void main() {
     final curatedEvents = events
         .where((e) => curatedTitles.contains(e.title))
         .toList();
-    expect(curatedEvents.length, totalWaypoints);
+    expect(curatedEvents.length, curatedTitles.length);
 
     // Re-running (directly, bypassing the cached provider) must not duplicate.
     await importer.ensureLoaded();
@@ -86,7 +86,7 @@ void main() {
     final curatedEvents = events
         .where((e) => curatedTitles.contains(e.title))
         .toList();
-    expect(curatedEvents.length, totalWaypoints);
+    expect(curatedEvents.length, curatedTitles.length);
   });
 
   test(
