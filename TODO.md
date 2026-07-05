@@ -16,6 +16,7 @@ Running list of known issues and follow-ups.
     - *King Saul*: Missing his military campaigns and pursuit of David (Gibeah, Michmash, Ziph, En-gedi, Gilboa).
   - **Women of the Bible**: Ruth (Moab to Bethlehem) and Esther (Susa) have **0 events** in the dataset, leaving their maps entirely blank.
   - **Other Key NT Figures**: John the Baptist, James, Andrew, Titus, and Apollos have either 0 events or 0 *dated* events, meaning their maps are also completely blank.
+  - **Post-Exilic Leaders**: Ezra and Nehemiah also have **0 events**, meaning their historic returns from Babylon and Susa to rebuild Jerusalem aren't mapped.
   - *Next steps:* Start by adding a `CuratedPersonJourney` for Peter (Simon), followed by Paul's companions (cross-referencing Paul's existing curated list), and then the Patriarchs. Add suppressed events to `_eventsSupersededByCuratedJourney`.
 
 ## Research
