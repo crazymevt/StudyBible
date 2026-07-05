@@ -16,21 +16,15 @@ class CuratedJourneysImporter {
 
   final ContentStore store;
 
-  Future<bool> _alreadyLoaded() async {
-    if (curatedPersonJourneys.isEmpty) return true;
-    final sentinelTitle = curatedPersonJourneys.first.waypoints.first.title;
-    final row = await (store.select(store.timelineEvents)
-          ..where((e) => e.title.equals(sentinelTitle))
-          ..limit(1))
-        .getSingleOrNull();
-    return row != null;
-  }
-
-  /// Idempotent: inserts each curated journey's waypoints once, then no-ops
-  /// on later calls.
+  /// Idempotent per waypoint (not just on the first call): each waypoint is
+  /// only inserted if no `timeline_events` row with its exact title exists
+  /// yet, so adding new entries to curated_journeys_data.dart is picked up on
+  /// a persistent on-device database that already ran an earlier version of
+  /// this importer — not just on a fresh in-memory one. A single "have we
+  /// ever run this importer" sentinel used to gate the whole method instead,
+  /// which meant every waypoint added after the first real run silently
+  /// never reached any device that had already loaded at least one.
   Future<void> ensureLoaded() async {
-    if (await _alreadyLoaded()) return;
-
     for (final journey in curatedPersonJourneys) {
       final person = await (store.select(store.biblePeople)
             ..where((p) => p.slug.equals(journey.personSlug)))
@@ -42,6 +36,12 @@ class CuratedJourneysImporter {
       }
 
       for (final waypoint in journey.waypoints) {
+        final alreadyInserted = await (store.select(store.timelineEvents)
+              ..where((e) => e.title.equals(waypoint.title))
+              ..limit(1))
+            .getSingleOrNull();
+        if (alreadyInserted != null) continue;
+
         final place = await (store.select(store.places)
               ..where((pl) => pl.name.equals(waypoint.placeName)))
             .getSingleOrNull();

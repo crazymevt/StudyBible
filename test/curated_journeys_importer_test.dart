@@ -52,6 +52,37 @@ void main() {
     expect(recount.length, events.length);
   });
 
+  // Regression: ensureLoaded() used to gate on a single "have we ever run
+  // this importer" sentinel (the very first waypoint's title) — so a
+  // persistent on-device DB that already had that one title from an early
+  // run would skip every waypoint added afterward, forever. Fixed to check
+  // each waypoint's own title individually.
+  test('a DB that already has just the first curated waypoint still gets '
+      'every other waypoint on the next run', () async {
+    await container.read(curatedJourneysReadyProvider.future);
+
+    // Wipe everything the setup just loaded, then re-plant only the old
+    // sentinel title, simulating a persistent DB stuck mid-history.
+    await store.delete(store.timelineEvents).go();
+    final sentinelTitle = curatedPersonJourneys.first.waypoints.first.title;
+    await store.into(store.timelineEvents).insert(
+          TimelineEventsCompanion.insert(title: sentinelTitle),
+        );
+
+    await CuratedJourneysImporter(store).ensureLoaded();
+
+    final totalWaypoints =
+        curatedPersonJourneys.fold<int>(0, (sum, j) => sum + j.waypoints.length);
+    final curatedTitles = {
+      for (final j in curatedPersonJourneys)
+        for (final w in j.waypoints) w.title,
+    };
+    final events = await store.select(store.timelineEvents).get();
+    final curatedEvents =
+        events.where((e) => curatedTitles.contains(e.title)).toList();
+    expect(curatedEvents.length, totalWaypoints);
+  });
+
   test("Elijah's journey has all 14 real stops in chronological order",
       () async {
     await container.read(curatedJourneysReadyProvider.future);
