@@ -6,21 +6,6 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [ ] show users the size of their installed content in the content manager
-
-- [x] **Hand-curate missing major Biblical journeys.** The auto-generated maps for several major figures suffer from low resolution because `theographic.json` events are heavily bundled (e.g., "Second Missionary Journey") or rely on regional mentions without specific city coordinates.
-  - **Early Church**: Peter (Simon) is the most glaring omission (34 events, all undated or bundled), along with Luke, Silas, Barnabas, Timothy, and Philip the Evangelist.
-  - **Patriarchs**: Abraham, Joseph, and Isaac have massive multi-national journeys that resolve poorly under the auto-derived heuristic.
-  - **Exodus/Conquest**: Joshua's conquest is currently lost in generic event blocks.
-  - **Prophets & Kings**: The source dataset collapses entire ministries into single generic events (e.g., "Prophecies of Jonah") or omits them entirely (Samuel has 0 events).
-    - *Jonah, Ezekiel*: Their prophetic careers (including exiles to Babylon/Egypt) are reduced to just 1 event each.
-    - *Samuel*: His judging circuit (Bethel, Gilgal, Mizpah, Ramah) is missing.
-    - *King Saul*: Missing his military campaigns and pursuit of David (Gibeah, Michmash, Ziph, En-gedi, Gilboa).
-  - **Women of the Bible**: Ruth, Naomi, and Esther have **0 events** in the dataset, leaving their entire geographic stories entirely blank.
-  - **Other Key NT Figures**: John the Baptist, James, Andrew, Titus, and Apollos have either 0 events or 0 *dated* events, meaning their maps are also completely blank.
-  - **Post-Exilic Leaders**: Ezra and Nehemiah also have **0 events**, meaning their historic returns from Babylon and Susa to rebuild Jerusalem aren't mapped.
-  - *Next steps:* Start by adding a `CuratedPersonJourney` for Peter (Simon), followed by Paul's companions (cross-referencing Paul's existing curated list), and then the Patriarchs. Add suppressed events to `_eventsSupersededByCuratedJourney`.
-
 ## Research
 
 - [ ] **Explorer — richer content on entity/passage pages.** Three enrichments
@@ -98,7 +83,10 @@ Running list of known issues and follow-ups.
     notes are in git history — see TODO.md prior to this condensation.)
 
 ## Issues
-- [ ] **loading times** users with large databases have significant loading times.  These can be caused by large number of commentaries, notebooks, sermons, tags, and possibly other user entered data.  We should look at adding missing indexes.  We should also consider if a new mechnisim is needed for sermons and notebooks (i.e. scans vs's a reference lookup table) if the collection grows large, which it will over time.
+
+## Archive
+
+- [x] **loading times** users with large databases have significant loading times.  These can be caused by large number of commentaries, notebooks, sermons, tags, and possibly other user entered data.  We should look at adding missing indexes.  We should also consider if a new mechnisim is needed for sermons and notebooks (i.e. scans vs's a reference lookup table) if the collection grows large, which it will over time.
   - *Done (indexes):* the user store had **zero** indexes and the content
     store was missing several hot-path ones. Added (user store v28, content
     store v13, both with idempotent `CREATE INDEX IF NOT EXISTS` upgrade
@@ -132,11 +120,12 @@ Running list of known issues and follow-ups.
     `document_reference_index_test.dart` (incl. the bare-row-update sync
     case and the hard-delete restore case) and the pre-existing
     explorer_providers_test backlink groups, which pass unchanged.
-  - *Remaining (minor):* the sermon/notebook list panels still hydrate full
-    Delta content via `allSermonsProvider` / `allNotebookPagesProvider` just
-    to render title rows; a content-free projection would cut list-open cost
-    for huge libraries. Lower urgency now that the Explorer no longer rides
-    those streams.
+  - *Descoped:* the sermon/notebook list panels still hydrate full Delta
+    content via `allSermonsProvider` / `allNotebookPagesProvider` just to
+    render title rows; a content-free projection would cut list-open cost
+    for huge libraries, but the Explorer no longer rides those streams and
+    list-open cost hasn't been reported as a real-world problem. Not worth
+    the schema/query churn unless it resurfaces.
   - *Done (Explorer first-open latency):* `TheographicImporter`/
     `TopicalImporter.ensureLoaded()` — awaited by `explorerReadyProvider`,
     so it gated every first Explorer/People/Topics/Atlas/Search open each
@@ -155,9 +144,22 @@ Running list of known issues and follow-ups.
     `content_store_migration_test.dart` (heal + no-op-when-already-healed
     cases).
 
+- [x] **Show users the size of their installed content in the content manager.**
+  Approximate data size shown on the Content Manager's Installed panel
+  (`405f705`).
 
-
-## Archive
+- [x] **Hand-curate missing major Biblical journeys.** The auto-generated maps for several major figures suffer from low resolution because `theographic.json` events are heavily bundled (e.g., "Second Missionary Journey") or rely on regional mentions without specific city coordinates.
+  - **Early Church**: Peter (Simon) is the most glaring omission (34 events, all undated or bundled), along with Luke, Silas, Barnabas, Timothy, and Philip the Evangelist.
+  - **Patriarchs**: Abraham, Joseph, and Isaac have massive multi-national journeys that resolve poorly under the auto-derived heuristic.
+  - **Exodus/Conquest**: Joshua's conquest is currently lost in generic event blocks.
+  - **Prophets & Kings**: The source dataset collapses entire ministries into single generic events (e.g., "Prophecies of Jonah") or omits them entirely (Samuel has 0 events).
+    - *Jonah, Ezekiel*: Their prophetic careers (including exiles to Babylon/Egypt) are reduced to just 1 event each.
+    - *Samuel*: His judging circuit (Bethel, Gilgal, Mizpah, Ramah) is missing.
+    - *King Saul*: Missing his military campaigns and pursuit of David (Gibeah, Michmash, Ziph, En-gedi, Gilboa).
+  - **Women of the Bible**: Ruth, Naomi, and Esther have **0 events** in the dataset, leaving their entire geographic stories entirely blank.
+  - **Other Key NT Figures**: John the Baptist, James, Andrew, Titus, and Apollos have either 0 events or 0 *dated* events, meaning their maps are also completely blank.
+  - **Post-Exilic Leaders**: Ezra and Nehemiah also have **0 events**, meaning their historic returns from Babylon and Susa to rebuild Jerusalem aren't mapped.
+  - *Next steps:* Start by adding a `CuratedPersonJourney` for Peter (Simon), followed by Paul's companions (cross-referencing Paul's existing curated list), and then the Patriarchs. Add suppressed events to `_eventsSupersededByCuratedJourney`.
 
 - [x] **Expand Tags card in Explorer.** Full parity with the passage page: on
   top of the People / Places (with map) / Events cards and the Media card
