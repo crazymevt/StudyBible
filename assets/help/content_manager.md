@@ -7,7 +7,7 @@ The Content Manager is your gateway to expanding the StudyBible app. It draws on
 ## Catalogs
 The Content Manager has tabs for each source:
 
-- **Installed** — everything currently on your device, with the option to remove what you no longer need.
+- **Installed** — everything currently on your device, with the option to remove what you no longer need. Each entry shows its approximate on-disk size, so you can see what's worth removing before you do.
 - **ph4.org Catalog** — a broad collection of Bibles, commentaries, dictionaries, and devotionals.
 - **OSIS Catalog** — translations organized by language, so you can find Scripture in the language you need.
 - **CrossWire Catalog** — the classic, massive CrossWire/SWORD library.

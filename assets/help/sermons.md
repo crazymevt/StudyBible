@@ -13,6 +13,9 @@ The Sermons tool is a full writing studio for structured sermon notes and outlin
 ## Outline Generator
 Tap **Outline** to scaffold a sermon instantly. Choose how many points you want, and the app drops in an Introduction, numbered points (each with a Reference and Application line), and a Conclusion for you to fill in.
 
+## View Only
+Tap the eye icon to switch the editor into **view only** mode—the title, series, and body all become read-only, and editing controls (the formatting toolbar, dictation, **Link to Explorer**, **Outline**) are hidden so you can read or hand your device to someone else without risking an accidental edit. Tap the icon again (now a pencil) to return to editing. This is a per-session toggle only—it isn't saved, and reopening the sermon later starts back in edit mode.
+
 ## Presentation Mode
 Tap **Presentation Mode** for a clean, enlarged, distraction-free full-screen view of your notes—ideal for preaching or teaching from a tablet or laptop without squinting at small text.
 
