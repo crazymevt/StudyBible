@@ -154,6 +154,13 @@ const _eventsSupersededByCuratedJourney = {
   'Birth of Caleb',
   'Birth of Jacob and Esau',
 
+  // Superseded by Jesus's CuratedPersonJourney (nativity): both are
+  // Matthew-sourced and sort ahead of "Birth of Jesus" (Luke 2) purely from
+  // the book-number sort-key quirk, putting the Egypt trip before the
+  // Bethlehem birth. See the doc comment on jesus_905's CuratedPersonJourney.
+  'Joseph and Mary return from Egypt',
+  'Joseph and Mary return to Nazareth',
+
   // Superseded by Paul's CuratedPersonJourney
   'Saul persecutes the church',
   'Saul is converted',

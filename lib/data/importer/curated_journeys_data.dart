@@ -1492,9 +1492,46 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
   // Caiaphas (its only place-tagged verses are about Peter being recognized
   // as a Galilean, not Jesus), and the specific burial site (no verse ties
   // the garden tomb itself to a place — it's folded into the Golgotha stop).
+  //
+  // The nativity has the same cross-Gospel sort-key quirk described above,
+  // and it's visible rather than cosmetic: Theographic's "Birth of Jesus"
+  // (Luke 2, k=-2.57997999) sorts *after* its own "Joseph and Mary return
+  // from Egypt" (Matthew 2, k=-2.59997981) and "...return to Nazareth"
+  // (k=-2.59997978), purely because Matthew is book 39 and Luke is book 41 —
+  // the map showed the Egypt trip before the Bethlehem birth. The two
+  // Matthew-sourced events are superseded here (see
+  // _eventsSupersededByCuratedJourney in atlas_providers.dart) and replaced
+  // with waypoints dated just after "Childhood of Jesus" (Luke 2:40,
+  // k=-2.5799796), the last of the Luke-sourced birth/circumcision/
+  // presentation sequence. "...return to Nazareth" also gets its true
+  // destination here instead of Theographic's own resolution: its cited
+  // verses are Matthew 2:22-23, and 2:22 (Galilee/Judea, the region they
+  // feared, not their destination) sorts ahead of 2:23's Nazareth by ord.
   CuratedPersonJourney(
     personSlug: 'jesus_905',
     waypoints: [
+      CuratedWaypoint(
+        // Deliberately distinct from Theographic's own "Joseph and Mary
+        // return from Egypt" title (see _eventsSupersededByCuratedJourney) —
+        // CuratedJourneysImporter treats an exact title match as "already
+        // inserted" and skips writing a fresh sortKey, so reusing that title
+        // here would silently keep the old, wrongly-ordered row instead of
+        // replacing it.
+        title: "Returns from Egypt after Herod's death",
+        year: -2.55,
+        bookName: 'Matthew',
+        chapter: 2,
+        verse: 20,
+        placeName: 'Egypt',
+      ),
+      CuratedWaypoint(
+        title: 'Settles with the family in Nazareth',
+        year: -2.54,
+        bookName: 'Matthew',
+        chapter: 2,
+        verse: 23,
+        placeName: 'Nazareth',
+      ),
       CuratedWaypoint(
         title: 'Anointed by Mary at Bethany six days before Passover',
         year: 30.45,
