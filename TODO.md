@@ -6,6 +6,8 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
+- [ ] show users the size of their installed content in the content manager
+
 - [x] **Hand-curate missing major Biblical journeys.** The auto-generated maps for several major figures suffer from low resolution because `theographic.json` events are heavily bundled (e.g., "Second Missionary Journey") or rely on regional mentions without specific city coordinates.
   - **Early Church**: Peter (Simon) is the most glaring omission (34 events, all undated or bundled), along with Luke, Silas, Barnabas, Timothy, and Philip the Evangelist.
   - **Patriarchs**: Abraham, Joseph, and Isaac have massive multi-national journeys that resolve poorly under the auto-derived heuristic.
@@ -96,7 +98,9 @@ Running list of known issues and follow-ups.
     notes are in git history — see TODO.md prior to this condensation.)
 
 ## Issues
-- [ ] **loading times** users with large databases have significant loading times.  These can be caused by large number of commentaries, notebooks, sermons, tags, and possibly other user entered data.  We should look at adding missing indexes.  We should also consider if a new mechnisim is needed for sermons and notebooks if the collection grows large, which it will over time.
+- [ ] **loading times** users with large databases have significant loading times.  These can be caused by large number of commentaries, notebooks, sermons, tags, and possibly other user entered data.  We should look at adding missing indexes.  We should also consider if a new mechnisim is needed for sermons and notebooks (i.e. scans vs's a reference lookup table) if the collection grows large, which it will over time.
+
+
 
 ## Archive
 
