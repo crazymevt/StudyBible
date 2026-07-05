@@ -26,45 +26,59 @@ class CuratedJourneysImporter {
   /// never reached any device that had already loaded at least one.
   Future<void> ensureLoaded() async {
     for (final journey in curatedPersonJourneys) {
-      final person = await (store.select(store.biblePeople)
-            ..where((p) => p.slug.equals(journey.personSlug)))
-          .getSingleOrNull();
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals(journey.personSlug))).getSingleOrNull();
       if (person == null) {
         throw StateError(
-            'CuratedJourneysImporter: no bible_people row with slug '
-            '"${journey.personSlug}" — check curated_journeys_data.dart');
+          'CuratedJourneysImporter: no bible_people row with slug '
+          '"${journey.personSlug}" — check curated_journeys_data.dart',
+        );
       }
 
       for (final waypoint in journey.waypoints) {
-        final alreadyInserted = await (store.select(store.timelineEvents)
-              ..where((e) => e.title.equals(waypoint.title))
-              ..limit(1))
-            .getSingleOrNull();
-        if (alreadyInserted != null) continue;
-
-        final place = await (store.select(store.places)
-              ..where((pl) => pl.name.equals(waypoint.placeName)))
-            .getSingleOrNull();
+        final alreadyInserted =
+            await (store.select(store.timelineEvents)
+                  ..where((e) => e.title.equals(waypoint.title))
+                  ..limit(1))
+                .getSingleOrNull();
+        var eventId = -1;
+        final place = await (store.select(
+          store.places,
+        )..where((pl) => pl.name.equals(waypoint.placeName))).getSingleOrNull();
         if (place == null) {
           throw StateError(
-              'CuratedJourneysImporter: no places row named '
-              '"${waypoint.placeName}" (waypoint "${waypoint.title}")');
+            'CuratedJourneysImporter: no places row named '
+            '"${waypoint.placeName}" (waypoint "${waypoint.title}")',
+          );
         }
 
-        final eventId = await store.into(store.timelineEvents).insert(
-              TimelineEventsCompanion.insert(
-                title: waypoint.title,
-                sortKey: Value(waypoint.year.toDouble()),
-                startYear: Value(waypoint.year.round()),
-              ),
-            );
-        await store.into(store.eventParticipants).insert(
+        if (alreadyInserted != null) {
+          eventId = alreadyInserted.id;
+        } else {
+          eventId = await store
+              .into(store.timelineEvents)
+              .insert(
+                TimelineEventsCompanion.insert(
+                  title: waypoint.title,
+                  sortKey: Value(waypoint.year?.toDouble()),
+                  startYear: Value(waypoint.year?.round()),
+                ),
+              );
+        }
+        await store
+            .into(store.eventParticipants)
+            .insert(
+              mode: InsertMode.insertOrIgnore,
               EventParticipantsCompanion.insert(
                 eventId: eventId,
                 personId: person.id,
               ),
             );
-        await store.into(store.eventVerses).insert(
+        await store
+            .into(store.eventVerses)
+            .insert(
+              mode: InsertMode.insertOrIgnore,
               EventVersesCompanion.insert(
                 eventId: eventId,
                 ord: 0,
@@ -77,16 +91,22 @@ class CuratedJourneysImporter {
         // Backfill the place↔verse link if the bundled gazetteer doesn't
         // already have it (e.g. Abel-meholah isn't linked to 1 Kings 19:19,
         // only to 19:16, which merely names it as Elisha's hometown).
-        final linkExists = await (store.select(store.placeVerses)
-              ..where((pv) =>
-                  pv.placeId.equals(place.id) &
-                  pv.bookName.equals(waypoint.bookName) &
-                  pv.chapter.equals(waypoint.chapter) &
-                  pv.verse.equals(waypoint.verse))
-              ..limit(1))
-            .getSingleOrNull();
+        final linkExists =
+            await (store.select(store.placeVerses)
+                  ..where(
+                    (pv) =>
+                        pv.placeId.equals(place.id) &
+                        pv.bookName.equals(waypoint.bookName) &
+                        pv.chapter.equals(waypoint.chapter) &
+                        pv.verse.equals(waypoint.verse),
+                  )
+                  ..limit(1))
+                .getSingleOrNull();
         if (linkExists == null) {
-          await store.into(store.placeVerses).insert(
+          await store
+              .into(store.placeVerses)
+              .insert(
+                mode: InsertMode.insertOrIgnore,
                 PlaceVersesCompanion.insert(
                   placeId: place.id,
                   bookName: waypoint.bookName,
