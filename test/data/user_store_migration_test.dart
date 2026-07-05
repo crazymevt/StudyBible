@@ -13,10 +13,12 @@ void main() {
       // Hand-build a minimal schema matching what a v16 install looks like:
       // sermons already carry content_plain (added v13) but journals do NOT
       // (that column is not added until v21). Only the columns the v17+
-      // migration blocks touch need to exist.
+      // migration blocks touch need to exist — which since v28 includes the
+      // indexed columns (notes.book_name/chapter; a real v16 DB has always
+      // had them).
       final raw = sqlite.sqlite3.open(file.path);
       raw.execute(
-        'CREATE TABLE notes (id TEXT NOT NULL PRIMARY KEY, content TEXT NOT NULL DEFAULT \'\', deleted INTEGER NOT NULL DEFAULT 0);',
+        'CREATE TABLE notes (id TEXT NOT NULL PRIMARY KEY, content TEXT NOT NULL DEFAULT \'\', book_name TEXT NOT NULL DEFAULT \'\', chapter INTEGER NOT NULL DEFAULT 0, deleted INTEGER NOT NULL DEFAULT 0);',
       );
       raw.execute(
         'CREATE TABLE journals (id TEXT NOT NULL PRIMARY KEY, title TEXT NOT NULL DEFAULT \'\', content TEXT NOT NULL DEFAULT \'\', deleted INTEGER NOT NULL DEFAULT 0);',

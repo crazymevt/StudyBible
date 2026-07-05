@@ -42,7 +42,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration {
@@ -162,6 +162,56 @@ class ContentStore extends _$ContentStore {
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_cross_references_source '
             'ON cross_references (source_book_name, source_chapter)',
+          );
+        }
+        if (from < 13) {
+          // Hot-path indexes that were missing entirely. verses and
+          // commentary_entries are the big ones: every chapter load scanned
+          // the whole verses table (across all installed versions), and every
+          // commentary lookup scanned every entry of every installed
+          // commentary — the dominant cost behind slow loads for users with
+          // several modules installed. Mirrors the @TableIndex annotations in
+          // content_tables.dart, which cover fresh installs via onCreate.
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_verses_location '
+            'ON verses (book_id, chapter)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_commentary_entry_location '
+            'ON commentary_entries (book_name, chapter)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_commentary_entry_commentary '
+            'ON commentary_entries (commentary_id)',
+          );
+          // NOCASE so the no-wildcard LIKE headword lookups can use it.
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_dictionary_entry_word '
+            'ON dictionary_entries (word COLLATE NOCASE)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_subheading_location '
+            'ON subheadings (version_id, book_order, chapter)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_topic_entry_topic '
+            'ON topic_entries (topic_id)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_topic_ref_topic '
+            'ON topic_references (topic_id)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_place_verse_place '
+            'ON place_verses (place_id)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_event_verse_location '
+            'ON event_verses (book_name, chapter)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_event_verse_event '
+            'ON event_verses (event_id)',
           );
         }
       },

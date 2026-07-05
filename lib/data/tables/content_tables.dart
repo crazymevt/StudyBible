@@ -21,6 +21,7 @@ class Books extends Table {
   TextColumn get testament => text()(); // "OT" or "NT"
 }
 
+@TableIndex(name: 'idx_verses_location', columns: {#bookId, #chapter})
 @DataClassName('Verse')
 class Verses extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -56,6 +57,11 @@ class Commentaries extends Table {
   TextColumn get about => text().nullable()();
 }
 
+@TableIndex(
+  name: 'idx_commentary_entry_location',
+  columns: {#bookName, #chapter},
+)
+@TableIndex(name: 'idx_commentary_entry_commentary', columns: {#commentaryId})
 @DataClassName('CommentaryEntry')
 class CommentaryEntries extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -74,6 +80,13 @@ class Dictionaries extends Table {
   TextColumn get about => text().nullable()();
 }
 
+// NOCASE so the no-wildcard LIKE lookups (headword matches, e.g. the
+// Explorer's dictionary card) can use the index — SQLite's LIKE optimization
+// only applies to an index with NOCASE collation.
+@TableIndex.sql(
+  'CREATE INDEX idx_dictionary_entry_word '
+  'ON dictionary_entries (word COLLATE NOCASE);',
+)
 @DataClassName('DictionaryEntry')
 class DictionaryEntries extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -82,6 +95,10 @@ class DictionaryEntries extends Table {
   TextColumn get definition => text()();
 }
 
+@TableIndex(
+  name: 'idx_subheading_location',
+  columns: {#versionId, #bookOrder, #chapter},
+)
 @DataClassName('Subheading')
 class Subheadings extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -101,6 +118,7 @@ class Topics extends Table {
   TextColumn get section => text()(); // single-letter A–Z bucket
 }
 
+@TableIndex(name: 'idx_topic_entry_topic', columns: {#topicId})
 @DataClassName('TopicEntry')
 class TopicEntries extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -113,6 +131,7 @@ class TopicEntries extends Table {
 
 @DataClassName('TopicReference')
 @TableIndex(name: 'idx_topic_ref_location', columns: {#bookName, #chapter})
+@TableIndex(name: 'idx_topic_ref_topic', columns: {#topicId})
 class TopicReferences extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get topicId => integer().references(Topics, #id)();
@@ -133,6 +152,7 @@ class Places extends Table {
 
 @DataClassName('PlaceVerse')
 @TableIndex(name: 'idx_place_verse_location', columns: {#bookName, #chapter})
+@TableIndex(name: 'idx_place_verse_place', columns: {#placeId})
 class PlaceVerses extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get placeId => integer().references(Places, #id)();
@@ -227,6 +247,8 @@ class EventParticipants extends Table {
   IntColumn get personId => integer().references(BiblePeople, #id)();
 }
 
+@TableIndex(name: 'idx_event_verse_location', columns: {#bookName, #chapter})
+@TableIndex(name: 'idx_event_verse_event', columns: {#eventId})
 @DataClassName('EventVerse')
 class EventVerses extends Table {
   IntColumn get id => integer().autoIncrement()();

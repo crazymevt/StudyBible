@@ -99,6 +99,35 @@ Running list of known issues and follow-ups.
 
 ## Issues
 - [ ] **loading times** users with large databases have significant loading times.  These can be caused by large number of commentaries, notebooks, sermons, tags, and possibly other user entered data.  We should look at adding missing indexes.  We should also consider if a new mechnisim is needed for sermons and notebooks (i.e. scans vs's a reference lookup table) if the collection grows large, which it will over time.
+  - *Done (indexes):* the user store had **zero** indexes and the content
+    store was missing several hot-path ones. Added (user store v28, content
+    store v13, both with idempotent `CREATE INDEX IF NOT EXISTS` upgrade
+    blocks + `@TableIndex` annotations for fresh installs): `verses(book_id,
+    chapter)` — every chapter load was scanning the whole verses table across
+    all installed versions; `commentary_entries(book_name, chapter)` +
+    `(commentary_id)` — every commentary lookup scanned every entry of every
+    installed commentary (the "large number of commentaries" report);
+    `dictionary_entries(word COLLATE NOCASE)` (serves the no-wildcard LIKE
+    headword lookups — verified via EXPLAIN QUERY PLAN in
+    `test/store_indexes_test.dart`); `subheadings`, `event_verses` ×2,
+    `place_verses(place_id)`, `topic_entries/topic_references(topic_id)`;
+    and user-store indexes on highlights/notes/bookmarks locations,
+    entity_tags (tag_id / entity_id / entity_type), notebook_pages,
+    all three revision tables, attachment_references, and
+    navigation_histories(updated_at).
+  - *Remaining (the reference lookup table):* the Explorer's "Your sermons" /
+    "Your notebooks" backlink cards (`explorerSermonsProvider` /
+    `explorerNotebookPagesProvider`) still load **every** sermon and notebook
+    page (full Delta content, via watched `allSermonsProvider` /
+    `allNotebookPagesProvider` streams, so every table write re-emits and
+    re-scans) and re-run `BibleReferenceScanner` / entity-link extraction per
+    page view. Indexes can't help; the fix is a persisted reference table
+    (e.g. `document_references(doc_type, doc_id, kind, book_name,
+    chapter_start, chapter_end, entity_type, entity_id)`) written on save
+    (the editors already derive `contentPlain` on save — same hook),
+    backfilled in one migration, and queried by (book_name) or (entity_type,
+    entity_id). That also frees the sermon/notebook list panels from
+    hydrating full content just to show titles.
 
 
 

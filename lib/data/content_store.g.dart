@@ -8650,17 +8650,49 @@ abstract class _$ContentStore extends GeneratedDatabase {
   late final $EventParticipantsTable eventParticipants =
       $EventParticipantsTable(this);
   late final $EventVersesTable eventVerses = $EventVersesTable(this);
+  late final Index idxVersesLocation = Index(
+    'idx_verses_location',
+    'CREATE INDEX idx_verses_location ON verses (book_id, chapter)',
+  );
   late final Index idxCrossReferencesSource = Index(
     'idx_cross_references_source',
     'CREATE INDEX idx_cross_references_source ON cross_references (source_book_name, source_chapter)',
+  );
+  late final Index idxCommentaryEntryLocation = Index(
+    'idx_commentary_entry_location',
+    'CREATE INDEX idx_commentary_entry_location ON commentary_entries (book_name, chapter)',
+  );
+  late final Index idxCommentaryEntryCommentary = Index(
+    'idx_commentary_entry_commentary',
+    'CREATE INDEX idx_commentary_entry_commentary ON commentary_entries (commentary_id)',
+  );
+  late final Index idxDictionaryEntryWord = Index(
+    'idx_dictionary_entry_word',
+    'CREATE INDEX idx_dictionary_entry_word ON dictionary_entries (word COLLATE NOCASE)',
+  );
+  late final Index idxSubheadingLocation = Index(
+    'idx_subheading_location',
+    'CREATE INDEX idx_subheading_location ON subheadings (version_id, book_order, chapter)',
+  );
+  late final Index idxTopicEntryTopic = Index(
+    'idx_topic_entry_topic',
+    'CREATE INDEX idx_topic_entry_topic ON topic_entries (topic_id)',
   );
   late final Index idxTopicRefLocation = Index(
     'idx_topic_ref_location',
     'CREATE INDEX idx_topic_ref_location ON topic_references (book_name, chapter)',
   );
+  late final Index idxTopicRefTopic = Index(
+    'idx_topic_ref_topic',
+    'CREATE INDEX idx_topic_ref_topic ON topic_references (topic_id)',
+  );
   late final Index idxPlaceVerseLocation = Index(
     'idx_place_verse_location',
     'CREATE INDEX idx_place_verse_location ON place_verses (book_name, chapter)',
+  );
+  late final Index idxPlaceVersePlace = Index(
+    'idx_place_verse_place',
+    'CREATE INDEX idx_place_verse_place ON place_verses (place_id)',
   );
   late final Index idxPersonVerseLocation = Index(
     'idx_person_verse_location',
@@ -8677,6 +8709,14 @@ abstract class _$ContentStore extends GeneratedDatabase {
   late final Index idxEventParticipantPerson = Index(
     'idx_event_participant_person',
     'CREATE INDEX idx_event_participant_person ON event_participants (person_id)',
+  );
+  late final Index idxEventVerseLocation = Index(
+    'idx_event_verse_location',
+    'CREATE INDEX idx_event_verse_location ON event_verses (book_name, chapter)',
+  );
+  late final Index idxEventVerseEvent = Index(
+    'idx_event_verse_event',
+    'CREATE INDEX idx_event_verse_event ON event_verses (event_id)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -8707,13 +8747,23 @@ abstract class _$ContentStore extends GeneratedDatabase {
     timelineEvents,
     eventParticipants,
     eventVerses,
+    idxVersesLocation,
     idxCrossReferencesSource,
+    idxCommentaryEntryLocation,
+    idxCommentaryEntryCommentary,
+    idxDictionaryEntryWord,
+    idxSubheadingLocation,
+    idxTopicEntryTopic,
     idxTopicRefLocation,
+    idxTopicRefTopic,
     idxPlaceVerseLocation,
+    idxPlaceVersePlace,
     idxPersonVerseLocation,
     idxPersonVersePerson,
     idxPeopleGroupMemberPerson,
     idxEventParticipantPerson,
+    idxEventVerseLocation,
+    idxEventVerseEvent,
   ];
 }
 

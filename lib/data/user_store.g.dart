@@ -13299,6 +13299,58 @@ abstract class _$UserStore extends GeneratedDatabase {
   );
   late final $AttachmentReferencesTable attachmentReferences =
       $AttachmentReferencesTable(this);
+  late final Index idxHighlightLocation = Index(
+    'idx_highlight_location',
+    'CREATE INDEX idx_highlight_location ON highlights (book_name, chapter)',
+  );
+  late final Index idxNoteLocation = Index(
+    'idx_note_location',
+    'CREATE INDEX idx_note_location ON notes (book_name, chapter)',
+  );
+  late final Index idxBookmarkLocation = Index(
+    'idx_bookmark_location',
+    'CREATE INDEX idx_bookmark_location ON bookmarks (book_name, chapter)',
+  );
+  late final Index idxNavigationHistoryUpdated = Index(
+    'idx_navigation_history_updated',
+    'CREATE INDEX idx_navigation_history_updated ON navigation_histories (updated_at)',
+  );
+  late final Index idxSermonRevisionSermon = Index(
+    'idx_sermon_revision_sermon',
+    'CREATE INDEX idx_sermon_revision_sermon ON sermon_revisions (sermon_id)',
+  );
+  late final Index idxJournalRevisionJournal = Index(
+    'idx_journal_revision_journal',
+    'CREATE INDEX idx_journal_revision_journal ON journal_revisions (journal_id)',
+  );
+  late final Index idxEntityTagTag = Index(
+    'idx_entity_tag_tag',
+    'CREATE INDEX idx_entity_tag_tag ON entity_tags (tag_id)',
+  );
+  late final Index idxEntityTagEntity = Index(
+    'idx_entity_tag_entity',
+    'CREATE INDEX idx_entity_tag_entity ON entity_tags (entity_id)',
+  );
+  late final Index idxEntityTagType = Index(
+    'idx_entity_tag_type',
+    'CREATE INDEX idx_entity_tag_type ON entity_tags (entity_type)',
+  );
+  late final Index idxNotebookPageNotebook = Index(
+    'idx_notebook_page_notebook',
+    'CREATE INDEX idx_notebook_page_notebook ON notebook_pages (notebook_id)',
+  );
+  late final Index idxNotebookPageRevisionPage = Index(
+    'idx_notebook_page_revision_page',
+    'CREATE INDEX idx_notebook_page_revision_page ON notebook_page_revisions (page_id)',
+  );
+  late final Index idxAttachmentRefLocation = Index(
+    'idx_attachment_ref_location',
+    'CREATE INDEX idx_attachment_ref_location ON attachment_references (book_name, chapter)',
+  );
+  late final Index idxAttachmentRefAttachment = Index(
+    'idx_attachment_ref_attachment',
+    'CREATE INDEX idx_attachment_ref_attachment ON attachment_references (attachment_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13329,6 +13381,19 @@ abstract class _$UserStore extends GeneratedDatabase {
     notebookPageRevisions,
     mediaAttachments,
     attachmentReferences,
+    idxHighlightLocation,
+    idxNoteLocation,
+    idxBookmarkLocation,
+    idxNavigationHistoryUpdated,
+    idxSermonRevisionSermon,
+    idxJournalRevisionJournal,
+    idxEntityTagTag,
+    idxEntityTagEntity,
+    idxEntityTagType,
+    idxNotebookPageNotebook,
+    idxNotebookPageRevisionPage,
+    idxAttachmentRefLocation,
+    idxAttachmentRefAttachment,
   ];
 }
 

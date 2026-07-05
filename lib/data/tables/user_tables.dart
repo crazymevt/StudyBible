@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+@TableIndex(name: 'idx_highlight_location', columns: {#bookName, #chapter})
 @DataClassName('Highlight')
 class Highlights extends Table {
   TextColumn get id => text()();
@@ -16,6 +17,7 @@ class Highlights extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@TableIndex(name: 'idx_note_location', columns: {#bookName, #chapter})
 @DataClassName('Note')
 class Notes extends Table {
   TextColumn get id => text()();
@@ -33,6 +35,7 @@ class Notes extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@TableIndex(name: 'idx_bookmark_location', columns: {#bookName, #chapter})
 @DataClassName('Bookmark')
 class Bookmarks extends Table {
   TextColumn get id => text()();
@@ -87,6 +90,7 @@ class Journals extends Table {
 /// A point-in-time snapshot of a [Journals] row. Like [SermonRevisions], a
 /// revision's content is never edited after creation — only created or
 /// tombstoned — so Last-Writer-Wins needs no special handling for them.
+@TableIndex(name: 'idx_journal_revision_journal', columns: {#journalId})
 @DataClassName('JournalRevision')
 class JournalRevisions extends Table {
   TextColumn get id => text()(); // UUID of the revision
@@ -134,6 +138,7 @@ class Sermons extends Table {
 /// edited after creation — it is only ever created or tombstoned (a delete
 /// bumps [updatedAt] so the tombstone wins) — so Last-Writer-Wins needs no
 /// special handling for them.
+@TableIndex(name: 'idx_sermon_revision_sermon', columns: {#sermonId})
 @DataClassName('SermonRevision')
 class SermonRevisions extends Table {
   TextColumn get id => text()(); // UUID of the revision
@@ -261,6 +266,7 @@ class Achievements extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@TableIndex(name: 'idx_navigation_history_updated', columns: {#updatedAt})
 @DataClassName('NavigationHistory')
 class NavigationHistories extends Table {
   TextColumn get id => text()(); // UUID
@@ -343,6 +349,9 @@ class Tags extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@TableIndex(name: 'idx_entity_tag_tag', columns: {#tagId})
+@TableIndex(name: 'idx_entity_tag_entity', columns: {#entityId})
+@TableIndex(name: 'idx_entity_tag_type', columns: {#entityType})
 @DataClassName('EntityTag')
 class EntityTags extends Table {
   TextColumn get id => text()();
@@ -386,6 +395,7 @@ class Notebooks extends Table {
 /// A rich-text page inside a [Notebooks]. Content is Quill Delta JSON, matching
 /// [Sermons]; [contentPlain] is the derived plain-text projection used only for
 /// the FTS index. [position] orders pages within their notebook (drag-reorder).
+@TableIndex(name: 'idx_notebook_page_notebook', columns: {#notebookId})
 @DataClassName('NotebookPage')
 class NotebookPages extends Table {
   TextColumn get id => text()();
@@ -407,6 +417,7 @@ class NotebookPages extends Table {
 /// A point-in-time snapshot of a [NotebookPages] row. Mirrors [SermonRevisions]:
 /// a revision's content is never edited after creation — only created or
 /// tombstoned — so Last-Writer-Wins needs no special handling.
+@TableIndex(name: 'idx_notebook_page_revision_page', columns: {#pageId})
 @DataClassName('NotebookPageRevision')
 class NotebookPageRevisions extends Table {
   TextColumn get id => text()(); // UUID of the revision
@@ -445,6 +456,8 @@ class MediaAttachments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@TableIndex(name: 'idx_attachment_ref_location', columns: {#bookName, #chapter})
+@TableIndex(name: 'idx_attachment_ref_attachment', columns: {#attachmentId})
 @DataClassName('AttachmentReference')
 class AttachmentReferences extends Table {
   TextColumn get id => text()();

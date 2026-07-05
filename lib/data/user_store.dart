@@ -42,7 +42,7 @@ class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 27;
+  int get schemaVersion => 28;
 
   @override
   MigrationStrategy get migration {
@@ -631,8 +631,82 @@ class UserStore extends _$UserStore {
             );
           }
         }
+        if (from < 28) {
+          // Until now no user table had a single index, so every non-PK
+          // lookup was a full table scan — noticeable once a library grows to
+          // thousands of tags/notes/revisions. Mirrors the @TableIndex
+          // annotations in user_tables.dart (which cover fresh installs via
+          // createAll); IF NOT EXISTS keeps a re-run after a rolled-back
+          // attempt safe, since CREATE INDEX auto-commits like ALTER TABLE.
+          await _createUserIndexes();
+        }
       },
     );
+  }
+
+  /// The index set shared by the v28 upgrade and the @TableIndex annotations.
+  /// Names and columns must stay in sync with user_tables.dart. Each entry is
+  /// guarded on its table existing (like [_installSearchTriggers]) so a
+  /// partially-created older DB can't fail the whole upgrade on one index.
+  Future<void> _createUserIndexes() async {
+    const statements = [
+      (
+        'highlights',
+        'CREATE INDEX IF NOT EXISTS idx_highlight_location ON highlights (book_name, chapter)',
+      ),
+      (
+        'notes',
+        'CREATE INDEX IF NOT EXISTS idx_note_location ON notes (book_name, chapter)',
+      ),
+      (
+        'bookmarks',
+        'CREATE INDEX IF NOT EXISTS idx_bookmark_location ON bookmarks (book_name, chapter)',
+      ),
+      (
+        'journal_revisions',
+        'CREATE INDEX IF NOT EXISTS idx_journal_revision_journal ON journal_revisions (journal_id)',
+      ),
+      (
+        'sermon_revisions',
+        'CREATE INDEX IF NOT EXISTS idx_sermon_revision_sermon ON sermon_revisions (sermon_id)',
+      ),
+      (
+        'navigation_histories',
+        'CREATE INDEX IF NOT EXISTS idx_navigation_history_updated ON navigation_histories (updated_at)',
+      ),
+      (
+        'entity_tags',
+        'CREATE INDEX IF NOT EXISTS idx_entity_tag_tag ON entity_tags (tag_id)',
+      ),
+      (
+        'entity_tags',
+        'CREATE INDEX IF NOT EXISTS idx_entity_tag_entity ON entity_tags (entity_id)',
+      ),
+      (
+        'entity_tags',
+        'CREATE INDEX IF NOT EXISTS idx_entity_tag_type ON entity_tags (entity_type)',
+      ),
+      (
+        'notebook_pages',
+        'CREATE INDEX IF NOT EXISTS idx_notebook_page_notebook ON notebook_pages (notebook_id)',
+      ),
+      (
+        'notebook_page_revisions',
+        'CREATE INDEX IF NOT EXISTS idx_notebook_page_revision_page ON notebook_page_revisions (page_id)',
+      ),
+      (
+        'attachment_references',
+        'CREATE INDEX IF NOT EXISTS idx_attachment_ref_location ON attachment_references (book_name, chapter)',
+      ),
+      (
+        'attachment_references',
+        'CREATE INDEX IF NOT EXISTS idx_attachment_ref_attachment ON attachment_references (attachment_id)',
+      ),
+    ];
+    for (final (table, sql) in statements) {
+      if (!await _tableExists(table)) continue;
+      await customStatement(sql);
+    }
   }
 
   /// Idempotently adds the journals.content_plain column. Guarded because the
