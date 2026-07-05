@@ -10,6 +10,12 @@ Running list of known issues and follow-ups.
   - **Early Church**: Peter (Simon) is the most glaring omission (34 events, all undated or bundled), along with Luke, Silas, Barnabas, Timothy, and Philip the Evangelist.
   - **Patriarchs**: Abraham, Joseph, and Isaac have massive multi-national journeys that resolve poorly under the auto-derived heuristic.
   - **Exodus/Conquest**: Joshua's conquest is currently lost in generic event blocks.
+  - **Prophets & Kings**: The source dataset collapses entire ministries into single generic events (e.g., "Prophecies of Jonah") or omits them entirely (Samuel has 0 events).
+    - *Jonah*: Joppa → Sea → Nineveh.
+    - *Samuel*: His judging circuit (Bethel, Gilgal, Mizpah, Ramah) is missing.
+    - *King Saul*: Missing his military campaigns and pursuit of David (Gibeah, Michmash, Ziph, En-gedi, Gilboa).
+  - **Women of the Bible**: Ruth (Moab to Bethlehem) and Esther (Susa) have **0 events** in the dataset, leaving their maps entirely blank.
+  - **Other Key NT Figures**: John the Baptist, James, Andrew, Titus, and Apollos have either 0 events or 0 *dated* events, meaning their maps are also completely blank.
   - *Next steps:* Start by adding a `CuratedPersonJourney` for Peter (Simon), followed by Paul's companions (cross-referencing Paul's existing curated list), and then the Patriarchs. Add suppressed events to `_eventsSupersededByCuratedJourney`.
 
 ## Research
