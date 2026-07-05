@@ -44,6 +44,18 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   final _titleController = TextEditingController();
   final _seriesController = TextEditingController();
 
+  /// Mirrors [sermonViewOnlyProvider] for this sermon — kept as a field so the
+  /// rest of the widget can read it without threading `ref` everywhere.
+  /// Reassigned from the provider at the top of every [build], which also
+  /// keeps it in sync across the docked panel and a full-screen editor for
+  /// the same sermon (two separate [State] instances sharing one provider
+  /// entry, in-memory only, never persisted or synced).
+  bool _viewOnly = false;
+
+  void _toggleViewOnly() {
+    ref.read(sermonViewOnlyProvider(widget.sermonId).notifier).toggle();
+  }
+
   /// `updatedAt` of the sermon version currently loaded in the editor. Lets the
   /// remote-change watcher tell the editor's own saves (which advance this)
   /// apart from a sync that overwrote the sermon underneath the open document.
@@ -156,7 +168,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     _controller = QuillController(
       document: Document.fromJson(jsonData),
       selection: const TextSelection.collapsed(offset: 0),
-    );
+    )..readOnly = _viewOnly;
     _controller.addListener(_saveSermonContent);
     _controller.addListener(_scheduleAutolink);
     _titleController.text = sermon.title;
@@ -405,13 +417,14 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   }
 
   /// Overflow menu holding the secondary actions, used wherever the header
-  /// can't fit the full icon row.
+  /// can't fit the full icon row. Link/Outline both write straight into the
+  /// document, so they're left out while [_viewOnly] is on.
   Widget _buildOverflowMenu(BuildContext context) {
     return PopupMenuButton<_SermonAction>(
       tooltip: 'More',
       onSelected: (action) => _handleSermonAction(context, action),
-      itemBuilder: (context) => const [
-        PopupMenuItem(
+      itemBuilder: (context) => [
+        const PopupMenuItem(
           value: _SermonAction.export,
           child: ListTile(
             leading: Icon(Icons.file_upload),
@@ -419,7 +432,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
             contentPadding: EdgeInsets.zero,
           ),
         ),
-        PopupMenuItem(
+        const PopupMenuItem(
           value: _SermonAction.print,
           child: ListTile(
             leading: Icon(Icons.print),
@@ -427,15 +440,16 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
             contentPadding: EdgeInsets.zero,
           ),
         ),
-        PopupMenuItem(
-          value: _SermonAction.linkEntity,
-          child: ListTile(
-            leading: Icon(Icons.travel_explore),
-            title: Text('Link to Explorer'),
-            contentPadding: EdgeInsets.zero,
+        if (!_viewOnly)
+          const PopupMenuItem(
+            value: _SermonAction.linkEntity,
+            child: ListTile(
+              leading: Icon(Icons.travel_explore),
+              title: Text('Link to Explorer'),
+              contentPadding: EdgeInsets.zero,
+            ),
           ),
-        ),
-        PopupMenuItem(
+        const PopupMenuItem(
           value: _SermonAction.tags,
           child: ListTile(
             leading: Icon(Icons.label),
@@ -443,7 +457,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
             contentPadding: EdgeInsets.zero,
           ),
         ),
-        PopupMenuItem(
+        const PopupMenuItem(
           value: _SermonAction.revisions,
           child: ListTile(
             leading: Icon(Icons.history),
@@ -451,14 +465,15 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
             contentPadding: EdgeInsets.zero,
           ),
         ),
-        PopupMenuItem(
-          value: _SermonAction.outline,
-          child: ListTile(
-            leading: Icon(Icons.list_alt),
-            title: Text('Outline'),
-            contentPadding: EdgeInsets.zero,
+        if (!_viewOnly)
+          const PopupMenuItem(
+            value: _SermonAction.outline,
+            child: ListTile(
+              leading: Icon(Icons.list_alt),
+              title: Text('Outline'),
+              contentPadding: EdgeInsets.zero,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -485,6 +500,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         return const Center(child: CircularProgressIndicator());
       }
     }
+
+    _viewOnly = ref.watch(sermonViewOnlyProvider(widget.sermonId));
+    _controller.readOnly = _viewOnly;
 
     // Watch for a sync overwriting this sermon while the editor is open.
     ref.listen<AsyncValue<Sermon?>>(
@@ -519,6 +537,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                   Expanded(
                     child: TextField(
                       controller: _titleController,
+                      readOnly: _viewOnly,
                       decoration: const InputDecoration(labelText: 'Title'),
                     ),
                   ),
@@ -526,27 +545,29 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                   Expanded(
                     child: TextField(
                       controller: _seriesController,
+                      readOnly: _viewOnly,
                       decoration: const InputDecoration(labelText: 'Series'),
                     ),
                   ),
                 ],
               ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: QuillSimpleToolbar(
-                    controller: _controller,
-                    config: QuillSimpleToolbarConfig(
-                      multiRowsDisplay: multiRowToolbar,
+            if (!_viewOnly)
+              Row(
+                children: [
+                  Expanded(
+                    child: QuillSimpleToolbar(
+                      controller: _controller,
+                      config: QuillSimpleToolbarConfig(
+                        multiRowsDisplay: multiRowToolbar,
+                      ),
                     ),
                   ),
-                ),
-                SpeechInputButton(
-                  onResult: (t) => insertDictatedText(_controller, t),
-                ),
-              ],
-            ),
+                  SpeechInputButton(
+                    onResult: (t) => insertDictatedText(_controller, t),
+                  ),
+                ],
+              ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -556,7 +577,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DragTarget<String>(
-                    onWillAcceptWithDetails: (_) => true,
+                    onWillAcceptWithDetails: (_) => !_viewOnly,
                     onAcceptWithDetails: (details) {
                       final text = details.data;
                       final offset = _controller.selection.baseOffset;
@@ -617,6 +638,11 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
           // app bar. Wider layouts show every action.
           actions: [
             IconButton(
+              icon: Icon(_viewOnly ? Icons.edit : Icons.visibility_outlined),
+              tooltip: _viewOnly ? 'Exit view only' : 'View only',
+              onPressed: _toggleViewOnly,
+            ),
+            IconButton(
               icon: const Icon(Icons.slideshow),
               tooltip: 'Presentation Mode',
               onPressed: () => _openPresentation(context),
@@ -639,11 +665,12 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                 tooltip: 'Print',
                 onPressed: () => _printSermon(context, ref),
               ),
-              IconButton(
-                icon: const Icon(Icons.travel_explore),
-                tooltip: 'Link to Explorer',
-                onPressed: () => _linkEntity(context),
-              ),
+              if (!_viewOnly)
+                IconButton(
+                  icon: const Icon(Icons.travel_explore),
+                  tooltip: 'Link to Explorer',
+                  onPressed: () => _linkEntity(context),
+                ),
               IconButton(
                 icon: const Icon(Icons.label),
                 tooltip: 'Manage Tags',
@@ -654,11 +681,12 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                 tooltip: 'Revision History',
                 onPressed: () => _openRevisions(),
               ),
-              TextButton.icon(
-                icon: const Icon(Icons.list_alt),
-                label: const Text('Outline'),
-                onPressed: () => _showOutlineGeneratorDialog(context),
-              ),
+              if (!_viewOnly)
+                TextButton.icon(
+                  icon: const Icon(Icons.list_alt),
+                  label: const Text('Outline'),
+                  onPressed: () => _showOutlineGeneratorDialog(context),
+                ),
             ],
             const SizedBox(width: 8),
           ],
@@ -699,6 +727,11 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                ),
+                IconButton(
+                  icon: Icon(_viewOnly ? Icons.edit : Icons.visibility_outlined),
+                  tooltip: _viewOnly ? 'Exit view only' : 'View only',
+                  onPressed: _toggleViewOnly,
                 ),
                 IconButton(
                   icon: const Icon(Icons.slideshow),

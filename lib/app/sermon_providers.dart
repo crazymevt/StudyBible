@@ -85,6 +85,24 @@ final selectedSermonIdProvider =
       () => SelectedSermonIdNotifier(),
     );
 
+/// Whether a sermon's editor is in view-only mode: in-memory only, never
+/// persisted or synced, and reset the moment the app restarts. Keyed by
+/// sermon id (not a single flag) so the docked panel and a full-screen editor
+/// opened from it — separate [SermonEditorScreen] instances for the same
+/// sermon — share one toggle instead of resetting it on the way in or out of
+/// full screen.
+class SermonViewOnlyNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void toggle() => state = !state;
+}
+
+final sermonViewOnlyProvider =
+    NotifierProvider.family<SermonViewOnlyNotifier, bool, String>(
+      (sermonId) => SermonViewOnlyNotifier(),
+    );
+
 class SermonActionNotifier {
   final Ref _ref;
   final UserStore _store;
