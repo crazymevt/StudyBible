@@ -25,14 +25,17 @@ void main() {
     // ph4.org serves a ~2-byte blank page (or an HTML error) instead of the
     // module when a download link is dead. The extractor must report that as a
     // ModuleUnavailableException, not a cryptic decode failure.
-    test('throws ModuleUnavailableException for an empty/blank response',
-        () async {
-      final file = await writeFile('blank.zip.bz2', '\r\n'.codeUnits);
-      expect(
-        () => ArchiveExtractor.extractArchive(file, Directory('${tmp.path}/o')),
-        throwsA(isA<ModuleUnavailableException>()),
-      );
-    });
+    test(
+      'throws ModuleUnavailableException for an empty/blank response',
+      () async {
+        final file = await writeFile('blank.zip.bz2', '\r\n'.codeUnits);
+        expect(
+          () =>
+              ArchiveExtractor.extractArchive(file, Directory('${tmp.path}/o')),
+          throwsA(isA<ModuleUnavailableException>()),
+        );
+      },
+    );
 
     test('throws ModuleUnavailableException for an HTML error page', () async {
       final file = await writeFile(
@@ -52,8 +55,7 @@ void main() {
       final file = await writeFile('real.zip', zipped);
 
       final out = Directory('${tmp.path}/out');
-      final extracted =
-          await ArchiveExtractor.extractArchive(file, out);
+      final extracted = await ArchiveExtractor.extractArchive(file, out);
 
       expect(extracted, hasLength(1));
       expect(extracted.first.path, endsWith('module.sqlite3'));

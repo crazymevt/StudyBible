@@ -29,11 +29,13 @@ void main() {
       });
       final prefs = await SharedPreferences.getInstance();
       store = UserStore(NativeDatabase.memory());
-      container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+        ],
+      );
     });
 
     tearDown(() async {
@@ -41,27 +43,29 @@ void main() {
       await store.close();
     });
 
-    Future<List<Bookmark>> live() => (store.select(store.bookmarks)
-          ..where((b) => b.deleted.equals(false)))
-        .get();
+    Future<List<Bookmark>> live() => (store.select(
+      store.bookmarks,
+    )..where((b) => b.deleted.equals(false))).get();
 
-    test('adds a ribbon auto-labeled with the reference, then removes it',
-        () async {
-      final action = container.read(bookmarkActionProvider);
+    test(
+      'adds a ribbon auto-labeled with the reference, then removes it',
+      () async {
+        final action = container.read(bookmarkActionProvider);
 
-      final added = await action.toggleBookmark(16);
-      expect(added, isTrue);
-      final rows = await live();
-      expect(rows, hasLength(1));
-      expect(rows.single.bookName, 'John');
-      expect(rows.single.chapter, 3);
-      expect(rows.single.verse, 16);
-      expect(rows.single.label, 'John 3:16');
+        final added = await action.toggleBookmark(16);
+        expect(added, isTrue);
+        final rows = await live();
+        expect(rows, hasLength(1));
+        expect(rows.single.bookName, 'John');
+        expect(rows.single.chapter, 3);
+        expect(rows.single.verse, 16);
+        expect(rows.single.label, 'John 3:16');
 
-      final removed = await action.toggleBookmark(16);
-      expect(removed, isFalse);
-      expect(await live(), isEmpty);
-    });
+        final removed = await action.toggleBookmark(16);
+        expect(removed, isFalse);
+        expect(await live(), isEmpty);
+      },
+    );
 
     test('toggling a second verse leaves the first in place', () async {
       final action = container.read(bookmarkActionProvider);
@@ -106,11 +110,13 @@ void main() {
       });
       final prefs = await SharedPreferences.getInstance();
       store = UserStore(NativeDatabase.memory());
-      container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+        ],
+      );
     });
 
     tearDown(() async {
@@ -181,10 +187,10 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    Future<List<int>> ribbonedVerses() async => ((await (store.select(
+    Future<List<int>> ribbonedVerses() async =>
+        ((await (store.select(
               store.bookmarks,
-            )..where((b) => b.deleted.equals(false)))
-                .get())
+            )..where((b) => b.deleted.equals(false))).get())
             .map((b) => b.verse)
             .toList()
           ..sort());
@@ -196,11 +202,13 @@ void main() {
       });
       final prefs = await SharedPreferences.getInstance();
       store = UserStore(NativeDatabase.memory());
-      container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+        ],
+      );
     });
 
     tearDown(() async {
@@ -209,23 +217,25 @@ void main() {
     });
 
     testWidgets(
-        'a mixed selection adds the missing ribbon without removing the existing one',
-        (tester) async {
-      // Verse 16 already ribboned; both 16 and 17 selected (the "navigated
-      // verse still selected" case that used to un-ribbon 16).
-      await container.read(bookmarkActionProvider).addBookmark(16);
-      container.read(selectedVersesProvider.notifier).toggle(16);
-      container.read(selectedVersesProvider.notifier).toggle(17);
+      'a mixed selection adds the missing ribbon without removing the existing one',
+      (tester) async {
+        // Verse 16 already ribboned; both 16 and 17 selected (the "navigated
+        // verse still selected" case that used to un-ribbon 16).
+        await container.read(bookmarkActionProvider).addBookmark(16);
+        container.read(selectedVersesProvider.notifier).toggle(16);
+        container.read(selectedVersesProvider.notifier).toggle(17);
 
-      await pump(tester);
-      await tester.tap(find.byTooltip('Ribbon'));
-      await tester.pumpAndSettle();
+        await pump(tester);
+        await tester.tap(find.byTooltip('Ribbon'));
+        await tester.pumpAndSettle();
 
-      expect(await ribbonedVerses(), [16, 17]);
-    });
+        expect(await ribbonedVerses(), [16, 17]);
+      },
+    );
 
-    testWidgets('a fully-ribboned selection removes the ribbons',
-        (tester) async {
+    testWidgets('a fully-ribboned selection removes the ribbons', (
+      tester,
+    ) async {
       await container.read(bookmarkActionProvider).addBookmark(16);
       container.read(selectedVersesProvider.notifier).toggle(16);
 

@@ -16,12 +16,24 @@ void main() {
     });
 
     test('round-trips place/event/topic', () {
-      expect(parseEntityLinkUrl(buildEntityLinkUrl(const ExplorerRef.place(1, 'En Gedi')))!.type,
-          ExplorerEntityType.place);
-      expect(parseEntityLinkUrl(buildEntityLinkUrl(const ExplorerRef.event(2, 'Exodus')))!.type,
-          ExplorerEntityType.event);
-      expect(parseEntityLinkUrl(buildEntityLinkUrl(const ExplorerRef.topic(3, 'Faith')))!.type,
-          ExplorerEntityType.topic);
+      expect(
+        parseEntityLinkUrl(
+          buildEntityLinkUrl(const ExplorerRef.place(1, 'En Gedi')),
+        )!.type,
+        ExplorerEntityType.place,
+      );
+      expect(
+        parseEntityLinkUrl(
+          buildEntityLinkUrl(const ExplorerRef.event(2, 'Exodus')),
+        )!.type,
+        ExplorerEntityType.event,
+      );
+      expect(
+        parseEntityLinkUrl(
+          buildEntityLinkUrl(const ExplorerRef.topic(3, 'Faith')),
+        )!.type,
+        ExplorerEntityType.topic,
+      );
     });
 
     test('rejects a non-sbent URL', () {

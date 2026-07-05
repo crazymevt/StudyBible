@@ -24,13 +24,16 @@ void main() {
     user = UserStore(NativeDatabase.memory());
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(user),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      deviceIdProvider.overrideWith((ref) async => 'test-device'),
-      achievementServiceProvider
-          .overrideWith((ref) => _NoopAchievementService(ref)),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(user),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        deviceIdProvider.overrideWith((ref) async => 'test-device'),
+        achievementServiceProvider.overrideWith(
+          (ref) => _NoopAchievementService(ref),
+        ),
+      ],
+    );
   });
 
   tearDown(() async {
@@ -45,9 +48,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(
-          home: Scaffold(body: PrayerTrackerPanel()),
-        ),
+        child: const MaterialApp(home: Scaffold(body: PrayerTrackerPanel())),
       ),
     );
   }
@@ -60,36 +61,40 @@ void main() {
   // and dropping the "Hide Answered" label to an icon-only Switch on phones.
   for (final size in [const Size(360, 800), const Size(411, 891)]) {
     testWidgets(
-        'adding a prayer saves it without layout overflow at ${size.width}x${size.height}',
-        (tester) async {
-      await pump(tester, size);
-      await _settle(tester);
-      expect(find.text('No prayers yet'), findsOneWidget);
+      'adding a prayer saves it without layout overflow at ${size.width}x${size.height}',
+      (tester) async {
+        await pump(tester, size);
+        await _settle(tester);
+        expect(find.text('No prayers yet'), findsOneWidget);
 
-      final errors = <FlutterErrorDetails>[];
-      final previousOnError = FlutterError.onError;
-      FlutterError.onError = (details) {
-        errors.add(details);
-        previousOnError?.call(details);
-      };
-      addTearDown(() => FlutterError.onError = previousOnError);
+        final errors = <FlutterErrorDetails>[];
+        final previousOnError = FlutterError.onError;
+        FlutterError.onError = (details) {
+          errors.add(details);
+          previousOnError?.call(details);
+        };
+        addTearDown(() => FlutterError.onError = previousOnError);
 
-      await tester.tap(find.byTooltip('Add Prayer'));
-      await tester.pumpAndSettle();
-      expect(find.text('Add Prayer'), findsOneWidget);
+        await tester.tap(find.byTooltip('Add Prayer'));
+        await tester.pumpAndSettle();
+        expect(find.text('Add Prayer'), findsOneWidget);
 
-      await tester.enterText(find.byType(TextField).first, 'For patience');
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
-      await _settle(tester);
-      await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).first, 'For patience');
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+        await _settle(tester);
+        await tester.pumpAndSettle();
 
-      expect(find.text('For patience'), findsOneWidget,
-          reason: 'the new prayer should appear in the list after saving');
-      expect(
-        errors.where((e) => e.exceptionAsString().contains('overflowed')),
-        isEmpty,
-      );
-    });
+        expect(
+          find.text('For patience'),
+          findsOneWidget,
+          reason: 'the new prayer should appear in the list after saving',
+        );
+        expect(
+          errors.where((e) => e.exceptionAsString().contains('overflowed')),
+          isEmpty,
+        );
+      },
+    );
   }
 }
 

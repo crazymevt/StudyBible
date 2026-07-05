@@ -23,18 +23,17 @@ ActionItem _item({
   int? dueAt,
   int? completedAt,
   bool deleted = false,
-}) =>
-    ActionItem(
-      id: id,
-      updatedAt: 1,
-      deviceId: 'A',
-      deleted: deleted,
-      title: 'Do $id',
-      description: '',
-      createdAt: 1,
-      dueAt: dueAt,
-      completedAt: completedAt,
-    );
+}) => ActionItem(
+  id: id,
+  updatedAt: 1,
+  deviceId: 'A',
+  deleted: deleted,
+  title: 'Do $id',
+  description: '',
+  createdAt: 1,
+  dueAt: dueAt,
+  completedAt: completedAt,
+);
 
 void main() {
   group('actionsNeedingAlert', () {
@@ -55,16 +54,18 @@ void main() {
 
     test('alerts within the lead window', () {
       expect(
-        actionsNeedingAlert([_item(id: 'a', dueAt: now + day ~/ 2)], now)
-            .map((a) => a.id),
+        actionsNeedingAlert([
+          _item(id: 'a', dueAt: now + day ~/ 2),
+        ], now).map((a) => a.id),
         ['a'],
       );
     });
 
     test('alerts when overdue', () {
       expect(
-        actionsNeedingAlert([_item(id: 'a', dueAt: now - day)], now)
-            .map((a) => a.id),
+        actionsNeedingAlert([
+          _item(id: 'a', dueAt: now - day),
+        ], now).map((a) => a.id),
         ['a'],
       );
     });
@@ -84,10 +85,12 @@ void main() {
 
     setUp(() {
       store = UserStore(NativeDatabase.memory());
-      container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+        ],
+      );
     });
 
     tearDown(() async {
@@ -95,12 +98,14 @@ void main() {
       await store.close();
     });
 
-    Future<List<ActionItem>> live() => (store.select(store.actionItems)
-          ..where((a) => a.deleted.equals(false)))
-        .get();
+    Future<List<ActionItem>> live() => (store.select(
+      store.actionItems,
+    )..where((a) => a.deleted.equals(false))).get();
 
     test('saveActionItem creates, then updates', () async {
-      final id = await container.read(actionItemActionProvider).saveActionItem(
+      final id = await container
+          .read(actionItemActionProvider)
+          .saveActionItem(
             title: 'Call client',
             description: 'about the proposal',
             dueAt: 123456,
@@ -111,7 +116,9 @@ void main() {
       expect(rows.single.dueAt, 123456);
       expect(rows.single.completedAt, isNull);
 
-      await container.read(actionItemActionProvider).saveActionItem(
+      await container
+          .read(actionItemActionProvider)
+          .saveActionItem(
             id: id,
             title: 'Call client back',
             dueAt: null, // clears the due date
@@ -171,20 +178,23 @@ void main() {
       });
       final prefs = await SharedPreferences.getInstance();
 
-      final container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-        achievementServiceProvider
-            .overrideWith((ref) => _NoopAchievementService(ref)),
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+          achievementServiceProvider.overrideWith(
+            (ref) => _NoopAchievementService(ref),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
 
       await container.read(syncServiceProvider).sync();
 
-      final row = await (store.select(store.actionItems)
-            ..where((a) => a.id.equals('act1')))
-          .getSingle();
+      final row = await (store.select(
+        store.actionItems,
+      )..where((a) => a.id.equals('act1'))).getSingle();
       expect(row.title, 'Remote task');
       expect(row.dueAt, 5000);
       expect(row.description, 'from device B');

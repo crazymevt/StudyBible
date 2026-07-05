@@ -14,32 +14,45 @@ import 'package:study_bible/ui/reader/people_timeline_screen.dart';
 void main() {
   late ContentStore store;
 
-  Future<void> person(int id, String name, int birth, int death) =>
-      store.into(store.biblePeople).insert(BiblePeopleCompanion(
-            id: Value(id),
-            slug: Value(name.toLowerCase()),
-            name: Value(name),
-            displayTitle: Value(name),
-            birthYear: Value(birth),
-            deathYear: Value(death),
-            verseCount: const Value(0),
-          ));
+  Future<void> person(int id, String name, int birth, int death) => store
+      .into(store.biblePeople)
+      .insert(
+        BiblePeopleCompanion(
+          id: Value(id),
+          slug: Value(name.toLowerCase()),
+          name: Value(name),
+          displayTitle: Value(name),
+          birthYear: Value(birth),
+          deathYear: Value(death),
+          verseCount: const Value(0),
+        ),
+      );
 
   setUp(() async {
     store = ContentStore(NativeDatabase.memory());
     await person(1, 'Adam', -4004, -3074);
     await person(2, 'Seth', -3874, -2692);
     await person(3, 'Noah', -2948, -1998);
-    await store.into(store.timelineEvents).insert(const TimelineEventsCompanion(
-        id: Value(1),
-        title: Value('Creation'),
-        sortKey: Value(-4002.9),
-        startYear: Value(-4003)));
-    await store.into(store.timelineEvents).insert(const TimelineEventsCompanion(
-        id: Value(2),
-        title: Value('The Flood'),
-        sortKey: Value(-2348.0),
-        startYear: Value(-2348)));
+    await store
+        .into(store.timelineEvents)
+        .insert(
+          const TimelineEventsCompanion(
+            id: Value(1),
+            title: Value('Creation'),
+            sortKey: Value(-4002.9),
+            startYear: Value(-4003),
+          ),
+        );
+    await store
+        .into(store.timelineEvents)
+        .insert(
+          const TimelineEventsCompanion(
+            id: Value(2),
+            title: Value('The Flood'),
+            sortKey: Value(-2348.0),
+            startYear: Value(-2348),
+          ),
+        );
   });
 
   tearDown(() async {
@@ -59,8 +72,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('renders the axis, gutter names, and lifespan bars',
-      (tester) async {
+  testWidgets('renders the axis, gutter names, and lifespan bars', (
+    tester,
+  ) async {
     await pump(tester);
 
     expect(find.text('Bible Timeline'), findsOneWidget);
@@ -102,8 +116,9 @@ void main() {
     expect(find.byTooltip('Timeline'), findsNothing);
   });
 
-  testWidgets('Events view lists and searches events chronologically',
-      (tester) async {
+  testWidgets('Events view lists and searches events chronologically', (
+    tester,
+  ) async {
     await pump(tester);
 
     await tester.tap(find.text('Events'));

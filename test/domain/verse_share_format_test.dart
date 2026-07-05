@@ -113,11 +113,15 @@ void main() {
   });
 
   test('VerseReferencePosition.fromName round-trips and defaults to top', () {
-    expect(VerseReferencePosition.fromName('bottom'),
-        VerseReferencePosition.bottom);
+    expect(
+      VerseReferencePosition.fromName('bottom'),
+      VerseReferencePosition.bottom,
+    );
     expect(VerseReferencePosition.fromName('top'), VerseReferencePosition.top);
     expect(VerseReferencePosition.fromName(null), VerseReferencePosition.top);
-    expect(VerseReferencePosition.fromName('garbage'),
-        VerseReferencePosition.top);
+    expect(
+      VerseReferencePosition.fromName('garbage'),
+      VerseReferencePosition.top,
+    );
   });
 }

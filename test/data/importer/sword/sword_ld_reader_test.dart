@@ -30,8 +30,7 @@ void main() {
     ]);
 
     test('decodes key/body pairs', () {
-      final r = SwordLdReader.raw(
-          idx: idx, dat: Uint8List.fromList(dat));
+      final r = SwordLdReader.raw(idx: idx, dat: Uint8List.fromList(dat));
       expect(r.entries.map((e) => e.key), ['A', 'AARON']);
       expect(r.entries[0].body, '<p>First letter.</p>');
       expect(r.entries[1].body, '<p>Brother of Moses.</p>');

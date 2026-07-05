@@ -18,59 +18,87 @@ import 'package:study_bible/ui/reader/atlas_screen.dart';
 void main() {
   late ContentStore store;
 
-  Future<void> place(int id, String name, double lat, double lng) =>
-      store.into(store.places).insert(PlacesCompanion(
-            id: Value(id),
-            name: Value(name),
-            lat: Value(lat),
-            lng: Value(lng),
-          ));
+  Future<void> place(int id, String name, double lat, double lng) => store
+      .into(store.places)
+      .insert(
+        PlacesCompanion(
+          id: Value(id),
+          name: Value(name),
+          lat: Value(lat),
+          lng: Value(lng),
+        ),
+      );
 
   Future<void> placeVerse(
-          int id, int placeId, String book, int chapter, int verse) =>
-      store.into(store.placeVerses).insert(PlaceVersesCompanion(
-            id: Value(id),
-            placeId: Value(placeId),
-            bookName: Value(book),
-            chapter: Value(chapter),
-            verse: Value(verse),
-          ));
+    int id,
+    int placeId,
+    String book,
+    int chapter,
+    int verse,
+  ) => store
+      .into(store.placeVerses)
+      .insert(
+        PlaceVersesCompanion(
+          id: Value(id),
+          placeId: Value(placeId),
+          bookName: Value(book),
+          chapter: Value(chapter),
+          verse: Value(verse),
+        ),
+      );
 
-  Future<void> person(int id, String name) =>
-      store.into(store.biblePeople).insert(BiblePeopleCompanion(
-            id: Value(id),
-            slug: Value(name.toLowerCase()),
-            name: Value(name),
-            displayTitle: Value(name),
-            verseCount: const Value(50),
-          ));
+  Future<void> person(int id, String name) => store
+      .into(store.biblePeople)
+      .insert(
+        BiblePeopleCompanion(
+          id: Value(id),
+          slug: Value(name.toLowerCase()),
+          name: Value(name),
+          displayTitle: Value(name),
+          verseCount: const Value(50),
+        ),
+      );
 
   Future<void> event(int id, String title, double sortKey, int startYear) =>
-      store.into(store.timelineEvents).insert(TimelineEventsCompanion(
-            id: Value(id),
-            title: Value(title),
-            sortKey: Value(sortKey),
-            startYear: Value(startYear),
-          ));
+      store
+          .into(store.timelineEvents)
+          .insert(
+            TimelineEventsCompanion(
+              id: Value(id),
+              title: Value(title),
+              sortKey: Value(sortKey),
+              startYear: Value(startYear),
+            ),
+          );
 
   Future<void> eventVerse(
-          int id, int eventId, String book, int chapter, int verse) =>
-      store.into(store.eventVerses).insert(EventVersesCompanion(
-            id: Value(id),
-            eventId: Value(eventId),
-            ord: const Value(0),
-            bookName: Value(book),
-            chapter: Value(chapter),
-            verse: Value(verse),
-          ));
+    int id,
+    int eventId,
+    String book,
+    int chapter,
+    int verse,
+  ) => store
+      .into(store.eventVerses)
+      .insert(
+        EventVersesCompanion(
+          id: Value(id),
+          eventId: Value(eventId),
+          ord: const Value(0),
+          bookName: Value(book),
+          chapter: Value(chapter),
+          verse: Value(verse),
+        ),
+      );
 
   Future<void> participant(int id, int eventId, int personId) => store
       .into(store.eventParticipants)
-      .insert(EventParticipantsCompanion(
-        id: Value(id),
-        eventId: Value(eventId),
-        personId: Value(personId),
-      ));
+      .insert(
+        EventParticipantsCompanion(
+          id: Value(id),
+          eventId: Value(eventId),
+          personId: Value(personId),
+        ),
+      );
 
   setUp(() async {
     store = ContentStore(NativeDatabase.memory());
@@ -110,8 +138,12 @@ void main() {
       (eventId: 13, placeId: 1, chapter: 27, verse: 9), // Damascus (place 1)
     ];
     for (final e in wideEvents) {
-      await event(e.eventId, 'Wide event ${e.eventId}', e.eventId.toDouble(),
-          2000 + e.eventId);
+      await event(
+        e.eventId,
+        'Wide event ${e.eventId}',
+        e.eventId.toDouble(),
+        2000 + e.eventId,
+      );
       await eventVerse(e.eventId, e.eventId, 'Acts', e.chapter, e.verse);
       await placeVerse(e.eventId, e.placeId, 'Acts', e.chapter, e.verse);
       await participant(e.eventId + 100, e.eventId, 4);
@@ -135,9 +167,7 @@ void main() {
           // curated_journeys_importer_test.dart instead.
           curatedJourneysReadyProvider.overrideWith((ref) async => true),
         ],
-        child: MaterialApp(
-          home: AtlasScreen(initialPersonId: initialPersonId),
-        ),
+        child: MaterialApp(home: AtlasScreen(initialPersonId: initialPersonId)),
       ),
     );
     await tester.pumpAndSettle();
@@ -152,42 +182,51 @@ void main() {
   });
 
   testWidgets(
-      "the traveler icon starts exactly on the first waypoint's own pin",
-      (tester) async {
-    await pump(tester, initialPersonId: 1);
+    "the traveler icon starts exactly on the first waypoint's own pin",
+    (tester) async {
+      await pump(tester, initialPersonId: 1);
 
-    final travelerCenter =
-        tester.getCenter(find.byIcon(Icons.directions_walk));
-    final pinCenter = tester.getCenter(find.descendant(
-      of: find.byKey(const ValueKey('marker-1')),
-      matching: find.byIcon(Icons.location_on),
-    ));
+      final travelerCenter = tester.getCenter(
+        find.byIcon(Icons.directions_walk),
+      );
+      final pinCenter = tester.getCenter(
+        find.descendant(
+          of: find.byKey(const ValueKey('marker-1')),
+          matching: find.byIcon(Icons.location_on),
+        ),
+      );
 
-    // A small tolerance for the location_on glyph's own internal shape
-    // (its "pin tip" isn't dead-center of its icon box) — anything beyond
-    // that means the traveler and the waypoint it's supposedly standing on
-    // have drifted apart on screen.
-    expect((travelerCenter - pinCenter).distance, lessThan(40));
-  });
+      // A small tolerance for the location_on glyph's own internal shape
+      // (its "pin tip" isn't dead-center of its icon box) — anything beyond
+      // that means the traveler and the waypoint it's supposedly standing on
+      // have drifted apart on screen.
+      expect((travelerCenter - pinCenter).distance, lessThan(40));
+    },
+  );
 
   testWidgets(
-      'the traveler icon coincides with its pin on a wide, low-zoom journey '
-      '(Italy to Jerusalem, mirroring a real multi-leg route)',
-      (tester) async {
-    await pump(tester, initialPersonId: 4);
+    'the traveler icon coincides with its pin on a wide, low-zoom journey '
+    '(Italy to Jerusalem, mirroring a real multi-leg route)',
+    (tester) async {
+      await pump(tester, initialPersonId: 4);
 
-    final travelerCenter =
-        tester.getCenter(find.byIcon(Icons.directions_walk));
-    final pinCenter = tester.getCenter(find.descendant(
-      of: find.byKey(const ValueKey('marker-10')),
-      matching: find.byIcon(Icons.location_on),
-    ));
+      final travelerCenter = tester.getCenter(
+        find.byIcon(Icons.directions_walk),
+      );
+      final pinCenter = tester.getCenter(
+        find.descendant(
+          of: find.byKey(const ValueKey('marker-10')),
+          matching: find.byIcon(Icons.location_on),
+        ),
+      );
 
-    expect((travelerCenter - pinCenter).distance, lessThan(40));
-  });
+      expect((travelerCenter - pinCenter).distance, lessThan(40));
+    },
+  );
 
-  testWidgets('opening with initialPersonId enters journey mode directly',
-      (tester) async {
+  testWidgets('opening with initialPersonId enters journey mode directly', (
+    tester,
+  ) async {
     await pump(tester, initialPersonId: 1);
 
     expect(find.text('Conversion'), findsOneWidget);
@@ -196,8 +235,9 @@ void main() {
     expect(find.byIcon(Icons.play_arrow), findsOneWidget);
   });
 
-  testWidgets('selecting a person via search enters journey mode',
-      (tester) async {
+  testWidgets('selecting a person via search enters journey mode', (
+    tester,
+  ) async {
     await pump(tester);
 
     await tester.tap(find.byTooltip("Follow a person's journey"));
@@ -210,8 +250,9 @@ void main() {
     expect(find.text('Conversion'), findsOneWidget);
   });
 
-  testWidgets('play/pause and step controls advance and rewind the journey',
-      (tester) async {
+  testWidgets('play/pause and step controls advance and rewind the journey', (
+    tester,
+  ) async {
     await pump(tester, initialPersonId: 1);
 
     expect(find.text('Conversion'), findsOneWidget);
@@ -233,59 +274,65 @@ void main() {
   });
 
   testWidgets(
-      'pausing mid-leg settles at the nearer waypoint instead of freezing '
-      'between them', (tester) async {
-    await pump(tester, initialPersonId: 1);
+    'pausing mid-leg settles at the nearer waypoint instead of freezing '
+    'between them',
+    (tester) async {
+      await pump(tester, initialPersonId: 1);
 
-    expect(find.text('Conversion'), findsOneWidget);
+      expect(find.text('Conversion'), findsOneWidget);
 
-    // Past the halfway point of the 2200ms leg -> pausing should settle
-    // forward onto the destination waypoint, not freeze mid-transit.
-    await tester.tap(find.byIcon(Icons.play_arrow));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 1300));
-    await tester.tap(find.byIcon(Icons.pause));
-    await tester.pump();
+      // Past the halfway point of the 2200ms leg -> pausing should settle
+      // forward onto the destination waypoint, not freeze mid-transit.
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1300));
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
 
-    expect(find.text('Sent out from Antioch'), findsOneWidget);
-    expect(find.text('Conversion'), findsNothing);
-  });
+      expect(find.text('Sent out from Antioch'), findsOneWidget);
+      expect(find.text('Conversion'), findsNothing);
+    },
+  );
 
   testWidgets(
-      'playback bar sits above the system navigation bar/gesture inset',
-      (tester) async {
-    // Regression: the journey controls (step card + playback bar) were
-    // rendered directly in the body's Column with no SafeArea, so on a
-    // device with on-screen nav buttons/gesture bar (simulated here via the
-    // view's bottom padding) they were drawn underneath the system UI.
-    // view.padding is in physical pixels; use the test device's pixel ratio
-    // so the simulated inset is exactly 48 *logical* pixels.
-    const insetLogical = 48.0;
-    final dpr = tester.view.devicePixelRatio;
-    final originalPadding = tester.view.padding;
-    tester.view.padding = FakeViewPadding(bottom: insetLogical * dpr);
-    addTearDown(() => tester.view.padding = originalPadding);
+    'playback bar sits above the system navigation bar/gesture inset',
+    (tester) async {
+      // Regression: the journey controls (step card + playback bar) were
+      // rendered directly in the body's Column with no SafeArea, so on a
+      // device with on-screen nav buttons/gesture bar (simulated here via the
+      // view's bottom padding) they were drawn underneath the system UI.
+      // view.padding is in physical pixels; use the test device's pixel ratio
+      // so the simulated inset is exactly 48 *logical* pixels.
+      const insetLogical = 48.0;
+      final dpr = tester.view.devicePixelRatio;
+      final originalPadding = tester.view.padding;
+      tester.view.padding = FakeViewPadding(bottom: insetLogical * dpr);
+      addTearDown(() => tester.view.padding = originalPadding);
 
-    await pump(tester, initialPersonId: 1);
+      await pump(tester, initialPersonId: 1);
 
-    final screenBottom =
-        tester.view.physicalSize.height / tester.view.devicePixelRatio;
-    final controlsBottom =
-        tester.getBottomLeft(find.byKey(const Key('atlas-journey-controls'))).dy;
+      final screenBottom =
+          tester.view.physicalSize.height / tester.view.devicePixelRatio;
+      final controlsBottom = tester
+          .getBottomLeft(find.byKey(const Key('atlas-journey-controls')))
+          .dy;
 
-    expect(screenBottom - controlsBottom, greaterThanOrEqualTo(insetLogical));
-  });
+      expect(screenBottom - controlsBottom, greaterThanOrEqualTo(insetLogical));
+    },
+  );
 
-  testWidgets('a single-waypoint journey has no playback controls',
-      (tester) async {
+  testWidgets('a single-waypoint journey has no playback controls', (
+    tester,
+  ) async {
     await pump(tester, initialPersonId: 2);
 
     expect(find.text('Sent out from Antioch'), findsOneWidget);
     expect(find.byIcon(Icons.play_arrow), findsNothing);
   });
 
-  testWidgets('a person with no mappable events shows the empty state',
-      (tester) async {
+  testWidgets('a person with no mappable events shows the empty state', (
+    tester,
+  ) async {
     await pump(tester, initialPersonId: 3);
 
     expect(find.text('No journey to show'), findsOneWidget);

@@ -15,18 +15,16 @@ void main() {
     // pending-timer check when the tree unmounts.
     final userStore = UserStore(NativeDatabase.memory());
     addTearDown(userStore.close);
-    final container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(userStore),
-    ]);
+    final container = ProviderContainer(
+      overrides: [userStoreProvider.overrideWithValue(userStore)],
+    );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
         child: const MaterialApp(
-          home: Scaffold(
-            body: MediaPanel(bookName: 'Genesis', chapter: 1),
-          ),
+          home: Scaffold(body: MediaPanel(bookName: 'Genesis', chapter: 1)),
         ),
       ),
     );

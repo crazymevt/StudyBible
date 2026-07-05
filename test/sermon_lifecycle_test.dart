@@ -1,7 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_quill/flutter_quill.dart' show FlutterQuillLocalizations;
+import 'package:flutter_quill/flutter_quill.dart'
+    show FlutterQuillLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:study_bible/app/achievement_service.dart';
@@ -26,8 +27,9 @@ void main() {
   // route was still tearing down, corrupting the element tree
   // ("_dependents.isEmpty is not true" / "TextEditingController used after
   // disposed"). Creating a sermon must mount the editor cleanly.
-  testWidgets('creating a sermon mounts the editor without a lifecycle crash',
-      (tester) async {
+  testWidgets('creating a sermon mounts the editor without a lifecycle crash', (
+    tester,
+  ) async {
     // Wide surface so SermonsPanel takes the desktop path: creating a sermon
     // sets selectedSermonIdProvider and rebuilds the panel into the editor
     // in-place — the same "mount the editor right after the dialog" sequence
@@ -39,12 +41,16 @@ void main() {
     final user = UserStore(NativeDatabase.memory());
     addTearDown(user.close);
 
-    final container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(user),
-      // path_provider-backed; would throw MissingPluginException in tests.
-      deviceIdProvider.overrideWith((ref) async => 'test-device'),
-      achievementServiceProvider.overrideWith((ref) => _NoopAchievementService(ref)),
-    ]);
+    final container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(user),
+        // path_provider-backed; would throw MissingPluginException in tests.
+        deviceIdProvider.overrideWith((ref) async => 'test-device'),
+        achievementServiceProvider.overrideWith(
+          (ref) => _NoopAchievementService(ref),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
 
     final errors = <FlutterErrorDetails>[];
@@ -87,14 +93,19 @@ void main() {
     await _settle(tester);
 
     final lifecycleErrors = errors
-        .where((e) =>
-            e.exceptionAsString().contains('_dependents.isEmpty') ||
-            e.exceptionAsString().contains('used after') ||
-            e.exceptionAsString().contains('called during build') ||
-            e.exceptionAsString().contains('disposed'))
+        .where(
+          (e) =>
+              e.exceptionAsString().contains('_dependents.isEmpty') ||
+              e.exceptionAsString().contains('used after') ||
+              e.exceptionAsString().contains('called during build') ||
+              e.exceptionAsString().contains('disposed'),
+        )
         .toList();
-    expect(lifecycleErrors, isEmpty,
-        reason: lifecycleErrors.map((e) => e.exceptionAsString()).join('\n\n'));
+    expect(
+      lifecycleErrors,
+      isEmpty,
+      reason: lifecycleErrors.map((e) => e.exceptionAsString()).join('\n\n'),
+    );
 
     // The editor actually mounted (the crash used to happen here).
     expect(find.byType(SermonEditorScreen), findsOneWidget);

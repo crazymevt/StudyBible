@@ -26,13 +26,16 @@ void main() {
         VerseSegment(text: 'next'),
         VerseSegment(isFootnote: true, footnoteText: 'see Gen 1'),
       ]);
-      expect(html,
-          '<p>plain <i>added</i><br>next<span class="note">[see Gen 1]</span></p>');
+      expect(
+        html,
+        '<p>plain <i>added</i><br>next<span class="note">[see Gen 1]</span></p>',
+      );
     });
 
     test('drops Strong\'s numbers from display text', () {
-      final html =
-          segmentsToHtml([const VerseSegment(text: 'God', strongs: 'H430')]);
+      final html = segmentsToHtml([
+        const VerseSegment(text: 'God', strongs: 'H430'),
+      ]);
       expect(html, '<p>God</p>');
     });
 

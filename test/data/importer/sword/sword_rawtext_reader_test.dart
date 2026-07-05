@@ -32,16 +32,12 @@ void main() {
     final lenB = utf8.encode(verseB).length;
 
     // Slot 0 is a zero-length heading; slots 1–2 are the two verses.
-    final verseIndex = _concat([
-      _vss(0, 0),
-      _vss(0, lenA),
-      _vss(lenA, lenB),
-    ]);
+    final verseIndex = _concat([_vss(0, 0), _vss(0, lenA), _vss(lenA, lenB)]);
 
     SwordRawTextReader reader() => SwordRawTextReader(
-          verseIndex: verseIndex,
-          textData: Uint8List.fromList(text),
-        );
+      verseIndex: verseIndex,
+      textData: Uint8List.fromList(text),
+    );
 
     test('decodes verses by slicing the flat text file', () {
       final r = reader();

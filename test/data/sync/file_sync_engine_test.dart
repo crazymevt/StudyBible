@@ -28,8 +28,10 @@ void main() {
 
   test('push writes this device state file and creates the folder', () async {
     final dir = Directory('${tmpDir.path}/nested');
-    final engine =
-        FileSyncEngine(storage: IoSyncStorage(dir), localDeviceId: 'A');
+    final engine = FileSyncEngine(
+      storage: IoSyncStorage(dir),
+      localDeviceId: 'A',
+    );
 
     await engine.push([record('1'), record('2')]);
 
@@ -39,13 +41,19 @@ void main() {
   });
 
   test('pull reads other devices but skips this device own file', () async {
-    await FileSyncEngine(storage: storage, localDeviceId: 'A')
-        .push([record('local', device: 'A')]);
-    await FileSyncEngine(storage: storage, localDeviceId: 'B')
-        .push([record('remote', device: 'B')]);
+    await FileSyncEngine(
+      storage: storage,
+      localDeviceId: 'A',
+    ).push([record('local', device: 'A')]);
+    await FileSyncEngine(
+      storage: storage,
+      localDeviceId: 'B',
+    ).push([record('remote', device: 'B')]);
 
-    final pulled = await FileSyncEngine(storage: storage, localDeviceId: 'A')
-        .pull();
+    final pulled = await FileSyncEngine(
+      storage: storage,
+      localDeviceId: 'A',
+    ).pull();
 
     expect(pulled.map((r) => r.id), ['remote']);
   });
@@ -59,11 +67,14 @@ void main() {
   });
 
   test('pull ignores malformed json lines', () async {
-    await File('${tmpDir.path}/state-B.jsonl')
-        .writeAsString('not json\n{"id":"ok","updatedAt":1,"deviceId":"B","deleted":false}\n');
+    await File('${tmpDir.path}/state-B.jsonl').writeAsString(
+      'not json\n{"id":"ok","updatedAt":1,"deviceId":"B","deleted":false}\n',
+    );
 
-    final pulled =
-        await FileSyncEngine(storage: storage, localDeviceId: 'A').pull();
+    final pulled = await FileSyncEngine(
+      storage: storage,
+      localDeviceId: 'A',
+    ).pull();
 
     expect(pulled.map((r) => r.id), ['ok']);
   });
@@ -73,8 +84,9 @@ void main() {
     await engine.push([record('1'), record('2')]);
     await engine.push([record('3')]);
 
-    final lines = (await File('${tmpDir.path}/state-A.jsonl').readAsLines())
-        .where((l) => l.isNotEmpty);
+    final lines = (await File(
+      '${tmpDir.path}/state-A.jsonl',
+    ).readAsLines()).where((l) => l.isNotEmpty);
     expect(lines, hasLength(1));
   });
 }

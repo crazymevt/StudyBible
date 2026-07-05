@@ -37,21 +37,23 @@ void main() {
     });
     final prefs = await SharedPreferences.getInstance();
 
-    final container = ProviderContainer(overrides: [
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      contentStoreProvider.overrideWithValue(ContentStore(NativeDatabase.memory())),
-      userStoreProvider.overrideWithValue(UserStore(NativeDatabase.memory())),
-      // The real provider hits path_provider, which has no test implementation.
-      deviceIdProvider.overrideWith((ref) async => 'test-device'),
-    ]);
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        contentStoreProvider.overrideWithValue(
+          ContentStore(NativeDatabase.memory()),
+        ),
+        userStoreProvider.overrideWithValue(UserStore(NativeDatabase.memory())),
+        // The real provider hits path_provider, which has no test implementation.
+        deviceIdProvider.overrideWith((ref) async => 'test-device'),
+      ],
+    );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(
-          home: Scaffold(body: ScriptureNavBar()),
-        ),
+        child: const MaterialApp(home: Scaffold(body: ScriptureNavBar())),
       ),
     );
 
@@ -88,7 +90,9 @@ void main() {
     // Next is disabled on the last stop; previous steps back.
     expect(
       tester
-          .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.chevron_right))
+          .widget<IconButton>(
+            find.widgetWithIcon(IconButton, Icons.chevron_right),
+          )
           .onPressed,
       isNull,
     );

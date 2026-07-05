@@ -60,10 +60,7 @@ void main() {
 
     test('single verse', () {
       const stop = ScriptureRouteStop(bookName: 'John', chapter: 3, verse: 16);
-      expect(
-        stopHighlightVerses(stop, 'John', 3, chapterVerses),
-        {16},
-      );
+      expect(stopHighlightVerses(stop, 'John', 3, chapterVerses), {16});
     });
 
     test('wrong book or chapter yields nothing', () {
@@ -74,10 +71,14 @@ void main() {
 
     test('chapter-only stop covers the whole chapter', () {
       const stop = ScriptureRouteStop(bookName: 'Psalms', chapter: 23);
-      expect(
-        stopHighlightVerses(stop, 'Psalms', 23, [1, 2, 3, 4, 5, 6]),
-        {1, 2, 3, 4, 5, 6},
-      );
+      expect(stopHighlightVerses(stop, 'Psalms', 23, [1, 2, 3, 4, 5, 6]), {
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+      });
     });
 
     test('range within a chapter', () {
@@ -88,10 +89,11 @@ void main() {
         endChapter: 8,
         endVerse: 30,
       );
-      expect(
-        stopHighlightVerses(stop, 'Romans', 8, chapterVerses),
-        {28, 29, 30},
-      );
+      expect(stopHighlightVerses(stop, 'Romans', 8, chapterVerses), {
+        28,
+        29,
+        30,
+      });
     });
 
     test('cross-chapter range highlights each chapter correctly', () {
@@ -103,20 +105,15 @@ void main() {
         endVerse: 2,
       );
       // First chapter: from the start verse to the chapter's end.
-      expect(
-        stopHighlightVerses(stop, 'Genesis', 1, chapterVerses),
-        {29, 30, 31},
-      );
+      expect(stopHighlightVerses(stop, 'Genesis', 1, chapterVerses), {
+        29,
+        30,
+        31,
+      });
       // Middle chapter: everything.
-      expect(
-        stopHighlightVerses(stop, 'Genesis', 2, [1, 2, 3]),
-        {1, 2, 3},
-      );
+      expect(stopHighlightVerses(stop, 'Genesis', 2, [1, 2, 3]), {1, 2, 3});
       // Last chapter: up to the end verse.
-      expect(
-        stopHighlightVerses(stop, 'Genesis', 3, chapterVerses),
-        {1, 2},
-      );
+      expect(stopHighlightVerses(stop, 'Genesis', 3, chapterVerses), {1, 2});
       // Outside the range.
       expect(stopHighlightVerses(stop, 'Genesis', 4, chapterVerses), isEmpty);
     });
@@ -157,10 +154,7 @@ void main() {
     test('collapses an immediately repeated citation', () {
       const text = 'John 3:16 — yes, John 3:16! But also Romans 8:28.';
       final stops = scanSermonRoute(text, books);
-      expect(stops.map((s) => s.label).toList(), [
-        'John 3:16',
-        'Romans 8:28',
-      ]);
+      expect(stops.map((s) => s.label).toList(), ['John 3:16', 'Romans 8:28']);
     });
 
     test('no references yields an empty route', () {

@@ -11,10 +11,12 @@ void main() {
   TagData tag(int i) => TagData(id: 't$i', name: 'tag$i');
 
   Widget harness({required double keyboardInset}) {
-    final container = ProviderContainer(overrides: [
-      // Several applied tags so the fixed content is tall enough to overflow
-      // the keyboard-shrunk dialog if the body weren't scrollable.
-      tagsForEntityProvider('e1').overrideWith((ref) => Stream.value([
+    final container = ProviderContainer(
+      overrides: [
+        // Several applied tags so the fixed content is tall enough to overflow
+        // the keyboard-shrunk dialog if the body weren't scrollable.
+        tagsForEntityProvider('e1').overrideWith(
+          (ref) => Stream.value([
             for (var i = 0; i < 6; i++)
               EntityTagData(
                 id: 'et$i',
@@ -23,17 +25,22 @@ void main() {
                 entityType: 'note',
                 tag: tag(i),
               ),
-          ])),
-      allTagsProvider
-          .overrideWith((ref) => Stream.value([for (var i = 0; i < 12; i++) tag(i)])),
-    ]);
+          ]),
+        ),
+        allTagsProvider.overrideWith(
+          (ref) => Stream.value([for (var i = 0; i < 12; i++) tag(i)]),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
     return UncontrolledProviderScope(
       container: container,
       child: MaterialApp(
         home: MediaQuery(
           // Simulate a raised keyboard eating most of the vertical space.
-          data: MediaQueryData(viewInsets: EdgeInsets.only(bottom: keyboardInset)),
+          data: MediaQueryData(
+            viewInsets: EdgeInsets.only(bottom: keyboardInset),
+          ),
           child: const Scaffold(
             body: TagEditorDialog(entityId: 'e1', entityType: 'note'),
           ),
@@ -42,8 +49,9 @@ void main() {
     );
   }
 
-  testWidgets('lays out without overflow when the keyboard is up',
-      (tester) async {
+  testWidgets('lays out without overflow when the keyboard is up', (
+    tester,
+  ) async {
     await tester.pumpWidget(harness(keyboardInset: 420));
     await tester.pump();
     await tester.pump();
@@ -54,8 +62,9 @@ void main() {
     expect(find.text('Manage Tags'), findsOneWidget);
   });
 
-  testWidgets('lays out without overflow with the keyboard down',
-      (tester) async {
+  testWidgets('lays out without overflow with the keyboard down', (
+    tester,
+  ) async {
     await tester.pumpWidget(harness(keyboardInset: 0));
     await tester.pump();
     await tester.pump();

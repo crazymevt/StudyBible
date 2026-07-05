@@ -33,14 +33,16 @@ void main() {
     SharedPreferences.setMockInitialValues(prefValues);
     final prefs = await SharedPreferences.getInstance();
     store = UserStore(NativeDatabase.memory());
-    container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(store),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      syncServiceProvider.overrideWith((ref) {
-        service = _CountingSyncService(store, ref);
-        return service;
-      }),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(store),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        syncServiceProvider.overrideWith((ref) {
+          service = _CountingSyncService(store, ref);
+          return service;
+        }),
+      ],
+    );
     addTearDown(store.close);
     // The provider is lazy; instantiate the counting service up front so the
     // zero-sync tests have something to assert against.
@@ -53,8 +55,9 @@ void main() {
   // before testWidgets' pending-timer check runs (addTearDown is too late).
   void disposeContainer() => container.dispose();
 
-  testWidgets('does nothing while the setting is off (the default)',
-      (tester) async {
+  testWidgets('does nothing while the setting is off (the default)', (
+    tester,
+  ) async {
     await setUpWith({});
 
     await tester.pump(const Duration(hours: 2));
@@ -62,8 +65,9 @@ void main() {
     disposeContainer();
   });
 
-  testWidgets('syncs shortly after startup, then on the default interval',
-      (tester) async {
+  testWidgets('syncs shortly after startup, then on the default interval', (
+    tester,
+  ) async {
     await setUpWith({'autoSyncEnabled': true});
 
     // Not yet — the startup sync is deferred past first paint.
@@ -94,16 +98,20 @@ void main() {
     disposeContainer();
   });
 
-  testWidgets('falls back to the default for an unknown stored interval',
-      (tester) async {
+  testWidgets('falls back to the default for an unknown stored interval', (
+    tester,
+  ) async {
     await setUpWith({'autoSyncEnabled': true, 'autoSyncIntervalMinutes': 7});
-    expect(container.read(autoSyncIntervalProvider),
-        kDefaultAutoSyncIntervalMinutes);
+    expect(
+      container.read(autoSyncIntervalProvider),
+      kDefaultAutoSyncIntervalMinutes,
+    );
     disposeContainer();
   });
 
-  testWidgets('turning the setting on starts syncing; off cancels the timers',
-      (tester) async {
+  testWidgets('turning the setting on starts syncing; off cancels the timers', (
+    tester,
+  ) async {
     await setUpWith({});
 
     container.read(autoSyncEnabledProvider.notifier).setEnabled(true);

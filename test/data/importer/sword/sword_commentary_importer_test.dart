@@ -31,8 +31,10 @@ SwordZTextReader _reader(Map<int, String> slotToFragment) {
   final offsets = <int, ({int offset, int len})>{};
   for (final slot in order) {
     final bytes = utf8.encode(slotToFragment[slot]!);
-    offsets[slot] =
-        (offset: utf8.encode(buffer.toString()).length, len: bytes.length);
+    offsets[slot] = (
+      offset: utf8.encode(buffer.toString()).length,
+      len: bytes.length,
+    );
     buffer.write(slotToFragment[slot]!);
   }
   final block = utf8.encode(buffer.toString());
@@ -41,9 +43,11 @@ SwordZTextReader _reader(Map<int, String> slotToFragment) {
   final verseRecords = <List<int>>[];
   for (var i = 0; i <= maxSlot; i++) {
     final e = offsets[i];
-    verseRecords.add(e == null
-        ? _concat([_le32(0), _le32(0), _le16(0)])
-        : _concat([_le32(0), _le32(e.offset), _le16(e.len)]));
+    verseRecords.add(
+      e == null
+          ? _concat([_le32(0), _le32(0), _le16(0)])
+          : _concat([_le32(0), _le32(e.offset), _le16(e.len)]),
+    );
   }
   return SwordZTextReader(
     verseIndex: _concat(verseRecords),
@@ -73,12 +77,11 @@ About=A test commentary.
 
   // Commentary notes on Genesis 1:1 (OT) and Matthew 1:1 (NT).
   SwordZTextReader otReader() => _reader({
-        kjv.indexOf('OT', 0, 1, 1)!:
-            '<p>The first verse.</p><p>A second paragraph<note>cf. John 1</note></p>',
-      });
-  SwordZTextReader ntReader() => _reader({
-        kjv.indexOf('NT', 0, 1, 1)!: 'The genealogy record.',
-      });
+    kjv.indexOf('OT', 0, 1, 1)!:
+        '<p>The first verse.</p><p>A second paragraph<note>cf. John 1</note></p>',
+  });
+  SwordZTextReader ntReader() =>
+      _reader({kjv.indexOf('NT', 0, 1, 1)!: 'The genealogy record.'});
 
   test('imports book- and chapter-intro slots as null coordinates', () async {
     final reader = _reader({
@@ -88,17 +91,19 @@ About=A test commentary.
     });
     await SwordCommentaryImporter(store).importCommentary(config, ot: reader);
 
-    final entries = await (store.select(store.commentaryEntries)
-          ..where((e) => e.bookName.equals('Genesis')))
-        .get();
+    final entries = await (store.select(
+      store.commentaryEntries,
+    )..where((e) => e.bookName.equals('Genesis'))).get();
     expect(entries, hasLength(3));
 
-    final bookIntro =
-        entries.singleWhere((e) => e.chapter == null && e.verse == null);
+    final bookIntro = entries.singleWhere(
+      (e) => e.chapter == null && e.verse == null,
+    );
     expect(bookIntro.textContent, contains('book introduction'));
 
-    final chapterIntro =
-        entries.singleWhere((e) => e.chapter == 1 && e.verse == null);
+    final chapterIntro = entries.singleWhere(
+      (e) => e.chapter == 1 && e.verse == null,
+    );
     expect(chapterIntro.textContent, contains('Chapter 1 overview'));
 
     final verse = entries.singleWhere((e) => e.chapter == 1 && e.verse == 1);
@@ -106,57 +111,68 @@ About=A test commentary.
   });
 
   test('imports commentary metadata and entries', () async {
-    await SwordCommentaryImporter(store)
-        .importCommentary(config, ot: otReader(), nt: ntReader());
+    await SwordCommentaryImporter(
+      store,
+    ).importCommentary(config, ot: otReader(), nt: ntReader());
 
     final commentary = await store.select(store.commentaries).getSingle();
     expect(commentary.abbreviation, 'MHCC');
     expect(commentary.name, 'Matthew Henry Concise');
     expect(commentary.about, 'A test commentary.');
 
-    final entries = await (store.select(store.commentaryEntries)
-          ..orderBy([(e) => OrderingTerm(expression: e.bookName)]))
-        .get();
+    final entries = await (store.select(
+      store.commentaryEntries,
+    )..orderBy([(e) => OrderingTerm(expression: e.bookName)])).get();
     expect(entries, hasLength(2));
     final gen = entries.firstWhere((e) => e.bookName == 'Genesis');
     expect(gen.chapter, 1);
     expect(gen.verse, 1);
   });
 
-  test('serialises entry markup to HTML paragraphs, footnotes inline', () async {
-    await SwordCommentaryImporter(store)
-        .importCommentary(config, ot: otReader(), nt: ntReader());
+  test(
+    'serialises entry markup to HTML paragraphs, footnotes inline',
+    () async {
+      await SwordCommentaryImporter(
+        store,
+      ).importCommentary(config, ot: otReader(), nt: ntReader());
 
-    final gen = await (store.select(store.commentaryEntries)
-          ..where((e) => e.bookName.equals('Genesis')))
-        .getSingle();
-    expect(gen.textContent, contains('<p>The first verse.</p>'));
-    expect(gen.textContent, contains('<p>A second paragraph'));
-    expect(gen.textContent, contains('[cf. John 1]')); // footnote inlined
-  });
+      final gen = await (store.select(
+        store.commentaryEntries,
+      )..where((e) => e.bookName.equals('Genesis'))).getSingle();
+      expect(gen.textContent, contains('<p>The first verse.</p>'));
+      expect(gen.textContent, contains('<p>A second paragraph'));
+      expect(gen.textContent, contains('[cf. John 1]')); // footnote inlined
+    },
+  );
 
   test('populates the FTS index with markup stripped', () async {
-    await SwordCommentaryImporter(store)
-        .importCommentary(config, ot: otReader(), nt: ntReader());
+    await SwordCommentaryImporter(
+      store,
+    ).importCommentary(config, ot: otReader(), nt: ntReader());
 
-    final rows = await store.customSelect(
-      "SELECT reference_id FROM content_search "
-      "WHERE type = 'commentary' AND content_search MATCH 'genealogy'",
-    ).get();
+    final rows = await store
+        .customSelect(
+          "SELECT reference_id FROM content_search "
+          "WHERE type = 'commentary' AND content_search MATCH 'genealogy'",
+        )
+        .get();
     expect(rows, hasLength(1));
     // The HTML markup itself (tag/attribute tokens) must not be indexed.
-    final tagRows = await store.customSelect(
-      "SELECT reference_id FROM content_search "
-      "WHERE type = 'commentary' AND content_search MATCH 'span'",
-    ).get();
+    final tagRows = await store
+        .customSelect(
+          "SELECT reference_id FROM content_search "
+          "WHERE type = 'commentary' AND content_search MATCH 'span'",
+        )
+        .get();
     expect(tagRows, isEmpty);
   });
 
   test('rejects a non-commentary driver', () async {
     final bible = SwordConfig.parse('[X]\nModDrv=zText\nSourceType=OSIS');
     expect(
-      () => SwordCommentaryImporter(store)
-          .importCommentary(bible, ot: otReader()),
+      () => SwordCommentaryImporter(
+        store,
+      ).importCommentary(bible, ot: otReader()),
       throwsUnsupportedError,
     );
   });
@@ -174,18 +190,20 @@ About=A test commentary.
     test('imports an uncompressed RawCom module (ot + ot.vss)', () async {
       final root = await Directory.systemTemp.createTemp('sword_rawcom');
       addTearDown(() => root.delete(recursive: true));
-      final dataDir =
-          Directory(p.join(root.path, 'modules', 'comments', 'rawcom', 'test'))
-            ..createSync(recursive: true);
+      final dataDir = Directory(
+        p.join(root.path, 'modules', 'comments', 'rawcom', 'test'),
+      )..createSync(recursive: true);
 
       const note = 'A plain commentary note.';
       final slot = kjv.indexOf('OT', 0, 1, 1)!;
       final bytes = utf8.encode(note);
       final records = <List<int>>[];
       for (var i = 0; i <= slot; i++) {
-        records.add(i == slot
-            ? _concat([_le32(0), _le16(bytes.length)])
-            : _concat([_le32(0), _le16(0)]));
+        records.add(
+          i == slot
+              ? _concat([_le32(0), _le16(bytes.length)])
+              : _concat([_le32(0), _le16(0)]),
+        );
       }
       File(p.join(dataDir.path, 'ot')).writeAsBytesSync(bytes);
       File(p.join(dataDir.path, 'ot.vss')).writeAsBytesSync(_concat(records));
@@ -201,9 +219,9 @@ Description=Raw Commentary
 
       await SwordCommentaryImporter(store).importFromDirectory(root, cfg);
 
-      final gen = await (store.select(store.commentaryEntries)
-            ..where((e) => e.bookName.equals('Genesis')))
-          .getSingle();
+      final gen = await (store.select(
+        store.commentaryEntries,
+      )..where((e) => e.bookName.equals('Genesis'))).getSingle();
       expect(gen.textContent, '<p>A plain commentary note.</p>');
     });
   });

@@ -31,13 +31,17 @@ void main() {
   setUp(() async {
     store = ContentStore(NativeDatabase.memory());
     userStore = UserStore(NativeDatabase.memory());
-    await store.into(store.biblePeople).insert(const BiblePeopleCompanion(
-          id: Value(1),
-          slug: Value('saul'),
-          name: Value('Saul'),
-          displayTitle: Value('Saul'),
-          verseCount: Value(1),
-        ));
+    await store
+        .into(store.biblePeople)
+        .insert(
+          const BiblePeopleCompanion(
+            id: Value(1),
+            slug: Value('saul'),
+            name: Value('Saul'),
+            displayTitle: Value('Saul'),
+            verseCount: Value(1),
+          ),
+        );
   });
 
   tearDown(() async {
@@ -46,17 +50,19 @@ void main() {
   });
 
   Future<({ProviderContainer container, ExplorerRef? Function() picked})>
-      pumpAndOpen(WidgetTester tester) async {
+  pumpAndOpen(WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    final container = ProviderContainer(overrides: [
-      contentStoreProvider.overrideWithValue(store),
-      userStoreProvider.overrideWithValue(userStore),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      peopleReadyProvider.overrideWith((ref) async => true),
-      placesReadyProvider.overrideWith((ref) async => true),
-      topicalIndexReadyProvider.overrideWith((ref) async => true),
-    ]);
+    final container = ProviderContainer(
+      overrides: [
+        contentStoreProvider.overrideWithValue(store),
+        userStoreProvider.overrideWithValue(userStore),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        peopleReadyProvider.overrideWith((ref) async => true),
+        placesReadyProvider.overrideWith((ref) async => true),
+        topicalIndexReadyProvider.overrideWith((ref) async => true),
+      ],
+    );
     addTearDown(container.dispose);
 
     ExplorerRef? picked;
@@ -94,8 +100,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('picking a result returns its ExplorerRef and closes cleanly',
-      (tester) async {
+  testWidgets('picking a result returns its ExplorerRef and closes cleanly', (
+    tester,
+  ) async {
     final opened = await pumpAndOpen(tester);
 
     await tester.enterText(find.byType(TextField), 'Saul');

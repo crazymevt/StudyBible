@@ -19,60 +19,88 @@ void main() {
   late ContentStore store;
   late ProviderContainer container;
 
-  Future<void> place(int id, String name, double lat, double lng) =>
-      store.into(store.places).insert(PlacesCompanion(
-            id: Value(id),
-            name: Value(name),
-            lat: Value(lat),
-            lng: Value(lng),
-          ));
+  Future<void> place(int id, String name, double lat, double lng) => store
+      .into(store.places)
+      .insert(
+        PlacesCompanion(
+          id: Value(id),
+          name: Value(name),
+          lat: Value(lat),
+          lng: Value(lng),
+        ),
+      );
 
   Future<void> placeVerse(
-          int id, int placeId, String book, int chapter, int verse) =>
-      store.into(store.placeVerses).insert(PlaceVersesCompanion(
-            id: Value(id),
-            placeId: Value(placeId),
-            bookName: Value(book),
-            chapter: Value(chapter),
-            verse: Value(verse),
-          ));
+    int id,
+    int placeId,
+    String book,
+    int chapter,
+    int verse,
+  ) => store
+      .into(store.placeVerses)
+      .insert(
+        PlaceVersesCompanion(
+          id: Value(id),
+          placeId: Value(placeId),
+          bookName: Value(book),
+          chapter: Value(chapter),
+          verse: Value(verse),
+        ),
+      );
 
-  Future<void> person(int id, String name) =>
-      store.into(store.biblePeople).insert(BiblePeopleCompanion(
-            id: Value(id),
-            slug: Value(name.toLowerCase()),
-            name: Value(name),
-            displayTitle: Value(name),
-            verseCount: const Value(0),
-          ));
+  Future<void> person(int id, String name) => store
+      .into(store.biblePeople)
+      .insert(
+        BiblePeopleCompanion(
+          id: Value(id),
+          slug: Value(name.toLowerCase()),
+          name: Value(name),
+          displayTitle: Value(name),
+          verseCount: const Value(0),
+        ),
+      );
 
-  Future<void> event(int id, String title,
-          {double? sortKey, int? startYear}) =>
-      store.into(store.timelineEvents).insert(TimelineEventsCompanion(
-            id: Value(id),
-            title: Value(title),
-            sortKey: Value(sortKey),
-            startYear: Value(startYear),
-          ));
+  Future<void> event(int id, String title, {double? sortKey, int? startYear}) =>
+      store
+          .into(store.timelineEvents)
+          .insert(
+            TimelineEventsCompanion(
+              id: Value(id),
+              title: Value(title),
+              sortKey: Value(sortKey),
+              startYear: Value(startYear),
+            ),
+          );
 
   Future<void> eventVerse(
-          int id, int eventId, int ord, String book, int chapter, int verse) =>
-      store.into(store.eventVerses).insert(EventVersesCompanion(
-            id: Value(id),
-            eventId: Value(eventId),
-            ord: Value(ord),
-            bookName: Value(book),
-            chapter: Value(chapter),
-            verse: Value(verse),
-          ));
+    int id,
+    int eventId,
+    int ord,
+    String book,
+    int chapter,
+    int verse,
+  ) => store
+      .into(store.eventVerses)
+      .insert(
+        EventVersesCompanion(
+          id: Value(id),
+          eventId: Value(eventId),
+          ord: Value(ord),
+          bookName: Value(book),
+          chapter: Value(chapter),
+          verse: Value(verse),
+        ),
+      );
 
   Future<void> participant(int id, int eventId, int personId) => store
       .into(store.eventParticipants)
-      .insert(EventParticipantsCompanion(
-        id: Value(id),
-        eventId: Value(eventId),
-        personId: Value(personId),
-      ));
+      .insert(
+        EventParticipantsCompanion(
+          id: Value(id),
+          eventId: Value(eventId),
+          personId: Value(personId),
+        ),
+      );
 
   setUp(() async {
     store = ContentStore(NativeDatabase.memory());
@@ -85,15 +113,23 @@ void main() {
     await place(3, 'Iconium', 37.85, 32.48);
 
     // Event 1: resolves to a single place (Damascus).
-    await event(1, 'Conversion on the road to Damascus',
-        sortKey: 35.0, startYear: 35);
+    await event(
+      1,
+      'Conversion on the road to Damascus',
+      sortKey: 35.0,
+      startYear: 35,
+    );
     await eventVerse(1, 1, 0, 'Acts', 9, 3);
     await placeVerse(1, 1, 'Acts', 9, 3);
 
     // Event 2: account mentions two places — Antioch (ord 0) then Iconium
     // (ord 1). The ord-0 place should win as the waypoint.
-    await event(2, 'Sent out from Antioch, passing through Iconium',
-        sortKey: 46.0, startYear: 46);
+    await event(
+      2,
+      'Sent out from Antioch, passing through Iconium',
+      sortKey: 46.0,
+      startYear: 46,
+    );
     await eventVerse(2, 2, 0, 'Acts', 13, 14);
     await eventVerse(3, 2, 1, 'Acts', 13, 51);
     await placeVerse(2, 2, 'Acts', 13, 14);
@@ -111,8 +147,12 @@ void main() {
     // Jerusalem) is a rhetorical aside, not the event's setting, so it
     // should fall through to unmapped rather than plotting any of them.
     await place(4, 'Nineveh', 36.36, 43.15);
-    await event(5, 'Blind and Dumb Demoniac and Following Discourse',
-        sortKey: 28.0, startYear: 28);
+    await event(
+      5,
+      'Blind and Dumb Demoniac and Following Discourse',
+      sortKey: 28.0,
+      startYear: 28,
+    );
     await eventVerse(5, 5, 0, 'Matthew', 12, 41);
     await placeVerse(4, 4, 'Matthew', 12, 41);
 
@@ -152,16 +192,18 @@ void main() {
       await participant(eventId, eventId, 1);
     }
 
-    container = ProviderContainer(overrides: [
-      contentStoreProvider.overrideWithValue(store),
-      peopleReadyProvider.overrideWith((ref) async => true),
-      placesReadyProvider.overrideWith((ref) async => true),
-      topicalIndexReadyProvider.overrideWith((ref) async => true),
-      // This suite's synthetic DB has no Elijah/Elisha rows for the real
-      // curated importer to find — it's exercised for real in
-      // curated_journeys_importer_test.dart instead.
-      curatedJourneysReadyProvider.overrideWith((ref) async => true),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        contentStoreProvider.overrideWithValue(store),
+        peopleReadyProvider.overrideWith((ref) async => true),
+        placesReadyProvider.overrideWith((ref) async => true),
+        topicalIndexReadyProvider.overrideWith((ref) async => true),
+        // This suite's synthetic DB has no Elijah/Elisha rows for the real
+        // curated importer to find — it's exercised for real in
+        // curated_journeys_importer_test.dart instead.
+        curatedJourneysReadyProvider.overrideWith((ref) async => true),
+      ],
+    );
   });
 
   tearDown(() async {
@@ -169,63 +211,76 @@ void main() {
     await store.close();
   });
 
-  test('waypoints follow chronological order and the first-mentioned place',
-      () async {
-    final journey =
-        await container.read(personJourneyProvider(1).future);
-    expect(journey, isNotNull);
-    expect(journey!.waypoints.map((w) => w.placeName),
-        ['Bethlehem 1', 'Damascus', 'Capernaum', 'Antioch']);
-    expect(journey.waypoints[3].eventId, 2);
-  });
-
-  test('a curated place override wins over the earlier-mentioned place',
-      () async {
-    final journey =
-        await container.read(personJourneyProvider(1).future);
-    final birth = journey!.waypoints.firstWhere((w) => w.eventId == 6);
-    expect(birth.placeName, 'Bethlehem 1');
-    expect(journey.waypoints.map((w) => w.placeName), isNot(contains('Syria')));
-  });
+  test(
+    'waypoints follow chronological order and the first-mentioned place',
+    () async {
+      final journey = await container.read(personJourneyProvider(1).future);
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Bethlehem 1',
+        'Damascus',
+        'Capernaum',
+        'Antioch',
+      ]);
+      expect(journey.waypoints[3].eventId, 2);
+    },
+  );
 
   test(
-      'a second curated override wins over an earlier retrospective mention',
-      () async {
-    final journey =
-        await container.read(personJourneyProvider(1).future);
-    final proclaims = journey!.waypoints.firstWhere((w) => w.eventId == 7);
-    expect(proclaims.placeName, 'Capernaum');
-  });
-
-  test('dated-but-unmapped and undated events are counted, not silent',
-      () async {
-    final journey =
-        await container.read(personJourneyProvider(1).future);
-    expect(journey!.unmappedEventCount, 3);
-    expect(journey.undatedEventCount, 1);
-  });
-
-  test('an event on the no-reliable-place list is treated as unmapped',
-      () async {
-    final journey =
-        await container.read(personJourneyProvider(1).future);
-    expect(journey!.waypoints.map((w) => w.placeName), isNot(contains('Nineveh')));
-    expect(journey.waypoints.map((w) => w.eventId), isNot(contains(5)));
-  });
+    'a curated place override wins over the earlier-mentioned place',
+    () async {
+      final journey = await container.read(personJourneyProvider(1).future);
+      final birth = journey!.waypoints.firstWhere((w) => w.eventId == 6);
+      expect(birth.placeName, 'Bethlehem 1');
+      expect(
+        journey.waypoints.map((w) => w.placeName),
+        isNot(contains('Syria')),
+      );
+    },
+  );
 
   test(
-      'a second no-reliable-place event (no correct candidate in its own '
+    'a second curated override wins over an earlier retrospective mention',
+    () async {
+      final journey = await container.read(personJourneyProvider(1).future);
+      final proclaims = journey!.waypoints.firstWhere((w) => w.eventId == 7);
+      expect(proclaims.placeName, 'Capernaum');
+    },
+  );
+
+  test(
+    'dated-but-unmapped and undated events are counted, not silent',
+    () async {
+      final journey = await container.read(personJourneyProvider(1).future);
+      expect(journey!.unmappedEventCount, 3);
+      expect(journey.undatedEventCount, 1);
+    },
+  );
+
+  test(
+    'an event on the no-reliable-place list is treated as unmapped',
+    () async {
+      final journey = await container.read(personJourneyProvider(1).future);
+      expect(
+        journey!.waypoints.map((w) => w.placeName),
+        isNot(contains('Nineveh')),
+      );
+      expect(journey.waypoints.map((w) => w.eventId), isNot(contains(5)));
+    },
+  );
+
+  test('a second no-reliable-place event (no correct candidate in its own '
       'verses) is treated as unmapped', () async {
-    final journey =
-        await container.read(personJourneyProvider(1).future);
+    final journey = await container.read(personJourneyProvider(1).future);
     expect(
-        journey!.waypoints.map((w) => w.placeName), isNot(contains('Thyatira')));
+      journey!.waypoints.map((w) => w.placeName),
+      isNot(contains('Thyatira')),
+    );
     expect(journey.waypoints.map((w) => w.eventId), isNot(contains(8)));
   });
 
   test('a person with no events resolves to an empty journey', () async {
-    final journey =
-        await container.read(personJourneyProvider(2).future);
+    final journey = await container.read(personJourneyProvider(2).future);
     expect(journey, isNotNull);
     expect(journey!.waypoints, isEmpty);
     expect(journey.unmappedEventCount, 0);
@@ -233,8 +288,7 @@ void main() {
   });
 
   test('an unknown person id resolves to null', () async {
-    final journey =
-        await container.read(personJourneyProvider(999).future);
+    final journey = await container.read(personJourneyProvider(999).future);
     expect(journey, isNull);
   });
 

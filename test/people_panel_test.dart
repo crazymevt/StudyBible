@@ -16,19 +16,28 @@ import 'package:study_bible/ui/reader/people_panel.dart';
 void main() {
   late ContentStore store;
 
-  Future<void> person(int id, String name,
-          {int? father, String? bio, int? birthYear, int? deathYear}) =>
-      store.into(store.biblePeople).insert(BiblePeopleCompanion(
-            id: Value(id),
-            slug: Value(name.toLowerCase()),
-            name: Value(name),
-            displayTitle: Value(name),
-            fatherId: Value(father),
-            bio: Value(bio),
-            birthYear: Value(birthYear),
-            deathYear: Value(deathYear),
-            verseCount: const Value(1),
-          ));
+  Future<void> person(
+    int id,
+    String name, {
+    int? father,
+    String? bio,
+    int? birthYear,
+    int? deathYear,
+  }) => store
+      .into(store.biblePeople)
+      .insert(
+        BiblePeopleCompanion(
+          id: Value(id),
+          slug: Value(name.toLowerCase()),
+          name: Value(name),
+          displayTitle: Value(name),
+          fatherId: Value(father),
+          bio: Value(bio),
+          birthYear: Value(birthYear),
+          deathYear: Value(deathYear),
+          verseCount: const Value(1),
+        ),
+      );
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({
@@ -37,17 +46,25 @@ void main() {
     });
     store = ContentStore(NativeDatabase.memory());
     await person(1, 'Amram');
-    await person(2, 'Aaron',
-        father: 1,
-        bio: 'The eldest son of Amram.',
-        birthYear: -1574,
-        deathYear: -1451);
-    await store.into(store.personVerses).insert(const PersonVersesCompanion(
-        id: Value(1),
-        personId: Value(2),
-        bookName: Value('Exodus'),
-        chapter: Value(4),
-        verse: Value(14)));
+    await person(
+      2,
+      'Aaron',
+      father: 1,
+      bio: 'The eldest son of Amram.',
+      birthYear: -1574,
+      deathYear: -1451,
+    );
+    await store
+        .into(store.personVerses)
+        .insert(
+          const PersonVersesCompanion(
+            id: Value(1),
+            personId: Value(2),
+            bookName: Value('Exodus'),
+            chapter: Value(4),
+            verse: Value(14),
+          ),
+        );
   });
 
   tearDown(() async {
@@ -56,11 +73,13 @@ void main() {
 
   Future<ProviderContainer> pumpPanel(WidgetTester tester) async {
     final prefs = await SharedPreferences.getInstance();
-    final container = ProviderContainer(overrides: [
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      contentStoreProvider.overrideWithValue(store),
-      peopleReadyProvider.overrideWith((ref) async => true),
-    ]);
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        contentStoreProvider.overrideWithValue(store),
+        peopleReadyProvider.overrideWith((ref) async => true),
+      ],
+    );
     addTearDown(container.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -71,8 +90,9 @@ void main() {
     return container;
   }
 
-  testWidgets('person detail shows years, family, bio, and verse groups',
-      (tester) async {
+  testWidgets('person detail shows years, family, bio, and verse groups', (
+    tester,
+  ) async {
     final container = await pumpPanel(tester);
     container.read(selectedPersonProvider.notifier).select(2);
     await tester.pumpAndSettle();
@@ -98,8 +118,9 @@ void main() {
     expect(find.widgetWithText(ActionChip, 'Aaron'), findsOneWidget);
   });
 
-  testWidgets('search lists matches and opens the tapped person',
-      (tester) async {
+  testWidgets('search lists matches and opens the tapped person', (
+    tester,
+  ) async {
     final container = await pumpPanel(tester);
     await tester.enterText(find.byType(TextField), 'Aar');
     await tester.pumpAndSettle();

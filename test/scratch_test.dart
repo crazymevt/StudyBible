@@ -28,12 +28,15 @@ void main() {
 
   setUp(() {
     store = UserStore(NativeDatabase.memory());
-    container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(store),
-      deviceIdProvider.overrideWith((ref) async => 'A'),
-      achievementServiceProvider
-          .overrideWith((ref) => _NoopAchievementService(ref)),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(store),
+        deviceIdProvider.overrideWith((ref) async => 'A'),
+        achievementServiceProvider.overrideWith(
+          (ref) => _NoopAchievementService(ref),
+        ),
+      ],
+    );
   });
 
   tearDown(() async {
@@ -61,92 +64,101 @@ void main() {
     expect((await rows()).single.content, '');
   });
 
-  test('promoteToSermon creates a sermon with the pad content, pad untouched',
-      () async {
-    final action = container.read(scratchActionProvider);
-    const delta = '[{"insert":"sermon seed\\n"}]';
-    await action.save(delta);
+  test(
+    'promoteToSermon creates a sermon with the pad content, pad untouched',
+    () async {
+      final action = container.read(scratchActionProvider);
+      const delta = '[{"insert":"sermon seed\\n"}]';
+      await action.save(delta);
 
-    final sermon = await action.promoteToSermon('My Sermon', delta);
-    expect(sermon.title, 'My Sermon');
-    expect(sermon.content, delta);
+      final sermon = await action.promoteToSermon('My Sermon', delta);
+      expect(sermon.title, 'My Sermon');
+      expect(sermon.content, delta);
 
-    // A real, non-deleted sermon row exists...
-    final sermons = await (store.select(store.sermons)
-          ..where((s) => s.deleted.equals(false)))
-        .get();
-    expect(sermons, hasLength(1));
-    // ...and the pad is left as-is.
-    expect((await rows()).single.content, delta);
-  });
+      // A real, non-deleted sermon row exists...
+      final sermons = await (store.select(
+        store.sermons,
+      )..where((s) => s.deleted.equals(false))).get();
+      expect(sermons, hasLength(1));
+      // ...and the pad is left as-is.
+      expect((await rows()).single.content, delta);
+    },
+  );
 
   test(
-      'promoteToNotebookPage creates a page with the pad content, pad untouched',
-      () async {
-    final action = container.read(scratchActionProvider);
-    const delta = '[{"insert":"notebook seed\\n"}]';
-    await action.save(delta);
+    'promoteToNotebookPage creates a page with the pad content, pad untouched',
+    () async {
+      final action = container.read(scratchActionProvider);
+      const delta = '[{"insert":"notebook seed\\n"}]';
+      await action.save(delta);
 
-    final notebook =
-        await container.read(notebookActionProvider).createNotebook('Ideas');
-    final page = await action.promoteToNotebookPage(
-      notebook.id,
-      'My Page',
-      delta,
-    );
-    expect(page.title, 'My Page');
-    expect(page.content, delta);
-    expect(page.notebookId, notebook.id);
+      final notebook = await container
+          .read(notebookActionProvider)
+          .createNotebook('Ideas');
+      final page = await action.promoteToNotebookPage(
+        notebook.id,
+        'My Page',
+        delta,
+      );
+      expect(page.title, 'My Page');
+      expect(page.content, delta);
+      expect(page.notebookId, notebook.id);
 
-    // A real, non-deleted page row exists...
-    final pages = await (store.select(store.notebookPages)
-          ..where((p) => p.deleted.equals(false)))
-        .get();
-    expect(pages, hasLength(1));
-    // ...and the pad is left as-is.
-    expect((await rows()).single.content, delta);
-  });
+      // A real, non-deleted page row exists...
+      final pages = await (store.select(
+        store.notebookPages,
+      )..where((p) => p.deleted.equals(false))).get();
+      expect(pages, hasLength(1));
+      // ...and the pad is left as-is.
+      expect((await rows()).single.content, delta);
+    },
+  );
 
-  test('sync never writes scratch content out (a synced entity still does)',
-      () async {
-    final tmpDir = await Directory.systemTemp.createTemp('scratch_sync');
-    addTearDown(() => tmpDir.delete(recursive: true));
+  test(
+    'sync never writes scratch content out (a synced entity still does)',
+    () async {
+      final tmpDir = await Directory.systemTemp.createTemp('scratch_sync');
+      addTearDown(() => tmpDir.delete(recursive: true));
 
-    SharedPreferences.setMockInitialValues({
-      'syncFolderPath': tmpDir.path,
-      'googleDriveEnabled': false,
-    });
-    final prefs = await SharedPreferences.getInstance();
+      SharedPreferences.setMockInitialValues({
+        'syncFolderPath': tmpDir.path,
+        'googleDriveEnabled': false,
+      });
+      final prefs = await SharedPreferences.getInstance();
 
-    final syncStore = UserStore(NativeDatabase.memory());
-    addTearDown(syncStore.close);
-    final syncContainer = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(syncStore),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      deviceIdProvider.overrideWith((ref) async => 'A'),
-      achievementServiceProvider
-          .overrideWith((ref) => _NoopAchievementService(ref)),
-    ]);
-    addTearDown(syncContainer.dispose);
+      final syncStore = UserStore(NativeDatabase.memory());
+      addTearDown(syncStore.close);
+      final syncContainer = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(syncStore),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+          achievementServiceProvider.overrideWith(
+            (ref) => _NoopAchievementService(ref),
+          ),
+        ],
+      );
+      addTearDown(syncContainer.dispose);
 
-    const scratchMarker = 'SCRATCH_SECRET_NOTE';
-    const bookmarkMarker = 'BOOKMARK_LABEL';
-    await syncContainer
-        .read(scratchActionProvider)
-        .save('[{"insert":"$scratchMarker\\n"}]');
-    // A normal synced entity, to prove sync actually wrote something out.
-    await syncContainer
-        .read(bookmarkActionProvider)
-        .saveBookmark(1, bookmarkMarker);
+      const scratchMarker = 'SCRATCH_SECRET_NOTE';
+      const bookmarkMarker = 'BOOKMARK_LABEL';
+      await syncContainer
+          .read(scratchActionProvider)
+          .save('[{"insert":"$scratchMarker\\n"}]');
+      // A normal synced entity, to prove sync actually wrote something out.
+      await syncContainer
+          .read(bookmarkActionProvider)
+          .saveBookmark(1, bookmarkMarker);
 
-    await syncContainer.read(syncServiceProvider).sync();
+      await syncContainer.read(syncServiceProvider).sync();
 
-    // The local device writes its own state file; it must carry the bookmark
-    // but never the scratch content.
-    final stateFile = File('${tmpDir.path}/state-A.jsonl');
-    expect(stateFile.existsSync(), isTrue);
-    final written = await stateFile.readAsString();
-    expect(written, contains(bookmarkMarker));
-    expect(written, isNot(contains(scratchMarker)));
-  });
+      // The local device writes its own state file; it must carry the bookmark
+      // but never the scratch content.
+      final stateFile = File('${tmpDir.path}/state-A.jsonl');
+      expect(stateFile.existsSync(), isTrue);
+      final written = await stateFile.readAsString();
+      expect(written, contains(bookmarkMarker));
+      expect(written, isNot(contains(scratchMarker)));
+    },
+  );
 }

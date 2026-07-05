@@ -31,8 +31,7 @@ Description=King James Version (1769)
     });
 
     test('ModDrv flags classify the content type', () {
-      SwordModDrv drv(String v) =>
-          SwordConfig.parse('[M]\nModDrv=$v').modDrv;
+      SwordModDrv drv(String v) => SwordConfig.parse('[M]\nModDrv=$v').modDrv;
 
       expect(drv('zText').isBible, isTrue);
       expect(drv('RawText').isBible, isTrue);
@@ -50,7 +49,10 @@ Description=King James Version (1769)
 
     test('ModDrv parsing is case-insensitive', () {
       expect(SwordConfig.parse('[M]\nModDrv=ZTEXT').modDrv, SwordModDrv.zText);
-      expect(SwordConfig.parse('[M]\nModDrv=ztext4').modDrv, SwordModDrv.zText4);
+      expect(
+        SwordConfig.parse('[M]\nModDrv=ztext4').modDrv,
+        SwordModDrv.zText4,
+      );
     });
 
     test('applies SWORD defaults for omitted keys', () {
@@ -72,8 +74,11 @@ GlobalOptionFilter=OSISMorph
 GlobalOptionFilter=OSISFootnotes
 ''';
       final c = SwordConfig.parse(conf);
-      expect(c.globalOptionFilters,
-          ['OSISStrongs', 'OSISMorph', 'OSISFootnotes']);
+      expect(c.globalOptionFilters, [
+        'OSISStrongs',
+        'OSISMorph',
+        'OSISFootnotes',
+      ]);
       expect(c.value('GlobalOptionFilter'), 'OSISStrongs');
     });
 
@@ -120,9 +125,9 @@ Lang=en
 
   group('SwordConfig.isFreelyDistributable', () {
     SwordConfig withLicense(String? license) => SwordConfig.parse(
-          '[M]\nModDrv=zText'
-          '${license == null ? '' : '\nDistributionLicense=$license'}',
-        );
+      '[M]\nModDrv=zText'
+      '${license == null ? '' : '\nDistributionLicense=$license'}',
+    );
 
     test('recognises licenses that grant redistribution', () {
       const granted = [

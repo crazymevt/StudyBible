@@ -5,12 +5,12 @@ void main() {
   group('parseGbfFragment', () {
     test('attaches trailing Strong\'s codes to the preceding word', () {
       final r = parseGbfFragment(
-          'In the beginning<WH7225> God<WH430> created<WH1254>');
+        'In the beginning<WH7225> God<WH430> created<WH1254>',
+      );
       expect(r.text, 'In the beginning God created');
 
-      String? strongsFor(String word) => r.segments
-          .firstWhere((s) => s.text.trim() == word)
-          .strongs;
+      String? strongsFor(String word) =>
+          r.segments.firstWhere((s) => s.text.trim() == word).strongs;
       expect(strongsFor('beginning'), 'H7225');
       expect(strongsFor('God'), 'H430');
       expect(strongsFor('created'), 'H1254');
@@ -34,10 +34,14 @@ void main() {
 
     test('marks italic (<FI>) and Jesus words (<FR>)', () {
       final r = parseGbfFragment('he said <FR>Follow me<Fr> to <FI>them<Fi>');
-      expect(r.segments.firstWhere((s) => s.text.contains('Follow')).isJesusWords,
-          isTrue);
       expect(
-          r.segments.firstWhere((s) => s.text.trim() == 'them').isItalic, isTrue);
+        r.segments.firstWhere((s) => s.text.contains('Follow')).isJesusWords,
+        isTrue,
+      );
+      expect(
+        r.segments.firstWhere((s) => s.text.trim() == 'them').isItalic,
+        isTrue,
+      );
     });
 
     test('emits a paragraph break for <CM> and keeps text flowing', () {

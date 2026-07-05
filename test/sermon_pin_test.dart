@@ -16,8 +16,8 @@ class _NoopAchievementService extends AchievementService {
 }
 
 String _delta(String text) => jsonEncode([
-      {'insert': '$text\n'}
-    ]);
+  {'insert': '$text\n'},
+]);
 
 void main() {
   group('SermonActionNotifier.setPinned', () {
@@ -26,12 +26,15 @@ void main() {
 
     setUp(() {
       store = UserStore(NativeDatabase.memory());
-      container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-        achievementServiceProvider
-            .overrideWith((ref) => _NoopAchievementService(ref)),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+          achievementServiceProvider.overrideWith(
+            (ref) => _NoopAchievementService(ref),
+          ),
+        ],
+      );
     });
 
     tearDown(() async {
@@ -50,17 +53,17 @@ void main() {
       final sermon = await actions.createSermon('Test', content: _delta('hi'));
 
       await actions.setPinned(sermon.id, true);
-      final pinned = await (store.select(store.sermons)
-            ..where((t) => t.id.equals(sermon.id)))
-          .getSingle();
+      final pinned = await (store.select(
+        store.sermons,
+      )..where((t) => t.id.equals(sermon.id))).getSingle();
       expect(pinned.pinned, isTrue);
       // Pinning must advance updatedAt so the change wins under sync LWW.
       expect(pinned.updatedAt, greaterThanOrEqualTo(sermon.updatedAt));
 
       await actions.setPinned(sermon.id, false);
-      final unpinned = await (store.select(store.sermons)
-            ..where((t) => t.id.equals(sermon.id)))
-          .getSingle();
+      final unpinned = await (store.select(
+        store.sermons,
+      )..where((t) => t.id.equals(sermon.id))).getSingle();
       expect(unpinned.pinned, isFalse);
     });
   });

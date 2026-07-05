@@ -50,11 +50,11 @@ About=A test dictionary.
 ''');
 
   SwordLdReader reader() => _rawReader({
-        'AARON':
-            '<entryFree><title>Aaron</title><p>Brother of Moses.</p></entryFree>',
-        'ABADDON':
-            '<entryFree><title>Abaddon</title><p>The destroyer.</p></entryFree>',
-      });
+    'AARON':
+        '<entryFree><title>Aaron</title><p>Brother of Moses.</p></entryFree>',
+    'ABADDON':
+        '<entryFree><title>Abaddon</title><p>The destroyer.</p></entryFree>',
+  });
 
   test('imports dictionary metadata and entries', () async {
     await SwordDictionaryImporter(store).importDictionary(config, reader());
@@ -70,9 +70,9 @@ About=A test dictionary.
 
   test('serialises TEI definitions to HTML', () async {
     await SwordDictionaryImporter(store).importDictionary(config, reader());
-    final aaron = await (store.select(store.dictionaryEntries)
-          ..where((e) => e.word.equals('AARON')))
-        .getSingle();
+    final aaron = await (store.select(
+      store.dictionaryEntries,
+    )..where((e) => e.word.equals('AARON'))).getSingle();
     expect(aaron.definition, contains('<p>Aaron'));
     expect(aaron.definition, contains('Brother of Moses.'));
     expect(aaron.definition, isNot(contains('<entryFree')));
@@ -80,10 +80,12 @@ About=A test dictionary.
 
   test('indexes headwords for search', () async {
     await SwordDictionaryImporter(store).importDictionary(config, reader());
-    final rows = await store.customSelect(
-      "SELECT reference_id FROM content_search "
-      "WHERE type = 'dictionary' AND content_search MATCH 'ABADDON'",
-    ).get();
+    final rows = await store
+        .customSelect(
+          "SELECT reference_id FROM content_search "
+          "WHERE type = 'dictionary' AND content_search MATCH 'ABADDON'",
+        )
+        .get();
     expect(rows, hasLength(1));
   });
 

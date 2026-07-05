@@ -29,29 +29,32 @@ void main() {
     final aaron = people.firstWhere((p) => p.slug == 'aaron_1');
     expect(aaron.displayTitle, 'Aaron');
     expect(aaron.bio, contains('eldest son of Amram'));
-    final father = await (store.select(store.biblePeople)
-          ..where((p) => p.id.equals(aaron.fatherId!)))
-        .getSingle();
+    final father = await (store.select(
+      store.biblePeople,
+    )..where((p) => p.id.equals(aaron.fatherId!))).getSingle();
     expect(father.name, 'Amram');
 
     // Aaron's verse links landed with real book names.
-    final firstVerse = await (store.select(store.personVerses)
-          ..where((v) => v.personId.equals(aaron.id))
-          ..limit(1))
-        .getSingle();
+    final firstVerse =
+        await (store.select(store.personVerses)
+              ..where((v) => v.personId.equals(aaron.id))
+              ..limit(1))
+            .getSingle();
     expect(firstVerse.bookName, 'Exodus');
 
     // Names (including alternate names) are searchable via the global FTS.
-    final hit = await store.customSelect(
-      "SELECT reference_id FROM content_search "
-      "WHERE type = 'person' AND content_search MATCH '\"Aaron\"' LIMIT 5",
-    ).get();
+    final hit = await store
+        .customSelect(
+          "SELECT reference_id FROM content_search "
+          "WHERE type = 'person' AND content_search MATCH '\"Aaron\"' LIMIT 5",
+        )
+        .get();
     expect(hit, isNotEmpty);
 
     // Events imported in chronological order.
-    final firstEvent = await (store.select(store.timelineEvents)
-          ..where((e) => e.id.equals(1)))
-        .getSingle();
+    final firstEvent = await (store.select(
+      store.timelineEvents,
+    )..where((e) => e.id.equals(1))).getSingle();
     expect(firstEvent.title, contains('Creation'));
 
     // Second call is a no-op, not a duplicate import.

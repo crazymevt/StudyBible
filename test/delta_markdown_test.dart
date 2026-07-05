@@ -10,43 +10,43 @@ void main() {
         {'insert': 'Title'},
         {
           'insert': '\n',
-          'attributes': {'header': 1}
+          'attributes': {'header': 1},
         },
         {'insert': 'A '},
         {
           'insert': 'bold',
-          'attributes': {'bold': true}
+          'attributes': {'bold': true},
         },
         {'insert': ' and '},
         {
           'insert': 'italic',
-          'attributes': {'italic': true}
+          'attributes': {'italic': true},
         },
         {'insert': ' word.\n'},
         {'insert': 'First'},
         {
           'insert': '\n',
-          'attributes': {'list': 'bullet'}
+          'attributes': {'list': 'bullet'},
         },
         {'insert': 'Second'},
         {
           'insert': '\n',
-          'attributes': {'list': 'bullet'}
+          'attributes': {'list': 'bullet'},
         },
         {'insert': 'Step one'},
         {
           'insert': '\n',
-          'attributes': {'list': 'ordered'}
+          'attributes': {'list': 'ordered'},
         },
         {'insert': 'Step two'},
         {
           'insert': '\n',
-          'attributes': {'list': 'ordered'}
+          'attributes': {'list': 'ordered'},
         },
         {'insert': 'A quote'},
         {
           'insert': '\n',
-          'attributes': {'blockquote': true}
+          'attributes': {'blockquote': true},
         },
       ];
 
@@ -65,12 +65,15 @@ void main() {
       final ops = [
         {
           'insert': 'hello ',
-          'attributes': {'bold': true}
+          'attributes': {'bold': true},
         },
         {'insert': 'world\n'},
       ];
       // The trailing space stays outside the ** markers.
-      expect(deltaToMarkdown(ops), 'hello world'.replaceFirst('hello ', '**hello** '));
+      expect(
+        deltaToMarkdown(ops),
+        'hello world'.replaceFirst('hello ', '**hello** '),
+      );
     });
 
     test('plain paragraphs pass through unchanged', () {

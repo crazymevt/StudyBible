@@ -26,11 +26,13 @@ void main() {
     });
     final prefs = await SharedPreferences.getInstance();
     store = UserStore(NativeDatabase.memory());
-    container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(store),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      deviceIdProvider.overrideWith((ref) async => 'device-A'),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(store),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        deviceIdProvider.overrideWith((ref) async => 'device-A'),
+      ],
+    );
   });
 
   tearDown(() async {
@@ -45,7 +47,9 @@ void main() {
     int chapter = 5,
     String platform = 'android',
   }) {
-    return store.into(store.readingPositions).insert(
+    return store
+        .into(store.readingPositions)
+        .insert(
           ReadingPosition(
             id: id,
             updatedAt: updatedAt,
@@ -79,22 +83,30 @@ void main() {
       expect(await container.read(continueReadingProvider.future), isNull);
     });
 
-    test('stays quiet when the reader is already at the remote position',
-        () async {
-      // Remote is newer but points at John 3, which is where the reader is.
-      await seed(id: 'device-B', updatedAt: 2000, bookName: 'John', chapter: 3);
+    test(
+      'stays quiet when the reader is already at the remote position',
+      () async {
+        // Remote is newer but points at John 3, which is where the reader is.
+        await seed(
+          id: 'device-B',
+          updatedAt: 2000,
+          bookName: 'John',
+          chapter: 3,
+        );
 
-      expect(await container.read(continueReadingProvider.future), isNull);
-    });
+        expect(await container.read(continueReadingProvider.future), isNull);
+      },
+    );
 
     test('picks the most recent among several other devices', () async {
       await seed(id: 'device-B', updatedAt: 2000, bookName: 'Mark', chapter: 5);
       await seed(
-          id: 'device-C',
-          updatedAt: 5000,
-          bookName: 'Luke',
-          chapter: 8,
-          platform: 'windows');
+        id: 'device-C',
+        updatedAt: 5000,
+        bookName: 'Luke',
+        chapter: 8,
+        platform: 'windows',
+      );
 
       final pos = await container.read(continueReadingProvider.future);
       expect(pos!.bookName, 'Luke');
@@ -118,9 +130,9 @@ void main() {
       ReadingPosition? row;
       for (var i = 0; i < 20 && row?.chapter != 5; i++) {
         await Future<void>.delayed(const Duration(milliseconds: 10));
-        row = await (store.select(store.readingPositions)
-              ..where((r) => r.id.equals('device-A')))
-            .getSingleOrNull();
+        row = await (store.select(
+          store.readingPositions,
+        )..where((r) => r.id.equals('device-A'))).getSingleOrNull();
       }
 
       expect(row, isNotNull);

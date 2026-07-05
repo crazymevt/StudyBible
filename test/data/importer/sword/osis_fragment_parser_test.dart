@@ -11,7 +11,8 @@ void main() {
 
     test('flattens inline markup and collapses whitespace', () {
       final r = parseOsisFragment(
-          'In the <w lemma="strong:H7225">beginning</w>   God\ncreated.');
+        'In the <w lemma="strong:H7225">beginning</w>   God\ncreated.',
+      );
       expect(r.text, 'In the beginning God created.');
     });
 
@@ -23,13 +24,15 @@ void main() {
 
     test('joins multiple Strong\'s lemmas', () {
       final r = parseOsisFragment(
-          '<w lemma="strong:G2532 strong:G1161">and</w>');
+        '<w lemma="strong:G2532 strong:G1161">and</w>',
+      );
       expect(r.segments.single.strongs, 'G2532 G1161');
     });
 
     test('keeps <note> text as a footnote segment, out of the verse text', () {
       final r = parseOsisFragment(
-          'the earth.<note type="study">cf. John 1:1</note>');
+        'the earth.<note type="study">cf. John 1:1</note>',
+      );
       expect(r.text, 'the earth.');
       expect(r.text, isNot(contains('John')));
       final notes = r.segments.where((s) => s.isFootnote).toList();
@@ -38,7 +41,9 @@ void main() {
     });
 
     test('marks transChange type="added" as italic', () {
-      final r = parseOsisFragment('God <transChange type="added">is</transChange> love');
+      final r = parseOsisFragment(
+        'God <transChange type="added">is</transChange> love',
+      );
       final added = r.segments.firstWhere((s) => s.text.trim() == 'is');
       expect(added.isItalic, isTrue);
       expect(r.text, 'God is love');
@@ -58,8 +63,9 @@ void main() {
       // Real KJV modules embed the Psalm superscription as a <title> in v.1;
       // without separation it merged as "David.The LORD…".
       final r = parseOsisFragment(
-          '<title canonical="true">A Psalm of David.</title>'
-          'The LORD is my shepherd');
+        '<title canonical="true">A Psalm of David.</title>'
+        'The LORD is my shepherd',
+      );
       expect(r.text, 'A Psalm of David. The LORD is my shepherd');
       expect(r.segments.any((s) => s.isLineBreak), isTrue);
     });

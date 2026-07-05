@@ -54,86 +54,96 @@ void main() {
   });
 
   Future<List<Verse>> versesFor(String bookName) async {
-    final book = await (store.select(store.books)
-          ..where((b) => b.name.equals(bookName)))
-        .getSingle();
+    final book = await (store.select(
+      store.books,
+    )..where((b) => b.name.equals(bookName))).getSingle();
     return (store.select(store.verses)
           ..where((v) => v.bookId.equals(book.id))
           ..orderBy([(v) => OrderingTerm(expression: v.verse)]))
         .get();
   }
 
-  test('imports the version, preferring the work <title> over the argument',
-      () async {
-    await OsisImporter(store)
-        .importOsisFile(osisFile, 'tsv', 'Fallback Title', 'en');
+  test(
+    'imports the version, preferring the work <title> over the argument',
+    () async {
+      await OsisImporter(
+        store,
+      ).importOsisFile(osisFile, 'tsv', 'Fallback Title', 'en');
 
-    final version = await store.select(store.versions).getSingle();
-    expect(version.id, 'TSV', reason: 'version id is upper-cased');
-    expect(version.abbreviation, 'tsv');
-    expect(version.name, 'Test Standard Version');
-    expect(version.language, 'en');
-  });
+      final version = await store.select(store.versions).getSingle();
+      expect(version.id, 'TSV', reason: 'version id is upper-cased');
+      expect(version.abbreviation, 'tsv');
+      expect(version.name, 'Test Standard Version');
+      expect(version.language, 'en');
+    },
+  );
 
   test('imports books with canonical names and testament', () async {
     await OsisImporter(store).importOsisFile(osisFile, 'tsv', 'TSV', 'en');
 
-    final books = await (store.select(store.books)
-          ..orderBy([(b) => OrderingTerm(expression: b.bookOrder)]))
-        .get();
+    final books = await (store.select(
+      store.books,
+    )..orderBy([(b) => OrderingTerm(expression: b.bookOrder)])).get();
     expect(books.map((b) => b.name), ['Genesis', 'Matthew']);
     expect(books.map((b) => b.testament), ['OT', 'NT']);
     expect(books.map((b) => b.bookOrder), [1, 2]);
   });
 
-  test('flattens inline markup but keeps <note> text out of the verse',
-      () async {
-    await OsisImporter(store).importOsisFile(osisFile, 'tsv', 'TSV', 'en');
+  test(
+    'flattens inline markup but keeps <note> text out of the verse',
+    () async {
+      await OsisImporter(store).importOsisFile(osisFile, 'tsv', 'TSV', 'en');
 
-    final gen = await versesFor('Genesis');
-    expect(gen.map((v) => v.verse), [1, 2]);
-    expect(gen.every((v) => v.chapter == 1), isTrue);
+      final gen = await versesFor('Genesis');
+      expect(gen.map((v) => v.verse), [1, 2]);
+      expect(gen.every((v) => v.chapter == 1), isTrue);
 
-    // <w> text is flattened inline; the <note> text is excluded; runs of
-    // whitespace collapse to a single space.
-    expect(
-      gen.first.textContent,
-      'In the beginning God created the heavens and the earth.',
-    );
-    expect(gen.first.textContent, isNot(contains('John 1:1')));
-    expect(gen.first.textContent, isNot(contains('   ')));
-  });
+      // <w> text is flattened inline; the <note> text is excluded; runs of
+      // whitespace collapse to a single space.
+      expect(
+        gen.first.textContent,
+        'In the beginning God created the heavens and the earth.',
+      );
+      expect(gen.first.textContent, isNot(contains('John 1:1')));
+      expect(gen.first.textContent, isNot(contains('   ')));
+    },
+  );
 
-  test('imports each <note> as a footnote segment, not inline verse text',
-      () async {
-    await OsisImporter(store).importOsisFile(osisFile, 'tsv', 'TSV', 'en');
+  test(
+    'imports each <note> as a footnote segment, not inline verse text',
+    () async {
+      await OsisImporter(store).importOsisFile(osisFile, 'tsv', 'TSV', 'en');
 
-    final gen = await versesFor('Genesis');
-    final segments = (jsonDecode(gen.first.segments) as List)
-        .map((e) => VerseSegment.fromJson(e as Map<String, dynamic>))
-        .toList();
+      final gen = await versesFor('Genesis');
+      final segments = (jsonDecode(gen.first.segments) as List)
+          .map((e) => VerseSegment.fromJson(e as Map<String, dynamic>))
+          .toList();
 
-    final footnotes = segments.where((s) => s.isFootnote).toList();
-    expect(footnotes, hasLength(1));
-    expect(footnotes.single.footnoteText, 'cf. John 1:1');
+      final footnotes = segments.where((s) => s.isFootnote).toList();
+      expect(footnotes, hasLength(1));
+      expect(footnotes.single.footnoteText, 'cf. John 1:1');
 
-    // The scripture text segments carry no footnote text.
-    final textSegs = segments.where((s) => !s.isFootnote);
-    expect(textSegs.map((s) => s.text).join(), isNot(contains('John 1:1')));
+      // The scripture text segments carry no footnote text.
+      final textSegs = segments.where((s) => !s.isFootnote);
+      expect(textSegs.map((s) => s.text).join(), isNot(contains('John 1:1')));
 
-    // The verse without a note has no footnote segment.
-    final v2 = (jsonDecode(gen[1].segments) as List)
-        .map((e) => VerseSegment.fromJson(e as Map<String, dynamic>));
-    expect(v2.any((s) => s.isFootnote), isFalse);
-  });
+      // The verse without a note has no footnote segment.
+      final v2 = (jsonDecode(gen[1].segments) as List).map(
+        (e) => VerseSegment.fromJson(e as Map<String, dynamic>),
+      );
+      expect(v2.any((s) => s.isFootnote), isFalse);
+    },
+  );
 
   test('populates the FTS search index for imported verses', () async {
     await OsisImporter(store).importOsisFile(osisFile, 'tsv', 'TSV', 'en');
 
-    final rows = await store.customSelect(
-      "SELECT reference_id FROM content_search "
-      "WHERE type = 'verse' AND content_search MATCH 'genealogy'",
-    ).get();
+    final rows = await store
+        .customSelect(
+          "SELECT reference_id FROM content_search "
+          "WHERE type = 'verse' AND content_search MATCH 'genealogy'",
+        )
+        .get();
     expect(rows, hasLength(1));
   });
 

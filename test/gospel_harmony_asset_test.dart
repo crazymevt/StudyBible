@@ -7,18 +7,12 @@ import 'package:study_bible/domain/harmony/gospel_harmony.dart';
 /// asset (swapped range ends, out-of-bounds chapter, empty section) fails CI
 /// instead of surfacing as a broken panel.
 void main() {
-  const chapterCounts = {
-    'Matthew': 28,
-    'Mark': 16,
-    'Luke': 24,
-    'John': 21,
-  };
+  const chapterCounts = {'Matthew': 28, 'Mark': 16, 'Luke': 24, 'John': 21};
 
   late GospelHarmony harmony;
 
   setUpAll(() {
-    final raw =
-        File('assets/data/gospel_harmony.json').readAsStringSync();
+    final raw = File('assets/data/gospel_harmony.json').readAsStringSync();
     harmony = GospelHarmony.fromJsonString(raw);
   });
 
@@ -43,19 +37,37 @@ void main() {
     for (final e in harmony.events) {
       for (final r in e.refs) {
         final maxChapter = chapterCounts[r.book];
-        expect(maxChapter, isNotNull,
-            reason: '"${e.title}": unknown book ${r.book}');
-        expect(r.startChapter, inInclusiveRange(1, maxChapter!),
-            reason: '"${e.title}": ${r.label}');
-        expect(r.endChapter, inInclusiveRange(r.startChapter, maxChapter),
-            reason: '"${e.title}": ${r.label}');
-        expect(r.startVerse, greaterThanOrEqualTo(1),
-            reason: '"${e.title}": ${r.label}');
-        expect(r.endVerse, greaterThanOrEqualTo(1),
-            reason: '"${e.title}": ${r.label}');
+        expect(
+          maxChapter,
+          isNotNull,
+          reason: '"${e.title}": unknown book ${r.book}',
+        );
+        expect(
+          r.startChapter,
+          inInclusiveRange(1, maxChapter!),
+          reason: '"${e.title}": ${r.label}',
+        );
+        expect(
+          r.endChapter,
+          inInclusiveRange(r.startChapter, maxChapter),
+          reason: '"${e.title}": ${r.label}',
+        );
+        expect(
+          r.startVerse,
+          greaterThanOrEqualTo(1),
+          reason: '"${e.title}": ${r.label}',
+        );
+        expect(
+          r.endVerse,
+          greaterThanOrEqualTo(1),
+          reason: '"${e.title}": ${r.label}',
+        );
         if (r.startChapter == r.endChapter) {
-          expect(r.endVerse, greaterThanOrEqualTo(r.startVerse),
-              reason: '"${e.title}": ${r.label}');
+          expect(
+            r.endVerse,
+            greaterThanOrEqualTo(r.startVerse),
+            reason: '"${e.title}": ${r.label}',
+          );
         }
       }
     }
@@ -63,8 +75,7 @@ void main() {
 
   test('the feeding of the five thousand appears in all four Gospels', () {
     final hits = harmony.eventsFor('John', 6, 10);
-    final feeding =
-        hits.where((e) => e.refs.length == 4).toList();
+    final feeding = hits.where((e) => e.refs.length == 4).toList();
     expect(feeding, hasLength(1));
     expect(feeding.single.refFor('Matthew')!.startChapter, 14);
     expect(feeding.single.refFor('Mark')!.startChapter, 6);

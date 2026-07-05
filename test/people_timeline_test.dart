@@ -14,17 +14,19 @@ void main() {
   late ContentStore store;
   late ProviderContainer container;
 
-  Future<void> person(int id, String name,
-          {int? birth, int? death}) =>
-      store.into(store.biblePeople).insert(BiblePeopleCompanion(
-            id: Value(id),
-            slug: Value(name.toLowerCase()),
-            name: Value(name),
-            displayTitle: Value(name),
-            birthYear: Value(birth),
-            deathYear: Value(death),
-            verseCount: const Value(0),
-          ));
+  Future<void> person(int id, String name, {int? birth, int? death}) => store
+      .into(store.biblePeople)
+      .insert(
+        BiblePeopleCompanion(
+          id: Value(id),
+          slug: Value(name.toLowerCase()),
+          name: Value(name),
+          displayTitle: Value(name),
+          birthYear: Value(birth),
+          deathYear: Value(death),
+          verseCount: const Value(0),
+        ),
+      );
 
   setUp(() async {
     store = ContentStore(NativeDatabase.memory());
@@ -37,26 +39,45 @@ void main() {
     await person(4, 'Anon');
 
     // Dated event with a first verse.
-    await store.into(store.timelineEvents).insert(const TimelineEventsCompanion(
-        id: Value(1),
-        title: Value('Creation of all things'),
-        sortKey: Value(-4002.9),
-        startYear: Value(-4003)));
-    await store.into(store.eventVerses).insert(const EventVersesCompanion(
-        id: Value(1),
-        eventId: Value(1),
-        ord: Value(0),
-        bookName: Value('Genesis'),
-        chapter: Value(1),
-        verse: Value(1)));
+    await store
+        .into(store.timelineEvents)
+        .insert(
+          const TimelineEventsCompanion(
+            id: Value(1),
+            title: Value('Creation of all things'),
+            sortKey: Value(-4002.9),
+            startYear: Value(-4003),
+          ),
+        );
+    await store
+        .into(store.eventVerses)
+        .insert(
+          const EventVersesCompanion(
+            id: Value(1),
+            eventId: Value(1),
+            ord: Value(0),
+            bookName: Value('Genesis'),
+            chapter: Value(1),
+            verse: Value(1),
+          ),
+        );
     // Event without a start year -> excluded.
-    await store.into(store.timelineEvents).insert(const TimelineEventsCompanion(
-        id: Value(2), title: Value('Undated'), sortKey: Value(1.0)));
+    await store
+        .into(store.timelineEvents)
+        .insert(
+          const TimelineEventsCompanion(
+            id: Value(2),
+            title: Value('Undated'),
+            sortKey: Value(1.0),
+          ),
+        );
 
-    container = ProviderContainer(overrides: [
-      contentStoreProvider.overrideWithValue(store),
-      peopleReadyProvider.overrideWith((ref) async => true),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        contentStoreProvider.overrideWithValue(store),
+        peopleReadyProvider.overrideWith((ref) async => true),
+      ],
+    );
   });
 
   tearDown(() async {
@@ -71,17 +92,19 @@ void main() {
     expect(people.first.deathYear, -3074);
   });
 
-  test('only events with a start year become markers, with first verse',
-      () async {
-    final events = await container.read(timelineEventsProvider.future);
-    expect(events.length, 1);
-    final e = events.single;
-    expect(e.title, 'Creation of all things');
-    expect(e.year, -4003);
-    expect(e.bookName, 'Genesis');
-    expect(e.chapter, 1);
-    expect(e.verse, 1);
-  });
+  test(
+    'only events with a start year become markers, with first verse',
+    () async {
+      final events = await container.read(timelineEventsProvider.future);
+      expect(events.length, 1);
+      final e = events.single;
+      expect(e.title, 'Creation of all things');
+      expect(e.year, -4003);
+      expect(e.bookName, 'Genesis');
+      expect(e.chapter, 1);
+      expect(e.verse, 1);
+    },
+  );
 
   test('axis span is padded to the enclosing century', () async {
     final data = await container.read(timelineDataProvider.future);

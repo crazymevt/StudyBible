@@ -14,8 +14,9 @@ void main() {
   });
 
   Future<Set<String>> vocab() async {
-    final rows =
-        await store.customSelect('SELECT term FROM content_vocab').get();
+    final rows = await store
+        .customSelect('SELECT term FROM content_vocab')
+        .get();
     return rows.map((r) => r.read<String>('term')).toSet();
   }
 
@@ -25,10 +26,14 @@ void main() {
   });
 
   test('indexStrippedEntries strips markup from commentary HTML', () async {
-    final commentaryId = await store.into(store.commentaries).insert(
+    final commentaryId = await store
+        .into(store.commentaries)
+        .insert(
           CommentariesCompanion.insert(abbreviation: 'X', name: 'X Commentary'),
         );
-    final entryId = await store.into(store.commentaryEntries).insert(
+    final entryId = await store
+        .into(store.commentaryEntries)
+        .insert(
           CommentaryEntriesCompanion.insert(
             commentaryId: commentaryId,
             bookName: 'John',
@@ -38,7 +43,11 @@ void main() {
     expect(entryId, greaterThan(0));
 
     await store.indexStrippedEntries(
-        'commentary', 'commentary_entries', 'commentary_id', commentaryId);
+      'commentary',
+      'commentary_entries',
+      'commentary_id',
+      commentaryId,
+    );
 
     final terms = await vocab();
     expect(terms, containsAll(<String>['grace', 'abounds']));
@@ -47,10 +56,14 @@ void main() {
   });
 
   test('rebuildSearchIndex cleans an index that holds raw HTML', () async {
-    final commentaryId = await store.into(store.commentaries).insert(
+    final commentaryId = await store
+        .into(store.commentaries)
+        .insert(
           CommentariesCompanion.insert(abbreviation: 'Y', name: 'Y Commentary'),
         );
-    final entryId = await store.into(store.commentaryEntries).insert(
+    final entryId = await store
+        .into(store.commentaryEntries)
+        .insert(
           CommentaryEntriesCompanion.insert(
             commentaryId: commentaryId,
             bookName: 'John',

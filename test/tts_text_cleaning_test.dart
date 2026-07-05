@@ -15,8 +15,10 @@ void main() {
   test('strips Strong\'s number tags from verse text', () {
     const raw =
         'In the beginning<S>7225</S> God<S>430</S> created<S>1254</S> <S>853</S> the heaven<S>8064</S> and<S>853</S> the earth<S>776</S>.';
-    expect(cleanForSpeech(raw),
-        'In the beginning God created the heaven and the earth.');
+    expect(
+      cleanForSpeech(raw),
+      'In the beginning God created the heaven and the earth.',
+    );
   });
 
   test('leaves plain text untouched', () {

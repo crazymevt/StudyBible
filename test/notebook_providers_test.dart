@@ -17,8 +17,8 @@ class _NoopAchievementService extends AchievementService {
 }
 
 String _delta(String text) => jsonEncode([
-      {'insert': '$text\n'}
-    ]);
+  {'insert': '$text\n'},
+]);
 
 void main() {
   late UserStore store;
@@ -26,12 +26,15 @@ void main() {
 
   setUp(() {
     store = UserStore(NativeDatabase.memory());
-    container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(store),
-      deviceIdProvider.overrideWith((ref) async => 'A'),
-      achievementServiceProvider
-          .overrideWith((ref) => _NoopAchievementService(ref)),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(store),
+        deviceIdProvider.overrideWith((ref) async => 'A'),
+        achievementServiceProvider.overrideWith(
+          (ref) => _NoopAchievementService(ref),
+        ),
+      ],
+    );
   });
 
   tearDown(() async {
@@ -54,20 +57,25 @@ void main() {
       expect(nb.deleted, isFalse);
     });
 
-    test('new pages append at the end and derive contentPlain for FTS',
-        () async {
-      final actions = container.read(notebookActionProvider);
-      final nb = await actions.createNotebook('N');
+    test(
+      'new pages append at the end and derive contentPlain for FTS',
+      () async {
+        final actions = container.read(notebookActionProvider);
+        final nb = await actions.createNotebook('N');
 
-      final p1 = await actions.createPage(nb.id,
-          title: 'One', content: _delta('first page body'));
-      final p2 = await actions.createPage(nb.id, title: 'Two');
+        final p1 = await actions.createPage(
+          nb.id,
+          title: 'One',
+          content: _delta('first page body'),
+        );
+        final p2 = await actions.createPage(nb.id, title: 'Two');
 
-      expect(p1.position, 0);
-      expect(p2.position, 1);
-      // contentPlain is the plain-text projection used by the FTS index.
-      expect(p1.contentPlain, contains('first page body'));
-    });
+        expect(p1.position, 0);
+        expect(p2.position, 1);
+        // contentPlain is the plain-text projection used by the FTS index.
+        expect(p1.contentPlain, contains('first page body'));
+      },
+    );
 
     test('reorderPages rewrites positions to the given order', () async {
       final actions = container.read(notebookActionProvider);
@@ -79,9 +87,9 @@ void main() {
       // Move C to the front: [C, A, B].
       await actions.reorderPages([c.id, a.id, b.id]);
 
-      final pages = await (store.select(store.notebookPages)
-            ..orderBy([(t) => OrderingTerm.asc(t.position)]))
-          .get();
+      final pages = await (store.select(
+        store.notebookPages,
+      )..orderBy([(t) => OrderingTerm.asc(t.position)])).get();
       expect(pages.map((p) => p.title).toList(), ['C', 'A', 'B']);
     });
 
@@ -93,38 +101,47 @@ void main() {
 
       await actions.deleteNotebook(nb.id);
 
-      final nbRow = await (store.select(store.notebooks)
-            ..where((t) => t.id.equals(nb.id)))
-          .getSingle();
+      final nbRow = await (store.select(
+        store.notebooks,
+      )..where((t) => t.id.equals(nb.id))).getSingle();
       expect(nbRow.deleted, isTrue);
-      final livePages = await (store.select(store.notebookPages)
-            ..where((t) => t.notebookId.equals(nb.id))
-            ..where((t) => t.deleted.equals(false)))
-          .get();
+      final livePages =
+          await (store.select(store.notebookPages)
+                ..where((t) => t.notebookId.equals(nb.id))
+                ..where((t) => t.deleted.equals(false)))
+              .get();
       expect(livePages, isEmpty);
     });
 
-    test('updatePage returns a fresh updatedAt and reprojects contentPlain',
-        () async {
-      final actions = container.read(notebookActionProvider);
-      final nb = await actions.createNotebook('N');
-      final page = await actions.createPage(nb.id, content: _delta('old'));
+    test(
+      'updatePage returns a fresh updatedAt and reprojects contentPlain',
+      () async {
+        final actions = container.read(notebookActionProvider);
+        final nb = await actions.createNotebook('N');
+        final page = await actions.createPage(nb.id, content: _delta('old'));
 
-      final ts = await actions.updatePage(page.id, content: _delta('new body'));
-      final row = await (store.select(store.notebookPages)
-            ..where((t) => t.id.equals(page.id)))
-          .getSingle();
-      expect(row.updatedAt, ts);
-      expect(row.contentPlain, contains('new body'));
-    });
+        final ts = await actions.updatePage(
+          page.id,
+          content: _delta('new body'),
+        );
+        final row = await (store.select(
+          store.notebookPages,
+        )..where((t) => t.id.equals(page.id))).getSingle();
+        expect(row.updatedAt, ts);
+        expect(row.contentPlain, contains('new body'));
+      },
+    );
   });
 
   group('notebook page FTS indexing', () {
     test('a page is searchable by its plain text', () async {
       final actions = container.read(notebookActionProvider);
       final nb = await actions.createNotebook('N');
-      await actions.createPage(nb.id,
-          title: 'Grace', content: _delta('justification by faith'));
+      await actions.createPage(
+        nb.id,
+        title: 'Grace',
+        content: _delta('justification by faith'),
+      );
 
       final rows = await store
           .customSelect(
@@ -138,8 +155,11 @@ void main() {
     test('soft-deleting a page removes it from the FTS index', () async {
       final actions = container.read(notebookActionProvider);
       final nb = await actions.createNotebook('N');
-      final page = await actions.createPage(nb.id,
-          title: 'Grace', content: _delta('unique_token_xyz'));
+      final page = await actions.createPage(
+        nb.id,
+        title: 'Grace',
+        content: _delta('unique_token_xyz'),
+      );
 
       await actions.deletePage(page.id);
 

@@ -29,8 +29,9 @@ class MockBibleVersionsNotifier extends BibleVersionsNotifier {
 }
 
 void main() {
-  testWidgets('App boots into the onboarding shell with no content installed',
-      (WidgetTester tester) async {
+  testWidgets('App boots into the onboarding shell with no content installed', (
+    WidgetTester tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 

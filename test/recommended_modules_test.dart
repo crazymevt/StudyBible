@@ -27,7 +27,10 @@ void main() {
       // ph4.org spells the download code "BSB’22"; a straight apostrophe would
       // silently fail to resolve against the catalog.
       expect(abbrs, contains('BSB’22'));
-      expect(abbrs, isNot(contains("BSB'22"))); // straight quote must not creep in
+      expect(
+        abbrs,
+        isNot(contains("BSB'22")),
+      ); // straight quote must not creep in
     });
 
     test('the Bible is installed before its study resources', () {

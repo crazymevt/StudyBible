@@ -43,13 +43,19 @@ void main() {
       expect(p['n'], isNotEmpty, reason: 'person $who');
       for (final key in ['f', 'm']) {
         if (p[key] != null) {
-          expect(p[key], inInclusiveRange(0, people.length - 1),
-              reason: 'person $who $key');
+          expect(
+            p[key],
+            inInclusiveRange(0, people.length - 1),
+            reason: 'person $who $key',
+          );
         }
       }
       for (final partner in (p['pa'] as List? ?? const [])) {
-        expect(partner, inInclusiveRange(0, people.length - 1),
-            reason: 'person $who partner');
+        expect(
+          partner,
+          inInclusiveRange(0, people.length - 1),
+          reason: 'person $who partner',
+        );
       }
       for (final r in p['v'] as List) {
         expectValidRef(r, 'person $who verse');
@@ -57,8 +63,11 @@ void main() {
     }
     for (final e in events.cast<Map<String, dynamic>>()) {
       for (final pt in e['pt'] as List) {
-        expect(pt, inInclusiveRange(0, people.length - 1),
-            reason: 'event "${e['t']}" participant');
+        expect(
+          pt,
+          inInclusiveRange(0, people.length - 1),
+          reason: 'event "${e['t']}" participant',
+        );
       }
       for (final r in e['v'] as List) {
         expectValidRef(r, 'event "${e['t']}" verse');
@@ -67,9 +76,9 @@ void main() {
   });
 
   test('Aaron is intact: family, bio, and Exodus references', () {
-    final aaron = people
-        .cast<Map<String, dynamic>>()
-        .firstWhere((p) => p['s'] == 'aaron_1');
+    final aaron = people.cast<Map<String, dynamic>>().firstWhere(
+      (p) => p['s'] == 'aaron_1',
+    );
     expect(aaron['n'], 'Aaron');
     expect(aaron['f'], isNotNull);
     expect(people[aaron['f'] as int]['n'], 'Amram');
@@ -81,15 +90,14 @@ void main() {
     expect((aaron['v'] as List).first, [1, 4, 14]);
   });
 
-  test("Death of Moses' first verse is Deuteronomy 34:1, not Genesis 34:1",
-      () {
+  test("Death of Moses' first verse is Deuteronomy 34:1, not Genesis 34:1", () {
     // Regression: an upstream book/verse-ID collision (both "34:1") once
     // linked this event to Dinah's story instead of Moses viewing the
     // promised land — corrected in build_theographic.dart's
     // _knownBadVerseLinks.
-    final deathOfMoses = events
-        .cast<Map<String, dynamic>>()
-        .firstWhere((e) => e['t'] == 'Death of Moses');
+    final deathOfMoses = events.cast<Map<String, dynamic>>().firstWhere(
+      (e) => e['t'] == 'Death of Moses',
+    );
     expect((deathOfMoses['v'] as List).first, [4, 34, 1]);
   });
 
@@ -101,8 +109,11 @@ void main() {
       final k = e['k'] as num?;
       if (k == null) continue;
       if (last != null) {
-        expect(k, greaterThanOrEqualTo(last),
-            reason: 'event "${e['t']}" out of order');
+        expect(
+          k,
+          greaterThanOrEqualTo(last),
+          reason: 'event "${e['t']}" out of order',
+        );
       }
       last = k;
     }

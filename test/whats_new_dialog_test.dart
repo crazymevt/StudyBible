@@ -44,12 +44,13 @@ void main() {
   setUp(() => store = ContentStore(NativeDatabase.memory()));
   tearDown(() => store.close());
 
-  testWidgets('shows the rebuild note and runs a one-tap rebuild', (tester) async {
+  testWidgets('shows the rebuild note and runs a one-tap rebuild', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
-    await _pump(tester,
-        showRebuildPrompt: true, prefs: prefs, store: store);
+    await _pump(tester, showRebuildPrompt: true, prefs: prefs, store: store);
 
     expect(find.textContaining('Rebuild your search index'), findsOneWidget);
     expect(find.text('Rebuild now'), findsOneWidget);
@@ -67,8 +68,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
-    await _pump(tester,
-        showRebuildPrompt: false, prefs: prefs, store: store);
+    await _pump(tester, showRebuildPrompt: false, prefs: prefs, store: store);
 
     expect(find.text('Rebuild now'), findsNothing);
     expect(find.textContaining('Rebuild your search index'), findsNothing);

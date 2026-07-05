@@ -11,17 +11,23 @@ import 'package:study_bible/ui/common/quill_content.dart';
 
 void main() {
   group('documentFromStoredContent (migration safety net)', () {
-    test('imports legacy plain text / markdown without dropping characters', () {
-      const legacy = '# Prayer\n\nLord, today I am grateful for **grace**.';
-      final doc = documentFromStoredContent(legacy);
-      // Every character survives — the literal markdown becomes plain text.
-      expect(doc.toPlainText().trim(), legacy);
-    });
+    test(
+      'imports legacy plain text / markdown without dropping characters',
+      () {
+        const legacy = '# Prayer\n\nLord, today I am grateful for **grace**.';
+        final doc = documentFromStoredContent(legacy);
+        // Every character survives — the literal markdown becomes plain text.
+        expect(doc.toPlainText().trim(), legacy);
+      },
+    );
 
     test('reads Quill Delta JSON back as its rich text', () {
       final deltaJson = jsonEncode([
         {'insert': 'Hello '},
-        {'insert': 'world', 'attributes': {'bold': true}},
+        {
+          'insert': 'world',
+          'attributes': {'bold': true},
+        },
         {'insert': '\n'},
       ]);
       final doc = documentFromStoredContent(deltaJson);
@@ -45,10 +51,12 @@ void main() {
 
     setUp(() {
       store = UserStore(NativeDatabase.memory());
-      container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+        ],
+      );
     });
 
     tearDown(() async {
@@ -64,9 +72,9 @@ void main() {
           .read(journalActionProvider)
           .saveJournal(null, 'Title', deltaJson);
 
-      final row = await (store.select(store.journals)
-            ..where((j) => j.id.equals(id)))
-          .getSingle();
+      final row = await (store.select(
+        store.journals,
+      )..where((j) => j.id.equals(id))).getSingle();
       expect(row.content, deltaJson);
       expect(row.contentPlain, 'Search me');
 

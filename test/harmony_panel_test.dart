@@ -41,21 +41,39 @@ void main() {
       'activeVersions': ['KJV'],
     });
     store = ContentStore(NativeDatabase.memory());
-    await store.into(store.versions).insert(const Version(
-        id: 'KJV', abbreviation: 'KJV', name: 'King James', language: 'en'));
-    await store.into(store.books).insert(const BooksCompanion(
-        id: Value(1),
-        versionId: Value('KJV'),
-        name: Value('John'),
-        bookOrder: Value(43),
-        testament: Value('NT')));
+    await store
+        .into(store.versions)
+        .insert(
+          const Version(
+            id: 'KJV',
+            abbreviation: 'KJV',
+            name: 'King James',
+            language: 'en',
+          ),
+        );
+    await store
+        .into(store.books)
+        .insert(
+          const BooksCompanion(
+            id: Value(1),
+            versionId: Value('KJV'),
+            name: Value('John'),
+            bookOrder: Value(43),
+            testament: Value('NT'),
+          ),
+        );
     for (var v = 1; v <= 5; v++) {
-      await store.into(store.verses).insert(VersesCompanion(
-          bookId: const Value(1),
-          chapter: const Value(2),
-          verse: Value(v),
-          textContent: Value('John two verse $v.'),
-          segments: const Value('[]')));
+      await store
+          .into(store.verses)
+          .insert(
+            VersesCompanion(
+              bookId: const Value(1),
+              chapter: const Value(2),
+              verse: Value(v),
+              textContent: Value('John two verse $v.'),
+              segments: const Value('[]'),
+            ),
+          );
     }
   });
 
@@ -65,12 +83,15 @@ void main() {
 
   Future<ProviderContainer> pumpPanel(WidgetTester tester) async {
     final prefs = await SharedPreferences.getInstance();
-    final container = ProviderContainer(overrides: [
-      contentStoreProvider.overrideWithValue(store),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      gospelHarmonyProvider.overrideWith(
-          (ref) async => GospelHarmony.fromJsonString(_fixture)),
-    ]);
+    final container = ProviderContainer(
+      overrides: [
+        contentStoreProvider.overrideWithValue(store),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        gospelHarmonyProvider.overrideWith(
+          (ref) async => GospelHarmony.fromJsonString(_fixture),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -82,8 +103,9 @@ void main() {
     return container;
   }
 
-  testWidgets('lists sections, events, and the current-chapter group',
-      (tester) async {
+  testWidgets('lists sections, events, and the current-chapter group', (
+    tester,
+  ) async {
     await pumpPanel(tester);
 
     expect(find.text('Gospel Harmony'), findsOneWidget);
@@ -94,8 +116,9 @@ void main() {
     expect(find.text('Test harmony attribution'), findsOneWidget);
   });
 
-  testWidgets('opening an event shows each account trimmed to its range',
-      (tester) async {
+  testWidgets('opening an event shows each account trimmed to its range', (
+    tester,
+  ) async {
     final container = await pumpPanel(tester);
 
     await tester.tap(find.text('Feeding crowds').first);
@@ -114,8 +137,10 @@ void main() {
     expect(text, isNot(contains('John two verse 4.')));
     // The Matthew account isn't in this one-book store.
     expect(find.text('Matthew 14:13–21'), findsOneWidget);
-    expect(find.text('Passage not available in the current version.'),
-        findsOneWidget);
+    expect(
+      find.text('Passage not available in the current version.'),
+      findsOneWidget,
+    );
 
     // Back returns to the event list.
     await tester.tap(find.byTooltip('Back to events'));

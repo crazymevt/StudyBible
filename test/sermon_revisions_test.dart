@@ -23,8 +23,8 @@ class _NoopAchievementService extends AchievementService {
 }
 
 String _delta(String text) => jsonEncode([
-      {'insert': '$text\n'}
-    ]);
+  {'insert': '$text\n'},
+]);
 
 Future<void> _insertSermon(
   UserStore store, {
@@ -34,18 +34,21 @@ Future<void> _insertSermon(
   String device = 'A',
   String title = 'Sermon',
 }) async {
-  await store.into(store.sermons).insert(SermonsCompanion.insert(
-        id: id,
-        createdAt: 1,
-        updatedAt: updatedAt,
-        deviceId: device,
-        title: title,
-        content: content,
-      ));
+  await store
+      .into(store.sermons)
+      .insert(
+        SermonsCompanion.insert(
+          id: id,
+          createdAt: 1,
+          updatedAt: updatedAt,
+          deviceId: device,
+          title: title,
+          content: content,
+        ),
+      );
 }
 
-Future<List<SermonRevision>> _liveRevisions(
-        UserStore store, String sermonId) =>
+Future<List<SermonRevision>> _liveRevisions(UserStore store, String sermonId) =>
     (store.select(store.sermonRevisions)
           ..where((t) => t.sermonId.equals(sermonId) & t.deleted.equals(false))
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
@@ -58,10 +61,12 @@ void main() {
 
     setUp(() {
       store = UserStore(NativeDatabase.memory());
-      container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+        ],
+      );
     });
 
     tearDown(() async {
@@ -70,10 +75,16 @@ void main() {
     });
 
     test('saveRevision stores a manual snapshot', () async {
-      await _insertSermon(store,
-          id: 's1', content: _delta('draft'), updatedAt: 100);
+      await _insertSermon(
+        store,
+        id: 's1',
+        content: _delta('draft'),
+        updatedAt: 100,
+      );
 
-      await container.read(sermonRevisionActionProvider).saveRevision(
+      await container
+          .read(sermonRevisionActionProvider)
+          .saveRevision(
             sermonId: 's1',
             title: 'My Sermon',
             content: _delta('draft'),
@@ -88,112 +99,150 @@ void main() {
       expect(revs.single.content, _delta('draft'));
     });
 
-    test('restoreRevision restores content and snapshots the prior version',
-        () async {
-      await _insertSermon(store,
-          id: 's1', content: _delta('original'), updatedAt: 100);
-      await container.read(sermonRevisionActionProvider).saveRevision(
-            sermonId: 's1',
-            title: 'Sermon',
-            content: _delta('original'),
-            kind: RevisionKind.manual,
-          );
+    test(
+      'restoreRevision restores content and snapshots the prior version',
+      () async {
+        await _insertSermon(
+          store,
+          id: 's1',
+          content: _delta('original'),
+          updatedAt: 100,
+        );
+        await container
+            .read(sermonRevisionActionProvider)
+            .saveRevision(
+              sermonId: 's1',
+              title: 'Sermon',
+              content: _delta('original'),
+              kind: RevisionKind.manual,
+            );
 
-      // Sermon moves on.
-      await container
-          .read(sermonActionProvider)
-          .updateSermon('s1', content: _delta('rewritten'));
+        // Sermon moves on.
+        await container
+            .read(sermonActionProvider)
+            .updateSermon('s1', content: _delta('rewritten'));
 
-      final manual = (await _liveRevisions(store, 's1'))
-          .firstWhere((r) => r.kind == RevisionKind.manual);
-      await container
-          .read(sermonRevisionActionProvider)
-          .restoreRevision(manual.id);
+        final manual = (await _liveRevisions(
+          store,
+          's1',
+        )).firstWhere((r) => r.kind == RevisionKind.manual);
+        await container
+            .read(sermonRevisionActionProvider)
+            .restoreRevision(manual.id);
 
-      // Sermon content is back to the restored revision.
-      final sermon = await (store.select(store.sermons)
-            ..where((t) => t.id.equals('s1')))
-          .getSingle();
-      expect(sermon.content, _delta('original'));
+        // Sermon content is back to the restored revision.
+        final sermon = await (store.select(
+          store.sermons,
+        )..where((t) => t.id.equals('s1'))).getSingle();
+        expect(sermon.content, _delta('original'));
 
-      // The pre-restore ("rewritten") state was preserved as a restore snapshot.
-      final restoreSnaps = (await _liveRevisions(store, 's1'))
-          .where((r) => r.kind == RevisionKind.restore)
-          .toList();
-      expect(restoreSnaps, hasLength(1));
-      expect(restoreSnaps.single.content, _delta('rewritten'));
-    });
+        // The pre-restore ("rewritten") state was preserved as a restore snapshot.
+        final restoreSnaps = (await _liveRevisions(
+          store,
+          's1',
+        )).where((r) => r.kind == RevisionKind.restore).toList();
+        expect(restoreSnaps, hasLength(1));
+        expect(restoreSnaps.single.content, _delta('rewritten'));
+      },
+    );
 
-    test('automatic snapshot is deduped when content is already preserved',
-        () async {
-      await _insertSermon(store,
-          id: 's1', content: _delta('losing'), updatedAt: 100);
+    test(
+      'automatic snapshot is deduped when content is already preserved',
+      () async {
+        await _insertSermon(
+          store,
+          id: 's1',
+          content: _delta('losing'),
+          updatedAt: 100,
+        );
 
-      // First conflict snapshot of the losing content (e.g. from the sync-side
-      // failsafe).
-      await container.read(sermonRevisionActionProvider).saveRevision(
-            sermonId: 's1',
-            title: 'Sermon',
-            content: _delta('losing'),
-            kind: RevisionKind.conflict,
-          );
-      // The editor's conflict flow tries to snapshot the same content again.
-      await container.read(sermonRevisionActionProvider).saveRevision(
-            sermonId: 's1',
-            title: 'Sermon',
-            content: _delta('losing'),
-            kind: RevisionKind.restore,
-          );
+        // First conflict snapshot of the losing content (e.g. from the sync-side
+        // failsafe).
+        await container
+            .read(sermonRevisionActionProvider)
+            .saveRevision(
+              sermonId: 's1',
+              title: 'Sermon',
+              content: _delta('losing'),
+              kind: RevisionKind.conflict,
+            );
+        // The editor's conflict flow tries to snapshot the same content again.
+        await container
+            .read(sermonRevisionActionProvider)
+            .saveRevision(
+              sermonId: 's1',
+              title: 'Sermon',
+              content: _delta('losing'),
+              kind: RevisionKind.restore,
+            );
 
-      // Only one live copy — no redundant duplicate.
-      final revs = await _liveRevisions(store, 's1');
-      expect(revs, hasLength(1));
-      expect(revs.single.content, _delta('losing'));
-    });
+        // Only one live copy — no redundant duplicate.
+        final revs = await _liveRevisions(store, 's1');
+        expect(revs, hasLength(1));
+        expect(revs.single.content, _delta('losing'));
+      },
+    );
 
-    test('dedup re-captures content that survives only in a tombstoned revision',
-        () async {
-      await _insertSermon(store,
-          id: 's1', content: _delta('x'), updatedAt: 100);
+    test(
+      'dedup re-captures content that survives only in a tombstoned revision',
+      () async {
+        await _insertSermon(
+          store,
+          id: 's1',
+          content: _delta('x'),
+          updatedAt: 100,
+        );
 
-      await container.read(sermonRevisionActionProvider).saveRevision(
-            sermonId: 's1',
-            title: 'Sermon',
-            content: _delta('precious'),
-            kind: RevisionKind.conflict,
-          );
-      final existing =
-          (await _liveRevisions(store, 's1')).single;
-      // The only snapshot of "precious" gets tombstoned (e.g. pruned/deleted).
-      await container
-          .read(sermonRevisionActionProvider)
-          .deleteRevision(existing.id);
+        await container
+            .read(sermonRevisionActionProvider)
+            .saveRevision(
+              sermonId: 's1',
+              title: 'Sermon',
+              content: _delta('precious'),
+              kind: RevisionKind.conflict,
+            );
+        final existing = (await _liveRevisions(store, 's1')).single;
+        // The only snapshot of "precious" gets tombstoned (e.g. pruned/deleted).
+        await container
+            .read(sermonRevisionActionProvider)
+            .deleteRevision(existing.id);
 
-      // Re-snapshotting the same content must NOT be skipped — the dedup only
-      // matches live revisions, so this content isn't lost.
-      await container.read(sermonRevisionActionProvider).saveRevision(
-            sermonId: 's1',
-            title: 'Sermon',
-            content: _delta('precious'),
-            kind: RevisionKind.conflict,
-          );
+        // Re-snapshotting the same content must NOT be skipped — the dedup only
+        // matches live revisions, so this content isn't lost.
+        await container
+            .read(sermonRevisionActionProvider)
+            .saveRevision(
+              sermonId: 's1',
+              title: 'Sermon',
+              content: _delta('precious'),
+              kind: RevisionKind.conflict,
+            );
 
-      final revs = await _liveRevisions(store, 's1');
-      expect(revs, hasLength(1));
-      expect(revs.single.content, _delta('precious'));
-    });
+        final revs = await _liveRevisions(store, 's1');
+        expect(revs, hasLength(1));
+        expect(revs.single.content, _delta('precious'));
+      },
+    );
 
     test('manual snapshots are never deduped', () async {
-      await _insertSermon(store,
-          id: 's1', content: _delta('draft'), updatedAt: 100);
+      await _insertSermon(
+        store,
+        id: 's1',
+        content: _delta('draft'),
+        updatedAt: 100,
+      );
 
-      await container.read(sermonRevisionActionProvider).saveRevision(
+      await container
+          .read(sermonRevisionActionProvider)
+          .saveRevision(
             sermonId: 's1',
             title: 'Sermon',
             content: _delta('draft'),
             kind: RevisionKind.manual,
           );
-      await container.read(sermonRevisionActionProvider).saveRevision(
+      await container
+          .read(sermonRevisionActionProvider)
+          .saveRevision(
             sermonId: 's1',
             title: 'Sermon',
             content: _delta('draft'),
@@ -204,144 +253,177 @@ void main() {
       expect(await _liveRevisions(store, 's1'), hasLength(2));
     });
 
-    test('automatic revisions are pruned to the cap; manual ones are kept',
-        () async {
-      await _insertSermon(store,
-          id: 's1', content: _delta('x'), updatedAt: 100);
+    test(
+      'automatic revisions are pruned to the cap; manual ones are kept',
+      () async {
+        await _insertSermon(
+          store,
+          id: 's1',
+          content: _delta('x'),
+          updatedAt: 100,
+        );
 
-      await container.read(sermonRevisionActionProvider).saveRevision(
-            sermonId: 's1',
-            title: 'Sermon',
-            content: _delta('manual-keep'),
-            kind: RevisionKind.manual,
-          );
-
-      for (var i = 0; i < kMaxAutoRevisions + 5; i++) {
-        await container.read(sermonRevisionActionProvider).saveRevision(
+        await container
+            .read(sermonRevisionActionProvider)
+            .saveRevision(
               sermonId: 's1',
               title: 'Sermon',
-              content: _delta('auto-$i'),
-              kind: RevisionKind.conflict,
+              content: _delta('manual-keep'),
+              kind: RevisionKind.manual,
             );
-      }
 
-      final revs = await _liveRevisions(store, 's1');
-      final auto =
-          revs.where((r) => r.kind != RevisionKind.manual).toList();
-      final manual =
-          revs.where((r) => r.kind == RevisionKind.manual).toList();
-      expect(auto, hasLength(kMaxAutoRevisions));
-      expect(manual, hasLength(1));
-      expect(manual.single.content, _delta('manual-keep'));
-    });
+        for (var i = 0; i < kMaxAutoRevisions + 5; i++) {
+          await container
+              .read(sermonRevisionActionProvider)
+              .saveRevision(
+                sermonId: 's1',
+                title: 'Sermon',
+                content: _delta('auto-$i'),
+                kind: RevisionKind.conflict,
+              );
+        }
+
+        final revs = await _liveRevisions(store, 's1');
+        final auto = revs.where((r) => r.kind != RevisionKind.manual).toList();
+        final manual = revs
+            .where((r) => r.kind == RevisionKind.manual)
+            .toList();
+        expect(auto, hasLength(kMaxAutoRevisions));
+        expect(manual, hasLength(1));
+        expect(manual.single.content, _delta('manual-keep'));
+      },
+    );
   });
 
   group('Sync conflict backstop', () {
-    test('snapshots the losing local sermon before a remote edit overwrites it',
-        () async {
-      final tmpDir =
-          await Directory.systemTemp.createTemp('sermon_revisions_sync');
-      addTearDown(() => tmpDir.delete(recursive: true));
+    test(
+      'snapshots the losing local sermon before a remote edit overwrites it',
+      () async {
+        final tmpDir = await Directory.systemTemp.createTemp(
+          'sermon_revisions_sync',
+        );
+        addTearDown(() => tmpDir.delete(recursive: true));
 
-      final store = UserStore(NativeDatabase.memory());
-      addTearDown(store.close);
+        final store = UserStore(NativeDatabase.memory());
+        addTearDown(store.close);
 
-      // Local sermon, edited on this device.
-      await _insertSermon(store,
+        // Local sermon, edited on this device.
+        await _insertSermon(
+          store,
           id: 's1',
           content: _delta('my local work'),
           updatedAt: 100,
-          device: 'A');
+          device: 'A',
+        );
 
-      // A newer version of the same sermon from device B, sitting in the sync
-      // folder waiting to be pulled.
-      final remoteLine = jsonEncode({
-        'id': 's1',
-        'updatedAt': 200,
-        'deviceId': 'B',
-        'deleted': false,
-        'type': 'sermon',
-        'createdAt': 1,
-        'title': 'Sermon',
-        'series': null,
-        'content': _delta('edit from other device'),
-      });
-      await File('${tmpDir.path}/state-B.jsonl').writeAsString('$remoteLine\n');
+        // A newer version of the same sermon from device B, sitting in the sync
+        // folder waiting to be pulled.
+        final remoteLine = jsonEncode({
+          'id': 's1',
+          'updatedAt': 200,
+          'deviceId': 'B',
+          'deleted': false,
+          'type': 'sermon',
+          'createdAt': 1,
+          'title': 'Sermon',
+          'series': null,
+          'content': _delta('edit from other device'),
+        });
+        await File(
+          '${tmpDir.path}/state-B.jsonl',
+        ).writeAsString('$remoteLine\n');
 
-      SharedPreferences.setMockInitialValues({
-        'syncFolderPath': tmpDir.path,
-        'googleDriveEnabled': false,
-      });
-      final prefs = await SharedPreferences.getInstance();
+        SharedPreferences.setMockInitialValues({
+          'syncFolderPath': tmpDir.path,
+          'googleDriveEnabled': false,
+        });
+        final prefs = await SharedPreferences.getInstance();
 
-      final container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-        achievementServiceProvider
-            .overrideWith((ref) => _NoopAchievementService(ref)),
-      ]);
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [
+            userStoreProvider.overrideWithValue(store),
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            deviceIdProvider.overrideWith((ref) async => 'A'),
+            achievementServiceProvider.overrideWith(
+              (ref) => _NoopAchievementService(ref),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      await container.read(syncServiceProvider).sync();
+        await container.read(syncServiceProvider).sync();
 
-      // Remote version won (200 > 100).
-      final sermon = await (store.select(store.sermons)
-            ..where((t) => t.id.equals('s1')))
-          .getSingle();
-      expect(sermon.content, _delta('edit from other device'));
+        // Remote version won (200 > 100).
+        final sermon = await (store.select(
+          store.sermons,
+        )..where((t) => t.id.equals('s1'))).getSingle();
+        expect(sermon.content, _delta('edit from other device'));
 
-      // The overwritten local content was preserved as a conflict revision.
-      final revs = await _liveRevisions(store, 's1');
-      expect(revs, hasLength(1));
-      expect(revs.single.kind, RevisionKind.conflict);
-      expect(revs.single.content, _delta('my local work'));
-    });
+        // The overwritten local content was preserved as a conflict revision.
+        final revs = await _liveRevisions(store, 's1');
+        expect(revs, hasLength(1));
+        expect(revs.single.kind, RevisionKind.conflict);
+        expect(revs.single.content, _delta('my local work'));
+      },
+    );
 
-    test('no snapshot when the incoming version matches local content',
-        () async {
-      final tmpDir =
-          await Directory.systemTemp.createTemp('sermon_revisions_sync2');
-      addTearDown(() => tmpDir.delete(recursive: true));
+    test(
+      'no snapshot when the incoming version matches local content',
+      () async {
+        final tmpDir = await Directory.systemTemp.createTemp(
+          'sermon_revisions_sync2',
+        );
+        addTearDown(() => tmpDir.delete(recursive: true));
 
-      final store = UserStore(NativeDatabase.memory());
-      addTearDown(store.close);
+        final store = UserStore(NativeDatabase.memory());
+        addTearDown(store.close);
 
-      await _insertSermon(store,
-          id: 's1', content: _delta('same'), updatedAt: 100, device: 'A');
+        await _insertSermon(
+          store,
+          id: 's1',
+          content: _delta('same'),
+          updatedAt: 100,
+          device: 'A',
+        );
 
-      final remoteLine = jsonEncode({
-        'id': 's1',
-        'updatedAt': 200,
-        'deviceId': 'B',
-        'deleted': false,
-        'type': 'sermon',
-        'createdAt': 1,
-        'title': 'Sermon',
-        'series': null,
-        'content': _delta('same'),
-      });
-      await File('${tmpDir.path}/state-B.jsonl').writeAsString('$remoteLine\n');
+        final remoteLine = jsonEncode({
+          'id': 's1',
+          'updatedAt': 200,
+          'deviceId': 'B',
+          'deleted': false,
+          'type': 'sermon',
+          'createdAt': 1,
+          'title': 'Sermon',
+          'series': null,
+          'content': _delta('same'),
+        });
+        await File(
+          '${tmpDir.path}/state-B.jsonl',
+        ).writeAsString('$remoteLine\n');
 
-      SharedPreferences.setMockInitialValues({
-        'syncFolderPath': tmpDir.path,
-        'googleDriveEnabled': false,
-      });
-      final prefs = await SharedPreferences.getInstance();
+        SharedPreferences.setMockInitialValues({
+          'syncFolderPath': tmpDir.path,
+          'googleDriveEnabled': false,
+        });
+        final prefs = await SharedPreferences.getInstance();
 
-      final container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-        achievementServiceProvider
-            .overrideWith((ref) => _NoopAchievementService(ref)),
-      ]);
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [
+            userStoreProvider.overrideWithValue(store),
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            deviceIdProvider.overrideWith((ref) async => 'A'),
+            achievementServiceProvider.overrideWith(
+              (ref) => _NoopAchievementService(ref),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      await container.read(syncServiceProvider).sync();
+        await container.read(syncServiceProvider).sync();
 
-      expect(await _liveRevisions(store, 's1'), isEmpty);
-    });
+        expect(await _liveRevisions(store, 's1'), isEmpty);
+      },
+    );
   });
 
   group('SermonRevisionsDialog', () {
@@ -350,17 +432,24 @@ void main() {
     // animation and throwing "_dependents.isEmpty is not true" /
     // "TextEditingController used after disposed" (same class as commit
     // 0da8e21). The prompt is now a StatefulWidget that disposes in dispose().
-    testWidgets('saving a labelled revision does not crash on dialog dismiss',
-        (tester) async {
+    testWidgets('saving a labelled revision does not crash on dialog dismiss', (
+      tester,
+    ) async {
       final store = UserStore(NativeDatabase.memory());
       addTearDown(store.close);
-      await _insertSermon(store,
-          id: 's1', content: _delta('draft'), updatedAt: 100);
+      await _insertSermon(
+        store,
+        id: 's1',
+        content: _delta('draft'),
+        updatedAt: 100,
+      );
 
-      final container = ProviderContainer(overrides: [
-        userStoreProvider.overrideWithValue(store),
-        deviceIdProvider.overrideWith((ref) async => 'A'),
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+        ],
+      );
       addTearDown(container.dispose);
 
       final errors = <FlutterErrorDetails>[];
@@ -400,15 +489,19 @@ void main() {
       await tester.pumpAndSettle();
 
       final lifecycleErrors = errors
-          .where((e) =>
-              e.exceptionAsString().contains('_dependents.isEmpty') ||
-              e.exceptionAsString().contains('used after') ||
-              e.exceptionAsString().contains('wrong build scope') ||
-              e.exceptionAsString().contains('disposed'))
+          .where(
+            (e) =>
+                e.exceptionAsString().contains('_dependents.isEmpty') ||
+                e.exceptionAsString().contains('used after') ||
+                e.exceptionAsString().contains('wrong build scope') ||
+                e.exceptionAsString().contains('disposed'),
+          )
           .toList();
-      expect(lifecycleErrors, isEmpty,
-          reason:
-              lifecycleErrors.map((e) => e.exceptionAsString()).join('\n\n'));
+      expect(
+        lifecycleErrors,
+        isEmpty,
+        reason: lifecycleErrors.map((e) => e.exceptionAsString()).join('\n\n'),
+      );
 
       final revs = await _liveRevisions(store, 's1');
       expect(revs, hasLength(1));

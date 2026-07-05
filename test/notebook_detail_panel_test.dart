@@ -22,12 +22,15 @@ void main() {
 
   setUp(() {
     store = UserStore(NativeDatabase.memory());
-    container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(store),
-      deviceIdProvider.overrideWith((ref) async => 'A'),
-      achievementServiceProvider
-          .overrideWith((ref) => _NoopAchievementService(ref)),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(store),
+        deviceIdProvider.overrideWith((ref) async => 'A'),
+        achievementServiceProvider.overrideWith(
+          (ref) => _NoopAchievementService(ref),
+        ),
+      ],
+    );
   });
 
   tearDown(() async {
@@ -93,8 +96,9 @@ void main() {
     },
   );
 
-  testWidgets('dragging a page to the end reorders it without throwing',
-      (tester) async {
+  testWidgets('dragging a page to the end reorders it without throwing', (
+    tester,
+  ) async {
     final id = await seedNotebookWithPages();
     await pumpPanel(tester, id);
 
@@ -105,9 +109,9 @@ void main() {
 
     // Persisted order should have changed (A no longer first). We assert on the
     // store so the test doesn't depend on exact drop-target math.
-    final pages = await (store.select(store.notebookPages)
-          ..orderBy([(t) => OrderingTerm.asc(t.position)]))
-        .get();
+    final pages = await (store.select(
+      store.notebookPages,
+    )..orderBy([(t) => OrderingTerm.asc(t.position)])).get();
     expect(pages.first.title, isNot('A'));
     // No exception was thrown during the reorder (the crash we fixed).
     expect(tester.takeException(), isNull);

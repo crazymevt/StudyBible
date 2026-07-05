@@ -2,7 +2,8 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_quill/flutter_quill.dart' show FlutterQuillLocalizations;
+import 'package:flutter_quill/flutter_quill.dart'
+    show FlutterQuillLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,37 +31,51 @@ void main() {
     store = UserStore(NativeDatabase.memory());
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    container = ProviderContainer(overrides: [
-      userStoreProvider.overrideWithValue(store),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      deviceIdProvider.overrideWith((ref) async => 'test-device'),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        userStoreProvider.overrideWithValue(store),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        deviceIdProvider.overrideWith((ref) async => 'test-device'),
+      ],
+    );
 
-    await store.into(store.notebooks).insert(const NotebooksCompanion(
-          id: Value('notebook-1'),
-          createdAt: Value(0),
-          updatedAt: Value(0),
-          deviceId: Value('test-device'),
-          title: Value('Study Notes'),
-        ));
-    await store.into(store.notebookPages).insert(const NotebookPagesCompanion(
-          id: Value('page-1'),
-          createdAt: Value(0),
-          updatedAt: Value(0),
-          deviceId: Value('test-device'),
-          notebookId: Value('notebook-1'),
-          title: Value('On Saul'),
-          content: Value('[{"insert":"Saul hides.\\n"}]'),
-        ));
-    await store.into(store.notebookPages).insert(const NotebookPagesCompanion(
-          id: Value('page-2'),
-          createdAt: Value(0),
-          updatedAt: Value(0),
-          deviceId: Value('test-device'),
-          notebookId: Value('notebook-1'),
-          title: Value('On the Wilderness'),
-          content: Value('[{"insert":"Reflections.\\n"}]'),
-        ));
+    await store
+        .into(store.notebooks)
+        .insert(
+          const NotebooksCompanion(
+            id: Value('notebook-1'),
+            createdAt: Value(0),
+            updatedAt: Value(0),
+            deviceId: Value('test-device'),
+            title: Value('Study Notes'),
+          ),
+        );
+    await store
+        .into(store.notebookPages)
+        .insert(
+          const NotebookPagesCompanion(
+            id: Value('page-1'),
+            createdAt: Value(0),
+            updatedAt: Value(0),
+            deviceId: Value('test-device'),
+            notebookId: Value('notebook-1'),
+            title: Value('On Saul'),
+            content: Value('[{"insert":"Saul hides.\\n"}]'),
+          ),
+        );
+    await store
+        .into(store.notebookPages)
+        .insert(
+          const NotebookPagesCompanion(
+            id: Value('page-2'),
+            createdAt: Value(0),
+            updatedAt: Value(0),
+            deviceId: Value('test-device'),
+            notebookId: Value('notebook-1'),
+            title: Value('On the Wilderness'),
+            content: Value('[{"insert":"Reflections.\\n"}]'),
+          ),
+        );
   });
 
   tearDown(() async {
@@ -104,18 +119,20 @@ void main() {
       tester.widget<TextField>(find.byType(TextField).first).controller!.text;
 
   testWidgets(
-      'switching selectedNotebookPageIdProvider to a different page while '
-      'the panel is already open loads the new page', (tester) async {
-    await pumpPanel(tester);
+    'switching selectedNotebookPageIdProvider to a different page while '
+    'the panel is already open loads the new page',
+    (tester) async {
+      await pumpPanel(tester);
 
-    container.read(selectedNotebookPageIdProvider.notifier).set('page-1');
-    await settle(tester);
-    expect(visibleTitle(tester), 'On Saul');
+      container.read(selectedNotebookPageIdProvider.notifier).set('page-1');
+      await settle(tester);
+      expect(visibleTitle(tester), 'On Saul');
 
-    // Same code path an Explorer backlink tap drives: just re-set the
-    // provider to a different id while the editor is already mounted.
-    container.read(selectedNotebookPageIdProvider.notifier).set('page-2');
-    await settle(tester);
-    expect(visibleTitle(tester), 'On the Wilderness');
-  });
+      // Same code path an Explorer backlink tap drives: just re-set the
+      // provider to a different id while the editor is already mounted.
+      container.read(selectedNotebookPageIdProvider.notifier).set('page-2');
+      await settle(tester);
+      expect(visibleTitle(tester), 'On the Wilderness');
+    },
+  );
 }

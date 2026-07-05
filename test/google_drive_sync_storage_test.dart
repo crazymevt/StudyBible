@@ -17,10 +17,10 @@ GoogleDriveSyncStorage storageWith(
 }
 
 http.Response json(Object body) => http.Response(
-      jsonEncode(body),
-      200,
-      headers: {'content-type': 'application/json; charset=utf-8'},
-    );
+  jsonEncode(body),
+  200,
+  headers: {'content-type': 'application/json; charset=utf-8'},
+);
 
 void main() {
   test('id encodes the account so SyncService can detect account changes', () {
@@ -45,27 +45,35 @@ void main() {
     expect(names, ['state-a.jsonl', 'state-b.jsonl']);
   });
 
-  test('readLines finds the file then downloads and splits its media',
-      () async {
-    final storage = storageWith((req) async {
-      // Media download: GET .../files/<id> with alt=media.
-      if (req.url.queryParameters['alt'] == 'media') {
-        expect(req.url.path, endsWith('/files/file-1'));
-        return http.Response('line one\nline two', 200,
-            headers: {'content-type': 'application/octet-stream'});
-      }
-      // Otherwise it's the name lookup (files.list with a q filter).
-      expect(req.url.queryParameters['q'], contains("name = 'state-a.jsonl'"));
-      return json({
-        'files': [
-          {'id': 'file-1', 'name': 'state-a.jsonl'},
-        ],
+  test(
+    'readLines finds the file then downloads and splits its media',
+    () async {
+      final storage = storageWith((req) async {
+        // Media download: GET .../files/<id> with alt=media.
+        if (req.url.queryParameters['alt'] == 'media') {
+          expect(req.url.path, endsWith('/files/file-1'));
+          return http.Response(
+            'line one\nline two',
+            200,
+            headers: {'content-type': 'application/octet-stream'},
+          );
+        }
+        // Otherwise it's the name lookup (files.list with a q filter).
+        expect(
+          req.url.queryParameters['q'],
+          contains("name = 'state-a.jsonl'"),
+        );
+        return json({
+          'files': [
+            {'id': 'file-1', 'name': 'state-a.jsonl'},
+          ],
+        });
       });
-    });
 
-    final lines = await storage.readLines('state-a.jsonl');
-    expect(lines, ['line one', 'line two']);
-  });
+      final lines = await storage.readLines('state-a.jsonl');
+      expect(lines, ['line one', 'line two']);
+    },
+  );
 
   test('readLines returns empty when the document is absent', () async {
     final storage = storageWith((_) async => json({'files': []}));

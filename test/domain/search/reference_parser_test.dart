@@ -5,7 +5,13 @@ import 'package:study_bible/domain/search/reference_parser.dart';
 void main() {
   // A small canonical set of books to resolve against.
   const books = <Book>[
-    Book(id: 1, versionId: 'KJV', name: 'Genesis', bookOrder: 1, testament: 'OT'),
+    Book(
+      id: 1,
+      versionId: 'KJV',
+      name: 'Genesis',
+      bookOrder: 1,
+      testament: 'OT',
+    ),
     Book(
       id: 2,
       versionId: 'KJV',
@@ -14,7 +20,13 @@ void main() {
       testament: 'OT',
     ),
     Book(id: 3, versionId: 'KJV', name: 'John', bookOrder: 43, testament: 'NT'),
-    Book(id: 4, versionId: 'KJV', name: '1 John', bookOrder: 62, testament: 'NT'),
+    Book(
+      id: 4,
+      versionId: 'KJV',
+      name: '1 John',
+      bookOrder: 62,
+      testament: 'NT',
+    ),
   ];
 
   group('search ReferenceParser', () {

@@ -46,7 +46,7 @@ void main() {
       expect(ref.endChapter, 1);
       expect(ref.startVerse, isNull);
       expect(ref.endVerse, isNull);
-      
+
       final ref2 = ReferenceParser.parse('1Samuel 13:6-18');
       expect(ref2.bookName, '1 Samuel');
       expect(ref2.startChapter, 13);
@@ -92,7 +92,10 @@ void main() {
 
   group('ReferenceParser.normalizeBookName', () {
     test('maps known aliases to canonical names', () {
-      expect(ReferenceParser.normalizeBookName('SongOfSongs'), 'Song of Solomon');
+      expect(
+        ReferenceParser.normalizeBookName('SongOfSongs'),
+        'Song of Solomon',
+      );
       expect(ReferenceParser.normalizeBookName('1 Cor'), '1 Corinthians');
       expect(ReferenceParser.normalizeBookName('1 Cor.'), '1 Corinthians');
       expect(ReferenceParser.normalizeBookName('2Tim'), '2 Timothy');

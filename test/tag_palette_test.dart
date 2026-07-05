@@ -37,9 +37,16 @@ void main() {
 
   test('every palette swatch has a parseable, canonical hex', () {
     for (final s in kTagPalette) {
-      expect(tagColorFromHex(s.hex), isNotNull, reason: '${s.name} unparseable');
-      expect(normalizeTagHex(s.hex), s.hex,
-          reason: '${s.name} hex is not already canonical');
+      expect(
+        tagColorFromHex(s.hex),
+        isNotNull,
+        reason: '${s.name} unparseable',
+      );
+      expect(
+        normalizeTagHex(s.hex),
+        s.hex,
+        reason: '${s.name} hex is not already canonical',
+      );
     }
   });
 }

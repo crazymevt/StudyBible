@@ -30,7 +30,8 @@ void main() {
       BibleReferenceScanner.scan(text, books, requireVerse: requireVerse);
 
   // Convenience: the substring the scanner claims it matched.
-  String matched(String text, ReferenceMatch m) => text.substring(m.start, m.end);
+  String matched(String text, ReferenceMatch m) =>
+      text.substring(m.start, m.end);
 
   group('single reference in prose', () {
     test('chapter and verse', () {
@@ -92,8 +93,7 @@ void main() {
 
   group('multiple references', () {
     test('finds each in order', () {
-      final refs =
-          scan('Compare John 3:16 with Romans 5:8 and 1 John 4:9.');
+      final refs = scan('Compare John 3:16 with Romans 5:8 and 1 John 4:9.');
       expect(refs.map((r) => r.book.name), ['John', 'Romans', '1 John']);
       expect(refs.map((r) => r.verse), [16, 8, 9]);
     });
@@ -108,8 +108,10 @@ void main() {
     });
 
     test('are dropped when requireVerse is set', () {
-      expect(scan('The whole of Genesis 1 sets the stage.', requireVerse: true),
-          isEmpty);
+      expect(
+        scan('The whole of Genesis 1 sets the stage.', requireVerse: true),
+        isEmpty,
+      );
       // ...but a verse-bearing reference still comes through.
       expect(
         scan('Genesis 1:1 in the beginning.', requireVerse: true),
@@ -129,11 +131,16 @@ void main() {
       expect(scan('Chapter 5 was hard to read.'), isEmpty);
     });
 
-    test('book name as an ordinary word without a verse is safe under requireVerse', () {
-      // "Mark 5 boxes" — chapter-only, so requireVerse drops it.
-      expect(scan('Please Mark 5 boxes on the form.', requireVerse: true),
-          isEmpty);
-    });
+    test(
+      'book name as an ordinary word without a verse is safe under requireVerse',
+      () {
+        // "Mark 5 boxes" — chapter-only, so requireVerse drops it.
+        expect(
+          scan('Please Mark 5 boxes on the form.', requireVerse: true),
+          isEmpty,
+        );
+      },
+    );
 
     test('word boundary — no match glued to letters/digits', () {
       expect(scan('emailJohn 3 times'), isEmpty);

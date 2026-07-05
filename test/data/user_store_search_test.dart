@@ -19,7 +19,9 @@ void main() {
     const delta =
         '[{"insert":"Grace and "},{"insert":"truth","attributes":{"bold":true}},{"insert":"\\n"}]';
 
-    await store.into(store.sermons).insert(
+    await store
+        .into(store.sermons)
+        .insert(
           SermonsCompanion.insert(
             id: 's1',
             createdAt: 0,
@@ -33,7 +35,9 @@ void main() {
         );
 
     final rows = await store
-        .customSelect("SELECT text_content AS t FROM user_search WHERE type='sermon'")
+        .customSelect(
+          "SELECT text_content AS t FROM user_search WHERE type='sermon'",
+        )
         .get();
     final indexed = rows.map((r) => r.read<String>('t')).join(' ');
 
@@ -56,70 +60,88 @@ void main() {
     return rows.first.read<int>('c');
   }
 
-  test('soft-deleting a note via INSERT OR REPLACE removes it from the index',
-      () async {
-    await store.into(store.notes).insert(
-          NotesCompanion.insert(
-            id: 'n1',
-            updatedAt: 0,
-            deviceId: 'device',
-            bookName: 'John',
-            chapter: 3,
-            content: 'amazing grace',
-          ),
-        );
-    expect(await noteCount(store, 'n1'), 1);
+  test(
+    'soft-deleting a note via INSERT OR REPLACE removes it from the index',
+    () async {
+      await store
+          .into(store.notes)
+          .insert(
+            NotesCompanion.insert(
+              id: 'n1',
+              updatedAt: 0,
+              deviceId: 'device',
+              bookName: 'John',
+              chapter: 3,
+              content: 'amazing grace',
+            ),
+          );
+      expect(await noteCount(store, 'n1'), 1);
 
-    // Mirror how sync/save writes: a full-row INSERT OR REPLACE that flips the
-    // soft-delete flag. REPLACE's implicit row delete does not fire the AFTER
-    // DELETE trigger (recursive_triggers is off), so the INSERT/UPDATE trigger
-    // must clear the stale index row itself.
-    await store.into(store.notes).insert(
-          NotesCompanion.insert(
-            id: 'n1',
-            updatedAt: 1,
-            deviceId: 'device',
-            bookName: 'John',
-            chapter: 3,
-            content: 'amazing grace',
-            deleted: const Value(true),
-          ),
-          mode: InsertMode.replace,
-        );
+      // Mirror how sync/save writes: a full-row INSERT OR REPLACE that flips the
+      // soft-delete flag. REPLACE's implicit row delete does not fire the AFTER
+      // DELETE trigger (recursive_triggers is off), so the INSERT/UPDATE trigger
+      // must clear the stale index row itself.
+      await store
+          .into(store.notes)
+          .insert(
+            NotesCompanion.insert(
+              id: 'n1',
+              updatedAt: 1,
+              deviceId: 'device',
+              bookName: 'John',
+              chapter: 3,
+              content: 'amazing grace',
+              deleted: const Value(true),
+            ),
+            mode: InsertMode.replace,
+          );
 
-    expect(await noteCount(store, 'n1'), 0,
-        reason: 'soft-deleted note should not leak into the search index');
-  });
+      expect(
+        await noteCount(store, 'n1'),
+        0,
+        reason: 'soft-deleted note should not leak into the search index',
+      );
+    },
+  );
 
-  test('restoring a soft-deleted note via REPLACE re-indexes it once',
-      () async {
-    await store.into(store.notes).insert(
-          NotesCompanion.insert(
-            id: 'n2',
-            updatedAt: 0,
-            deviceId: 'device',
-            bookName: 'Acts',
-            chapter: 2,
-            content: 'pentecost',
-            deleted: const Value(true),
-          ),
-        );
-    expect(await noteCount(store, 'n2'), 0);
+  test(
+    'restoring a soft-deleted note via REPLACE re-indexes it once',
+    () async {
+      await store
+          .into(store.notes)
+          .insert(
+            NotesCompanion.insert(
+              id: 'n2',
+              updatedAt: 0,
+              deviceId: 'device',
+              bookName: 'Acts',
+              chapter: 2,
+              content: 'pentecost',
+              deleted: const Value(true),
+            ),
+          );
+      expect(await noteCount(store, 'n2'), 0);
 
-    await store.into(store.notes).insert(
-          NotesCompanion.insert(
-            id: 'n2',
-            updatedAt: 1,
-            deviceId: 'device',
-            bookName: 'Acts',
-            chapter: 2,
-            content: 'pentecost',
-            deleted: const Value(false),
-          ),
-          mode: InsertMode.replace,
-        );
+      await store
+          .into(store.notes)
+          .insert(
+            NotesCompanion.insert(
+              id: 'n2',
+              updatedAt: 1,
+              deviceId: 'device',
+              bookName: 'Acts',
+              chapter: 2,
+              content: 'pentecost',
+              deleted: const Value(false),
+            ),
+            mode: InsertMode.replace,
+          );
 
-    expect(await noteCount(store, 'n2'), 1,
-        reason: 'restored note should be re-indexed exactly once');
-  });
+      expect(
+        await noteCount(store, 'n2'),
+        1,
+        reason: 'restored note should be re-indexed exactly once',
+      );
+    },
+  );
 }

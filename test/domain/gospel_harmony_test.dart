@@ -33,8 +33,12 @@ void main() {
     final feeding = harmony.events[0];
     expect(feeding.title, 'All four');
     expect(feeding.sectionTitle, 'Section One');
-    expect(feeding.refs.map((r) => r.book),
-        ['Matthew', 'Mark', 'Luke', 'John']);
+    expect(feeding.refs.map((r) => r.book), [
+      'Matthew',
+      'Mark',
+      'Luke',
+      'John',
+    ]);
     expect(feeding.refFor('Mark')!.startVerse, 30);
     expect(feeding.refFor('John')!.label, 'John 6:1–15');
   });
@@ -50,13 +54,23 @@ void main() {
   test('labels collapse single verses and span chapters', () {
     expect(harmony.events[1].refs.single.label, 'Mark 8:31–9:1');
     const single = HarmonyRef(
-        book: 'John', startChapter: 18, startVerse: 1, endChapter: 18, endVerse: 1);
+      book: 'John',
+      startChapter: 18,
+      startVerse: 1,
+      endChapter: 18,
+      endVerse: 1,
+    );
     expect(single.label, 'John 18:1');
   });
 
   group('HarmonyRef.contains', () {
     const range = HarmonyRef(
-        book: 'Mark', startChapter: 8, startVerse: 31, endChapter: 9, endVerse: 1);
+      book: 'Mark',
+      startChapter: 8,
+      startVerse: 31,
+      endChapter: 9,
+      endVerse: 1,
+    );
 
     test('inside, boundary, and outside verses', () {
       expect(range.contains('Mark', 8, 31), isTrue);
@@ -79,8 +93,9 @@ void main() {
     test('finds every event touching a verse, in harmony order', () {
       final hits = harmony.eventsFor('Mark', 8, 31);
       expect(hits.map((e) => e.title), ['Cross-chapter']);
-      expect(harmony.eventsFor('Luke', 15, 11).map((e) => e.title),
-          ['Luke only']);
+      expect(harmony.eventsFor('Luke', 15, 11).map((e) => e.title), [
+        'Luke only',
+      ]);
     });
 
     test('chapter-only lookup and non-Gospel books', () {

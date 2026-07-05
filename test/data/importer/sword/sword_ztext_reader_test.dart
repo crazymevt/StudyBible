@@ -62,11 +62,11 @@ void main() {
     ]);
 
     SwordZTextReader reader() => SwordZTextReader(
-          verseIndex: verseIndex,
-          blockIndex: blockIndex,
-          textData: textData,
-          compressType: SwordCompressType.zip,
-        );
+      verseIndex: verseIndex,
+      blockIndex: blockIndex,
+      textData: textData,
+      compressType: SwordCompressType.zip,
+    );
 
     test('decodes verses, slicing within and across blocks', () {
       final r = reader();

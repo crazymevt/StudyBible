@@ -64,8 +64,9 @@ void main() {
     });
 
     test('decodes HTML entities', () {
-      final segments =
-          MyBibleVerseParser().parseVerse('Shadrach &amp; &lt;name&gt;');
+      final segments = MyBibleVerseParser().parseVerse(
+        'Shadrach &amp; &lt;name&gt;',
+      );
       expect(segments.single.text, 'Shadrach & <name>');
     });
 
@@ -74,10 +75,16 @@ void main() {
     });
 
     test('keeps formatting state across a combined verse', () {
-      final segments = MyBibleVerseParser()
-          .parseVerse('And <t>God said,<i> Let</i> there be</t> light');
-      expect(segments.map((s) => s.text),
-          ['And ', 'God said,', ' Let', ' there be', ' light']);
+      final segments = MyBibleVerseParser().parseVerse(
+        'And <t>God said,<i> Let</i> there be</t> light',
+      );
+      expect(segments.map((s) => s.text), [
+        'And ',
+        'God said,',
+        ' Let',
+        ' there be',
+        ' light',
+      ]);
       // " Let" is both Jesus words and italic; the trailing " light" is neither.
       final letSeg = segments.firstWhere((s) => s.text == ' Let');
       expect(letSeg.isJesusWords, isTrue);

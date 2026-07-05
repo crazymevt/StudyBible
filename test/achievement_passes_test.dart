@@ -38,11 +38,16 @@ int _at(int year, int month, int day, {int hour = 12}) =>
     DateTime(year, month, day, hour).millisecondsSinceEpoch;
 
 /// Every chapter of [book] read at the given [readAts] (one per chapter).
-List<ReadingProgress> _wholeBook(String book, List<int> readAts, {int iteration = 1}) {
+List<ReadingProgress> _wholeBook(
+  String book,
+  List<int> readAts, {
+  int iteration = 1,
+}) {
   final chapters = bibleChapters[book]!;
   assert(readAts.length == chapters);
   return [
-    for (int c = 1; c <= chapters; c++) _read(book, c, readAts[c - 1], iteration: iteration),
+    for (int c = 1; c <= chapters; c++)
+      _read(book, c, readAts[c - 1], iteration: iteration),
   ];
 }
 
@@ -124,22 +129,24 @@ void main() {
       expect(bookReadInOneDay('Philippians', progress), isFalse);
     });
 
-    test('one single-day iteration counts even if another iteration spans days', () {
-      final chapters = bibleChapters['Philippians']!;
-      // Iteration 1: read across two days -> does not qualify on its own.
-      final iter1 = _wholeBook(
-        'Philippians',
-        [for (int c = 1; c <= chapters; c++) _at(2026, 7, c == chapters ? 2 : 1)],
-        iteration: 1,
-      );
-      // Iteration 2: read entirely on one day -> qualifies.
-      final iter2 = _wholeBook(
-        'Philippians',
-        List.filled(chapters, _at(2026, 8, 1)),
-        iteration: 2,
-      );
-      expect(bookReadInOneDay('Philippians', [...iter1, ...iter2]), isTrue);
-    });
+    test(
+      'one single-day iteration counts even if another iteration spans days',
+      () {
+        final chapters = bibleChapters['Philippians']!;
+        // Iteration 1: read across two days -> does not qualify on its own.
+        final iter1 = _wholeBook('Philippians', [
+          for (int c = 1; c <= chapters; c++)
+            _at(2026, 7, c == chapters ? 2 : 1),
+        ], iteration: 1);
+        // Iteration 2: read entirely on one day -> qualifies.
+        final iter2 = _wholeBook(
+          'Philippians',
+          List.filled(chapters, _at(2026, 8, 1)),
+          iteration: 2,
+        );
+        expect(bookReadInOneDay('Philippians', [...iter1, ...iter2]), isTrue);
+      },
+    );
   });
 
   group('allShortBooksFinished (Short Book Reader)', () {
@@ -154,8 +161,13 @@ void main() {
     }
 
     test('the five single-chapter books are the tracked set', () {
-      expect(singleChapterBooks.toSet(),
-          {'Obadiah', 'Philemon', '2 John', '3 John', 'Jude'});
+      expect(singleChapterBooks.toSet(), {
+        'Obadiah',
+        'Philemon',
+        '2 John',
+        '3 John',
+        'Jude',
+      });
       // Guard the definition: each must actually be one chapter.
       for (final book in singleChapterBooks) {
         expect(bibleChapters[book], 1, reason: '$book should be one chapter');
@@ -167,7 +179,10 @@ void main() {
     });
 
     test('all five single-chapter books read -> earned', () {
-      expect(allShortBooksFinished(readSetForBooks(singleChapterBooks)), isTrue);
+      expect(
+        allShortBooksFinished(readSetForBooks(singleChapterBooks)),
+        isTrue,
+      );
     });
 
     test('missing one short book -> not earned', () {
@@ -176,8 +191,10 @@ void main() {
     });
 
     test('reading other books does not earn it', () {
-      expect(allShortBooksFinished(readSetForBooks(['Philippians', 'Ruth'])),
-          isFalse);
+      expect(
+        allShortBooksFinished(readSetForBooks(['Philippians', 'Ruth'])),
+        isFalse,
+      );
     });
   });
 
@@ -275,10 +292,14 @@ void main() {
     test('light and dark defaults differ for the retuned slots', () {
       // Green and blue were given distinct light shades; they should not equal
       // their dark defaults.
-      expect(defaultHighlightColorArgb('green', dark: true),
-          isNot(defaultHighlightColorArgb('green', dark: false)));
-      expect(defaultHighlightColorArgb('blue', dark: true),
-          isNot(defaultHighlightColorArgb('blue', dark: false)));
+      expect(
+        defaultHighlightColorArgb('green', dark: true),
+        isNot(defaultHighlightColorArgb('green', dark: false)),
+      );
+      expect(
+        defaultHighlightColorArgb('blue', dark: true),
+        isNot(defaultHighlightColorArgb('blue', dark: false)),
+      );
     });
 
     test('an override replaces only its own slot and mode', () {
