@@ -8,60 +8,6 @@ Running list of known issues and follow-ups.
 
 ## Research
 
-- [ ] **Explorer — richer content on entity/passage pages.** Three enrichments
-  scoped from a data-source audit (2026-07-02). Ordered cheapest-first.
-  - **(a) Dictionary facet card for places & topics. — DONE** (commit 1e9821c).
-    `explorerEntryDictionaryProvider` matches an entity name against every
-    installed dictionary's headwords (case-insensitive `LIKE`, trailing
-    parenthetical qualifier stripped), and `_DictionaryCard` in
-    `explorer_pages.dart` renders it on place/topic pages, grouped by module.
-    Person pages are excluded on purpose (their bio card already shows the
-    Easton entry). Note: only surfaces content the user has *imported* — the
-    bundled `content.db` ships just a 2-entry seed, not full Easton's; person
-    bios come baked into `theographic.json`, not the `dictionary_entries` table.
-  - **(b) Fuller timeline events. — DEFERRED; premise corrected 2026-07-02.**
-    The original note assumed the upstream events carried a summary, an end
-    year, and a location. Audited the real `events.json` (450 records) — the
-    reality is narrower:
-    - **Summaries don't exist.** The only descriptive text is `title` (already
-      imported). There's a `notes` field but it's on just **6 of 450** events
-      and holds trivia, not summaries. Drop this entirely.
-    - **No end year.** No `endDate` field. There *is* a `duration` on all 450
-      (`"1D"` for 301 of them, else `"40Y"`/`"7Y"`/`"1M"`…). An end year is only
-      *derivable*; `duration` displayed as "lasted 40 years" reads better and is
-      the cheap win. Skip the derived end year.
-    - **Locations are real and worth it.** `locations` links on **305** events
-      point to Theographic's *own* `places.json` (1,274 records w/ names +
-      lat/lng, pre-matched to OpenBible via `openBibleLat`). We don't download
-      that file today. Of 160 distinct event-location places, **126 (79%) match
-      an existing OpenBible `places` row by name** → can become a clickable
-      place chip + authoritative map pin; the ~21% miss (name variants like
-      Galilee/Samaria, regions like Olivet) fall back to a stored name+coords.
-    - *If picked up:* recommended scope is **duration (display) + locations
-      (cross-linked)**. Build script (`scripts/build_theographic.dart`,
-      Airtable-export JSON, cached in `scratch/theographic/`): keep `duration`,
-      download `places.json`, resolve `locations[]` → name+lat/lng. Importer
-      (`theographic_importer.dart`) does the name→`places.id` match at import
-      time (both come from the same import gate) storing a `location_place_id`
-      FK plus name/coords fallback. Add columns in
-      `lib/data/tables/content_tables.dart` (`timeline_events`), regen with
-      `dart run build_runner build --delete-conflicting-outputs`, and lead the
-      event page's "Where it happened" with the explicit location (verse-derived
-      places stay below as "also mentioned"). Out of scope but interesting for
-      later: `predecessor`/`partOf` (event chains/hierarchy), `groups` links,
-      and the `periods` table for era buckets. License unchanged (CC BY-SA 4.0).
-  - **(c) OpenBible.info place descriptions.** Places currently have only
-    `name`/`lat`/`lng` — no prose. OpenBible's Bible-Geocoding-Data carries
-    descriptive text and ancient/modern name variants we don't ingest.
-    - *Research notes:* `tool/build_places.dart` converts OpenBible
-      `ancient.jsonl` + `modern.jsonl` into `places.json`; extend it to keep the
-      description + name-variant fields, add columns to the `places` table,
-      update `places_importer.dart` and regenerate. Pairs naturally with (a) —
-      show OpenBible description + Easton entry together on the place page.
-      License CC-BY 4.0 (already in use). Verify the upstream jsonl actually
-      carries a description field before scoping (audit noted it as a gap, not
-      confirmed present).
-
 - [ ] **Import SWORD modules** (CrossWire format — translations, commentaries,
   dictionaries). Implementation lives in `lib/data/importer/sword/`. Phases
   1, 2, 4, and 5 are **DONE** and verified in the macOS app; **Phase 3 is the
@@ -85,6 +31,43 @@ Running list of known issues and follow-ups.
 ## Issues
 
 ## Archive
+
+- [x] **Explorer — richer content on entity/passage pages.** Three enrichments
+  scoped from a data-source audit (2026-07-02). All three now resolved:
+  - **(a) Dictionary facet card for places & topics. — DONE** (commit 1e9821c).
+    `explorerEntryDictionaryProvider` matches an entity name against every
+    installed dictionary's headwords (case-insensitive `LIKE`, trailing
+    parenthetical qualifier stripped), and `_DictionaryCard` in
+    `explorer_pages.dart` renders it on place/topic pages, grouped by module.
+    Person pages are excluded on purpose (their bio card already shows the
+    Easton entry). Note: only surfaces content the user has *imported* — the
+    bundled `content.db` ships just a 2-entry seed, not full Easton's; person
+    bios come baked into `theographic.json`, not the `dictionary_entries` table.
+  - **(b) Fuller timeline events. — DROPPED 2026-07-05; premise corrected
+    2026-07-02.** The original note assumed the upstream events carried a
+    summary, an end year, and a location. Audited the real `events.json` (450
+    records) — the reality is narrower: summaries don't exist (only `title`,
+    already imported; a `notes` field covers just 6/450 events and holds
+    trivia, not summaries); no end year field (only a `duration` on all 450,
+    e.g. `"40Y"`, which would've been the cheap display win); locations were
+    real and viable (`locations` links on 305 events resolve to Theographic's
+    own `places.json`, 126/160 distinct places matching an existing OpenBible
+    `places` row by name). Scoped but not implemented — dropped rather than
+    picked up.
+  - **(c) OpenBible.info place descriptions. — DROPPED; premise false
+    (2026-07-05).** Audited all 5 files in `Bible-Geocoding-Data`
+    (`ancient.jsonl`, `modern.jsonl`, `geometry.jsonl`, `image.jsonl`,
+    `source.jsonl`, fetched from GitHub). There is no descriptive-prose field
+    anywhere in the dataset. Every `"description"` string found (on
+    ancient-place identifications, on `modern.jsonl` entries, in
+    `image.jsonl`) is a short auto-generated photo caption (e.g. "aerial
+    cityscape of Jerusalem", "closeup of the Barada River"), not
+    encyclopedia-style text about the place; `source.jsonl` is a bibliography
+    of scholarly works, citable but not body text. Confirmed on Jerusalem and
+    Abana specifically. The real-but-narrower pieces that *do* exist in the
+    data (`translation_name_counts` name variants — 766/1342 places have more
+    than one; and a `types` classification like settlement/mountain/river on
+    all 1342 places) are not being pursued either per this decision.
 
 - [x] **loading times** users with large databases have significant loading times.  These can be caused by large number of commentaries, notebooks, sermons, tags, and possibly other user entered data.  We should look at adding missing indexes.  We should also consider if a new mechnisim is needed for sermons and notebooks (i.e. scans vs's a reference lookup table) if the collection grows large, which it will over time.
   - *Done (indexes):* the user store had **zero** indexes and the content
