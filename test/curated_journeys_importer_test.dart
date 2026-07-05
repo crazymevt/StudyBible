@@ -620,4 +620,87 @@ void main() {
       'Bethany 1', // Ascends to heaven
     ]);
   });
+
+  test("Paul's journey has all 60 curated stops in chronological order",
+      () async {
+    await container.read(curatedJourneysReadyProvider.future);
+    final paul = await (store.select(store.biblePeople)
+          ..where((p) => p.slug.equals('paul_2479')))
+        .getSingle();
+
+    final journey =
+        await container.read(personJourneyProvider(paul.id).future);
+    expect(journey, isNotNull);
+    expect(journey!.waypoints.map((w) => w.placeName), [
+      'Damascus',
+      'Arabia 2',
+      'Jerusalem',
+      'Tarsus',
+      'Antioch 1',
+      'Salamis',
+      'Paphos',
+      'Perga',
+      'Antioch 2',
+      'Iconium',
+      'Lystra',
+      'Derbe',
+      'Attalia',
+      'Syria 2',
+      'Derbe',
+      'Lystra',
+      'Phrygia',
+      'Galatia',
+      'Troas',
+      'Neapolis',
+      'Philippi',
+      'Amphipolis',
+      'Apollonia',
+      'Thessalonica',
+      'Berea',
+      'Athens',
+      'Corinth',
+      'Cenchreae',
+      'Ephesus',
+      'Caesarea',
+      'Jerusalem',
+      'Antioch 1',
+      'Galatia',
+      'Ephesus',
+      'Macedonia',
+      'Corinth',
+      'Philippi',
+      'Troas',
+      'Assos',
+      'Mitylene',
+      'Chios',
+      'Samos',
+      'Miletus',
+      'Cos',
+      'Rhodes 1',
+      'Patara',
+      'Tyre',
+      'Ptolemais',
+      'Caesarea',
+      'Jerusalem',
+      'Sidon',
+      'Myra',
+      'Fair Havens',
+      'Malta',
+      'Syracuse',
+      'Rhegium',
+      'Puteoli',
+      'Forum of Appius',
+      'Three Taverns',
+      'Rome',
+    ]);
+    // 30 dated-but-excluded events: the 29 bundled events superseded by this
+    // curated journey that still carry a start_year (same pattern as e.g.
+    // Solomon's "Reign of Solomon" above), plus "Stephen is stoned" — the one
+    // other bundled event tying Paul in as a participant (he consents to it,
+    // Acts 7:58) — whose verses (Acts 7:54-60) have no place_verses ties at
+    // all, so it's dated but unmapped rather than a waypoint here. The
+    // remaining 23 superseded events have no start_year and fall under
+    // undatedEventCount instead.
+    expect(journey.unmappedEventCount, 30);
+  });
 }
