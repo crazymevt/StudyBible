@@ -20,35 +20,26 @@ class TheographicImporter {
     return await query.map((row) => row.read(countExp)).getSingle() ?? 0;
   }
 
-  Future<int> _indexedPersonCount() async {
-    final row = await store
-        .customSelect(
-            "SELECT COUNT(*) AS c FROM content_search WHERE type = 'person'")
-        .getSingle();
-    return row.read<int>('c');
-  }
-
-  /// Inserts person names into the global FTS index if absent. Self-heals DBs
-  /// that loaded people before search indexing existed.
-  Future<void> _ensureIndexed() async {
-    if (await _indexedPersonCount() == 0 && await _personCount() > 0) {
-      await store.customStatement(_indexSql);
-    }
-  }
-
   /// Indexes name, disambiguated title, and alternate names, so "Jehiel"
-  /// finds the Ner also called Jehiel.
+  /// finds the Ner also called Jehiel. Kept in sync with ContentStore's
+  /// `from < 14` migration and `rebuildSearchIndex`.
   static const String _indexSql =
       "INSERT INTO content_search(type, reference_id, text_content) "
       "SELECT 'person', id, display_title || CASE WHEN also_called IS NULL "
       "THEN '' ELSE ' ' || also_called END FROM bible_people";
 
   /// Idempotent: loads the dataset once and ensures it is searchable.
+  ///
+  /// Older versions of this method re-verified the content_search rows on
+  /// every call with `SELECT COUNT(*) FROM content_search WHERE type =
+  /// 'person'` — a full scan of the whole FTS table, since `type` is
+  /// UNINDEXED, costing 100ms+ on a well-equipped install. That self-heal
+  /// (for DBs that loaded people before search indexing existed) now runs
+  /// once via ContentStore's `from < 14` migration instead; a fresh load
+  /// always indexes as part of the import below, so nothing here needs to
+  /// re-check content_search.
   Future<void> ensureLoaded() async {
-    if (await _personCount() > 0) {
-      await _ensureIndexed();
-      return;
-    }
+    if (await _personCount() > 0) return;
 
     final raw = await rootBundle.loadString(assetPath);
     final data = jsonDecode(raw) as Map<String, dynamic>;

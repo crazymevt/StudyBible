@@ -42,7 +42,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration {
@@ -213,6 +213,50 @@ class ContentStore extends _$ContentStore {
             'CREATE INDEX IF NOT EXISTS idx_event_verse_event '
             'ON event_verses (event_id)',
           );
+        }
+        if (from < 14) {
+          // TheographicImporter/TopicalImporter used to self-heal their FTS
+          // rows on *every* ensureLoaded() call — a `SELECT COUNT(*) FROM
+          // content_search WHERE type = 'person'` (or 'topic'), which can't
+          // use an index (type is UNINDEXED in the fts5 definition) and so
+          // scans the *entire* content_search table. That table's size is
+          // dominated by verses and installed commentaries, so on a
+          // well-equipped install this one check could cost 100ms+ — paid
+          // twice, on whichever of Explorer/People/Topics/Atlas/Search the
+          // user opened first each session, since that's the only place the
+          // importers' ensureLoaded() is called from.
+          //
+          // The heal only ever mattered for DBs that loaded people/topics
+          // before content_search indexing existed; run it once here instead.
+          final personIndexed = await customSelect(
+            "SELECT COUNT(*) AS c FROM content_search WHERE type = 'person'",
+          ).getSingle();
+          if (personIndexed.read<int>('c') == 0) {
+            final personCount =
+                await customSelect('SELECT COUNT(*) AS c FROM bible_people')
+                    .getSingle();
+            if (personCount.read<int>('c') > 0) {
+              await customStatement(
+                "INSERT INTO content_search(type, reference_id, text_content) "
+                "SELECT 'person', id, display_title || CASE WHEN also_called IS NULL "
+                "THEN '' ELSE ' ' || also_called END FROM bible_people",
+              );
+            }
+          }
+          final topicIndexed = await customSelect(
+            "SELECT COUNT(*) AS c FROM content_search WHERE type = 'topic'",
+          ).getSingle();
+          if (topicIndexed.read<int>('c') == 0) {
+            final topicCount =
+                await customSelect('SELECT COUNT(*) AS c FROM topics')
+                    .getSingle();
+            if (topicCount.read<int>('c') > 0) {
+              await customStatement(
+                "INSERT INTO content_search(type, reference_id, text_content) "
+                "SELECT 'topic', id, name FROM topics",
+              );
+            }
+          }
         }
       },
     );

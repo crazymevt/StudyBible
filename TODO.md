@@ -137,6 +137,23 @@ Running list of known issues and follow-ups.
     to render title rows; a content-free projection would cut list-open cost
     for huge libraries. Lower urgency now that the Explorer no longer rides
     those streams.
+  - *Done (Explorer first-open latency):* `TheographicImporter`/
+    `TopicalImporter.ensureLoaded()` — awaited by `explorerReadyProvider`,
+    so it gated every first Explorer/People/Topics/Atlas/Search open each
+    session — re-verified their FTS rows on *every* call via `SELECT
+    COUNT(*) FROM content_search WHERE type = 'person'` (or `'topic'`). That
+    can't use an index (`type` is UNINDEXED in the fts5 definition) so it
+    scanned the **entire** content_search table, which is dominated by
+    verses + installed commentaries — benchmarked at ~155ms on a
+    heavily-equipped install's content_search (1.27M rows) vs. ~15ms at a
+    moderate 159k rows, and it ran twice (person + topic). Moved the one-time
+    heal (for DBs that loaded people/topics before search indexing existed)
+    into ContentStore's `from < 14` migration and deleted the runtime
+    recheck entirely — `ensureLoaded()` now only does a fast PK-backed count
+    on the small entity table. Verified with a synthetic 300k-row
+    content_search: 7ms, down from the ~155ms scan. Tests:
+    `content_store_migration_test.dart` (heal + no-op-when-already-healed
+    cases).
 
 
 

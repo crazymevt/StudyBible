@@ -20,30 +20,18 @@ class TopicalImporter {
     return await query.map((row) => row.read(countExp)).getSingle() ?? 0;
   }
 
-  Future<int> _indexedTopicCount() async {
-    final row = await store
-        .customSelect("SELECT COUNT(*) AS c FROM content_search WHERE type = 'topic'")
-        .getSingle();
-    return row.read<int>('c');
-  }
-
-  /// Inserts topic names into the global FTS index if absent. Self-heals DBs
-  /// that loaded topics before search indexing existed.
-  Future<void> _ensureIndexed() async {
-    if (await _indexedTopicCount() == 0 && await _topicCount() > 0) {
-      await store.customStatement(
-        "INSERT INTO content_search(type, reference_id, text_content) "
-        "SELECT 'topic', id, name FROM topics",
-      );
-    }
-  }
-
   /// Idempotent: loads the topical index once and ensures it is searchable.
+  ///
+  /// Older versions of this method re-verified the content_search rows on
+  /// every call with `SELECT COUNT(*) FROM content_search WHERE type =
+  /// 'topic'` — a full scan of the whole FTS table, since `type` is
+  /// UNINDEXED, costing 100ms+ on a well-equipped install. That self-heal
+  /// (for DBs that loaded topics before search indexing existed) now runs
+  /// once via ContentStore's `from < 14` migration instead; a fresh load
+  /// always indexes as part of the import below, so nothing here needs to
+  /// re-check content_search.
   Future<void> ensureLoaded() async {
-    if (await _topicCount() > 0) {
-      await _ensureIndexed();
-      return;
-    }
+    if (await _topicCount() > 0) return;
 
     final raw = await rootBundle.loadString(assetPath);
     final data = jsonDecode(raw) as Map<String, dynamic>;
