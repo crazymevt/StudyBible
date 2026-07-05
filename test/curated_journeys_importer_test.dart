@@ -747,4 +747,683 @@ void main() {
       expect(journey.unmappedEventCount, 30);
     },
   );
+
+  test(
+    "Peter's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('peter_2745'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Sea of Galilee',
+        'Sea of Galilee',
+        'Galilee 1',
+        'Galilee 1',
+        'Caesarea Philippi',
+        'Bethsaida 2',
+        'Caesarea Philippi',
+        'Jerusalem',
+        'Capernaum',
+        'Capernaum',
+        'Beautiful Gate',
+        'Solomon’s Portico',
+        'Jerusalem',
+        'Solomon’s Portico',
+        'Jerusalem',
+        'Jerusalem',
+        'Samaria 1',
+        'Jerusalem',
+        'Lod',
+        'Joppa',
+        'Caesarea',
+        'Lod',
+        'Caesarea',
+        'Galilee 1',
+        'Judea 1',
+        'Jerusalem',
+        'Caesarea',
+        'Jerusalem',
+        'Jerusalem',
+        'Antioch 1',
+        'Babylon 2',
+      ]);
+      expect(journey.unmappedEventCount, 7);
+      expect(journey.undatedEventCount, 7);
+    },
+  );
+
+  test(
+    "Barnabas's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('barnabas_1722'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Cyprus',
+        'Cyprus',
+        'Antioch 1',
+        'Tarsus',
+        'Antioch 1',
+        'Jerusalem',
+        'Salamis',
+        'Paphos',
+        'Perga',
+        'Antioch 2',
+        'Iconium',
+        'Lystra',
+        'Derbe',
+        'Attalia',
+        'Jerusalem',
+        'Cyprus',
+      ]);
+      expect(journey.unmappedEventCount, 6);
+      expect(journey.undatedEventCount, 6);
+    },
+  );
+
+  test(
+    "Silas's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('silas_2740'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      // Regression: the Jerusalem Council stops used to carry Silas's real
+      // introduction year (~49.0/49.1), which sorted *after* his Second
+      // Journey stops (46.0-48.1, matching Paul's internal numbering) and
+      // played his journey backwards. Renumbered to 45.8/45.9 so the
+      // Council correctly comes first.
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Antioch 1',
+        'Antioch 1',
+        'Syria 2',
+        'Neapolis',
+        'Philippi',
+        'Thessalonica',
+        'Berea',
+        'Corinth',
+      ]);
+      expect(journey.unmappedEventCount, 7);
+      expect(journey.undatedEventCount, 7);
+    },
+  );
+
+  test(
+    "Timothy's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('timotheus_2863'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Derbe',
+        'Macedonia',
+        'Berea',
+        'Corinth',
+        'Asia',
+        'Troas',
+        'Rome',
+      ]);
+      expect(journey.unmappedEventCount, 4);
+      expect(journey.undatedEventCount, 7);
+    },
+  );
+
+  test(
+    "Luke's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('luke_1836'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      // Regression: see the 'Arrives in Jerusalem' note on Ezra's test —
+      // this Jerusalem stop is Luke's own Acts 21:15, not a merge target.
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Macedonia',
+        'Macedonia',
+        'Macedonia',
+        'Chios',
+        'Jerusalem',
+        'Caesarea',
+        'Malta',
+        'Rome',
+      ]);
+      expect(journey.unmappedEventCount, 11);
+      expect(journey.undatedEventCount, 6);
+    },
+  );
+
+  test(
+    "Philip the Evangelist's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('philip_2347'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Antioch 1',
+        'Samaria 1',
+        'Antioch 1',
+        'Gaza',
+        'Samaria 1',
+        'Gaza',
+        'Ashdod',
+        'Ashdod',
+        'Caesarea',
+      ]);
+      expect(journey.unmappedEventCount, 1);
+      expect(journey.undatedEventCount, 1);
+    },
+  );
+
+  test(
+    "Joshua's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('joshua_893'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Amalek',
+        'Mount Sinai',
+        'Kadesh-barnea',
+        'Jericho 1',
+        'Jordan',
+        'Gilgal 1',
+        'Jericho 1',
+        'Ai 1',
+        'Mount Ebal',
+        'Gibeon',
+        'Waters of Merom',
+        'Shiloh',
+        'Shechem',
+        'Gaash',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Jonah's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('jonah_1689'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Nineveh',
+        'Gath-hepher',
+        'Joppa',
+        'Nineveh',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Ezekiel's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('ezekiel_1237'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Babylon 1',
+        'Chebar',
+        'Babylon 1',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Samuel's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('samuel_2469'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Shiloh',
+        'Mizpah 2',
+        'Ebenezer 1',
+        'Bethel 1',
+        'Ramah 1',
+        'Zuph',
+        'Gilgal 1',
+        'Bethlehem 1',
+        'Paran',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Saul's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('saul_2478'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Gibeah 1',
+        'Bezek 1',
+        'Gilgal 1',
+        'Zelzah',
+        'Bethel 1',
+        'Carmel 1',
+        'Valley of Elah',
+        'Naioth',
+        'Wilderness of Ziph',
+        'Arabah',
+        'Engedi',
+        'En-dor',
+        'Mount Gilboa',
+        'Jordan',
+      ]);
+      expect(journey.unmappedEventCount, 1);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Ruth's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('ruth_2450'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Moab 1',
+        'Bethlehem 1',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Naomi's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('naomi_2147'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Bethlehem 1',
+        'Bethlehem 1',
+        'Bethlehem 1',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Esther's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('esther_1343'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), ['Susa']);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "John the Baptist's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('john_1676'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Judea 1',
+        'Judea 1',
+        'Judea 1',
+        'Judea 1',
+        'Jordan',
+        'Jordan',
+        'Bethany 2',
+        'Galilee 1',
+        'Jerusalem',
+        'Aenon',
+        'Galilee 1',
+      ]);
+      expect(journey.unmappedEventCount, 1);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "James's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('james_717'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Sea of Galilee',
+        'Capernaum',
+        'Sea of Galilee',
+        'Gethsemane',
+        'Jerusalem',
+        'Jerusalem',
+      ]);
+      expect(journey.unmappedEventCount, 2);
+      expect(journey.undatedEventCount, 1);
+    },
+  );
+
+  test(
+    "Andrew's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('andrew_264'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Bethsaida 1',
+        'Sea of Galilee',
+        'Bethany 2',
+        'Sea of Galilee',
+        'Galilee 1',
+        'Bethsaida 2',
+        'Jerusalem',
+      ]);
+      expect(journey.unmappedEventCount, 1);
+      expect(journey.undatedEventCount, 2);
+    },
+  );
+
+  test(
+    "Titus's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('titus_2869'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Jerusalem',
+        'Macedonia',
+        'Corinth',
+        'Crete',
+        'Nicopolis',
+        'Dalmatia',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Apollos's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('apollos_276'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Alexandria',
+        'Alexandria',
+        'Achaia',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 1);
+    },
+  );
+
+  test(
+    "Ezra's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('ezra_1244'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      // Regression: 'Arrives in Jerusalem' used to collide with Luke's
+      // identically-titled Acts 21:15 waypoint, silently merging Ezra's
+      // 458 BC return into Luke's AD 54 event. Now titled distinctly, so
+      // this must resolve to Ezra's own three curated stops.
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Babylon 1',
+        'Ahava',
+        'Jerusalem',
+      ]);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Nehemiah's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('nehemiah_2171'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), ['Susa', 'Jerusalem']);
+      expect(journey.unmappedEventCount, 0);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Abraham's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('abraham_58'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Canaan',
+        'Canaan',
+        'Moreh 1',
+        'Ai 1',
+        'Canaan',
+        'Ai 1',
+        'Hebron',
+        'Dan',
+        'Damascus',
+        'Salem',
+        'Gerar',
+        'Beersheba 1',
+        'Moriah',
+        'Beersheba 1',
+        'Canaan',
+        'Canaan',
+        'Egypt',
+        'Egypt',
+        'Bethel 1',
+        'Beer-lahai-roi',
+        'Gomorrah',
+        'Beersheba 1',
+      ]);
+      expect(journey.unmappedEventCount, 4);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Isaac's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('isaac_616'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Beersheba 1',
+        'Moriah',
+        'Beersheba 1',
+        'Beer-lahai-roi',
+        'Gerar',
+        'Valley of Gerar',
+        'Beersheba 1',
+        'Beersheba 1',
+        'Beersheba 1',
+        'Hebron',
+        'Paddan-aram',
+      ]);
+      expect(journey.unmappedEventCount, 2);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
+
+  test(
+    "Joseph's journey follows the curated waypoints in chronological order",
+    () async {
+      await container.read(curatedJourneysReadyProvider.future);
+      final person = await (store.select(
+        store.biblePeople,
+      )..where((p) => p.slug.equals('joseph_1710'))).getSingle();
+
+      final journey = await container.read(
+        personJourneyProvider(person.id).future,
+      );
+      expect(journey, isNotNull);
+      expect(journey!.waypoints.map((w) => w.placeName), [
+        'Shechem',
+        'Shechem',
+        'Dothan',
+        'Egypt',
+        'Egypt',
+        'Egypt',
+        'Goshen 1',
+        'Canaan',
+        'Egypt',
+        'Egypt',
+        'Shechem',
+        'Egypt',
+        'Egypt',
+        'Egypt',
+        'Egypt',
+        'Canaan',
+        'Egypt',
+      ]);
+      expect(journey.unmappedEventCount, 1);
+      expect(journey.undatedEventCount, 0);
+    },
+  );
 }

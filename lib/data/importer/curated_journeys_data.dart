@@ -1810,7 +1810,7 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         year: 47.0,
         bookName: 'Acts',
         chapter: 16,
-        verse: 12,
+        verse: 19,
         placeName: 'Philippi',
       ),
       CuratedWaypoint(
@@ -2341,12 +2341,18 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         verse: 25,
         placeName: 'Attalia',
       ),
+      // Same title/citation as Peter's waypoint below — this is the same
+      // single Council event, not a distinct one, so it's deliberately
+      // shared (same pattern as Paul/Silas's Second Journey stops): the
+      // importer merges same-titled waypoints into one timeline_events row
+      // with both as participants, rather than two near-duplicate "Council"
+      // entries on the Jerusalem place page.
       CuratedWaypoint(
         title: 'Attends the Jerusalem Council',
         year: 49.0,
         bookName: 'Acts',
         chapter: 15,
-        verse: 2,
+        verse: 7,
         placeName: 'Jerusalem',
       ),
       CuratedWaypoint(
@@ -2364,9 +2370,18 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
   CuratedPersonJourney(
     personSlug: 'silas_2740',
     waypoints: [
+      // Real-world scholarly dating puts the Council around AD 49, after
+      // Paul's internal numbering (below) already reaches 46.0-48.1 for the
+      // Second Journey that follows it — Paul's curated journey compresses
+      // that gap rather than tracking absolute years. Using 49.0/49.1 here
+      // (Silas's actual introduction) would sort *after* his own Second
+      // Journey stops and play his path backwards, so these two are
+      // renumbered just ahead of 46.0 to keep Silas's own journey in true
+      // chronological order; the Second Journey stops below still line up
+      // with Paul's numbering.
       CuratedWaypoint(
         title: 'Introduced at the Jerusalem Council',
-        year: 49.0,
+        year: 45.8,
         bookName: 'Acts',
         chapter: 15,
         verse: 22,
@@ -2374,13 +2389,12 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
       ),
       CuratedWaypoint(
         title: 'Sent to Antioch with the council\'s letter',
-        year: 49.1,
+        year: 45.9,
         bookName: 'Acts',
         chapter: 15,
         verse: 30,
         placeName: 'Antioch 1',
       ),
-      // Matches Paul's Second Journey (46.0 - 47.4) -- note: Paul's dates are slightly off relative to Council (49.0), keeping Paul's internal timeline numbering 46.0+
       CuratedWaypoint(
         title: 'Second Journey: Travels through Syria and Cilicia',
         year: 46.0,
@@ -3123,12 +3137,17 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
   CuratedPersonJourney(
     personSlug: 'james_717', // Verified: Matt 4:21 — son of Zebedee
     waypoints: [
+      // Same title/citation as Peter's/Andrew's waypoint — Matthew 4:18-22
+      // narrates both callings (Peter & Andrew, then James & John) as one
+      // continuous scene by the Sea of Galilee, so this is deliberately
+      // shared rather than split into two near-duplicate "Called by Jesus"
+      // entries at the same place and year.
       CuratedWaypoint(
         title: 'Called by Jesus at the Sea of Galilee',
         year: 27.0,
         bookName: 'Matthew',
         chapter: 4,
-        verse: 21,
+        verse: 18,
         placeName: 'Sea of Galilee',
       ),
       CuratedWaypoint(
@@ -3314,8 +3333,12 @@ const curatedPersonJourneys = <CuratedPersonJourney>[
         verse: 15,
         placeName: 'Ahava', // Or Ahava Canal
       ),
+      // Distinct title from Luke's "Arrives in Jerusalem" (Acts 21:15, AD
+      // 54) — the importer dedupes waypoints by exact title with no
+      // per-person scoping, so a shared title here would silently merge
+      // Ezra's 458 BC arrival into Luke's unrelated NT event.
       CuratedWaypoint(
-        title: 'Arrives in Jerusalem',
+        title: 'Arrives in Jerusalem with the returning exiles',
         year: -458,
         bookName: 'Ezra',
         chapter: 8,
