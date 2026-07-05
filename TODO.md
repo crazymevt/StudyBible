@@ -11,7 +11,7 @@ Running list of known issues and follow-ups.
   - **Patriarchs**: Abraham, Joseph, and Isaac have massive multi-national journeys that resolve poorly under the auto-derived heuristic.
   - **Exodus/Conquest**: Joshua's conquest is currently lost in generic event blocks.
   - **Prophets & Kings**: The source dataset collapses entire ministries into single generic events (e.g., "Prophecies of Jonah") or omits them entirely (Samuel has 0 events).
-    - *Jonah, Isaiah, Jeremiah, Daniel, Ezekiel*: Their prophetic careers (including exiles to Babylon/Egypt) are reduced to just 1 event each.
+    - *Jonah, Ezekiel*: Their prophetic careers (including exiles to Babylon/Egypt) are reduced to just 1 event each.
     - *Samuel*: His judging circuit (Bethel, Gilgal, Mizpah, Ramah) is missing.
     - *King Saul*: Missing his military campaigns and pursuit of David (Gibeah, Michmash, Ziph, En-gedi, Gilboa).
   - **Women of the Bible**: Ruth, Naomi, and Esther have **0 events** in the dataset, leaving their entire geographic stories entirely blank.
