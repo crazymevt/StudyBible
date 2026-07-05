@@ -96,6 +96,7 @@ Running list of known issues and follow-ups.
     notes are in git history — see TODO.md prior to this condensation.)
 
 ## Issues
+- [ ] **loading times** users with large databases have significant loading times.  These can be caused by large number of commentaries, notebooks, sermons, tags, and possibly other user entered data.  We should look at adding missing indexes.  We should also consider if a new mechnisim is needed for sermons and notebooks if the collection grows large, which it will over time.
 
 ## Archive
 
