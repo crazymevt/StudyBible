@@ -115,19 +115,28 @@ Running list of known issues and follow-ups.
     entity_tags (tag_id / entity_id / entity_type), notebook_pages,
     all three revision tables, attachment_references, and
     navigation_histories(updated_at).
-  - *Remaining (the reference lookup table):* the Explorer's "Your sermons" /
-    "Your notebooks" backlink cards (`explorerSermonsProvider` /
-    `explorerNotebookPagesProvider`) still load **every** sermon and notebook
-    page (full Delta content, via watched `allSermonsProvider` /
-    `allNotebookPagesProvider` streams, so every table write re-emits and
-    re-scans) and re-run `BibleReferenceScanner` / entity-link extraction per
-    page view. Indexes can't help; the fix is a persisted reference table
-    (e.g. `document_references(doc_type, doc_id, kind, book_name,
-    chapter_start, chapter_end, entity_type, entity_id)`) written on save
-    (the editors already derive `contentPlain` on save — same hook),
-    backfilled in one migration, and queried by (book_name) or (entity_type,
-    entity_id). That also frees the sermon/notebook list panels from
-    hydrating full content just to show titles.
+  - *Done (reference lookup table):* the Explorer's "Your sermons" / "Your
+    notebooks" backlink cards no longer load and re-scan every document. A
+    persisted `document_references` table (user store v29) holds one row per
+    scripture citation (chapter span) or `sbent:` entity link a document
+    makes; the backlink providers query it by `(book_name, chapter range)` or
+    `(entity_type, entity_id)` with a join for the title. The index is
+    **self-healing** rather than save-hooked: `documentReferenceIndexProvider`
+    diffs each document's `updatedAt` (plus the scan version) against a
+    `document_reference_states` bookkeeping table and re-extracts only stale
+    docs — so local saves, sync merges, revision restores, and backup
+    restores all heal through one code path, none of which know the index
+    exists, and the first sweep after upgrade doubles as the backfill (off
+    the app-startup path; it runs on first Explorer use). Extraction is pure
+    domain code (`document_reference_extractor.dart`). Tests:
+    `document_reference_index_test.dart` (incl. the bare-row-update sync
+    case and the hard-delete restore case) and the pre-existing
+    explorer_providers_test backlink groups, which pass unchanged.
+  - *Remaining (minor):* the sermon/notebook list panels still hydrate full
+    Delta content via `allSermonsProvider` / `allNotebookPagesProvider` just
+    to render title rows; a content-free projection would cut list-open cost
+    for huge libraries. Lower urgency now that the Explorer no longer rides
+    those streams.
 
 
 

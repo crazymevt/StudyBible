@@ -456,6 +456,61 @@ class MediaAttachments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// The persisted reference index for rich-text documents (sermons and
+/// notebook pages): one row per scripture citation (kind 'passage') or
+/// explicit `sbent:` Explorer link (kind 'entity') a document makes. Written
+/// by DocumentReferenceIndexer, which extracts references whenever a
+/// document's `updatedAt` moves — so the Explorer's backlink cards query this
+/// table instead of loading and re-scanning every document's full content.
+///
+/// Derived, device-local data: never synced (each device rebuilds it from the
+/// synced documents) and rebuilt from scratch whenever it's missing, so it
+/// carries no sync columns.
+@DataClassName('DocumentReference')
+@TableIndex(name: 'idx_document_ref_doc', columns: {#docType, #docId})
+@TableIndex(name: 'idx_document_ref_passage', columns: {#bookName})
+@TableIndex(name: 'idx_document_ref_entity', columns: {#entityType, #entityId})
+class DocumentReferences extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get docType => text()(); // 'sermon' | 'notebookPage'
+  TextColumn get docId => text()();
+  TextColumn get kind => text()(); // 'passage' | 'entity'
+
+  // kind == 'passage': the chapter span the citation covers ("Gen 1:1-2:3"
+  // → Genesis 1..2; a single-chapter citation has start == end).
+  TextColumn get bookName => text().nullable()();
+  IntColumn get chapterStart => integer().nullable()();
+  IntColumn get chapterEnd => integer().nullable()();
+
+  // kind == 'entity': an ExplorerEntityType.name + dataset id, as stored in
+  // the document's sbent: link.
+  TextColumn get entityType => text().nullable()();
+  IntColumn get entityId => integer().nullable()();
+}
+
+/// Per-document bookkeeping for [DocumentReferences]: which `updatedAt` (and
+/// which version's book list) a document's references were extracted from. A
+/// document is re-indexed whenever its row here is missing or stale — that
+/// one rule covers local saves, sync merges, backup restores, and the initial
+/// backfill without any of those paths knowing the index exists.
+@DataClassName('DocumentReferenceState')
+class DocumentReferenceStates extends Table {
+  TextColumn get docType => text()();
+  TextColumn get docId => text()();
+
+  /// The document's `updatedAt` at extraction time.
+  IntColumn get indexedUpdatedAt => integer()();
+
+  /// The version id whose book list scripture citations were resolved
+  /// against ('' when none was installed). A mismatch marks the document
+  /// stale so a version change re-resolves its citations.
+  TextColumn get scanVersion => text()();
+
+  @override
+  Set<Column> get primaryKey => {docType, docId};
+}
+
 @TableIndex(name: 'idx_attachment_ref_location', columns: {#bookName, #chapter})
 @TableIndex(name: 'idx_attachment_ref_attachment', columns: {#attachmentId})
 @DataClassName('AttachmentReference')

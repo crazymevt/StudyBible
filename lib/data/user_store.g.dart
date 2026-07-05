@@ -13255,6 +13255,906 @@ class AttachmentReferencesCompanion
   }
 }
 
+class $DocumentReferencesTable extends DocumentReferences
+    with TableInfo<$DocumentReferencesTable, DocumentReference> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DocumentReferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _docTypeMeta = const VerificationMeta(
+    'docType',
+  );
+  @override
+  late final GeneratedColumn<String> docType = GeneratedColumn<String>(
+    'doc_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _docIdMeta = const VerificationMeta('docId');
+  @override
+  late final GeneratedColumn<String> docId = GeneratedColumn<String>(
+    'doc_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bookNameMeta = const VerificationMeta(
+    'bookName',
+  );
+  @override
+  late final GeneratedColumn<String> bookName = GeneratedColumn<String>(
+    'book_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _chapterStartMeta = const VerificationMeta(
+    'chapterStart',
+  );
+  @override
+  late final GeneratedColumn<int> chapterStart = GeneratedColumn<int>(
+    'chapter_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _chapterEndMeta = const VerificationMeta(
+    'chapterEnd',
+  );
+  @override
+  late final GeneratedColumn<int> chapterEnd = GeneratedColumn<int>(
+    'chapter_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _entityTypeMeta = const VerificationMeta(
+    'entityType',
+  );
+  @override
+  late final GeneratedColumn<String> entityType = GeneratedColumn<String>(
+    'entity_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _entityIdMeta = const VerificationMeta(
+    'entityId',
+  );
+  @override
+  late final GeneratedColumn<int> entityId = GeneratedColumn<int>(
+    'entity_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    docType,
+    docId,
+    kind,
+    bookName,
+    chapterStart,
+    chapterEnd,
+    entityType,
+    entityId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'document_references';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DocumentReference> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('doc_type')) {
+      context.handle(
+        _docTypeMeta,
+        docType.isAcceptableOrUnknown(data['doc_type']!, _docTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_docTypeMeta);
+    }
+    if (data.containsKey('doc_id')) {
+      context.handle(
+        _docIdMeta,
+        docId.isAcceptableOrUnknown(data['doc_id']!, _docIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_docIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('book_name')) {
+      context.handle(
+        _bookNameMeta,
+        bookName.isAcceptableOrUnknown(data['book_name']!, _bookNameMeta),
+      );
+    }
+    if (data.containsKey('chapter_start')) {
+      context.handle(
+        _chapterStartMeta,
+        chapterStart.isAcceptableOrUnknown(
+          data['chapter_start']!,
+          _chapterStartMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chapter_end')) {
+      context.handle(
+        _chapterEndMeta,
+        chapterEnd.isAcceptableOrUnknown(data['chapter_end']!, _chapterEndMeta),
+      );
+    }
+    if (data.containsKey('entity_type')) {
+      context.handle(
+        _entityTypeMeta,
+        entityType.isAcceptableOrUnknown(data['entity_type']!, _entityTypeMeta),
+      );
+    }
+    if (data.containsKey('entity_id')) {
+      context.handle(
+        _entityIdMeta,
+        entityId.isAcceptableOrUnknown(data['entity_id']!, _entityIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DocumentReference map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentReference(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      docType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}doc_type'],
+      )!,
+      docId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}doc_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      bookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_name'],
+      ),
+      chapterStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter_start'],
+      ),
+      chapterEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter_end'],
+      ),
+      entityType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity_type'],
+      ),
+      entityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}entity_id'],
+      ),
+    );
+  }
+
+  @override
+  $DocumentReferencesTable createAlias(String alias) {
+    return $DocumentReferencesTable(attachedDatabase, alias);
+  }
+}
+
+class DocumentReference extends DataClass
+    implements Insertable<DocumentReference> {
+  final int id;
+  final String docType;
+  final String docId;
+  final String kind;
+  final String? bookName;
+  final int? chapterStart;
+  final int? chapterEnd;
+  final String? entityType;
+  final int? entityId;
+  const DocumentReference({
+    required this.id,
+    required this.docType,
+    required this.docId,
+    required this.kind,
+    this.bookName,
+    this.chapterStart,
+    this.chapterEnd,
+    this.entityType,
+    this.entityId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['doc_type'] = Variable<String>(docType);
+    map['doc_id'] = Variable<String>(docId);
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || bookName != null) {
+      map['book_name'] = Variable<String>(bookName);
+    }
+    if (!nullToAbsent || chapterStart != null) {
+      map['chapter_start'] = Variable<int>(chapterStart);
+    }
+    if (!nullToAbsent || chapterEnd != null) {
+      map['chapter_end'] = Variable<int>(chapterEnd);
+    }
+    if (!nullToAbsent || entityType != null) {
+      map['entity_type'] = Variable<String>(entityType);
+    }
+    if (!nullToAbsent || entityId != null) {
+      map['entity_id'] = Variable<int>(entityId);
+    }
+    return map;
+  }
+
+  DocumentReferencesCompanion toCompanion(bool nullToAbsent) {
+    return DocumentReferencesCompanion(
+      id: Value(id),
+      docType: Value(docType),
+      docId: Value(docId),
+      kind: Value(kind),
+      bookName: bookName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bookName),
+      chapterStart: chapterStart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterStart),
+      chapterEnd: chapterEnd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterEnd),
+      entityType: entityType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(entityType),
+      entityId: entityId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(entityId),
+    );
+  }
+
+  factory DocumentReference.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentReference(
+      id: serializer.fromJson<int>(json['id']),
+      docType: serializer.fromJson<String>(json['docType']),
+      docId: serializer.fromJson<String>(json['docId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      bookName: serializer.fromJson<String?>(json['bookName']),
+      chapterStart: serializer.fromJson<int?>(json['chapterStart']),
+      chapterEnd: serializer.fromJson<int?>(json['chapterEnd']),
+      entityType: serializer.fromJson<String?>(json['entityType']),
+      entityId: serializer.fromJson<int?>(json['entityId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'docType': serializer.toJson<String>(docType),
+      'docId': serializer.toJson<String>(docId),
+      'kind': serializer.toJson<String>(kind),
+      'bookName': serializer.toJson<String?>(bookName),
+      'chapterStart': serializer.toJson<int?>(chapterStart),
+      'chapterEnd': serializer.toJson<int?>(chapterEnd),
+      'entityType': serializer.toJson<String?>(entityType),
+      'entityId': serializer.toJson<int?>(entityId),
+    };
+  }
+
+  DocumentReference copyWith({
+    int? id,
+    String? docType,
+    String? docId,
+    String? kind,
+    Value<String?> bookName = const Value.absent(),
+    Value<int?> chapterStart = const Value.absent(),
+    Value<int?> chapterEnd = const Value.absent(),
+    Value<String?> entityType = const Value.absent(),
+    Value<int?> entityId = const Value.absent(),
+  }) => DocumentReference(
+    id: id ?? this.id,
+    docType: docType ?? this.docType,
+    docId: docId ?? this.docId,
+    kind: kind ?? this.kind,
+    bookName: bookName.present ? bookName.value : this.bookName,
+    chapterStart: chapterStart.present ? chapterStart.value : this.chapterStart,
+    chapterEnd: chapterEnd.present ? chapterEnd.value : this.chapterEnd,
+    entityType: entityType.present ? entityType.value : this.entityType,
+    entityId: entityId.present ? entityId.value : this.entityId,
+  );
+  DocumentReference copyWithCompanion(DocumentReferencesCompanion data) {
+    return DocumentReference(
+      id: data.id.present ? data.id.value : this.id,
+      docType: data.docType.present ? data.docType.value : this.docType,
+      docId: data.docId.present ? data.docId.value : this.docId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      bookName: data.bookName.present ? data.bookName.value : this.bookName,
+      chapterStart: data.chapterStart.present
+          ? data.chapterStart.value
+          : this.chapterStart,
+      chapterEnd: data.chapterEnd.present
+          ? data.chapterEnd.value
+          : this.chapterEnd,
+      entityType: data.entityType.present
+          ? data.entityType.value
+          : this.entityType,
+      entityId: data.entityId.present ? data.entityId.value : this.entityId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentReference(')
+          ..write('id: $id, ')
+          ..write('docType: $docType, ')
+          ..write('docId: $docId, ')
+          ..write('kind: $kind, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapterStart: $chapterStart, ')
+          ..write('chapterEnd: $chapterEnd, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    docType,
+    docId,
+    kind,
+    bookName,
+    chapterStart,
+    chapterEnd,
+    entityType,
+    entityId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentReference &&
+          other.id == this.id &&
+          other.docType == this.docType &&
+          other.docId == this.docId &&
+          other.kind == this.kind &&
+          other.bookName == this.bookName &&
+          other.chapterStart == this.chapterStart &&
+          other.chapterEnd == this.chapterEnd &&
+          other.entityType == this.entityType &&
+          other.entityId == this.entityId);
+}
+
+class DocumentReferencesCompanion extends UpdateCompanion<DocumentReference> {
+  final Value<int> id;
+  final Value<String> docType;
+  final Value<String> docId;
+  final Value<String> kind;
+  final Value<String?> bookName;
+  final Value<int?> chapterStart;
+  final Value<int?> chapterEnd;
+  final Value<String?> entityType;
+  final Value<int?> entityId;
+  const DocumentReferencesCompanion({
+    this.id = const Value.absent(),
+    this.docType = const Value.absent(),
+    this.docId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.bookName = const Value.absent(),
+    this.chapterStart = const Value.absent(),
+    this.chapterEnd = const Value.absent(),
+    this.entityType = const Value.absent(),
+    this.entityId = const Value.absent(),
+  });
+  DocumentReferencesCompanion.insert({
+    this.id = const Value.absent(),
+    required String docType,
+    required String docId,
+    required String kind,
+    this.bookName = const Value.absent(),
+    this.chapterStart = const Value.absent(),
+    this.chapterEnd = const Value.absent(),
+    this.entityType = const Value.absent(),
+    this.entityId = const Value.absent(),
+  }) : docType = Value(docType),
+       docId = Value(docId),
+       kind = Value(kind);
+  static Insertable<DocumentReference> custom({
+    Expression<int>? id,
+    Expression<String>? docType,
+    Expression<String>? docId,
+    Expression<String>? kind,
+    Expression<String>? bookName,
+    Expression<int>? chapterStart,
+    Expression<int>? chapterEnd,
+    Expression<String>? entityType,
+    Expression<int>? entityId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (docType != null) 'doc_type': docType,
+      if (docId != null) 'doc_id': docId,
+      if (kind != null) 'kind': kind,
+      if (bookName != null) 'book_name': bookName,
+      if (chapterStart != null) 'chapter_start': chapterStart,
+      if (chapterEnd != null) 'chapter_end': chapterEnd,
+      if (entityType != null) 'entity_type': entityType,
+      if (entityId != null) 'entity_id': entityId,
+    });
+  }
+
+  DocumentReferencesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? docType,
+    Value<String>? docId,
+    Value<String>? kind,
+    Value<String?>? bookName,
+    Value<int?>? chapterStart,
+    Value<int?>? chapterEnd,
+    Value<String?>? entityType,
+    Value<int?>? entityId,
+  }) {
+    return DocumentReferencesCompanion(
+      id: id ?? this.id,
+      docType: docType ?? this.docType,
+      docId: docId ?? this.docId,
+      kind: kind ?? this.kind,
+      bookName: bookName ?? this.bookName,
+      chapterStart: chapterStart ?? this.chapterStart,
+      chapterEnd: chapterEnd ?? this.chapterEnd,
+      entityType: entityType ?? this.entityType,
+      entityId: entityId ?? this.entityId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (docType.present) {
+      map['doc_type'] = Variable<String>(docType.value);
+    }
+    if (docId.present) {
+      map['doc_id'] = Variable<String>(docId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (bookName.present) {
+      map['book_name'] = Variable<String>(bookName.value);
+    }
+    if (chapterStart.present) {
+      map['chapter_start'] = Variable<int>(chapterStart.value);
+    }
+    if (chapterEnd.present) {
+      map['chapter_end'] = Variable<int>(chapterEnd.value);
+    }
+    if (entityType.present) {
+      map['entity_type'] = Variable<String>(entityType.value);
+    }
+    if (entityId.present) {
+      map['entity_id'] = Variable<int>(entityId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentReferencesCompanion(')
+          ..write('id: $id, ')
+          ..write('docType: $docType, ')
+          ..write('docId: $docId, ')
+          ..write('kind: $kind, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapterStart: $chapterStart, ')
+          ..write('chapterEnd: $chapterEnd, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DocumentReferenceStatesTable extends DocumentReferenceStates
+    with TableInfo<$DocumentReferenceStatesTable, DocumentReferenceState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DocumentReferenceStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _docTypeMeta = const VerificationMeta(
+    'docType',
+  );
+  @override
+  late final GeneratedColumn<String> docType = GeneratedColumn<String>(
+    'doc_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _docIdMeta = const VerificationMeta('docId');
+  @override
+  late final GeneratedColumn<String> docId = GeneratedColumn<String>(
+    'doc_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _indexedUpdatedAtMeta = const VerificationMeta(
+    'indexedUpdatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> indexedUpdatedAt = GeneratedColumn<int>(
+    'indexed_updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scanVersionMeta = const VerificationMeta(
+    'scanVersion',
+  );
+  @override
+  late final GeneratedColumn<String> scanVersion = GeneratedColumn<String>(
+    'scan_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    docType,
+    docId,
+    indexedUpdatedAt,
+    scanVersion,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'document_reference_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DocumentReferenceState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('doc_type')) {
+      context.handle(
+        _docTypeMeta,
+        docType.isAcceptableOrUnknown(data['doc_type']!, _docTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_docTypeMeta);
+    }
+    if (data.containsKey('doc_id')) {
+      context.handle(
+        _docIdMeta,
+        docId.isAcceptableOrUnknown(data['doc_id']!, _docIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_docIdMeta);
+    }
+    if (data.containsKey('indexed_updated_at')) {
+      context.handle(
+        _indexedUpdatedAtMeta,
+        indexedUpdatedAt.isAcceptableOrUnknown(
+          data['indexed_updated_at']!,
+          _indexedUpdatedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_indexedUpdatedAtMeta);
+    }
+    if (data.containsKey('scan_version')) {
+      context.handle(
+        _scanVersionMeta,
+        scanVersion.isAcceptableOrUnknown(
+          data['scan_version']!,
+          _scanVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_scanVersionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {docType, docId};
+  @override
+  DocumentReferenceState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentReferenceState(
+      docType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}doc_type'],
+      )!,
+      docId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}doc_id'],
+      )!,
+      indexedUpdatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}indexed_updated_at'],
+      )!,
+      scanVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scan_version'],
+      )!,
+    );
+  }
+
+  @override
+  $DocumentReferenceStatesTable createAlias(String alias) {
+    return $DocumentReferenceStatesTable(attachedDatabase, alias);
+  }
+}
+
+class DocumentReferenceState extends DataClass
+    implements Insertable<DocumentReferenceState> {
+  final String docType;
+  final String docId;
+
+  /// The document's `updatedAt` at extraction time.
+  final int indexedUpdatedAt;
+
+  /// The version id whose book list scripture citations were resolved
+  /// against ('' when none was installed). A mismatch marks the document
+  /// stale so a version change re-resolves its citations.
+  final String scanVersion;
+  const DocumentReferenceState({
+    required this.docType,
+    required this.docId,
+    required this.indexedUpdatedAt,
+    required this.scanVersion,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['doc_type'] = Variable<String>(docType);
+    map['doc_id'] = Variable<String>(docId);
+    map['indexed_updated_at'] = Variable<int>(indexedUpdatedAt);
+    map['scan_version'] = Variable<String>(scanVersion);
+    return map;
+  }
+
+  DocumentReferenceStatesCompanion toCompanion(bool nullToAbsent) {
+    return DocumentReferenceStatesCompanion(
+      docType: Value(docType),
+      docId: Value(docId),
+      indexedUpdatedAt: Value(indexedUpdatedAt),
+      scanVersion: Value(scanVersion),
+    );
+  }
+
+  factory DocumentReferenceState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentReferenceState(
+      docType: serializer.fromJson<String>(json['docType']),
+      docId: serializer.fromJson<String>(json['docId']),
+      indexedUpdatedAt: serializer.fromJson<int>(json['indexedUpdatedAt']),
+      scanVersion: serializer.fromJson<String>(json['scanVersion']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'docType': serializer.toJson<String>(docType),
+      'docId': serializer.toJson<String>(docId),
+      'indexedUpdatedAt': serializer.toJson<int>(indexedUpdatedAt),
+      'scanVersion': serializer.toJson<String>(scanVersion),
+    };
+  }
+
+  DocumentReferenceState copyWith({
+    String? docType,
+    String? docId,
+    int? indexedUpdatedAt,
+    String? scanVersion,
+  }) => DocumentReferenceState(
+    docType: docType ?? this.docType,
+    docId: docId ?? this.docId,
+    indexedUpdatedAt: indexedUpdatedAt ?? this.indexedUpdatedAt,
+    scanVersion: scanVersion ?? this.scanVersion,
+  );
+  DocumentReferenceState copyWithCompanion(
+    DocumentReferenceStatesCompanion data,
+  ) {
+    return DocumentReferenceState(
+      docType: data.docType.present ? data.docType.value : this.docType,
+      docId: data.docId.present ? data.docId.value : this.docId,
+      indexedUpdatedAt: data.indexedUpdatedAt.present
+          ? data.indexedUpdatedAt.value
+          : this.indexedUpdatedAt,
+      scanVersion: data.scanVersion.present
+          ? data.scanVersion.value
+          : this.scanVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentReferenceState(')
+          ..write('docType: $docType, ')
+          ..write('docId: $docId, ')
+          ..write('indexedUpdatedAt: $indexedUpdatedAt, ')
+          ..write('scanVersion: $scanVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(docType, docId, indexedUpdatedAt, scanVersion);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentReferenceState &&
+          other.docType == this.docType &&
+          other.docId == this.docId &&
+          other.indexedUpdatedAt == this.indexedUpdatedAt &&
+          other.scanVersion == this.scanVersion);
+}
+
+class DocumentReferenceStatesCompanion
+    extends UpdateCompanion<DocumentReferenceState> {
+  final Value<String> docType;
+  final Value<String> docId;
+  final Value<int> indexedUpdatedAt;
+  final Value<String> scanVersion;
+  final Value<int> rowid;
+  const DocumentReferenceStatesCompanion({
+    this.docType = const Value.absent(),
+    this.docId = const Value.absent(),
+    this.indexedUpdatedAt = const Value.absent(),
+    this.scanVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DocumentReferenceStatesCompanion.insert({
+    required String docType,
+    required String docId,
+    required int indexedUpdatedAt,
+    required String scanVersion,
+    this.rowid = const Value.absent(),
+  }) : docType = Value(docType),
+       docId = Value(docId),
+       indexedUpdatedAt = Value(indexedUpdatedAt),
+       scanVersion = Value(scanVersion);
+  static Insertable<DocumentReferenceState> custom({
+    Expression<String>? docType,
+    Expression<String>? docId,
+    Expression<int>? indexedUpdatedAt,
+    Expression<String>? scanVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (docType != null) 'doc_type': docType,
+      if (docId != null) 'doc_id': docId,
+      if (indexedUpdatedAt != null) 'indexed_updated_at': indexedUpdatedAt,
+      if (scanVersion != null) 'scan_version': scanVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DocumentReferenceStatesCompanion copyWith({
+    Value<String>? docType,
+    Value<String>? docId,
+    Value<int>? indexedUpdatedAt,
+    Value<String>? scanVersion,
+    Value<int>? rowid,
+  }) {
+    return DocumentReferenceStatesCompanion(
+      docType: docType ?? this.docType,
+      docId: docId ?? this.docId,
+      indexedUpdatedAt: indexedUpdatedAt ?? this.indexedUpdatedAt,
+      scanVersion: scanVersion ?? this.scanVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (docType.present) {
+      map['doc_type'] = Variable<String>(docType.value);
+    }
+    if (docId.present) {
+      map['doc_id'] = Variable<String>(docId.value);
+    }
+    if (indexedUpdatedAt.present) {
+      map['indexed_updated_at'] = Variable<int>(indexedUpdatedAt.value);
+    }
+    if (scanVersion.present) {
+      map['scan_version'] = Variable<String>(scanVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentReferenceStatesCompanion(')
+          ..write('docType: $docType, ')
+          ..write('docId: $docId, ')
+          ..write('indexedUpdatedAt: $indexedUpdatedAt, ')
+          ..write('scanVersion: $scanVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$UserStore extends GeneratedDatabase {
   _$UserStore(QueryExecutor e) : super(e);
   $UserStoreManager get managers => $UserStoreManager(this);
@@ -13299,6 +14199,10 @@ abstract class _$UserStore extends GeneratedDatabase {
   );
   late final $AttachmentReferencesTable attachmentReferences =
       $AttachmentReferencesTable(this);
+  late final $DocumentReferencesTable documentReferences =
+      $DocumentReferencesTable(this);
+  late final $DocumentReferenceStatesTable documentReferenceStates =
+      $DocumentReferenceStatesTable(this);
   late final Index idxHighlightLocation = Index(
     'idx_highlight_location',
     'CREATE INDEX idx_highlight_location ON highlights (book_name, chapter)',
@@ -13351,6 +14255,18 @@ abstract class _$UserStore extends GeneratedDatabase {
     'idx_attachment_ref_attachment',
     'CREATE INDEX idx_attachment_ref_attachment ON attachment_references (attachment_id)',
   );
+  late final Index idxDocumentRefDoc = Index(
+    'idx_document_ref_doc',
+    'CREATE INDEX idx_document_ref_doc ON document_references (doc_type, doc_id)',
+  );
+  late final Index idxDocumentRefPassage = Index(
+    'idx_document_ref_passage',
+    'CREATE INDEX idx_document_ref_passage ON document_references (book_name)',
+  );
+  late final Index idxDocumentRefEntity = Index(
+    'idx_document_ref_entity',
+    'CREATE INDEX idx_document_ref_entity ON document_references (entity_type, entity_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13381,6 +14297,8 @@ abstract class _$UserStore extends GeneratedDatabase {
     notebookPageRevisions,
     mediaAttachments,
     attachmentReferences,
+    documentReferences,
+    documentReferenceStates,
     idxHighlightLocation,
     idxNoteLocation,
     idxBookmarkLocation,
@@ -13394,6 +14312,9 @@ abstract class _$UserStore extends GeneratedDatabase {
     idxNotebookPageRevisionPage,
     idxAttachmentRefLocation,
     idxAttachmentRefAttachment,
+    idxDocumentRefDoc,
+    idxDocumentRefPassage,
+    idxDocumentRefEntity,
   ];
 }
 
@@ -20051,6 +20972,499 @@ typedef $$AttachmentReferencesTableProcessedTableManager =
       AttachmentReference,
       PrefetchHooks Function()
     >;
+typedef $$DocumentReferencesTableCreateCompanionBuilder =
+    DocumentReferencesCompanion Function({
+      Value<int> id,
+      required String docType,
+      required String docId,
+      required String kind,
+      Value<String?> bookName,
+      Value<int?> chapterStart,
+      Value<int?> chapterEnd,
+      Value<String?> entityType,
+      Value<int?> entityId,
+    });
+typedef $$DocumentReferencesTableUpdateCompanionBuilder =
+    DocumentReferencesCompanion Function({
+      Value<int> id,
+      Value<String> docType,
+      Value<String> docId,
+      Value<String> kind,
+      Value<String?> bookName,
+      Value<int?> chapterStart,
+      Value<int?> chapterEnd,
+      Value<String?> entityType,
+      Value<int?> entityId,
+    });
+
+class $$DocumentReferencesTableFilterComposer
+    extends Composer<_$UserStore, $DocumentReferencesTable> {
+  $$DocumentReferencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get docType => $composableBuilder(
+    column: $table.docType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get docId => $composableBuilder(
+    column: $table.docId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapterStart => $composableBuilder(
+    column: $table.chapterStart,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapterEnd => $composableBuilder(
+    column: $table.chapterEnd,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DocumentReferencesTableOrderingComposer
+    extends Composer<_$UserStore, $DocumentReferencesTable> {
+  $$DocumentReferencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get docType => $composableBuilder(
+    column: $table.docType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get docId => $composableBuilder(
+    column: $table.docId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapterStart => $composableBuilder(
+    column: $table.chapterStart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapterEnd => $composableBuilder(
+    column: $table.chapterEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DocumentReferencesTableAnnotationComposer
+    extends Composer<_$UserStore, $DocumentReferencesTable> {
+  $$DocumentReferencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get docType =>
+      $composableBuilder(column: $table.docType, builder: (column) => column);
+
+  GeneratedColumn<String> get docId =>
+      $composableBuilder(column: $table.docId, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get bookName =>
+      $composableBuilder(column: $table.bookName, builder: (column) => column);
+
+  GeneratedColumn<int> get chapterStart => $composableBuilder(
+    column: $table.chapterStart,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get chapterEnd => $composableBuilder(
+    column: $table.chapterEnd,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get entityId =>
+      $composableBuilder(column: $table.entityId, builder: (column) => column);
+}
+
+class $$DocumentReferencesTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $DocumentReferencesTable,
+          DocumentReference,
+          $$DocumentReferencesTableFilterComposer,
+          $$DocumentReferencesTableOrderingComposer,
+          $$DocumentReferencesTableAnnotationComposer,
+          $$DocumentReferencesTableCreateCompanionBuilder,
+          $$DocumentReferencesTableUpdateCompanionBuilder,
+          (
+            DocumentReference,
+            BaseReferences<
+              _$UserStore,
+              $DocumentReferencesTable,
+              DocumentReference
+            >,
+          ),
+          DocumentReference,
+          PrefetchHooks Function()
+        > {
+  $$DocumentReferencesTableTableManager(
+    _$UserStore db,
+    $DocumentReferencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DocumentReferencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DocumentReferencesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DocumentReferencesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> docType = const Value.absent(),
+                Value<String> docId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String?> bookName = const Value.absent(),
+                Value<int?> chapterStart = const Value.absent(),
+                Value<int?> chapterEnd = const Value.absent(),
+                Value<String?> entityType = const Value.absent(),
+                Value<int?> entityId = const Value.absent(),
+              }) => DocumentReferencesCompanion(
+                id: id,
+                docType: docType,
+                docId: docId,
+                kind: kind,
+                bookName: bookName,
+                chapterStart: chapterStart,
+                chapterEnd: chapterEnd,
+                entityType: entityType,
+                entityId: entityId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String docType,
+                required String docId,
+                required String kind,
+                Value<String?> bookName = const Value.absent(),
+                Value<int?> chapterStart = const Value.absent(),
+                Value<int?> chapterEnd = const Value.absent(),
+                Value<String?> entityType = const Value.absent(),
+                Value<int?> entityId = const Value.absent(),
+              }) => DocumentReferencesCompanion.insert(
+                id: id,
+                docType: docType,
+                docId: docId,
+                kind: kind,
+                bookName: bookName,
+                chapterStart: chapterStart,
+                chapterEnd: chapterEnd,
+                entityType: entityType,
+                entityId: entityId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DocumentReferencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $DocumentReferencesTable,
+      DocumentReference,
+      $$DocumentReferencesTableFilterComposer,
+      $$DocumentReferencesTableOrderingComposer,
+      $$DocumentReferencesTableAnnotationComposer,
+      $$DocumentReferencesTableCreateCompanionBuilder,
+      $$DocumentReferencesTableUpdateCompanionBuilder,
+      (
+        DocumentReference,
+        BaseReferences<
+          _$UserStore,
+          $DocumentReferencesTable,
+          DocumentReference
+        >,
+      ),
+      DocumentReference,
+      PrefetchHooks Function()
+    >;
+typedef $$DocumentReferenceStatesTableCreateCompanionBuilder =
+    DocumentReferenceStatesCompanion Function({
+      required String docType,
+      required String docId,
+      required int indexedUpdatedAt,
+      required String scanVersion,
+      Value<int> rowid,
+    });
+typedef $$DocumentReferenceStatesTableUpdateCompanionBuilder =
+    DocumentReferenceStatesCompanion Function({
+      Value<String> docType,
+      Value<String> docId,
+      Value<int> indexedUpdatedAt,
+      Value<String> scanVersion,
+      Value<int> rowid,
+    });
+
+class $$DocumentReferenceStatesTableFilterComposer
+    extends Composer<_$UserStore, $DocumentReferenceStatesTable> {
+  $$DocumentReferenceStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get docType => $composableBuilder(
+    column: $table.docType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get docId => $composableBuilder(
+    column: $table.docId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get indexedUpdatedAt => $composableBuilder(
+    column: $table.indexedUpdatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scanVersion => $composableBuilder(
+    column: $table.scanVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DocumentReferenceStatesTableOrderingComposer
+    extends Composer<_$UserStore, $DocumentReferenceStatesTable> {
+  $$DocumentReferenceStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get docType => $composableBuilder(
+    column: $table.docType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get docId => $composableBuilder(
+    column: $table.docId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get indexedUpdatedAt => $composableBuilder(
+    column: $table.indexedUpdatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scanVersion => $composableBuilder(
+    column: $table.scanVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DocumentReferenceStatesTableAnnotationComposer
+    extends Composer<_$UserStore, $DocumentReferenceStatesTable> {
+  $$DocumentReferenceStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get docType =>
+      $composableBuilder(column: $table.docType, builder: (column) => column);
+
+  GeneratedColumn<String> get docId =>
+      $composableBuilder(column: $table.docId, builder: (column) => column);
+
+  GeneratedColumn<int> get indexedUpdatedAt => $composableBuilder(
+    column: $table.indexedUpdatedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get scanVersion => $composableBuilder(
+    column: $table.scanVersion,
+    builder: (column) => column,
+  );
+}
+
+class $$DocumentReferenceStatesTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $DocumentReferenceStatesTable,
+          DocumentReferenceState,
+          $$DocumentReferenceStatesTableFilterComposer,
+          $$DocumentReferenceStatesTableOrderingComposer,
+          $$DocumentReferenceStatesTableAnnotationComposer,
+          $$DocumentReferenceStatesTableCreateCompanionBuilder,
+          $$DocumentReferenceStatesTableUpdateCompanionBuilder,
+          (
+            DocumentReferenceState,
+            BaseReferences<
+              _$UserStore,
+              $DocumentReferenceStatesTable,
+              DocumentReferenceState
+            >,
+          ),
+          DocumentReferenceState,
+          PrefetchHooks Function()
+        > {
+  $$DocumentReferenceStatesTableTableManager(
+    _$UserStore db,
+    $DocumentReferenceStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DocumentReferenceStatesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$DocumentReferenceStatesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DocumentReferenceStatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> docType = const Value.absent(),
+                Value<String> docId = const Value.absent(),
+                Value<int> indexedUpdatedAt = const Value.absent(),
+                Value<String> scanVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DocumentReferenceStatesCompanion(
+                docType: docType,
+                docId: docId,
+                indexedUpdatedAt: indexedUpdatedAt,
+                scanVersion: scanVersion,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String docType,
+                required String docId,
+                required int indexedUpdatedAt,
+                required String scanVersion,
+                Value<int> rowid = const Value.absent(),
+              }) => DocumentReferenceStatesCompanion.insert(
+                docType: docType,
+                docId: docId,
+                indexedUpdatedAt: indexedUpdatedAt,
+                scanVersion: scanVersion,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DocumentReferenceStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $DocumentReferenceStatesTable,
+      DocumentReferenceState,
+      $$DocumentReferenceStatesTableFilterComposer,
+      $$DocumentReferenceStatesTableOrderingComposer,
+      $$DocumentReferenceStatesTableAnnotationComposer,
+      $$DocumentReferenceStatesTableCreateCompanionBuilder,
+      $$DocumentReferenceStatesTableUpdateCompanionBuilder,
+      (
+        DocumentReferenceState,
+        BaseReferences<
+          _$UserStore,
+          $DocumentReferenceStatesTable,
+          DocumentReferenceState
+        >,
+      ),
+      DocumentReferenceState,
+      PrefetchHooks Function()
+    >;
 
 class $UserStoreManager {
   final _$UserStore _db;
@@ -20104,4 +21518,11 @@ class $UserStoreManager {
       $$MediaAttachmentsTableTableManager(_db, _db.mediaAttachments);
   $$AttachmentReferencesTableTableManager get attachmentReferences =>
       $$AttachmentReferencesTableTableManager(_db, _db.attachmentReferences);
+  $$DocumentReferencesTableTableManager get documentReferences =>
+      $$DocumentReferencesTableTableManager(_db, _db.documentReferences);
+  $$DocumentReferenceStatesTableTableManager get documentReferenceStates =>
+      $$DocumentReferenceStatesTableTableManager(
+        _db,
+        _db.documentReferenceStates,
+      );
 }

@@ -2,19 +2,15 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content_store.dart';
-import '../data/fts_text.dart';
 import '../data/user_store.dart';
-import '../domain/explorer/entity_link.dart';
 import '../domain/explorer/explorer_ref.dart';
-import '../domain/scripture/bible_reference_scanner.dart';
 import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
-import 'notebook_providers.dart';
+import 'document_reference_providers.dart';
 import 'people_providers.dart';
 import 'place_providers.dart';
 import 'reader_state.dart';
 import 'search_providers.dart';
-import 'sermon_providers.dart';
 import 'tag_providers.dart';
 import 'topic_providers.dart';
 import 'user_providers.dart';
@@ -667,122 +663,90 @@ final explorerPassageCrossReferencesProvider = FutureProvider.family<
   ];
 });
 
+/// The documents of one type that reference [target], straight from the
+/// persisted `document_references` index (maintained by
+/// [documentReferenceIndexProvider]) — no content is loaded or scanned. A
+/// passage matches when a stored citation's chapter span covers the target
+/// chapter (the same rule the old live scan applied); a
+/// person/place/event/topic matches its stored `sbent:` link exactly.
+Future<List<SearchResult>> _documentsReferencing(
+  Ref ref,
+  ExplorerRef target, {
+  required String docType,
+  required String docTable,
+}) async {
+  await ref.watch(documentReferenceIndexProvider.future);
+  final db = ref.watch(userStoreProvider);
+
+  final String where;
+  final List<Variable> variables;
+  if (target.type == ExplorerEntityType.passage) {
+    where = "r.kind = 'passage' AND r.book_name = ? "
+        'AND r.chapter_start <= ? AND r.chapter_end >= ?';
+    variables = [
+      Variable.withString(target.book!),
+      Variable.withInt(target.chapter!),
+      Variable.withInt(target.chapter!),
+    ];
+  } else {
+    final id = target.id;
+    if (id == null) return const [];
+    where = "r.kind = 'entity' AND r.entity_type = ? AND r.entity_id = ?";
+    variables = [
+      Variable.withString(target.type.name),
+      Variable.withInt(id),
+    ];
+  }
+
+  final rows = await db.customSelect(
+    'SELECT d.id AS id, d.title AS title FROM document_references r '
+    'JOIN $docTable d ON d.id = r.doc_id '
+    "WHERE r.doc_type = '$docType' AND d.deleted = 0 AND $where "
+    'GROUP BY d.id, d.title ORDER BY MAX(d.updated_at) DESC',
+    variables: variables,
+  ).get();
+  return [
+    for (final r in rows)
+      SearchResult(
+        type: docType,
+        referenceId: r.read<String>('id'),
+        title: r.read<String>('title'),
+        textContent: '',
+      ),
+  ];
+}
+
 /// The user's own sermons that reference an Explorer entity — the "Your
 /// sermons" backlink card on person/place/event/topic/passage pages.
 ///
-/// A passage match is scanned live with the same [BibleReferenceScanner] the
-/// "Navigate Scriptures" sermon route uses (a chapter- or range-citation
-/// counts if it spans the chapter, not just an exact verse match) — there's
-/// no persisted reference index to query instead. A person/place/event/topic
-/// match is looked up exactly, from the `sbent:` links the sermon editor's
-/// "Link to Explorer" action stores, for the same collision reason
-/// [explorerNotebookPagesProvider] does: free-text dataset names are too
-/// collision-prone to detect by scanning prose.
+/// Served from the persisted `document_references` index: a passage match is
+/// a stored scripture citation whose chapter span covers the target (a
+/// chapter- or range-citation counts, not just an exact verse match); a
+/// person/place/event/topic match is the exact `sbent:` link the sermon
+/// editor's "Link to Explorer" action stores — free-text dataset names are
+/// too collision-prone to detect by scanning prose.
 final explorerSermonsProvider =
-    FutureProvider.family<List<SearchResult>, ExplorerRef>((ref, target) async {
-  final sermons = await ref.watch(allSermonsProvider.future);
-  if (sermons.isEmpty) return const [];
-
-  if (target.type == ExplorerEntityType.passage) {
-    final versions = ref.watch(activeVersionsProvider);
-    if (versions.isEmpty) return const [];
-    final books = await ref.watch(booksForVersionProvider(versions.first).future);
-    if (books.isEmpty) return const [];
-
-    final matches = <SearchResult>[];
-    for (final s in sermons) {
-      final text = s.contentPlain ?? deltaToPlainText(s.content);
-      final touches = BibleReferenceScanner.scan(text, books).any((m) =>
-          m.book.name == target.book &&
-          m.chapter <= target.chapter! &&
-          (m.endChapter ?? m.chapter) >= target.chapter!);
-      if (touches) {
-        matches.add(SearchResult(
-          type: 'sermon',
-          referenceId: s.id,
-          title: s.title,
-          textContent: '',
-        ));
-      }
-    }
-    return matches;
-  }
-
-  final id = target.id;
-  if (id == null) return const [];
-  final matches = <SearchResult>[];
-  for (final s in sermons) {
-    final linked = extractEntityLinksFromDelta(s.content)
-        .any((l) => l.type == target.type && l.id == id);
-    if (linked) {
-      matches.add(SearchResult(
-        type: 'sermon',
-        referenceId: s.id,
-        title: s.title,
-        textContent: '',
-      ));
-    }
-  }
-  return matches;
-});
+    FutureProvider.family<List<SearchResult>, ExplorerRef>(
+  (ref, target) => _documentsReferencing(
+    ref,
+    target,
+    docType: kDocTypeSermon,
+    docTable: 'sermons',
+  ),
+);
 
 /// The user's own notebook pages that reference an Explorer entity — the
 /// "Your notebooks" backlink card on person/place/event/topic/passage pages.
-///
-/// A passage match is scanned live the same way [explorerSermonsProvider]
-/// scans sermons (there's no persisted reference index for scripture
-/// citations). A person/place/event/topic match is looked up exactly, from the
-/// `sbent:` links the notebook editor's "Link to Explorer" action stores —
-/// unlike scripture citations, dataset names are too collision-prone (a
-/// person named "Grace", a topic named "Love") to detect by scanning prose,
-/// so those links are the only source of truth.
+/// Same index and matching rules as [explorerSermonsProvider].
 final explorerNotebookPagesProvider =
-    FutureProvider.family<List<SearchResult>, ExplorerRef>((ref, target) async {
-  final pages = await ref.watch(allNotebookPagesProvider.future);
-  if (pages.isEmpty) return const [];
-
-  if (target.type == ExplorerEntityType.passage) {
-    final versions = ref.watch(activeVersionsProvider);
-    if (versions.isEmpty) return const [];
-    final books = await ref.watch(booksForVersionProvider(versions.first).future);
-    if (books.isEmpty) return const [];
-
-    final matches = <SearchResult>[];
-    for (final p in pages) {
-      final text = p.contentPlain ?? deltaToPlainText(p.content);
-      final touches = BibleReferenceScanner.scan(text, books).any((m) =>
-          m.book.name == target.book &&
-          m.chapter <= target.chapter! &&
-          (m.endChapter ?? m.chapter) >= target.chapter!);
-      if (touches) {
-        matches.add(SearchResult(
-          type: 'notebookPage',
-          referenceId: p.id,
-          title: p.title,
-          textContent: '',
-        ));
-      }
-    }
-    return matches;
-  }
-
-  final id = target.id;
-  if (id == null) return const [];
-  final matches = <SearchResult>[];
-  for (final p in pages) {
-    final linked = extractEntityLinksFromDelta(p.content)
-        .any((l) => l.type == target.type && l.id == id);
-    if (linked) {
-      matches.add(SearchResult(
-        type: 'notebookPage',
-        referenceId: p.id,
-        title: p.title,
-        textContent: '',
-      ));
-    }
-  }
-  return matches;
-});
+    FutureProvider.family<List<SearchResult>, ExplorerRef>(
+  (ref, target) => _documentsReferencing(
+    ref,
+    target,
+    docType: kDocTypeNotebookPage,
+    docTable: 'notebook_pages',
+  ),
+);
 
 class ExplorerPassageOverview {
   final List<PersonInPassage> people;

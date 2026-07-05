@@ -45,6 +45,9 @@ void main() {
           'idx_notebook_page_revision_page',
           'idx_attachment_ref_location',
           'idx_attachment_ref_attachment',
+          'idx_document_ref_doc',
+          'idx_document_ref_passage',
+          'idx_document_ref_entity',
         }),
       );
     });
@@ -60,11 +63,13 @@ void main() {
       expect(detail, contains('idx_highlight_location'));
     });
 
-    test('the v28 upgrade block recreates every index', () async {
+    test('the v28+v29 upgrade blocks recreate every index', () async {
       // A fresh store gets its indexes from createAll; upgrading installs get
-      // them from the raw SQL in the `from < 28` block. Drop them all, replay
-      // that block, and require the same end state — catching any typo in the
-      // raw statements that the annotation-driven path would mask.
+      // them from the raw SQL in the `from < 28` / `from < 29` blocks. Drop
+      // them all, replay those blocks, and require the same end state —
+      // catching any typo in the raw statements that the annotation-driven
+      // path would mask. (The v29 createTable calls are IF NOT EXISTS, so
+      // replaying them over the existing tables is safe.)
       final before = await store
           .customSelect(
             "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%'",
@@ -74,7 +79,7 @@ void main() {
       for (final row in before) {
         await store.customStatement('DROP INDEX ${row.data['name']}');
       }
-      await store.migration.onUpgrade(store.createMigrator(), 27, 28);
+      await store.migration.onUpgrade(store.createMigrator(), 27, 29);
       final after = await store
           .customSelect(
             "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%'",

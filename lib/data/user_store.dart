@@ -36,13 +36,15 @@ part 'user_store.g.dart';
     NotebookPageRevisions,
     MediaAttachments,
     AttachmentReferences,
+    DocumentReferences,
+    DocumentReferenceStates,
   ],
 )
 class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 28;
+  int get schemaVersion => 29;
 
   @override
   MigrationStrategy get migration {
@@ -639,6 +641,28 @@ class UserStore extends _$UserStore {
           // createAll); IF NOT EXISTS keeps a re-run after a rolled-back
           // attempt safe, since CREATE INDEX auto-commits like ALTER TABLE.
           await _createUserIndexes();
+        }
+        if (from < 29) {
+          // Persisted document-reference index (see DocumentReferences in
+          // user_tables.dart). Tables only — no backfill here, because the
+          // book list scripture citations resolve against lives in the
+          // *content* DB, which this migration can't reach. The indexer
+          // treats a document with no state row as stale, so the first
+          // Explorer use after this upgrade performs the backfill.
+          await m.createTable(documentReferences);
+          await m.createTable(documentReferenceStates);
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_document_ref_doc '
+            'ON document_references (doc_type, doc_id)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_document_ref_passage '
+            'ON document_references (book_name)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_document_ref_entity '
+            'ON document_references (entity_type, entity_id)',
+          );
         }
       },
     );
