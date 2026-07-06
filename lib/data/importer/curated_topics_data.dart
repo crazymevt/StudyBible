@@ -261,10 +261,16 @@ const _storyTopics = <CuratedTopic>[
     description:
         "Jesus teaches the Beatitudes and the core of his ethical "
         'teaching to a crowd gathered on a mountainside.',
-    refs: [
-      CuratedTopicRef('Matthew', 5, 1, 12),
-      CuratedTopicRef('Matthew', 7, 24, 29),
-    ],
+    refs: [CuratedTopicRef('Matthew', 5, 1, 12)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE WISE AND FOOLISH BUILDERS',
+    category: 'story',
+    description:
+        'Jesus closes the Sermon on the Mount by contrasting a '
+        'wise man who built his house on rock with a foolish man who '
+        'built on sand, and only the first survives the storm.',
+    refs: [CuratedTopicRef('Matthew', 7, 24, 27)],
   ),
   CuratedTopic(
     name: 'THE FEEDING OF THE FIVE THOUSAND',
@@ -1541,6 +1547,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 7, 11, 17)],
   ),
   CuratedTopic(
+    name: "THE SINFUL WOMAN ANOINTS JESUS' FEET",
+    category: 'story',
+    description:
+        'A sinful woman washes Jesus\' feet with her tears at a '
+        'Pharisee\'s house; Jesus tells of two debtors to show that "he '
+        'who is forgiven little, loves little."',
+    refs: [CuratedTopicRef('Luke', 7, 36, 50)],
+  ),
+  CuratedTopic(
     name: 'JESUS CALMS THE STORM',
     category: 'story',
     description:
@@ -1676,6 +1691,54 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 13, 1, 23)],
   ),
   CuratedTopic(
+    name: 'THE PARABLE OF THE WHEAT AND THE WEEDS',
+    category: 'story',
+    description:
+        "A farmer's enemy sows weeds among his wheat; both grow "
+        'together until harvest, when the weeds are burned and the wheat '
+        'gathered into the barn — a picture of the final judgment.',
+    refs: [
+      CuratedTopicRef('Matthew', 13, 24, 30),
+      CuratedTopicRef('Matthew', 13, 36, 43),
+    ],
+  ),
+  CuratedTopic(
+    name: 'THE GROWING SEED',
+    category: 'story',
+    description:
+        'A man scatters seed that sprouts and grows he knows not '
+        'how, all by itself, until the harvest comes — a picture of the '
+        'quietly growing kingdom of God.',
+    refs: [CuratedTopicRef('Mark', 4, 26, 29)],
+  ),
+  CuratedTopic(
+    name: 'THE MUSTARD SEED AND THE LEAVEN',
+    category: 'story',
+    description:
+        'Jesus compares the kingdom of heaven to a mustard seed '
+        'that grows into a tree from the smallest of seeds, and to leaven '
+        'a woman works through a whole batch of dough.',
+    refs: [CuratedTopicRef('Matthew', 13, 31, 33)],
+  ),
+  CuratedTopic(
+    name: 'THE HIDDEN TREASURE AND THE PEARL OF GREAT PRICE',
+    category: 'story',
+    description:
+        'Jesus compares the kingdom of heaven to treasure hidden '
+        'in a field and to a pearl of great price — each worth selling '
+        'everything else to obtain.',
+    refs: [CuratedTopicRef('Matthew', 13, 44, 46)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE NET',
+    category: 'story',
+    description:
+        'Jesus compares the kingdom of heaven to a net cast into '
+        'the sea that gathers fish of every kind, sorted only at the end '
+        'of the age.',
+    refs: [CuratedTopicRef('Matthew', 13, 47, 50)],
+  ),
+  CuratedTopic(
     name: 'THE PARABLE OF THE GOOD SAMARITAN',
     category: 'story',
     description:
@@ -1690,6 +1753,33 @@ const _storyTopics = <CuratedTopic>[
         'Martha busies herself serving while her sister Mary sits '
         'at Jesus\' feet, and Jesus commends Mary\'s choice.',
     refs: [CuratedTopicRef('Luke', 10, 38, 42)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE FRIEND AT MIDNIGHT',
+    category: 'story',
+    description:
+        'Jesus tells of a man who pesters his neighbor for bread '
+        'at midnight until he gets up and gives it, urging his hearers to '
+        'ask, seek, and knock in prayer.',
+    refs: [CuratedTopicRef('Luke', 11, 5, 8)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE RICH FOOL',
+    category: 'story',
+    description:
+        'A rich man plans bigger barns for his abundant harvest, '
+        'only to hear, "Fool! This night your soul is required of you" — '
+        'a warning against storing up treasure for oneself.',
+    refs: [CuratedTopicRef('Luke', 12, 13, 21)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE BARREN FIG TREE',
+    category: 'story',
+    description:
+        'A gardener persuades the owner of a fruitless fig tree '
+        'to spare it one more year, giving it a chance to bear fruit '
+        'before it is cut down.',
+    refs: [CuratedTopicRef('Luke', 13, 6, 9)],
   ),
   CuratedTopic(
     name: 'JESUS HEALS A CRIPPLED WOMAN ON THE SABBATH',
@@ -1710,6 +1800,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 14, 1, 6)],
   ),
   CuratedTopic(
+    name: 'THE PARABLE OF THE GREAT BANQUET',
+    category: 'story',
+    description:
+        'Invited guests all make excuses to skip a great banquet, '
+        'so the host sends his servant to bring in the poor, crippled, '
+        'blind, and lame from the streets instead.',
+    refs: [CuratedTopicRef('Luke', 14, 15, 24)],
+  ),
+  CuratedTopic(
     name: 'THE PARABLE OF THE LOST SHEEP',
     category: 'story',
     description:
@@ -1719,12 +1818,30 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 15, 1, 7)],
   ),
   CuratedTopic(
+    name: 'THE PARABLE OF THE LOST COIN',
+    category: 'story',
+    description:
+        'A woman lights a lamp and sweeps her house to find one '
+        'lost coin, then calls her friends to celebrate — as heaven '
+        'rejoices over one sinner who repents.',
+    refs: [CuratedTopicRef('Luke', 15, 8, 10)],
+  ),
+  CuratedTopic(
     name: 'THE PARABLE OF THE PRODIGAL SON',
     category: 'story',
     description:
         'A wayward son squanders his inheritance and returns home '
         'in shame, only to be welcomed back by his father with open arms.',
     refs: [CuratedTopicRef('Luke', 15, 11, 32)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE DISHONEST MANAGER',
+    category: 'story',
+    description:
+        'A steward about to be fired shrewdly slashes his '
+        "master's debtors' bills to win future favor, and is commended for "
+        'his shrewdness — a lesson in using worldly wealth wisely.',
+    refs: [CuratedTopicRef('Luke', 16, 1, 13)],
   ),
   CuratedTopic(
     name: 'THE RICH MAN AND LAZARUS',
@@ -1744,6 +1861,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 17, 11, 19)],
   ),
   CuratedTopic(
+    name: 'THE PARABLE OF THE PERSISTENT WIDOW AND THE UNJUST JUDGE',
+    category: 'story',
+    description:
+        'A widow wears down an uncaring judge with her persistent '
+        'pleas for justice, and Jesus urges his hearers to pray always '
+        'and not lose heart.',
+    refs: [CuratedTopicRef('Luke', 18, 1, 8)],
+  ),
+  CuratedTopic(
     name: 'THE PHARISEE AND THE TAX COLLECTOR',
     category: 'story',
     description:
@@ -1753,12 +1879,30 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 18, 9, 14)],
   ),
   CuratedTopic(
+    name: 'THE PARABLE OF THE UNFORGIVING SERVANT',
+    category: 'story',
+    description:
+        'A servant forgiven an enormous debt turns and chokes a '
+        'fellow servant over a pittance, teaching that God expects those '
+        'forgiven much to forgive "seventy times seven" in turn.',
+    refs: [CuratedTopicRef('Matthew', 18, 21, 35)],
+  ),
+  CuratedTopic(
     name: 'THE RICH YOUNG RULER',
     category: 'story',
     description:
         'A wealthy young man walks away sorrowful when Jesus '
         'tells him to sell all he has and follow him.',
     refs: [CuratedTopicRef('Matthew', 19, 16, 30)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE WORKERS IN THE VINEYARD',
+    category: 'story',
+    description:
+        'A landowner pays workers hired at the eleventh hour the '
+        'same wage as those who worked all day, illustrating that "the '
+        'last will be first, and the first last."',
+    refs: [CuratedTopicRef('Matthew', 20, 1, 16)],
   ),
   CuratedTopic(
     name: 'BLIND BARTIMAEUS RECEIVES HIS SIGHT',
@@ -1779,6 +1923,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 19, 1, 10)],
   ),
   CuratedTopic(
+    name: 'THE PARABLE OF THE MINAS',
+    category: 'story',
+    description:
+        'A nobleman entrusts ten servants with ten minas before '
+        'going away, and rewards on his return in proportion to how each '
+        'servant put the money to work.',
+    refs: [CuratedTopicRef('Luke', 19, 11, 27)],
+  ),
+  CuratedTopic(
     name: 'THE WOMAN CAUGHT IN ADULTERY',
     category: 'story',
     description:
@@ -1795,6 +1948,15 @@ const _storyTopics = <CuratedTopic>[
         '"I was blind, now I see" — confounds the religious leaders who '
         'question him.',
     refs: [CuratedTopicRef('John', 9)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE GOOD SHEPHERD',
+    category: 'story',
+    description:
+        'Jesus calls himself the good shepherd who knows his '
+        'sheep by name and lays down his life for them, unlike a hired '
+        'hand who flees when the wolf comes.',
+    refs: [CuratedTopicRef('John', 10, 1, 18)],
   ),
   CuratedTopic(
     name: 'THE RAISING OF LAZARUS',
@@ -1830,6 +1992,43 @@ const _storyTopics = <CuratedTopic>[
         'its roots overnight — a sign to his astonished disciples about '
         'faith that does not doubt.',
     refs: [CuratedTopicRef('Matthew', 21, 18, 22)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE TWO SONS',
+    category: 'story',
+    description:
+        'Asked which of two sons truly did his father\'s will — '
+        'the one who refused then went, or the one who agreed then '
+        'didn\'t — Jesus tells the chief priests that tax collectors and '
+        'prostitutes are entering the kingdom ahead of them.',
+    refs: [CuratedTopicRef('Matthew', 21, 28, 32)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE WICKED TENANTS',
+    category: 'story',
+    description:
+        'Tenants beat and kill the servants — and finally the '
+        'son — sent to collect a vineyard owner\'s share of the harvest, '
+        'a parable the chief priests recognize is aimed at them.',
+    refs: [CuratedTopicRef('Matthew', 21, 33, 46)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE WEDDING FEAST',
+    category: 'story',
+    description:
+        'Invited guests refuse a king\'s invitation to his son\'s '
+        'wedding feast, so he fills the hall with people from the streets '
+        '— but casts out one who came without a wedding garment.',
+    refs: [CuratedTopicRef('Matthew', 22, 1, 14)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE FAITHFUL AND WISE SERVANT',
+    category: 'story',
+    description:
+        'Jesus contrasts a servant who faithfully manages his '
+        "master's household while he is away with a wicked one who abuses "
+        'it, warning his disciples to stay ready for his return.',
+    refs: [CuratedTopicRef('Matthew', 24, 45, 51)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE TEN VIRGINS',
@@ -1874,6 +2073,15 @@ const _storyTopics = <CuratedTopic>[
         'At the Last Supper, Jesus takes a towel and basin and '
         'washes his disciples\' feet, modeling humble service.',
     refs: [CuratedTopicRef('John', 13, 1, 17)],
+  ),
+  CuratedTopic(
+    name: 'THE PARABLE OF THE VINE AND THE BRANCHES',
+    category: 'story',
+    description:
+        'At the Last Supper, Jesus tells his disciples, "I am the '
+        'vine, you are the branches," urging them to remain in him so '
+        'they can bear fruit.',
+    refs: [CuratedTopicRef('John', 15, 1, 8)],
   ),
   CuratedTopic(
     name: 'JESUS PRAYS IN GETHSEMANE',
