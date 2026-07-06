@@ -66,8 +66,16 @@ class CommentaryPanel extends ConsumerWidget {
                                   return const SizedBox.shrink();
                                 }
 
-                                // Auto-select first if none selected
-                                if (selectedId == null) {
+                                // Auto-select first if none selected, or if
+                                // the stored selection (e.g. a persisted
+                                // preference from before a commentary was
+                                // removed/reimported) no longer exists.
+                                final validSelectedId = commentaries.any(
+                                      (c) => c.id == selectedId,
+                                    )
+                                    ? selectedId
+                                    : null;
+                                if (validSelectedId == null) {
                                   Future.microtask(
                                     () => ref
                                         .read(
@@ -79,7 +87,7 @@ class CommentaryPanel extends ConsumerWidget {
 
                                 return DropdownButton<int>(
                                   isExpanded: true,
-                                  value: selectedId ?? commentaries.first.id,
+                                  value: validSelectedId ?? commentaries.first.id,
                                   underline: const SizedBox(),
                                   items: commentaries
                                       .map(
