@@ -346,6 +346,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 23, 33, 46)],
   ),
   CuratedTopic(
+    name: 'JOHN AT THE FOOT OF THE CROSS',
+    category: 'story',
+    description:
+        "Standing at the cross with Jesus' mother, John receives "
+        'his dying charge to care for her: "Woman, behold your son!" and '
+        '"Behold your mother."',
+    refs: [CuratedTopicRef('John', 19, 25, 27)],
+  ),
+  CuratedTopic(
     name: 'THE BURIAL OF JESUS',
     category: 'story',
     description:
@@ -381,6 +390,15 @@ const _storyTopics = <CuratedTopic>[
         'Jesus commissions his disciples and is taken up into '
         'heaven before their eyes.',
     refs: [CuratedTopicRef('Acts', 1, 6, 11)],
+  ),
+  CuratedTopic(
+    name: 'THE CHOOSING OF MATTHIAS',
+    category: 'story',
+    description:
+        "After Judas's betrayal and death, the disciples cast "
+        'lots between two candidates to restore the number of the Twelve, '
+        'and Matthias is added to the apostles.',
+    refs: [CuratedTopicRef('Acts', 1, 15, 26)],
   ),
   CuratedTopic(
     name: 'THE DAY OF PENTECOST',
@@ -1497,6 +1515,25 @@ const _storyTopics = <CuratedTopic>[
 
   // --- Gospels ---
   CuratedTopic(
+    name: 'ANDREW BRINGS PETER TO JESUS',
+    category: 'story',
+    description:
+        'Andrew, a disciple of John the Baptist, follows Jesus '
+        'after hearing him called "the Lamb of God," then finds his '
+        'brother Simon and brings him to Jesus, who renames him Peter.',
+    refs: [CuratedTopicRef('John', 1, 35, 42)],
+  ),
+  CuratedTopic(
+    name: 'THE CALLING OF PHILIP AND NATHANAEL',
+    category: 'story',
+    description:
+        "Jesus calls Philip, who finds Nathanael and tells him "
+        "they've found the Messiah; Nathanael doubts anything good can "
+        'come from Nazareth until Jesus reveals he saw him under the fig '
+        'tree.',
+    refs: [CuratedTopicRef('John', 1, 43, 51)],
+  ),
+  CuratedTopic(
     name: 'THE CALLING OF THE FIRST DISCIPLES',
     category: 'story',
     description:
@@ -1566,6 +1603,17 @@ const _storyTopics = <CuratedTopic>[
         'accuse him, Jesus heals a man\'s withered hand on the Sabbath, '
         'asking, "Is it lawful to do good on the Sabbath?"',
     refs: [CuratedTopicRef('Mark', 3, 1, 6)],
+  ),
+  CuratedTopic(
+    name: 'JESUS CHOOSES THE TWELVE APOSTLES',
+    category: 'story',
+    description:
+        'After a night spent praying on the mountain, Jesus '
+        'chooses twelve of his disciples and names them apostles — '
+        'including Simon Peter, Andrew, James, John, Philip, Bartholomew, '
+        'Thomas, Matthew, James son of Alphaeus, Simon the Zealot, Judas '
+        'son of James, and Judas Iscariot.',
+    refs: [CuratedTopicRef('Luke', 6, 12, 16)],
   ),
   CuratedTopic(
     name: 'THE SERMON ON THE PLAIN',
@@ -1728,6 +1776,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 16, 13, 20)],
   ),
   CuratedTopic(
+    name: 'JESUS REBUKES PETER',
+    category: 'story',
+    description:
+        'When Peter rebukes Jesus for predicting his death, Jesus '
+        'turns and rebukes him in turn: "Get behind me, Satan! You are a '
+        'hindrance to me."',
+    refs: [CuratedTopicRef('Matthew', 16, 21, 23)],
+  ),
+  CuratedTopic(
     name: 'JESUS HEALS A BOY WITH A DEMON',
     category: 'story',
     description:
@@ -1837,6 +1894,15 @@ const _storyTopics = <CuratedTopic>[
         'the sea that gathers fish of every kind, sorted only at the end '
         'of the age.',
     refs: [CuratedTopicRef('Matthew', 13, 47, 50)],
+  ),
+  CuratedTopic(
+    name: 'JAMES AND JOHN CALL FOR FIRE FROM A SAMARITAN VILLAGE',
+    category: 'story',
+    description:
+        'When a Samaritan village refuses to welcome Jesus, James '
+        'and John ask if he wants them to call down fire from heaven to '
+        'consume it; Jesus rebukes them instead.',
+    refs: [CuratedTopicRef('Luke', 9, 51, 56)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE GOOD SAMARITAN',
@@ -2014,6 +2080,19 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 20, 1, 16)],
   ),
   CuratedTopic(
+    name: 'THE REQUEST OF JAMES AND JOHN FOR THE HIGHEST PLACE',
+    category: 'story',
+    description:
+        "James and John (through their mother, in Matthew's "
+        "account) ask to sit at Jesus' right and left hand in his "
+        'kingdom; Jesus tells the indignant Ten that greatness means '
+        'becoming a servant of all.',
+    refs: [
+      CuratedTopicRef('Mark', 10, 35, 45),
+      CuratedTopicRef('Matthew', 20, 20, 28),
+    ],
+  ),
+  CuratedTopic(
     name: 'BLIND BARTIMAEUS RECEIVES HIS SIGHT',
     category: 'story',
     description:
@@ -2077,6 +2156,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('John', 10, 1, 18)],
   ),
   CuratedTopic(
+    name: "THOMAS'S WILLINGNESS TO DIE WITH JESUS",
+    category: 'story',
+    description:
+        'When Jesus resolves to return to Judea despite the '
+        'danger, Thomas tells the other disciples, "Let us also go, that '
+        'we may die with him."',
+    refs: [CuratedTopicRef('John', 11, 7, 16)],
+  ),
+  CuratedTopic(
     name: 'THE RAISING OF LAZARUS',
     category: 'story',
     description:
@@ -2101,6 +2189,15 @@ const _storyTopics = <CuratedTopic>[
         'the temple courts, declaring, "My house shall be called a house '
         'of prayer, but you have made it a den of robbers."',
     refs: [CuratedTopicRef('Matthew', 21, 12, 17)],
+  ),
+  CuratedTopic(
+    name: 'PHILIP AND ANDREW BRING THE GREEKS TO JESUS',
+    category: 'story',
+    description:
+        'Greeks who came to worship at the feast ask Philip to '
+        'see Jesus; Philip tells Andrew, and together they bring the '
+        'request to him.',
+    refs: [CuratedTopicRef('John', 12, 20, 22)],
   ),
   CuratedTopic(
     name: 'JESUS CURSES THE FIG TREE',
@@ -2260,6 +2357,34 @@ const _storyTopics = <CuratedTopic>[
       CuratedTopicRef('John', 16),
       CuratedTopicRef('John', 17),
     ],
+  ),
+  CuratedTopic(
+    name: 'THOMAS ASKS THE WAY',
+    category: 'story',
+    description:
+        "Thomas objects that the disciples don't know where "
+        'Jesus is going, prompting his answer: "I am the way, and the '
+        'truth, and the life. No one comes to the Father except through '
+        'me."',
+    refs: [CuratedTopicRef('John', 14, 5, 6)],
+  ),
+  CuratedTopic(
+    name: 'PHILIP\'S QUESTION: "SHOW US THE FATHER"',
+    category: 'story',
+    description:
+        'Philip asks Jesus to show them the Father; Jesus replies, '
+        '"Whoever has seen me has seen the Father," after being with them '
+        'so long.',
+    refs: [CuratedTopicRef('John', 14, 8, 9)],
+  ),
+  CuratedTopic(
+    name: "THADDAEUS'S QUESTION AT THE LAST SUPPER",
+    category: 'story',
+    description:
+        'Judas (not Iscariot), also called Thaddaeus, asks Jesus '
+        'why he will show himself to the disciples but not to the world; '
+        'Jesus answers that whoever loves him will keep his word.',
+    refs: [CuratedTopicRef('John', 14, 22, 24)],
   ),
   CuratedTopic(
     name: 'JESUS PRAYS IN GETHSEMANE',
@@ -2439,6 +2564,14 @@ const _storyTopics = <CuratedTopic>[
         'A vision of unclean animals prepares Peter to visit the '
         'Roman centurion Cornelius, opening the gospel to the Gentiles.',
     refs: [CuratedTopicRef('Acts', 10)],
+  ),
+  CuratedTopic(
+    name: 'THE MARTYRDOM OF JAMES, SON OF ZEBEDEE',
+    category: 'story',
+    description:
+        'King Herod has James, the brother of John, put to death '
+        'with the sword — the first of the Twelve to be martyred.',
+    refs: [CuratedTopicRef('Acts', 12, 1, 2)],
   ),
   CuratedTopic(
     name: "PETER'S ESCAPE FROM PRISON",
