@@ -548,6 +548,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 15, 7, 21)],
   ),
   CuratedTopic(
+    name: 'HAGAR FLEES TO THE WELL OF THE LIVING ONE WHO SEES ME',
+    category: 'story',
+    description:
+        'Mistreated by Sarai after conceiving Ishmael, the '
+        'pregnant Hagar flees into the wilderness, where the angel of the '
+        'LORD finds her at a well and tells her to return, naming God '
+        '"the One who sees me."',
+    refs: [CuratedTopicRef('Genesis', 16)],
+  ),
+  CuratedTopic(
     name: "SARAH'S LAUGHTER AND THE BIRTH OF ISAAC",
     category: 'story',
     description:
@@ -576,6 +586,15 @@ const _storyTopics = <CuratedTopic>[
         'and sulfur on Sodom and Gomorrah; Lot\'s wife looks back and '
         'becomes a pillar of salt.',
     refs: [CuratedTopicRef('Genesis', 19, 1, 29)],
+  ),
+  CuratedTopic(
+    name: 'ABRAHAM DECEIVES ABIMELECH AT GERAR',
+    category: 'story',
+    description:
+        'Abraham again passes off Sarah as his sister; God warns '
+        'Abimelech in a dream not to touch her, and the king restores '
+        'her along with gifts and a rebuke.',
+    refs: [CuratedTopicRef('Genesis', 20)],
   ),
   CuratedTopic(
     name: 'HAGAR AND ISHMAEL SENT AWAY',
@@ -840,6 +859,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Exodus', 2, 11, 22)],
   ),
   CuratedTopic(
+    name: 'THE BRIDEGROOM OF BLOOD: ZIPPORAH SAVES MOSES',
+    category: 'story',
+    description:
+        'On the road back to Egypt, the LORD seeks to kill Moses '
+        'until Zipporah circumcises their son and touches Moses with the '
+        'bloody flesh, calling him "a bridegroom of blood."',
+    refs: [CuratedTopicRef('Exodus', 4, 18, 26)],
+  ),
+  CuratedTopic(
     name: 'MOSES CONFRONTS PHARAOH: "LET MY PEOPLE GO"',
     category: 'story',
     description:
@@ -1006,6 +1034,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Exodus', 32)],
   ),
   CuratedTopic(
+    name: 'THE GRAVES OF CRAVING (KIBROTH-HATTAAVAH)',
+    category: 'story',
+    description:
+        'The people weep for meat and grow sick of manna; the LORD '
+        'sends a month-long wind of quail, then strikes the greediest '
+        'with a plague, and they bury the dead at a place called "the '
+        'graves of craving."',
+    refs: [CuratedTopicRef('Numbers', 11, 4, 34)],
+  ),
+  CuratedTopic(
     name: "MIRIAM AND AARON'S REBELLION",
     category: 'story',
     description:
@@ -1021,6 +1059,16 @@ const _storyTopics = <CuratedTopic>[
         'Twelve spies scout Canaan; ten report giants and defeat, '
         'but Joshua and Caleb urge Israel to trust God and take the land.',
     refs: [CuratedTopicRef('Numbers', 13)],
+  ),
+  CuratedTopic(
+    name: "ISRAEL'S REBELLION AND SENTENCE TO WANDER",
+    category: 'story',
+    description:
+        "Terrified by the spies' report, Israel refuses to enter "
+        'Canaan and even talks of stoning Moses; God sentences the '
+        'unbelieving generation to wander the wilderness forty years, '
+        'one year for each day the spies explored the land.',
+    refs: [CuratedTopicRef('Numbers', 14)],
   ),
   CuratedTopic(
     name: "BALAAM'S DONKEY",
@@ -1167,6 +1215,16 @@ const _storyTopics = <CuratedTopic>[
         'Jordan and its waters stop, letting Israel cross into Canaan on '
         'dry ground.',
     refs: [CuratedTopicRef('Joshua', 3), CuratedTopicRef('Joshua', 4, 1, 18)],
+  ),
+  CuratedTopic(
+    name: "THE COMMANDER OF THE LORD'S ARMY APPEARS TO JOSHUA",
+    category: 'story',
+    description:
+        'Before Jericho, Joshua meets a man with a drawn sword who '
+        "identifies himself as commander of the LORD's army; Joshua "
+        'falls facedown and is told to remove his sandals on holy '
+        'ground.',
+    refs: [CuratedTopicRef('Joshua', 5, 13, 15)],
   ),
   CuratedTopic(
     name: 'THE GIBEONITE DECEPTION',
@@ -1415,6 +1473,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('1 Samuel', 4, 12, 22)],
   ),
   CuratedTopic(
+    name: 'ISRAEL DEMANDS A KING',
+    category: 'story',
+    description:
+        "Aging Samuel's sons are corrupt judges, so the elders of "
+        'Israel demand a king "like all the nations"; Samuel warns them '
+        'what a king will cost, but the LORD tells him to give the '
+        'people what they ask.',
+    refs: [CuratedTopicRef('1 Samuel', 8)],
+  ),
+  CuratedTopic(
     name: 'SAUL ANOINTED KING',
     category: 'story',
     description:
@@ -1472,6 +1540,15 @@ const _storyTopics = <CuratedTopic>[
         'is recognized, so he pretends to be insane to escape King '
         'Achish unharmed.',
     refs: [CuratedTopicRef('1 Samuel', 21, 10, 15)],
+  ),
+  CuratedTopic(
+    name: 'DOEG SLAUGHTERS THE PRIESTS OF NOB',
+    category: 'story',
+    description:
+        'Doeg the Edomite reports that Ahimelech helped David, and '
+        "at Saul's command he kills eighty-five priests of Nob and puts "
+        'the whole town to the sword; only Abiathar escapes.',
+    refs: [CuratedTopicRef('1 Samuel', 22, 6, 23)],
   ),
   CuratedTopic(
     name: "DAVID SPARES SAUL'S LIFE",
@@ -1560,6 +1637,16 @@ const _storyTopics = <CuratedTopic>[
         'Jerusalem, his wife Michal despises him in her heart for it, '
         'and is left childless the rest of her life.',
     refs: [CuratedTopicRef('2 Samuel', 6, 16, 23)],
+  ),
+  CuratedTopic(
+    name: 'THE DAVIDIC COVENANT',
+    category: 'story',
+    description:
+        'David wants to build the LORD a house, but Nathan relays '
+        "God's promise instead to build David a house — an eternal "
+        "dynasty and throne — and David responds with a prayer of "
+        'humble thanksgiving.',
+    refs: [CuratedTopicRef('2 Samuel', 7)],
   ),
   CuratedTopic(
     name: 'DAVID AND MEPHIBOSHETH',
@@ -1911,6 +1998,16 @@ const _storyTopics = <CuratedTopic>[
         'temple for six years until the priest Jehoiada crowns him king '
         'and has her put to death.',
     refs: [CuratedTopicRef('2 Kings', 11)],
+  ),
+  CuratedTopic(
+    name: 'THE DEATH OF ELISHA AND THE BONES THAT RAISE THE DEAD',
+    category: 'story',
+    description:
+        "As Elisha lies dying, King Joash weeps over him and shoots "
+        "an arrow of victory at the prophet's command; later, a dead man "
+        "thrown hastily into Elisha's tomb touches his bones and springs "
+        'back to life.',
+    refs: [CuratedTopicRef('2 Kings', 13, 14, 21)],
   ),
   CuratedTopic(
     name: "SENNACHERIB'S SIEGE OF JERUSALEM",
