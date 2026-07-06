@@ -473,6 +473,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 4, 1, 16)],
   ),
   CuratedTopic(
+    name: 'ABRAHAM AND LOT SEPARATE',
+    category: 'story',
+    description:
+        'To end strife between their herdsmen, Abraham lets Lot '
+        'choose first and take the well-watered plain of the Jordan '
+        'toward Sodom, while Abraham remains in Canaan.',
+    refs: [CuratedTopicRef('Genesis', 13)],
+  ),
+  CuratedTopic(
     name: 'ABRAHAM AND MELCHIZEDEK',
     category: 'story',
     description:
@@ -480,6 +489,16 @@ const _storyTopics = <CuratedTopic>[
         'and wine after his rescue of Lot, and Abraham gives him a tenth '
         'of everything.',
     refs: [CuratedTopicRef('Genesis', 14, 17, 20)],
+  ),
+  CuratedTopic(
+    name: 'THE COVENANT OF THE SMOKING FIREPOT',
+    category: 'story',
+    description:
+        'As a deep sleep and terrifying darkness fall on Abram, '
+        'a smoking firepot and flaming torch pass between the halves of '
+        "his sacrifice, sealing God's covenant to give his offspring the "
+        'land after four hundred years of slavery.',
+    refs: [CuratedTopicRef('Genesis', 15, 7, 21)],
   ),
   CuratedTopic(
     name: "SARAH'S LAUGHTER AND THE BIRTH OF ISAAC",
@@ -492,6 +511,15 @@ const _storyTopics = <CuratedTopic>[
       CuratedTopicRef('Genesis', 18, 1, 15),
       CuratedTopicRef('Genesis', 21, 1, 7),
     ],
+  ),
+  CuratedTopic(
+    name: 'ABRAHAM INTERCEDES FOR SODOM',
+    category: 'story',
+    description:
+        "Abraham bargains with the LORD over Sodom's fate, "
+        'repeatedly asking him to spare the city for the sake of a '
+        'shrinking number of righteous people, down to just ten.',
+    refs: [CuratedTopicRef('Genesis', 18, 16, 33)],
   ),
   CuratedTopic(
     name: 'THE DESTRUCTION OF SODOM AND GOMORRAH',
@@ -512,12 +540,30 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 21, 8, 21)],
   ),
   CuratedTopic(
+    name: 'THE DEATH OF SARAH AND THE CAVE OF MACHPELAH',
+    category: 'story',
+    description:
+        'When Sarah dies at Hebron, Abraham buys the cave of '
+        'Machpelah from Ephron the Hittite as a family burial place, the '
+        'first land he owns in Canaan.',
+    refs: [CuratedTopicRef('Genesis', 23)],
+  ),
+  CuratedTopic(
     name: 'ISAAC AND REBEKAH',
     category: 'story',
     description:
         'Abraham\'s servant prays for a sign at a well and finds '
         'Rebekah, who returns with him to become Isaac\'s wife.',
     refs: [CuratedTopicRef('Genesis', 24)],
+  ),
+  CuratedTopic(
+    name: 'THE DEATH OF ABRAHAM',
+    category: 'story',
+    description:
+        'Abraham dies at a good old age, full of years, and his '
+        'sons Isaac and Ishmael bury him beside Sarah in the cave of '
+        'Machpelah.',
+    refs: [CuratedTopicRef('Genesis', 25, 1, 11)],
   ),
   CuratedTopic(
     name: "JACOB'S BIRTHRIGHT AND BLESSING",
@@ -941,6 +987,33 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Judges', 14)],
   ),
   CuratedTopic(
+    name: "SAMSON BURNS THE PHILISTINES' FIELDS",
+    category: 'story',
+    description:
+        'Denied his bride, Samson catches three hundred foxes, '
+        'ties them tail to tail with torches, and sets them loose to '
+        "burn the Philistines' grain, vineyards, and olive groves.",
+    refs: [CuratedTopicRef('Judges', 15, 1, 8)],
+  ),
+  CuratedTopic(
+    name: "SAMSON KILLS A THOUSAND MEN WITH A DONKEY'S JAWBONE",
+    category: 'story',
+    description:
+        'When the Philistines come for him, Samson bursts the '
+        'ropes binding him and strikes down a thousand men with the '
+        'jawbone of a donkey.',
+    refs: [CuratedTopicRef('Judges', 15, 9, 17)],
+  ),
+  CuratedTopic(
+    name: 'SAMSON CARRIES OFF THE GATES OF GAZA',
+    category: 'story',
+    description:
+        'Trapped in Gaza overnight, Samson gets up at midnight, '
+        'tears the city gate from its posts and bar, and carries it on '
+        'his shoulders to a hilltop facing Hebron.',
+    refs: [CuratedTopicRef('Judges', 16, 1, 3)],
+  ),
+  CuratedTopic(
     name: 'SAMSON AND DELILAH',
     category: 'story',
     description:
@@ -1071,6 +1144,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('1 Samuel', 25)],
   ),
   CuratedTopic(
+    name: 'DAVID SPARES SAUL A SECOND TIME',
+    category: 'story',
+    description:
+        "David sneaks into Saul's camp by night and takes his "
+        'spear and water jug from beside his sleeping head, again '
+        'refusing to harm "the LORD\'s anointed."',
+    refs: [CuratedTopicRef('1 Samuel', 26)],
+  ),
+  CuratedTopic(
     name: 'THE MEDIUM OF ENDOR',
     category: 'story',
     description:
@@ -1132,6 +1214,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('2 Samuel', 12, 1, 14)],
   ),
   CuratedTopic(
+    name: 'AMNON AND TAMAR',
+    category: 'story',
+    description:
+        "David's son Amnon feigns illness to lure his half-sister "
+        'Tamar into his room and rapes her, then has her thrown out in '
+        'disgrace — an act her brother Absalom will not forgive.',
+    refs: [CuratedTopicRef('2 Samuel', 13, 1, 22)],
+  ),
+  CuratedTopic(
     name: "ABSALOM'S REBELLION",
     category: 'story',
     description:
@@ -1146,6 +1237,36 @@ const _storyTopics = <CuratedTopic>[
         "David's rebellious son Absalom is caught by his hair in "
         'an oak tree and killed by Joab against David\'s explicit orders.',
     refs: [CuratedTopicRef('2 Samuel', 18, 9, 15)],
+  ),
+  CuratedTopic(
+    name: 'THE FAMINE AND THE GIBEONITES',
+    category: 'story',
+    description:
+        "To end a three-year famine caused by Saul's broken oath "
+        "to the Gibeonites, David hands over seven of Saul's "
+        "descendants to be executed, then gives Saul and Jonathan's "
+        'bones a proper burial.',
+    refs: [CuratedTopicRef('2 Samuel', 21, 1, 14)],
+  ),
+  CuratedTopic(
+    name: "DAVID'S LAST WORDS",
+    category: 'story',
+    description:
+        "In his final recorded oracle, David reflects on the "
+        "LORD's everlasting covenant with his house and the just rule "
+        'of one who governs in the fear of God, like the light of '
+        'morning.',
+    refs: [CuratedTopicRef('2 Samuel', 23, 1, 7)],
+  ),
+  CuratedTopic(
+    name: "DAVID'S MIGHTY MEN",
+    category: 'story',
+    description:
+        "Scripture honors David's elite warriors, including three "
+        'who broke through the Philistine lines to draw water from the '
+        "well at Bethlehem — water David refused to drink, pouring it "
+        'out to the LORD instead.',
+    refs: [CuratedTopicRef('2 Samuel', 23, 8, 39)],
   ),
   CuratedTopic(
     name: "DAVID'S CENSUS AND THE PLAGUE",
