@@ -229,6 +229,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 2, 1, 12)],
   ),
   CuratedTopic(
+    name: 'THE FLIGHT TO EGYPT AND THE MASSACRE OF THE INNOCENTS',
+    category: 'story',
+    description:
+        'Warned in a dream, Joseph flees with Mary and Jesus to '
+        'Egypt just before Herod, enraged by the magi, orders every boy '
+        'in Bethlehem under two years old put to death.',
+    refs: [CuratedTopicRef('Matthew', 2, 13, 23)],
+  ),
+  CuratedTopic(
     name: 'SIMEON AND ANNA AT THE TEMPLE',
     category: 'story',
     description:
@@ -254,6 +263,15 @@ const _storyTopics = <CuratedTopic>[
         'descends like a dove and a voice from heaven declares him God\'s '
         'Son.',
     refs: [CuratedTopicRef('Matthew', 3, 13, 17)],
+  ),
+  CuratedTopic(
+    name: 'THE TEMPTATION OF JESUS',
+    category: 'story',
+    description:
+        'Led by the Spirit into the wilderness, Jesus fasts '
+        'forty days and refuses Satan\'s three temptations — bread from '
+        'stones, a leap from the temple, and the kingdoms of the world.',
+    refs: [CuratedTopicRef('Matthew', 4, 1, 11)],
   ),
   CuratedTopic(
     name: 'THE SERMON AT NAZARETH',
@@ -326,6 +344,27 @@ const _storyTopics = <CuratedTopic>[
         'Jesus is crucified at Golgotha between two criminals and '
         'dies, committing his spirit into the Father\'s hands.',
     refs: [CuratedTopicRef('Luke', 23, 33, 46)],
+  ),
+  CuratedTopic(
+    name: 'THE BURIAL OF JESUS',
+    category: 'story',
+    description:
+        'Joseph of Arimathea asks Pilate for the body of Jesus '
+        'and lays it in his own new tomb, wrapped in linen with Nicodemus\' '
+        'spices, and rolls a stone across the entrance.',
+    refs: [CuratedTopicRef('John', 19, 38, 42)],
+  ),
+  CuratedTopic(
+    name: 'THE GUARD AT THE TOMB',
+    category: 'story',
+    description:
+        'Pilate has the tomb sealed and posts a guard at the '
+        'chief priests\' request, who later bribe the guards to spread the '
+        'story that the disciples stole Jesus\' body.',
+    refs: [
+      CuratedTopicRef('Matthew', 27, 62, 66),
+      CuratedTopicRef('Matthew', 28, 11, 15),
+    ],
   ),
   CuratedTopic(
     name: 'THE RESURRECTION',
@@ -1511,6 +1550,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Mark', 2, 1, 12)],
   ),
   CuratedTopic(
+    name: 'THE CALLING OF MATTHEW THE TAX COLLECTOR',
+    category: 'story',
+    description:
+        'Jesus calls the despised tax collector Matthew away '
+        'from his booth with two words — "Follow me" — then dines with '
+        'sinners, telling critics, "I desire mercy, not sacrifice."',
+    refs: [CuratedTopicRef('Matthew', 9, 9, 13)],
+  ),
+  CuratedTopic(
     name: 'JESUS HEALS A MAN WITH A WITHERED HAND',
     category: 'story',
     description:
@@ -1940,6 +1988,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 18, 21, 35)],
   ),
   CuratedTopic(
+    name: 'JESUS BLESSES THE LITTLE CHILDREN',
+    category: 'story',
+    description:
+        'Jesus rebukes his disciples for turning away children '
+        'brought to him, saying, "Let the little children come to me... '
+        'for to such belongs the kingdom of heaven."',
+    refs: [CuratedTopicRef('Matthew', 19, 13, 15)],
+  ),
+  CuratedTopic(
     name: 'THE RICH YOUNG RULER',
     category: 'story',
     description:
@@ -1982,6 +2039,15 @@ const _storyTopics = <CuratedTopic>[
         'going away, and rewards on his return in proportion to how each '
         'servant put the money to work.',
     refs: [CuratedTopicRef('Luke', 19, 11, 27)],
+  ),
+  CuratedTopic(
+    name: 'JESUS WEEPS OVER JERUSALEM',
+    category: 'story',
+    description:
+        'Approaching Jerusalem before his triumphal entry, Jesus '
+        'weeps over the city, lamenting that it did not recognize "the '
+        'things that make for peace."',
+    refs: [CuratedTopicRef('Luke', 19, 41, 44)],
   ),
   CuratedTopic(
     name: 'THE WOMAN CAUGHT IN ADULTERY',
@@ -2074,6 +2140,25 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 22, 1, 14)],
   ),
   CuratedTopic(
+    name: 'RENDER UNTO CAESAR',
+    category: 'story',
+    description:
+        'Trying to trap Jesus over the tax question, the '
+        'Pharisees hear him settle it with a coin: "Render to Caesar the '
+        'things that are Caesar\'s, and to God the things that are God\'s."',
+    refs: [CuratedTopicRef('Matthew', 22, 15, 22)],
+  ),
+  CuratedTopic(
+    name: 'THE GREAT COMMANDMENT',
+    category: 'story',
+    description:
+        'Asked which commandment is greatest, Jesus answers: '
+        'love the Lord your God with all your heart, and love your '
+        'neighbor as yourself — "on these two commandments depend all the '
+        'Law and the Prophets."',
+    refs: [CuratedTopicRef('Matthew', 22, 34, 40)],
+  ),
+  CuratedTopic(
     name: 'THE SEVEN WOES TO THE PHARISEES',
     category: 'story',
     description:
@@ -2081,6 +2166,16 @@ const _storyTopics = <CuratedTopic>[
         'courts — "Woe to you... hypocrites!" — for their hollow, '
         'showy religion, and laments over Jerusalem.',
     refs: [CuratedTopicRef('Matthew', 23)],
+  ),
+  CuratedTopic(
+    name: "THE WIDOW'S MITE",
+    category: 'story',
+    description:
+        'Watching the temple treasury, Jesus commends a poor '
+        'widow\'s two small copper coins above the large gifts of the '
+        'rich, "for they... out of their abundance, but she out of her '
+        'poverty put in everything she had."',
+    refs: [CuratedTopicRef('Mark', 12, 41, 44)],
   ),
   CuratedTopic(
     name: 'THE OLIVET DISCOURSE',
@@ -2197,12 +2292,39 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 22, 50, 51)],
   ),
   CuratedTopic(
+    name: 'JESUS BEFORE CAIAPHAS AND THE SANHEDRIN',
+    category: 'story',
+    description:
+        'Brought before the high priest and the council at '
+        'night, Jesus is condemned for blasphemy after declaring himself '
+        'the Son of God, then mocked, spit on, and struck.',
+    refs: [CuratedTopicRef('Matthew', 26, 57, 68)],
+  ),
+  CuratedTopic(
     name: "PETER'S DENIAL",
     category: 'story',
     description:
         'Just as Jesus predicted, Peter denies knowing him three '
         'times before the rooster crows, then weeps bitterly.',
     refs: [CuratedTopicRef('Luke', 22, 54, 62)],
+  ),
+  CuratedTopic(
+    name: "JUDAS'S REMORSE AND DEATH",
+    category: 'story',
+    description:
+        'Seeing Jesus condemned, Judas returns the thirty pieces '
+        'of silver to the chief priests, confessing "I have betrayed '
+        'innocent blood," then goes and hangs himself.',
+    refs: [CuratedTopicRef('Matthew', 27, 3, 10)],
+  ),
+  CuratedTopic(
+    name: 'JESUS BEFORE HEROD',
+    category: 'story',
+    description:
+        'Pilate sends Jesus to Herod Antipas, who has long '
+        'wanted to see him perform a sign; Jesus stays silent, and Herod '
+        'mocks him and sends him back to Pilate.',
+    refs: [CuratedTopicRef('Luke', 23, 6, 12)],
   ),
   CuratedTopic(
     name: 'JESUS BEFORE PILATE AND THE RELEASE OF BARABBAS',
@@ -2212,6 +2334,24 @@ const _storyTopics = <CuratedTopic>[
         'releasing the rebel Barabbas in his place and handing Jesus over '
         'to be crucified.',
     refs: [CuratedTopicRef('Matthew', 27, 11, 26)],
+  ),
+  CuratedTopic(
+    name: 'JESUS APPEARS TO MARY MAGDALENE',
+    category: 'story',
+    description:
+        'Weeping at the empty tomb, Mary Magdalene mistakes the '
+        'risen Jesus for the gardener until he speaks her name — "Mary!" '
+        '— and she recognizes him, crying, "Rabboni!"',
+    refs: [CuratedTopicRef('John', 20, 11, 18)],
+  ),
+  CuratedTopic(
+    name: 'JESUS APPEARS TO THE DISCIPLES',
+    category: 'story',
+    description:
+        'The risen Jesus appears to his disciples behind locked '
+        'doors, saying, "Peace be with you," and breathes on them, "Receive '
+        'the Holy Spirit."',
+    refs: [CuratedTopicRef('John', 20, 19, 23)],
   ),
   CuratedTopic(
     name: 'DOUBTING THOMAS',
