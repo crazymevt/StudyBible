@@ -1437,6 +1437,33 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 4, 18, 22)],
   ),
   CuratedTopic(
+    name: 'THE MIRACULOUS CATCH OF FISH',
+    category: 'story',
+    description:
+        'After a fruitless night, Peter lets down his nets at '
+        "Jesus' word and hauls in so many fish the boats begin to sink — "
+        'and falls at Jesus\' knees saying, "Depart from me, for I am a '
+        'sinful man."',
+    refs: [CuratedTopicRef('Luke', 5, 1, 11)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS A MAN WITH AN UNCLEAN SPIRIT',
+    category: 'story',
+    description:
+        'In the Capernaum synagogue, Jesus rebukes an unclean '
+        'spirit with a word of authority, and the crowd marvels that even '
+        'the demons obey him.',
+    refs: [CuratedTopicRef('Mark', 1, 21, 28)],
+  ),
+  CuratedTopic(
+    name: "JESUS HEALS PETER'S MOTHER-IN-LAW",
+    category: 'story',
+    description:
+        "Jesus heals Simon Peter's mother-in-law of a fever with "
+        'a touch, and she immediately gets up and begins serving them.',
+    refs: [CuratedTopicRef('Mark', 1, 29, 31)],
+  ),
+  CuratedTopic(
     name: 'JESUS HEALS A LEPER',
     category: 'story',
     description:
@@ -1453,6 +1480,15 @@ const _storyTopics = <CuratedTopic>[
         "in front of Jesus, who forgives his sins and heals him, to the "
         'crowd\'s astonishment.',
     refs: [CuratedTopicRef('Mark', 2, 1, 12)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS A MAN WITH A WITHERED HAND',
+    category: 'story',
+    description:
+        'Watched by hostile Pharisees looking for a reason to '
+        'accuse him, Jesus heals a man\'s withered hand on the Sabbath, '
+        'asking, "Is it lawful to do good on the Sabbath?"',
+    refs: [CuratedTopicRef('Mark', 3, 1, 6)],
   ),
   CuratedTopic(
     name: 'THE WEDDING AT CANA',
@@ -1542,6 +1578,24 @@ const _storyTopics = <CuratedTopic>[
     ],
   ),
   CuratedTopic(
+    name: "THE SYROPHOENICIAN WOMAN'S FAITH",
+    category: 'story',
+    description:
+        'A Gentile woman begs Jesus to free her daughter from a '
+        'demon, and her persistent faith — "even the dogs eat the '
+        'crumbs" — earns her daughter\'s healing.',
+    refs: [CuratedTopicRef('Mark', 7, 24, 30)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS A DEAF MAN',
+    category: 'story',
+    description:
+        'Jesus puts his fingers in a deaf man\'s ears and says '
+        '"Ephphatha" — "Be opened" — and the man\'s ears are opened and '
+        'his tongue loosed.',
+    refs: [CuratedTopicRef('Mark', 7, 31, 37)],
+  ),
+  CuratedTopic(
     name: 'THE FEEDING OF THE FOUR THOUSAND',
     category: 'story',
     description:
@@ -1549,6 +1603,15 @@ const _storyTopics = <CuratedTopic>[
         'feed a crowd of four thousand in the Gentile region of the '
         'Decapolis, with seven baskets left over.',
     refs: [CuratedTopicRef('Mark', 8, 1, 9)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS A BLIND MAN AT BETHSAIDA',
+    category: 'story',
+    description:
+        'Jesus heals a blind man in two stages, spitting on his '
+        'eyes and laying on hands twice, until the man sees everything '
+        'clearly.',
+    refs: [CuratedTopicRef('Mark', 8, 22, 26)],
   ),
   CuratedTopic(
     name: "PETER'S CONFESSION AT CAESAREA PHILIPPI",
@@ -1560,6 +1623,24 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 16, 13, 20)],
   ),
   CuratedTopic(
+    name: 'JESUS HEALS A BOY WITH A DEMON',
+    category: 'story',
+    description:
+        'After his disciples fail to cast out a demon tormenting '
+        'a boy with seizures, Jesus heals him and explains that "this kind '
+        'never comes out except by prayer."',
+    refs: [CuratedTopicRef('Matthew', 17, 14, 21)],
+  ),
+  CuratedTopic(
+    name: "THE COIN IN THE FISH'S MOUTH",
+    category: 'story',
+    description:
+        'To pay the temple tax without giving offense, Jesus '
+        'sends Peter to catch a fish, telling him he will find a coin in '
+        "its mouth enough for them both.",
+    refs: [CuratedTopicRef('Matthew', 17, 24, 27)],
+  ),
+  CuratedTopic(
     name: "JAIRUS'S DAUGHTER AND THE WOMAN WITH THE ISSUE OF BLOOD",
     category: 'story',
     description:
@@ -1567,6 +1648,24 @@ const _storyTopics = <CuratedTopic>[
         'Jesus is touched by and heals a woman who had bled for twelve '
         'years.',
     refs: [CuratedTopicRef('Mark', 5, 21, 43)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS TWO BLIND MEN',
+    category: 'story',
+    description:
+        'Two blind men follow Jesus into a house begging for '
+        'mercy, and he heals them, saying, "According to your faith be it '
+        'done to you."',
+    refs: [CuratedTopicRef('Matthew', 9, 27, 31)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS A BLIND AND MUTE DEMONIAC',
+    category: 'story',
+    description:
+        'Jesus heals a man who was blind and mute because of a '
+        'demon; when the crowds wonder if he is the Son of David, the '
+        'Pharisees accuse him of casting out demons by Beelzebul.',
+    refs: [CuratedTopicRef('Matthew', 12, 22, 28)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE SOWER',
@@ -1591,6 +1690,24 @@ const _storyTopics = <CuratedTopic>[
         'Martha busies herself serving while her sister Mary sits '
         'at Jesus\' feet, and Jesus commends Mary\'s choice.',
     refs: [CuratedTopicRef('Luke', 10, 38, 42)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS A CRIPPLED WOMAN ON THE SABBATH',
+    category: 'story',
+    description:
+        'Jesus heals a woman bent double for eighteen years, '
+        'calling her "a daughter of Abraham" whom Satan had bound, over '
+        'a synagogue leader\'s objection that it was the Sabbath.',
+    refs: [CuratedTopicRef('Luke', 13, 10, 17)],
+  ),
+  CuratedTopic(
+    name: 'JESUS HEALS A MAN WITH DROPSY',
+    category: 'story',
+    description:
+        'At a Pharisee\'s Sabbath dinner, Jesus heals a man '
+        'suffering from dropsy and silences his host\'s legalism with a '
+        'question: "Which of you... will not immediately pull him out?"',
+    refs: [CuratedTopicRef('Luke', 14, 1, 6)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE LOST SHEEP',
@@ -1618,6 +1735,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 16, 19, 31)],
   ),
   CuratedTopic(
+    name: 'JESUS CLEANSES TEN LEPERS',
+    category: 'story',
+    description:
+        'Jesus heals ten lepers at once, but only one — a '
+        'Samaritan — returns to give thanks, prompting Jesus to ask, '
+        '"Where are the nine?"',
+    refs: [CuratedTopicRef('Luke', 17, 11, 19)],
+  ),
+  CuratedTopic(
     name: 'THE PHARISEE AND THE TAX COLLECTOR',
     category: 'story',
     description:
@@ -1633,6 +1759,15 @@ const _storyTopics = <CuratedTopic>[
         'A wealthy young man walks away sorrowful when Jesus '
         'tells him to sell all he has and follow him.',
     refs: [CuratedTopicRef('Matthew', 19, 16, 30)],
+  ),
+  CuratedTopic(
+    name: 'BLIND BARTIMAEUS RECEIVES HIS SIGHT',
+    category: 'story',
+    description:
+        'Blind beggar Bartimaeus cries out to "Jesus, Son of '
+        'David" outside Jericho despite the crowd\'s rebukes, and Jesus '
+        'restores his sight for his persistent faith.',
+    refs: [CuratedTopicRef('Mark', 10, 46, 52)],
   ),
   CuratedTopic(
     name: 'ZACCHAEUS',
@@ -1686,6 +1821,15 @@ const _storyTopics = <CuratedTopic>[
         'the temple courts, declaring, "My house shall be called a house '
         'of prayer, but you have made it a den of robbers."',
     refs: [CuratedTopicRef('Matthew', 21, 12, 17)],
+  ),
+  CuratedTopic(
+    name: 'JESUS CURSES THE FIG TREE',
+    category: 'story',
+    description:
+        'Jesus curses a fruitless fig tree, and it withers to '
+        'its roots overnight — a sign to his astonished disciples about '
+        'faith that does not doubt.',
+    refs: [CuratedTopicRef('Matthew', 21, 18, 22)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE TEN VIRGINS',
@@ -1751,6 +1895,15 @@ const _storyTopics = <CuratedTopic>[
       CuratedTopicRef('Matthew', 26, 14, 16),
       CuratedTopicRef('Matthew', 26, 47, 50),
     ],
+  ),
+  CuratedTopic(
+    name: "JESUS HEALS MALCHUS'S EAR",
+    category: 'story',
+    description:
+        "As Peter draws his sword against the arresting party, "
+        'cutting off the high priest\'s servant\'s ear, Jesus performs his '
+        'last miracle before the cross by healing it.',
+    refs: [CuratedTopicRef('Luke', 22, 50, 51)],
   ),
   CuratedTopic(
     name: "PETER'S DENIAL",
