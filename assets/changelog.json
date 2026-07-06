@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.7.6+2",
+    "date": "2026-07-06",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "vastly expand the curated Bible stories library with hundreds of new entries",
+        "description": "Complete coverage of Jesus's miracles, parables, sermons, and each of the Twelve Apostles, plus the major and minor prophets, Job, the visions of Revelation, women of the Bible, Moses and the ten plagues, and Abraham, Samson, and David.",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "fill in dozens of remaining story gaps across the whole Bible",
+        "description": "From Genesis to Acts, including well-known passages like the Lord's Prayer and the Garden of Eden that weren't previously searchable on their own.",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.6+1",
     "date": "2026-07-06",
     "features": [
