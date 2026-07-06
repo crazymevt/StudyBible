@@ -1614,6 +1614,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Hosea', 1), CuratedTopicRef('Hosea', 3)],
   ),
   CuratedTopic(
+    name: 'AMOS CONFRONTS AMAZIAH AT BETHEL',
+    category: 'story',
+    description:
+        'When Amos prophesies judgment at Bethel, the priest '
+        'Amaziah orders him to flee back to Judah; Amos answers that he '
+        'was no professional prophet but a shepherd whom the LORD took '
+        'and sent.',
+    refs: [CuratedTopicRef('Amos', 7, 10, 17)],
+  ),
+  CuratedTopic(
     name: 'JONAH AND THE GREAT FISH',
     category: 'story',
     description:
@@ -1630,6 +1640,58 @@ const _storyTopics = <CuratedTopic>[
         'judgment, but Jonah sulks over God\'s mercy until a withered '
         'plant teaches him a lesson in compassion.',
     refs: [CuratedTopicRef('Jonah', 3), CuratedTopicRef('Jonah', 4)],
+  ),
+  CuratedTopic(
+    name: 'MICAH\'S COURTROOM: "WHAT DOES THE LORD REQUIRE?"',
+    category: 'story',
+    description:
+        'The LORD brings a covenant lawsuit against Israel, '
+        'recounting his saving acts, until Micah answers what is '
+        'required: "to do justice, and to love kindness, and to walk '
+        'humbly with your God."',
+    refs: [CuratedTopicRef('Micah', 6, 1, 8)],
+  ),
+  CuratedTopic(
+    name: "HABAKKUK'S COMPLAINT AND THE LORD'S ANSWER",
+    category: 'story',
+    description:
+        'Habakkuk complains to God about violence and injustice '
+        'going unanswered; God replies that the Babylonians are coming '
+        'as judgment, and tells the prophet to wait at his watchpost, '
+        'for "the righteous shall live by his faith."',
+    refs: [
+      CuratedTopicRef('Habakkuk', 1),
+      CuratedTopicRef('Habakkuk', 2, 1, 4),
+    ],
+  ),
+  CuratedTopic(
+    name: 'HAGGAI STIRS THE PEOPLE TO REBUILD THE TEMPLE',
+    category: 'story',
+    description:
+        "While the people excuse their neglect of God's house by "
+        "building their own paneled houses, Haggai's rebuke stirs "
+        'Zerubbabel, Joshua, and the remnant to resume work on the '
+        'temple.',
+    refs: [CuratedTopicRef('Haggai', 1)],
+  ),
+  CuratedTopic(
+    name: 'THE CLEANSING OF JOSHUA THE HIGH PRIEST',
+    category: 'story',
+    description:
+        'In a vision, Zechariah sees Satan accusing the high '
+        'priest Joshua as he stands in filthy garments; the LORD rebukes '
+        'Satan and has Joshua reclothed in clean garments as a sign of '
+        'forgiveness.',
+    refs: [CuratedTopicRef('Zechariah', 3)],
+  ),
+  CuratedTopic(
+    name: "ZECHARIAH'S VISION OF THE LAMPSTAND",
+    category: 'story',
+    description:
+        'Zechariah sees a golden lampstand fed by two olive '
+        'trees, and is told Zerubbabel will finish the temple "not by '
+        'might, nor by power, but by my Spirit."',
+    refs: [CuratedTopicRef('Zechariah', 4)],
   ),
 
   // --- Gospels ---
