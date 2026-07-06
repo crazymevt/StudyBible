@@ -24,6 +24,7 @@ enum ActiveTool {
   highlights,
   scratch,
   harmony,
+  feasts,
 }
 
 class ActiveToolNotifier extends Notifier<ActiveTool> {

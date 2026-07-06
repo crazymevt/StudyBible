@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app/feast_providers.dart';
 import '../../app/journal_providers.dart';
+import '../../domain/feasts/feast.dart';
 import '../../app/revision_common.dart';
 import '../../app/user_providers.dart';
 import '../../data/export/document_pdf.dart';
@@ -304,6 +306,34 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
     }
   }
 
+  Widget _buildFeastBanner(
+    BuildContext context,
+    List<(Feast, FeastOccurrence)> feastsToday,
+  ) {
+    final scheme = Theme.of(context).colorScheme;
+    final selectedDate = ref.read(selectedJournalDateProvider);
+    final today = DateTime.now();
+    final isToday = selectedDate.year == today.year &&
+        selectedDate.month == today.month &&
+        selectedDate.day == today.day;
+    final names = feastsToday.map((f) => f.$1.name).join(', ');
+    return MaterialBanner(
+      backgroundColor: scheme.secondaryContainer,
+      leading: Icon(Icons.event, color: scheme.onSecondaryContainer),
+      content: Text(
+        isToday ? 'Today is $names.' : 'This day is $names.',
+        style: TextStyle(color: scheme.onSecondaryContainer),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () =>
+              ref.read(showFeastOnJournalProvider.notifier).setEnabled(false),
+          child: const Text('Hide'),
+        ),
+      ],
+    );
+  }
+
   Widget _buildConflictBanner(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return MaterialBanner(
@@ -354,10 +384,16 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
     }
 
     final controller = _controller;
+    final selectedDate = ref.watch(selectedJournalDateProvider);
+    final showFeast = ref.watch(showFeastOnJournalProvider);
+    final feastsToday = showFeast
+        ? ref.watch(feastsOnDateProvider(selectedDate))
+        : const <(Feast, FeastOccurrence)>[];
 
     return Column(
       children: [
         if (_conflictDetected) _buildConflictBanner(context),
+        if (feastsToday.isNotEmpty) _buildFeastBanner(context, feastsToday),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(

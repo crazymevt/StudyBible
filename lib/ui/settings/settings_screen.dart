@@ -9,6 +9,7 @@ import '../../app/shared_prefs.dart';
 import '../../domain/scripture/verse_share_format.dart';
 import '../../app/sync_service.dart';
 import '../../app/dashboard_providers.dart';
+import '../../app/feast_providers.dart';
 import '../../data/logging.dart';
 import '../../theme/app_themes.dart';
 import 'package:file_selector/file_selector.dart';
@@ -264,6 +265,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 8),
+          SwitchListTile(
+            title: const Text('Show Feast Days on Journal Entries'),
+            subtitle: const Text(
+              "Note when a biblical feast falls on a journal entry's day",
+            ),
+            value: ref.watch(showFeastOnJournalProvider),
+            onChanged: (val) =>
+                ref.read(showFeastOnJournalProvider.notifier).setEnabled(val),
+          ),
           ListTile(
             title: const Text("What's New"),
             subtitle: const Text('View the latest features and updates'),

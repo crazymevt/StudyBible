@@ -17,6 +17,7 @@ import 'places_panel.dart';
 import 'people_panel.dart';
 import 'highlights_panel.dart';
 import 'scratch_panel.dart';
+import 'feasts_panel.dart';
 import '../common/tool_groups.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
@@ -77,6 +78,8 @@ class MobileToolsDrawer extends ConsumerWidget {
         return const HighlightsPanel();
       case ActiveTool.scratch:
         return const ScratchPanel();
+      case ActiveTool.feasts:
+        return const FeastsPanel();
       case ActiveTool.compare:
       case ActiveTool.history:
       case ActiveTool.none:

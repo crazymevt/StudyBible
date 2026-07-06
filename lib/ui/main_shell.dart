@@ -16,6 +16,7 @@ import 'reader/devotionals_panel.dart';
 import 'reader/topics_panel.dart';
 import 'reader/harmony_panel.dart';
 import 'reader/places_panel.dart';
+import 'reader/feasts_panel.dart';
 import 'reader/people_panel.dart';
 import 'reader/highlights_panel.dart';
 import 'reader/scratch_panel.dart';
@@ -334,6 +335,9 @@ class _DesktopLayout extends ConsumerWidget {
                   }
                   if (activeTool == ActiveTool.scratch) {
                     return const ScratchPanel();
+                  }
+                  if (activeTool == ActiveTool.feasts) {
+                    return const FeastsPanel();
                   }
                   return const SizedBox.shrink();
                 },
