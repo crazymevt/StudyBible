@@ -30,9 +30,11 @@ class SermonExporter {
       // Printing always produces a single combined PDF — the chosen export
       // format and the multi-sermon zip path don't apply to a print job.
       if (action == ExportAction.print) {
-        final bytes = await _generatePdf(sermons);
         final name = sermons.length == 1 ? sermons.first.title : 'Sermons';
-        await PrintService.printPdf(bytes, documentName: name);
+        await PrintService.printPdf(
+          (format) => _generatePdf(sermons, pageFormat: format),
+          documentName: name,
+        );
         return;
       }
 
@@ -177,7 +179,10 @@ class SermonExporter {
     return Uint8List.fromList(ZipEncoder().encode(archive));
   }
 
-  static Future<Uint8List> _generatePdf(List<Sermon> sermons) async {
+  static Future<Uint8List> _generatePdf(
+    List<Sermon> sermons, {
+    PdfPageFormat pageFormat = PdfPageFormat.letter,
+  }) async {
     final pdf = pw.Document(theme: await loadPdfTheme());
 
     for (final sermon in sermons) {
@@ -197,7 +202,7 @@ class SermonExporter {
 
       pdf.addPage(
         pw.MultiPage(
-          pageFormat: PdfPageFormat.letter,
+          pageFormat: pageFormat,
           build: (pw.Context context) => [
             pw.Text(sermon.title, style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
             if (sermon.series != null && sermon.series!.isNotEmpty) ...[

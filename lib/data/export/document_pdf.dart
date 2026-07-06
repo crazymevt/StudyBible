@@ -50,11 +50,12 @@ class PdfDocSection {
 Future<Uint8List> buildPlainTextPdf({
   required String title,
   required List<PdfDocSection> sections,
+  PdfPageFormat pageFormat = PdfPageFormat.letter,
 }) async {
   final pdf = pw.Document(theme: await loadPdfTheme());
   pdf.addPage(
     pw.MultiPage(
-      pageFormat: PdfPageFormat.letter,
+      pageFormat: pageFormat,
       build: (context) => [
         pw.Text(
           title,
@@ -96,8 +97,10 @@ Future<void> printPlainTextDocument({
   required String title,
   required List<PdfDocSection> sections,
 }) async {
-  final bytes = await buildPlainTextPdf(title: title, sections: sections);
-  await PrintService.printPdf(bytes, documentName: title);
+  await PrintService.printPdf(
+    (format) => buildPlainTextPdf(title: title, sections: sections, pageFormat: format),
+    documentName: title,
+  );
 }
 
 // ---------------------------------------------------------------------------

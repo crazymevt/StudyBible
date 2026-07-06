@@ -36,9 +36,8 @@ class NotebookExporter {
 
     try {
       if (action == ExportAction.print) {
-        final bytes = await _generatePdf(notebook, pages);
         await PrintService.printPdf(
-          bytes,
+          (format) => _generatePdf(notebook, pages, pageFormat: format),
           documentName: notebook.title.isEmpty ? 'Notebook' : notebook.title,
         );
         return;
@@ -146,8 +145,9 @@ class NotebookExporter {
 
   static Future<Uint8List> _generatePdf(
     Notebook notebook,
-    List<NotebookPage> pages,
-  ) async {
+    List<NotebookPage> pages, {
+    PdfPageFormat pageFormat = PdfPageFormat.letter,
+  }) async {
     final pdf = pw.Document(theme: await loadPdfTheme());
     for (final page in pages) {
       List<pw.Widget> body;
@@ -164,7 +164,7 @@ class NotebookExporter {
       }
       pdf.addPage(
         pw.MultiPage(
-          pageFormat: PdfPageFormat.letter,
+          pageFormat: pageFormat,
           build: (context) => [
             pw.Text(
               page.title.isEmpty ? 'Untitled Page' : page.title,
