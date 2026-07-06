@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.6+3",
+    "date": "2026-07-06",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "index the topics table to speed up Explorer loads",
+        "description": "The curated-story library recently grew a lot, and the topics table had no index, so every Explorer load was scanning it in full to keep the new entries in sync.",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.7.6+2",
     "date": "2026-07-06",
     "features": [

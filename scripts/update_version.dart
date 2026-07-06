@@ -89,15 +89,23 @@ const int buildNumber = $buildNumber;
     String title = c;
     
     final lowerC = c.toLowerCase();
-    if (lowerC.startsWith('feat:') || lowerC.startsWith('feat ')) {
+    if (lowerC.startsWith('feat:') ||
+        lowerC.startsWith('feat ') ||
+        lowerC.startsWith('feature:') ||
+        lowerC.startsWith('feature ')) {
       category = 'New Features';
       icon = 'star';
       title = c.substring(c.indexOf(':') + 1).trim();
-    } else if (lowerC.startsWith('fix:') || lowerC.startsWith('fix ')) {
+    } else if (lowerC.startsWith('fix:') ||
+        lowerC.startsWith('fix ') ||
+        lowerC.startsWith('bug:') ||
+        lowerC.startsWith('bug ')) {
       category = 'Bugfixes';
       icon = 'bug_report';
       title = c.substring(c.indexOf(':') + 1).trim();
-    } else if (lowerC.startsWith('update:') || lowerC.startsWith('refactor:')) {
+    } else if (lowerC.startsWith('update:') ||
+        lowerC.startsWith('refactor:') ||
+        lowerC.startsWith('perf:')) {
       category = 'Updates';
       icon = 'update';
       title = c.substring(c.indexOf(':') + 1).trim();
