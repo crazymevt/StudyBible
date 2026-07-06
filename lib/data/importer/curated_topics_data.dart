@@ -256,6 +256,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 3, 13, 17)],
   ),
   CuratedTopic(
+    name: 'THE SERMON AT NAZARETH',
+    category: 'story',
+    description:
+        'In his hometown synagogue, Jesus reads from Isaiah and '
+        'declares, "Today this Scripture is fulfilled in your hearing" — '
+        'and the crowd tries to throw him off a cliff for it.',
+    refs: [CuratedTopicRef('Luke', 4, 16, 30)],
+  ),
+  CuratedTopic(
     name: 'THE SERMON ON THE MOUNT',
     category: 'story',
     description:
@@ -1511,6 +1520,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Mark', 3, 1, 6)],
   ),
   CuratedTopic(
+    name: 'THE SERMON ON THE PLAIN',
+    category: 'story',
+    description:
+        'After choosing his twelve apostles, Jesus teaches a '
+        'crowd on a level place — blessings and woes, love for enemies, '
+        'and not judging others — in Luke\'s counterpart to the Sermon on '
+        'the Mount.',
+    refs: [CuratedTopicRef('Luke', 6, 17, 49)],
+  ),
+  CuratedTopic(
     name: 'THE WEDDING AT CANA',
     category: 'story',
     description:
@@ -1607,6 +1626,15 @@ const _storyTopics = <CuratedTopic>[
     ],
   ),
   CuratedTopic(
+    name: 'THE BREAD OF LIFE DISCOURSE',
+    category: 'story',
+    description:
+        'The day after feeding the five thousand, Jesus declares '
+        'in the Capernaum synagogue, "I am the bread of life," and many '
+        'disciples turn back, unable to accept the hard teaching.',
+    refs: [CuratedTopicRef('John', 6, 22, 59)],
+  ),
+  CuratedTopic(
     name: "THE SYROPHOENICIAN WOMAN'S FAITH",
     category: 'story',
     description:
@@ -1686,6 +1714,16 @@ const _storyTopics = <CuratedTopic>[
         'mercy, and he heals them, saying, "According to your faith be it '
         'done to you."',
     refs: [CuratedTopicRef('Matthew', 9, 27, 31)],
+  ),
+  CuratedTopic(
+    name: 'THE COMMISSIONING OF THE TWELVE',
+    category: 'story',
+    description:
+        'Seeing the crowds like sheep without a shepherd, Jesus '
+        'sends out his twelve disciples with authority to heal and cast '
+        'out demons, warning them they go out "as sheep in the midst of '
+        'wolves."',
+    refs: [CuratedTopicRef('Matthew', 10)],
   ),
   CuratedTopic(
     name: 'JESUS HEALS A BLIND AND MUTE DEMONIAC',
@@ -2036,6 +2074,24 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 22, 1, 14)],
   ),
   CuratedTopic(
+    name: 'THE SEVEN WOES TO THE PHARISEES',
+    category: 'story',
+    description:
+        'Jesus denounces the scribes and Pharisees in the temple '
+        'courts — "Woe to you... hypocrites!" — for their hollow, '
+        'showy religion, and laments over Jerusalem.',
+    refs: [CuratedTopicRef('Matthew', 23)],
+  ),
+  CuratedTopic(
+    name: 'THE OLIVET DISCOURSE',
+    category: 'story',
+    description:
+        'On the Mount of Olives, Jesus foretells the destruction '
+        'of the temple, wars and rumors of wars, and his own return, '
+        'teaching that "of that day and hour no one knows."',
+    refs: [CuratedTopicRef('Matthew', 24, 1, 44)],
+  ),
+  CuratedTopic(
     name: 'THE PARABLE OF THE FAITHFUL AND WISE SERVANT',
     category: 'story',
     description:
@@ -2096,6 +2152,19 @@ const _storyTopics = <CuratedTopic>[
         'vine, you are the branches," urging them to remain in him so '
         'they can bear fruit.',
     refs: [CuratedTopicRef('John', 15, 1, 8)],
+  ),
+  CuratedTopic(
+    name: 'THE UPPER ROOM DISCOURSE AND THE HIGH PRIESTLY PRAYER',
+    category: 'story',
+    description:
+        'Jesus comforts his disciples before his death — "Let '
+        'not your hearts be troubled" — promises the Holy Spirit, and '
+        'prays for them and all future believers.',
+    refs: [
+      CuratedTopicRef('John', 14),
+      CuratedTopicRef('John', 16),
+      CuratedTopicRef('John', 17),
+    ],
   ),
   CuratedTopic(
     name: 'JESUS PRAYS IN GETHSEMANE',
