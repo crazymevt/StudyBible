@@ -629,8 +629,6 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     if (widget.isFullScreen) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           title: const Text('Edit Sermon'),
           // Phones can't fit the full action row, so they keep the two
           // hands-on actions (presentation, scripture navigation) as icons and

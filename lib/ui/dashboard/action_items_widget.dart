@@ -21,8 +21,6 @@ class DashboardActionItemsWidget extends ConsumerWidget {
     const double listHeight = itemHeight * 5;
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

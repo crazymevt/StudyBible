@@ -9,8 +9,6 @@ class AcknowledgmentsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Acknowledgments'),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8.0),

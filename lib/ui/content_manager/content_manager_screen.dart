@@ -154,8 +154,6 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         centerTitle: true,
         title: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),

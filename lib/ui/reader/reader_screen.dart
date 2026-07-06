@@ -541,8 +541,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       child: Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           centerTitle: true,
           // Explicit drawer button (mirrors Scaffold's auto leading) so the
           // tutorial can spotlight it for the Journals and Content steps.

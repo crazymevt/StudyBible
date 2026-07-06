@@ -74,8 +74,6 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen>
       return Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           centerTitle: true,
           title: const SearchTitleBar(),
           actions: const [SyncButton()],
@@ -121,8 +119,6 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen>
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         centerTitle: true,
         title: const SearchTitleBar(),
         actions: const [SyncButton()],
@@ -156,9 +152,8 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen>
     return Card(
       margin: const EdgeInsets.all(8),
       clipBehavior: Clip.antiAlias,
-      elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         side: BorderSide(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
@@ -208,9 +203,8 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen>
     return Card(
       margin: const EdgeInsets.all(8),
       clipBehavior: Clip.antiAlias,
-      elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         side: BorderSide(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),

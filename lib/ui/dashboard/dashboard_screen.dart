@@ -41,8 +41,6 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         centerTitle: true,
         title: const SearchTitleBar(),
         actions: [
@@ -320,10 +318,8 @@ class DashboardScreen extends ConsumerWidget {
     int biblesCompleted,
   ) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         onTap: () {
           showDialog(
             context: context,
@@ -433,10 +429,8 @@ class DashboardScreen extends ConsumerWidget {
     final yearAgoMins = (timeData['yearAgoMs'] ?? 0) ~/ 60000;
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         onTap: () {
           final trackers = ref.read(timeTrackerProvider).value ?? [];
           showDialog(
@@ -514,11 +508,9 @@ class DashboardScreen extends ConsumerWidget {
     Color color,
   ) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           gradient: LinearGradient(
             colors: [color.withAlpha(20), color.withAlpha(5)],
             begin: Alignment.topLeft,
@@ -569,10 +561,8 @@ class DashboardScreen extends ConsumerWidget {
     AsyncValue achievementsAsync,
   ) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         onTap: () {
           achievementsAsync.whenData((unlockedList) {
             showDialog(
@@ -708,8 +698,6 @@ class DashboardScreen extends ConsumerWidget {
     final activePlansAsync = ref.watch(activeReadingPlansProvider);
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -846,10 +834,8 @@ extension on DashboardScreen {
     final verse = versesOfTheDay[dayOfYear % versesOfTheDay.length];
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         onTap: () {
           final reference = verse.reference;
           final lastSpaceIdx = reference.lastIndexOf(' ');
@@ -888,7 +874,7 @@ extension on DashboardScreen {
         },
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
               colors: [
                 Theme.of(context).colorScheme.primary.withAlpha(40),

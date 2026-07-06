@@ -172,6 +172,30 @@ class AppThemes {
       colorScheme: colorScheme,
       useMaterial3: true,
       textTheme: textTheme,
+      // Flat tonal surfaces with hairline outlines instead of drop shadows;
+      // one shared shape language (12dp cards, 20dp dialogs). Widgets should
+      // not set per-instance elevation/shape/colour unless they genuinely
+      // float above content (menus, overlays, the verse action bar).
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: colorScheme.outlineVariant),
+        ),
+      ),
+      // App bars keep the tinted primary-container look on every scheme (a
+      // white surface bar disappears into the page in light mode); the custom
+      // scheme's user-picked app-bar colour flows in via primaryContainer.
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 0,
+        scrolledUnderElevation: 3,
+      ),
+      dialogTheme: DialogThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
       // A consistent fade-through page transition on every platform, so pushing
       // screens (settings, sermons, journals, reading-plan generator) animates
       // the same way everywhere instead of defaulting to each OS's stock route

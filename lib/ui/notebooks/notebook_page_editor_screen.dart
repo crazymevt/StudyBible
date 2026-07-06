@@ -512,8 +512,6 @@ class _NotebookPageEditorScreenState
     if (widget.isFullScreen) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           title: const Text('Edit Page'),
           actions: [
             IconButton(
