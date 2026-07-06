@@ -410,6 +410,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Acts', 2, 1, 13)],
   ),
   CuratedTopic(
+    name: "PETER'S SERMON AT PENTECOST",
+    category: 'story',
+    description:
+        'Peter preaches to the gathered crowd that the risen '
+        'Jesus is Lord and Christ; cut to the heart, three thousand '
+        'repent and are baptized that day.',
+    refs: [CuratedTopicRef('Acts', 2, 14, 41)],
+  ),
+  CuratedTopic(
     name: 'PETER HEALS THE LAME MAN AT THE TEMPLE',
     category: 'story',
     description:
@@ -425,6 +434,15 @@ const _storyTopics = <CuratedTopic>[
         'the road to Damascus; Ananias restores his sight and he is '
         'baptized.',
     refs: [CuratedTopicRef('Acts', 9, 1, 19)],
+  ),
+  CuratedTopic(
+    name: 'SAUL ESCAPES DAMASCUS IN A BASKET',
+    category: 'story',
+    description:
+        'When the Jews in Damascus plot to kill him, Saul\'s '
+        'disciples lower him over the city wall by night in a large '
+        'basket.',
+    refs: [CuratedTopicRef('Acts', 9, 23, 25)],
   ),
 
   // --- Genesis ---
@@ -2747,6 +2765,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Acts', 10)],
   ),
   CuratedTopic(
+    name: 'PAUL REBUKES PETER AT ANTIOCH',
+    category: 'story',
+    description:
+        "Paul opposes Peter to his face at Antioch for drawing "
+        "back from eating with Gentile believers out of fear of the "
+        "circumcision party, telling him he is not acting in step with "
+        'the truth of the gospel.',
+    refs: [CuratedTopicRef('Galatians', 2, 11, 14)],
+  ),
+  CuratedTopic(
     name: 'THE MARTYRDOM OF JAMES, SON OF ZEBEDEE',
     category: 'story',
     description:
@@ -2772,6 +2800,25 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Acts', 12, 20, 23)],
   ),
   CuratedTopic(
+    name: 'PAUL AND BARNABAS SENT OUT FROM ANTIOCH',
+    category: 'story',
+    description:
+        'While the church at Antioch worships and fasts, the '
+        'Holy Spirit sets apart Barnabas and Saul for the work of the '
+        'first missionary journey, and the church sends them off with '
+        'the laying on of hands.',
+    refs: [CuratedTopicRef('Acts', 13, 1, 3)],
+  ),
+  CuratedTopic(
+    name: 'ELYMAS THE SORCERER STRUCK BLIND',
+    category: 'story',
+    description:
+        'On Cyprus, the sorcerer Elymas opposes Paul\'s preaching '
+        'to the proconsul; Paul denounces him as a "son of the devil," '
+        'and he is struck blind on the spot.',
+    refs: [CuratedTopicRef('Acts', 13, 6, 12)],
+  ),
+  CuratedTopic(
     name: 'PAUL AND BARNABAS MISTAKEN FOR GODS AT LYSTRA',
     category: 'story',
     description:
@@ -2779,6 +2826,15 @@ const _storyTopics = <CuratedTopic>[
         'Paul and Barnabas as Hermes and Zeus and tries to sacrifice to '
         'them, until the two tear their clothes in protest.',
     refs: [CuratedTopicRef('Acts', 14, 8, 18)],
+  ),
+  CuratedTopic(
+    name: 'PAUL STONED AT LYSTRA',
+    category: 'story',
+    description:
+        'The same crowd at Lystra is turned against Paul, stones '
+        'him, and drags him out of the city supposing him dead; he gets '
+        'up and walks back in.',
+    refs: [CuratedTopicRef('Acts', 14, 19, 20)],
   ),
   CuratedTopic(
     name: 'THE JERUSALEM COUNCIL',
@@ -2789,12 +2845,49 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Acts', 15)],
   ),
   CuratedTopic(
+    name: 'PAUL AND BARNABAS PART WAYS OVER JOHN MARK',
+    category: 'story',
+    description:
+        'Preparing for a second journey, Paul and Barnabas have '
+        'a sharp disagreement over whether to take John Mark, who had '
+        'deserted them before, and separate — Barnabas sailing with Mark, '
+        'Paul setting out with Silas.',
+    refs: [CuratedTopicRef('Acts', 15, 36, 41)],
+  ),
+  CuratedTopic(
+    name: 'THE MACEDONIAN CALL',
+    category: 'story',
+    description:
+        'Forbidden by the Spirit to preach in Asia, Paul sees a '
+        'vision of a man of Macedonia pleading, "Come over... and help '
+        'us," and the missionary band sets sail for Europe.',
+    refs: [CuratedTopicRef('Acts', 16, 6, 10)],
+  ),
+  CuratedTopic(
+    name: "LYDIA'S CONVERSION AT PHILIPPI",
+    category: 'story',
+    description:
+        'At a riverside prayer meeting outside Philippi, the '
+        "LORD opens the heart of Lydia, a seller of purple goods, and she "
+        'and her household are baptized.',
+    refs: [CuratedTopicRef('Acts', 16, 11, 15)],
+  ),
+  CuratedTopic(
     name: 'PAUL AND SILAS IN PRISON AT PHILIPPI',
     category: 'story',
     description:
         'An earthquake breaks open the prison doors after Paul '
         'and Silas sing hymns at midnight, and their jailer is converted.',
     refs: [CuratedTopicRef('Acts', 16, 16, 34)],
+  ),
+  CuratedTopic(
+    name: 'PAUL AT THESSALONICA AND BEREA',
+    category: 'story',
+    description:
+        'Paul reasons from the Scriptures in the Thessalonian '
+        'synagogue, then moves on to Berea, whose people are commended '
+        'for examining the Scriptures daily to see if his teaching was so.',
+    refs: [CuratedTopicRef('Acts', 17, 1, 15)],
   ),
   CuratedTopic(
     name: 'PAUL AT THE AREOPAGUS',
@@ -2804,6 +2897,15 @@ const _storyTopics = <CuratedTopic>[
         'Areopagus, proclaiming the "unknown god" they already worship in '
         'ignorance.',
     refs: [CuratedTopicRef('Acts', 17, 16, 34)],
+  ),
+  CuratedTopic(
+    name: 'PAUL IN CORINTH: AQUILA, PRISCILLA, AND GALLIO',
+    category: 'story',
+    description:
+        'Paul settles in Corinth with the tentmakers Aquila and '
+        'Priscilla, and when the Jews bring him before the proconsul '
+        'Gallio, Gallio dismisses the case as an internal Jewish dispute.',
+    refs: [CuratedTopicRef('Acts', 18, 1, 17)],
   ),
   CuratedTopic(
     name: 'THE SONS OF SCEVA',
@@ -2833,6 +2935,63 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Acts', 20, 7, 12)],
   ),
   CuratedTopic(
+    name: "PAUL'S FAREWELL TO THE EPHESIAN ELDERS",
+    category: 'story',
+    description:
+        'Meeting the Ephesian elders at Miletus, Paul warns that '
+        'fierce wolves will come in among them and commends them to God, '
+        'recalling the Lord Jesus\' words: "It is more blessed to give '
+        'than to receive."',
+    refs: [CuratedTopicRef('Acts', 20, 17, 38)],
+  ),
+  CuratedTopic(
+    name: 'PAUL ARRESTED IN THE TEMPLE',
+    category: 'story',
+    description:
+        'A mob drags Paul from the temple and beats him, '
+        'supposing he had defiled it by bringing in a Gentile; a Roman '
+        'commander rescues him from the riot by arresting him.',
+    refs: [CuratedTopicRef('Acts', 21, 27, 36)],
+  ),
+  CuratedTopic(
+    name: "PAUL'S DEFENSE BEFORE THE JERUSALEM CROWD",
+    category: 'story',
+    description:
+        'From the barracks steps, Paul addresses the hostile '
+        'crowd in Hebrew, recounting his conversion on the Damascus '
+        'road, until they cry out for his death at the mention of the '
+        'Gentiles.',
+    refs: [CuratedTopicRef('Acts', 22, 1, 21)],
+  ),
+  CuratedTopic(
+    name: 'PAUL BEFORE THE SANHEDRIN',
+    category: 'story',
+    description:
+        'Paul declares himself on trial over the resurrection of '
+        'the dead, splitting the council between Pharisees and Sadducees '
+        'until the dispute turns violent and he must be rescued.',
+    refs: [CuratedTopicRef('Acts', 23, 1, 10)],
+  ),
+  CuratedTopic(
+    name: 'THE PLOT TO KILL PAUL',
+    category: 'story',
+    description:
+        "More than forty men bind themselves by an oath to kill "
+        "Paul, but his nephew overhears the plot and warns the Roman "
+        'commander, who has Paul escorted to Caesarea by night.',
+    refs: [CuratedTopicRef('Acts', 23, 12, 24)],
+  ),
+  CuratedTopic(
+    name: 'PAUL BEFORE FELIX',
+    category: 'story',
+    description:
+        'Paul defends himself before Governor Felix, who leaves '
+        'him in custody for two years hoping for a bribe, though he '
+        'trembles when Paul reasons about righteousness and judgment to '
+        'come.',
+    refs: [CuratedTopicRef('Acts', 24)],
+  ),
+  CuratedTopic(
     name: "PAUL BEFORE FESTUS AND AGRIPPA",
     category: 'story',
     description:
@@ -2849,6 +3008,37 @@ const _storyTopics = <CuratedTopic>[
         'and everyone aboard reaches shore safely on Malta as he had '
         'promised.',
     refs: [CuratedTopicRef('Acts', 27, 13, 44)],
+  ),
+  CuratedTopic(
+    name: 'PAUL BITTEN BY A VIPER ON MALTA',
+    category: 'story',
+    description:
+        'Shipwrecked on Malta, Paul is bitten by a viper while '
+        'gathering firewood; when he shakes it off unharmed, the '
+        'islanders decide he must be a god.',
+    refs: [CuratedTopicRef('Acts', 28, 1, 6)],
+  ),
+  CuratedTopic(
+    name: "PAUL'S TWO YEARS UNDER HOUSE ARREST IN ROME",
+    category: 'story',
+    description:
+        'Awaiting trial in Rome, Paul lives at his own expense '
+        'under guard for two years, welcoming all who came to him and '
+        'proclaiming the kingdom of God "with all boldness and without '
+        'hindrance."',
+    refs: [CuratedTopicRef('Acts', 28, 16, 31)],
+  ),
+
+  // --- Revelation ---
+  CuratedTopic(
+    name: "JOHN'S VISION ON PATMOS",
+    category: 'story',
+    description:
+        'Exiled on the island of Patmos, John sees the risen '
+        'Christ walking among seven golden lampstands and falls at his '
+        'feet as though dead, before being commissioned to write what he '
+        'has seen.',
+    refs: [CuratedTopicRef('Revelation', 1, 9, 19)],
   ),
 ];
 
