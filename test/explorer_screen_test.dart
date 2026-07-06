@@ -460,6 +460,10 @@ void main() {
         peopleReadyProvider.overrideWith((ref) async => true),
         placesReadyProvider.overrideWith((ref) async => true),
         topicalIndexReadyProvider.overrideWith((ref) async => true),
+        // Skips the real CuratedTopicsImporter, which would otherwise insert
+        // every curated feast/story into this test's minimal seeded store
+        // and throw off the "N topics" stat chip below.
+        curatedTopicsReadyProvider.overrideWith((ref) async => true),
         // recordHistory reads this; the real one touches the filesystem.
         deviceIdProvider.overrideWith((ref) async => 'test-device'),
       ],

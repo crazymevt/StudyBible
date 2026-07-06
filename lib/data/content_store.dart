@@ -42,7 +42,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration {
@@ -258,8 +258,24 @@ class ContentStore extends _$ContentStore {
             }
           }
         }
+        if (from < 15) {
+          await _ensureTopicCategoryColumn(m);
+        }
       },
     );
+  }
+
+  /// Idempotently adds the topics.category column (CuratedTopicsImporter's
+  /// 'feast'/'story' tag, null for Nave's own entries). Guarded because ALTER
+  /// TABLE ADD COLUMN auto-commits, so a rolled-back v15 migration retry must
+  /// not re-throw "duplicate column name" and wedge the upgrade.
+  Future<void> _ensureTopicCategoryColumn(Migrator m) async {
+    final hasColumn = await customSelect(
+      "SELECT 1 FROM pragma_table_info('topics') WHERE name = 'category'",
+    ).get();
+    if (hasColumn.isEmpty) {
+      await m.addColumn(topics, topics.category);
+    }
   }
 
   /// Creates [entity] (a table, index, view, …) only if it isn't already

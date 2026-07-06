@@ -4136,8 +4136,19 @@ class $TopicsTable extends Topics with TableInfo<$TopicsTable, Topic> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, section];
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, section, category];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4169,6 +4180,12 @@ class $TopicsTable extends Topics with TableInfo<$TopicsTable, Topic> {
     } else if (isInserting) {
       context.missing(_sectionMeta);
     }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
     return context;
   }
 
@@ -4190,6 +4207,10 @@ class $TopicsTable extends Topics with TableInfo<$TopicsTable, Topic> {
         DriftSqlType.string,
         data['${effectivePrefix}section'],
       )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      ),
     );
   }
 
@@ -4203,13 +4224,22 @@ class Topic extends DataClass implements Insertable<Topic> {
   final int id;
   final String name;
   final String section;
-  const Topic({required this.id, required this.name, required this.section});
+  final String? category;
+  const Topic({
+    required this.id,
+    required this.name,
+    required this.section,
+    this.category,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
     map['section'] = Variable<String>(section);
+    if (!nullToAbsent || category != null) {
+      map['category'] = Variable<String>(category);
+    }
     return map;
   }
 
@@ -4218,6 +4248,9 @@ class Topic extends DataClass implements Insertable<Topic> {
       id: Value(id),
       name: Value(name),
       section: Value(section),
+      category: category == null && nullToAbsent
+          ? const Value.absent()
+          : Value(category),
     );
   }
 
@@ -4230,6 +4263,7 @@ class Topic extends DataClass implements Insertable<Topic> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       section: serializer.fromJson<String>(json['section']),
+      category: serializer.fromJson<String?>(json['category']),
     );
   }
   @override
@@ -4239,19 +4273,27 @@ class Topic extends DataClass implements Insertable<Topic> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'section': serializer.toJson<String>(section),
+      'category': serializer.toJson<String?>(category),
     };
   }
 
-  Topic copyWith({int? id, String? name, String? section}) => Topic(
+  Topic copyWith({
+    int? id,
+    String? name,
+    String? section,
+    Value<String?> category = const Value.absent(),
+  }) => Topic(
     id: id ?? this.id,
     name: name ?? this.name,
     section: section ?? this.section,
+    category: category.present ? category.value : this.category,
   );
   Topic copyWithCompanion(TopicsCompanion data) {
     return Topic(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       section: data.section.present ? data.section.value : this.section,
+      category: data.category.present ? data.category.value : this.category,
     );
   }
 
@@ -4260,46 +4302,53 @@ class Topic extends DataClass implements Insertable<Topic> {
     return (StringBuffer('Topic(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('section: $section')
+          ..write('section: $section, ')
+          ..write('category: $category')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, section);
+  int get hashCode => Object.hash(id, name, section, category);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Topic &&
           other.id == this.id &&
           other.name == this.name &&
-          other.section == this.section);
+          other.section == this.section &&
+          other.category == this.category);
 }
 
 class TopicsCompanion extends UpdateCompanion<Topic> {
   final Value<int> id;
   final Value<String> name;
   final Value<String> section;
+  final Value<String?> category;
   const TopicsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.section = const Value.absent(),
+    this.category = const Value.absent(),
   });
   TopicsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required String section,
+    this.category = const Value.absent(),
   }) : name = Value(name),
        section = Value(section);
   static Insertable<Topic> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? section,
+    Expression<String>? category,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (section != null) 'section': section,
+      if (category != null) 'category': category,
     });
   }
 
@@ -4307,11 +4356,13 @@ class TopicsCompanion extends UpdateCompanion<Topic> {
     Value<int>? id,
     Value<String>? name,
     Value<String>? section,
+    Value<String?>? category,
   }) {
     return TopicsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       section: section ?? this.section,
+      category: category ?? this.category,
     );
   }
 
@@ -4327,6 +4378,9 @@ class TopicsCompanion extends UpdateCompanion<Topic> {
     if (section.present) {
       map['section'] = Variable<String>(section.value);
     }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
     return map;
   }
 
@@ -4335,7 +4389,8 @@ class TopicsCompanion extends UpdateCompanion<Topic> {
     return (StringBuffer('TopicsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('section: $section')
+          ..write('section: $section, ')
+          ..write('category: $category')
           ..write(')'))
         .toString();
   }
@@ -12361,12 +12416,14 @@ typedef $$TopicsTableCreateCompanionBuilder =
       Value<int> id,
       required String name,
       required String section,
+      Value<String?> category,
     });
 typedef $$TopicsTableUpdateCompanionBuilder =
     TopicsCompanion Function({
       Value<int> id,
       Value<String> name,
       Value<String> section,
+      Value<String?> category,
     });
 
 final class $$TopicsTableReferences
@@ -12433,6 +12490,11 @@ class $$TopicsTableFilterComposer
 
   ColumnFilters<String> get section => $composableBuilder(
     column: $table.section,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12510,6 +12572,11 @@ class $$TopicsTableOrderingComposer
     column: $table.section,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TopicsTableAnnotationComposer
@@ -12529,6 +12596,9 @@ class $$TopicsTableAnnotationComposer
 
   GeneratedColumn<String> get section =>
       $composableBuilder(column: $table.section, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
 
   Expression<T> topicEntriesRefs<T extends Object>(
     Expression<T> Function($$TopicEntriesTableAnnotationComposer a) f,
@@ -12615,14 +12685,25 @@ class $$TopicsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> section = const Value.absent(),
-              }) => TopicsCompanion(id: id, name: name, section: section),
+                Value<String?> category = const Value.absent(),
+              }) => TopicsCompanion(
+                id: id,
+                name: name,
+                section: section,
+                category: category,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
                 required String section,
-              }) =>
-                  TopicsCompanion.insert(id: id, name: name, section: section),
+                Value<String?> category = const Value.absent(),
+              }) => TopicsCompanion.insert(
+                id: id,
+                name: name,
+                section: section,
+                category: category,
+              ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) =>

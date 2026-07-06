@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/explorer_providers.dart';
 import '../../app/reader_state.dart';
+import '../../app/topic_providers.dart';
+import '../../data/content_store.dart' show Topic;
 import '../../domain/explorer/explorer_ref.dart';
 import '../common/skeleton.dart';
 import '../tags/tag_palette.dart';
@@ -243,6 +245,12 @@ class _HomeIntro extends ConsumerWidget {
     final book = ref.watch(selectedBookNameProvider);
     final chapter = ref.watch(selectedChapterProvider);
     final stats = ref.watch(explorerStatsProvider).asData?.value;
+    final feasts =
+        ref.watch(curatedTopicsByCategoryProvider('feast')).asData?.value ??
+            const <Topic>[];
+    final stories =
+        ref.watch(curatedTopicsByCategoryProvider('story')).asData?.value ??
+            const <Topic>[];
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -259,6 +267,14 @@ class _HomeIntro extends ConsumerWidget {
                 .open(ExplorerRef.passage(book, chapter)),
           ),
         ),
+        if (feasts.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          _CuratedTopicsSection(title: 'Feasts', topics: feasts),
+        ],
+        if (stories.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          _CuratedTopicsSection(title: 'Bible Stories', topics: stories),
+        ],
         const SizedBox(height: 20),
         Text(
           'One search across the whole study library. Open anything, then '
@@ -285,6 +301,41 @@ class _HomeIntro extends ConsumerWidget {
             ],
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// A row of curated topics (feasts or well-known stories) on the Explorer
+/// home page, for browsing without already knowing what to search for.
+class _CuratedTopicsSection extends StatelessWidget {
+  const _CuratedTopicsSection({required this.title, required this.topics});
+
+  final String title;
+  final List<Topic> topics;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final t in topics)
+              ExplorerRefChip(ExplorerRef.topic(t.id, t.name)),
+          ],
+        ),
       ],
     );
   }

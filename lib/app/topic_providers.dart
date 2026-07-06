@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/content_store.dart';
+import '../data/importer/curated_topics_importer.dart';
 import '../data/importer/topical_importer.dart';
 import 'content_providers.dart';
 
@@ -13,6 +14,32 @@ final topicalImporterProvider = Provider<TopicalImporter>(
 final topicalIndexReadyProvider = FutureProvider<bool>((ref) async {
   await ref.watch(topicalImporterProvider).ensureLoaded();
   return true;
+});
+
+final curatedTopicsImporterProvider = Provider<CuratedTopicsImporter>(
+  (ref) => CuratedTopicsImporter(ref.watch(contentStoreProvider)),
+);
+
+/// Loads the hand-curated feasts/story topics (see curated_topics_data.dart)
+/// on top of Nave's index. Layered on [topicalIndexReadyProvider] since
+/// idempotency is keyed on topic name — Nave's own import must run first so a
+/// name that happens to collide is detected rather than double-inserted.
+final curatedTopicsReadyProvider = FutureProvider<bool>((ref) async {
+  await ref.watch(topicalIndexReadyProvider.future);
+  await ref.watch(curatedTopicsImporterProvider).ensureLoaded();
+  return true;
+});
+
+/// Curated topics in one category ('feast' or 'story'), name-ordered — the
+/// Explorer home page's browsable sections.
+final curatedTopicsByCategoryProvider =
+    FutureProvider.family<List<Topic>, String>((ref, category) async {
+  await ref.watch(curatedTopicsReadyProvider.future);
+  final store = ref.watch(contentStoreProvider);
+  return (store.select(store.topics)
+        ..where((t) => t.category.equals(category))
+        ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+      .get();
 });
 
 class TopicSearchQueryNotifier extends Notifier<String> {

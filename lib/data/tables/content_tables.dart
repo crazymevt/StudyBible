@@ -116,6 +116,9 @@ class Topics extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()(); // e.g. "AARON"
   TextColumn get section => text()(); // single-letter A–Z bucket
+  // Null for Nave's Topical Bible (the bundled default); 'feast' or 'story'
+  // for hand-curated entries layered on top — see CuratedTopicsImporter.
+  TextColumn get category => text().nullable()();
 }
 
 @TableIndex(name: 'idx_topic_entry_topic', columns: {#topicId})

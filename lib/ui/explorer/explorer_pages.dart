@@ -9,6 +9,7 @@ import '../../app/content_providers.dart';
 import '../../app/explorer_providers.dart';
 import '../../app/media_providers.dart';
 import '../../app/people_providers.dart';
+import '../../app/place_providers.dart';
 import '../../app/search_providers.dart';
 import '../../app/topic_providers.dart';
 import '../../app/user_providers.dart';
@@ -646,11 +647,24 @@ class _TopicPage extends ConsumerWidget {
                 .asData
                 ?.value ??
             const <SearchResult>[];
+        final passageFacets = ref
+                .watch(explorerTopicPassageFacetsProvider(topicId))
+                .asData
+                ?.value ??
+            const <ExplorerTopicLocationFacets>[];
+        final multiLocation = passageFacets.length > 1;
+        final places = _mergeTopicPlaces(passageFacets);
+        final videoGroups = _mergeTopicVideoGroups(passageFacets);
+        final attachments = _mergeTopicAttachments(passageFacets);
         return _PageScroll(
           children: [
             _PageTitle(
               title: d.topic.name,
-              subtitle: 'Nave\'s Topical Bible',
+              subtitle: switch (d.topic.category) {
+                'feast' => 'Bible feast',
+                'story' => 'Bible story',
+                _ => 'Nave\'s Topical Bible',
+              },
             ),
             if (dictionary.isNotEmpty) _DictionaryCard(entries: dictionary),
             for (final ev in d.entries)
@@ -698,6 +712,88 @@ class _TopicPage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (places.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.place_outlined,
+                title: 'Places (${places.length})',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ExplorerMap(places: [
+                      for (final p in places)
+                        ExplorerMapPlace(p.id, p.name, p.lat, p.lng),
+                    ]),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (final p in places)
+                          ExplorerRefChip(
+                            ExplorerRef.place(p.id, p.name),
+                            // A merged verse list only makes sense within a
+                            // single chapter — see [_mergeTopicPlaces].
+                            subtitle: multiLocation
+                                ? null
+                                : 'v. ${p.verses.join(', ')}',
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            for (final group in videoGroups)
+              ExplorerFacetCard(
+                icon: Icons.play_circle_outline,
+                title: '${group.collection.name} (${group.items.length})',
+                child: Column(
+                  children: [
+                    for (final item in group.items) MediaVideoTile(item: item),
+                  ],
+                ),
+              ),
+            if (attachments.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.attachment_outlined,
+                title: 'Your media (${attachments.length})',
+                child: Column(
+                  children: [
+                    for (final a in attachments) _AttachmentTile(attachment: a),
+                  ],
+                ),
+              ),
+            if (passageFacets.any((f) => f.commentaries.isNotEmpty))
+              ExplorerFacetCard(
+                icon: Icons.import_contacts_outlined,
+                title: 'Commentaries',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final f in passageFacets)
+                      if (f.commentaries.isNotEmpty) ...[
+                        if (multiLocation) _TopicLocationLabel(f.book, f.chapter),
+                        for (final section in f.commentaries)
+                          _CommentarySection(section: section),
+                      ],
+                  ],
+                ),
+              ),
+            if (passageFacets.any((f) => f.crossRefGroups.isNotEmpty))
+              ExplorerFacetCard(
+                icon: Icons.compare_arrows_outlined,
+                title: 'Cross-references',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final f in passageFacets)
+                      if (f.crossRefGroups.isNotEmpty) ...[
+                        if (multiLocation) _TopicLocationLabel(f.book, f.chapter),
+                        for (final group in f.crossRefGroups)
+                          _CrossRefGroupTile(group: group),
+                      ],
+                  ],
+                ),
+              ),
             if (sermons.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.co_present_outlined,
@@ -715,6 +811,42 @@ class _TopicPage extends ConsumerWidget {
                 child: Column(
                   children: [
                     for (final n in notebookPages) _TaggedItemTile(item: n),
+                  ],
+                ),
+              ),
+            if (passageFacets.any((f) => f.notes.isNotEmpty))
+              ExplorerFacetCard(
+                icon: Icons.edit_note_outlined,
+                title: 'Your notes',
+                child: Column(
+                  children: [
+                    for (final f in passageFacets)
+                      if (f.notes.isNotEmpty)
+                        for (final n in f.notes)
+                          _PassageNoteTile(book: f.book, chapter: f.chapter, note: n),
+                  ],
+                ),
+              ),
+            if (passageFacets.any((f) => f.tags.isNotEmpty))
+              ExplorerFacetCard(
+                icon: Icons.label_outline,
+                title: 'Your tags',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final f in passageFacets)
+                      if (f.tags.isNotEmpty) ...[
+                        if (multiLocation) _TopicLocationLabel(f.book, f.chapter),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            for (final t in f.tags)
+                              ExplorerTagChip(t.tag,
+                                  subtitle: 'v. ${t.verses.join(', ')}'),
+                          ],
+                        ),
+                      ],
                   ],
                 ),
               ),
@@ -1149,6 +1281,97 @@ class _DictionarySection extends StatelessWidget {
       ],
     );
   }
+}
+
+/// A small "Book Chapter" subheader above one location's share of a topic's
+/// aggregated facet card — only shown when the topic cites more than one
+/// chapter (see [_TopicPage]'s `multiLocation`), so a single-chapter feast or
+/// story reads exactly like the passage page it borrows these cards from.
+class _TopicLocationLabel extends StatelessWidget {
+  const _TopicLocationLabel(this.book, this.chapter);
+
+  final String book;
+  final int chapter;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 4),
+      child: Text(
+        '$book $chapter',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+}
+
+/// Merges a topic's per-chapter places into one deduped, name-ordered list —
+/// the map/chips on the topic page plot every chapter's markers together. A
+/// place's merged `verses` list mixes verse numbers across whatever chapters
+/// it appeared in, so it's only meaningful (and only shown) when the topic
+/// has just one location — see the `multiLocation` check where this is used.
+List<PlaceInPassage> _mergeTopicPlaces(
+    List<ExplorerTopicLocationFacets> facets) {
+  final byId = <int, PlaceInPassage>{};
+  for (final f in facets) {
+    for (final p in f.places) {
+      final existing = byId[p.id];
+      if (existing == null) {
+        byId[p.id] = PlaceInPassage(
+          id: p.id,
+          name: p.name,
+          lat: p.lat,
+          lng: p.lng,
+          verses: [...p.verses],
+        );
+      } else {
+        existing.verses.addAll(p.verses);
+      }
+    }
+  }
+  return byId.values.toList()..sort((a, b) => a.name.compareTo(b.name));
+}
+
+/// Merges a topic's per-chapter video groups into one group per collection,
+/// de-duplicating items a story's overlapping chapters would otherwise list
+/// twice (matched by youtube id/slug, falling back to title).
+List<MediaGroup> _mergeTopicVideoGroups(
+    List<ExplorerTopicLocationFacets> facets) {
+  final merged = <String, MediaGroup>{};
+  final seenKeys = <String, Set<String>>{};
+  for (final f in facets) {
+    for (final g in f.videoGroups) {
+      final keys = seenKeys.putIfAbsent(g.collection.name, () => {});
+      final newItems = [
+        for (final item in g.items)
+          if (keys.add(item.id ?? item.slug ?? item.title)) item,
+      ];
+      if (newItems.isEmpty) continue;
+      final existing = merged[g.collection.name];
+      merged[g.collection.name] = MediaGroup(
+        collection: g.collection,
+        items: existing == null ? newItems : [...existing.items, ...newItems],
+      );
+    }
+  }
+  return merged.values.toList();
+}
+
+/// Merges a topic's per-chapter media attachments, de-duplicating by id (an
+/// attachment tagged to more than one of a story's chapters would otherwise
+/// appear once per chapter).
+List<MediaAttachment> _mergeTopicAttachments(
+    List<ExplorerTopicLocationFacets> facets) {
+  final byId = <String, MediaAttachment>{};
+  for (final f in facets) {
+    for (final a in f.attachments) {
+      byId[a.id] = a;
+    }
+  }
+  return byId.values.toList();
 }
 
 // --- Tag ---

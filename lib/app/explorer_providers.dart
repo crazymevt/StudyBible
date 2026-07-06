@@ -7,6 +7,7 @@ import '../domain/explorer/explorer_ref.dart';
 import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
 import 'document_reference_providers.dart';
+import 'media_providers.dart';
 import 'people_providers.dart';
 import 'place_providers.dart';
 import 'reader_state.dart';
@@ -15,13 +16,14 @@ import 'tag_providers.dart';
 import 'topic_providers.dart';
 import 'user_providers.dart';
 
-/// All three bundled datasets the Explorer draws on (people, places, topics),
+/// All bundled/curated datasets the Explorer draws on (people, places,
+/// Nave's topics, and the curated feasts/stories layered on top of them),
 /// imported into the DB. One thing for the screen to await.
 final explorerReadyProvider = FutureProvider<bool>((ref) async {
   await Future.wait([
     ref.watch(peopleReadyProvider.future),
     ref.watch(placesReadyProvider.future),
-    ref.watch(topicalIndexReadyProvider.future),
+    ref.watch(curatedTopicsReadyProvider.future),
   ]);
   return true;
 });
@@ -662,6 +664,207 @@ final explorerPassageCrossReferencesProvider = FutureProvider.family<
       ExplorerCrossRefGroup(verse, byVerse[verse]!),
   ];
 });
+
+// --- Topic page: aggregated passage facets ---
+//
+// A topic page previously showed only its own description/refs/"Your
+// sermons"/"Your notebooks" — every other facet the passage page has
+// (commentaries, cross-references, notes, tags, media) was missing because
+// those are all keyed to a single (book, chapter), while a topic spans
+// several. The providers below fan the same per-chapter providers out over
+// every distinct chapter a topic's entries cite, so the topic page can show
+// the same "everything the datasets/your content know" experience.
+
+/// One (book, chapter) a topic's entries cite, plus the specific verses
+/// actually referenced there (the union, if more than one ref lands in the
+/// same chapter). [verses] is null when some ref for this chapter had no
+/// verse bound (a whole-chapter citation) — the whole chapter is then in
+/// scope, same as when there's no ref-level detail to narrow by.
+///
+/// Places carry per-verse detail already (see [PlaceInPassage.verses], the
+/// same field the reader's Places panel shows) — narrowing to [verses] is
+/// how a story's Places card avoids showing every place mentioned anywhere
+/// in the chapter when the story itself only covers a handful of verses.
+/// Chapter-granular facets (commentaries, cross-references, notes, tags)
+/// stay chapter-wide, matching the passage page they're borrowed from.
+class ExplorerTopicLocation {
+  final String book;
+  final int chapter;
+  final Set<int>? verses;
+
+  ExplorerTopicLocation({
+    required this.book,
+    required this.chapter,
+    required this.verses,
+  });
+}
+
+/// Distinct (book, chapter) locations across all of a topic's entries'
+/// references, deduped, in first-seen order, each carrying the verses cited
+/// there (see [ExplorerTopicLocation]).
+final explorerTopicLocationsProvider =
+    FutureProvider.family<List<ExplorerTopicLocation>, int>(
+        (ref, topicId) async {
+  final detail = await ref.watch(topicDetailProvider(topicId).future);
+  if (detail == null) return const [];
+  final order = <String>[];
+  final books = <String, String>{};
+  final chapters = <String, int>{};
+  final verses = <String, Set<int>?>{};
+  for (final entry in detail.entries) {
+    for (final r in entry.refs) {
+      final key = '${r.bookName}|${r.chapter}';
+      if (!verses.containsKey(key)) {
+        order.add(key);
+        books[key] = r.bookName;
+        chapters[key] = r.chapter;
+        verses[key] = <int>{};
+      }
+      final existing = verses[key];
+      if (existing == null) continue; // already widened to the whole chapter
+      if (r.verse == null) {
+        verses[key] = null;
+      } else {
+        final end = r.verseEnd ?? r.verse!;
+        existing.addAll([for (var v = r.verse!; v <= end; v++) v]);
+      }
+    }
+  }
+  return [
+    for (final key in order)
+      ExplorerTopicLocation(
+        book: books[key]!,
+        chapter: chapters[key]!,
+        verses: verses[key],
+      ),
+  ];
+});
+
+/// One chapter's full set of passage-style facets, for aggregating across a
+/// topic's several referenced chapters.
+class ExplorerTopicLocationFacets {
+  final String book;
+  final int chapter;
+  final List<PlaceInPassage> places;
+  final List<ExplorerCommentarySection> commentaries;
+  final List<ExplorerCrossRefGroup> crossRefGroups;
+  final List<Note> notes;
+  final List<ExplorerPassageTag> tags;
+  final List<MediaGroup> videoGroups;
+  final List<MediaAttachment> attachments;
+
+  ExplorerTopicLocationFacets({
+    required this.book,
+    required this.chapter,
+    required this.places,
+    required this.commentaries,
+    required this.crossRefGroups,
+    required this.notes,
+    required this.tags,
+    required this.videoGroups,
+    required this.attachments,
+  });
+
+  bool get isEmpty =>
+      places.isEmpty &&
+      commentaries.isEmpty &&
+      crossRefGroups.isEmpty &&
+      notes.isEmpty &&
+      tags.isEmpty &&
+      videoGroups.isEmpty &&
+      attachments.isEmpty;
+}
+
+/// A topic's chapter facets are only aggregated up to this many distinct
+/// chapters. Hand-curated feasts/stories cite a handful; Nave's Topical
+/// Bible headings like "GOD" or "CHURCH" cite thousands of verses across
+/// hundreds of chapters, where per-chapter fan-out would be prohibitively
+/// expensive and the resulting page unreadable regardless.
+const _kTopicPassageFacetCap = 30;
+
+/// Everything the datasets/your content know about every chapter a topic's
+/// entries cite — the topic-page equivalent of
+/// [explorerPassageOverviewProvider]'s facet providers, fanned out over
+/// several locations instead of one. Empty (not partial) once a topic
+/// exceeds [_kTopicPassageFacetCap] distinct chapters — see there.
+final explorerTopicPassageFacetsProvider =
+    FutureProvider.family<List<ExplorerTopicLocationFacets>, int>(
+        (ref, topicId) async {
+  final locations =
+      await ref.watch(explorerTopicLocationsProvider(topicId).future);
+  if (locations.isEmpty || locations.length > _kTopicPassageFacetCap) {
+    return const [];
+  }
+  // chapterMediaProvider derives synchronously from this; await it once so
+  // every location's synchronous watch below sees loaded data, not the
+  // provider's "still loading" empty fallback.
+  await ref.watch(mediaCollectionsProvider.future);
+
+  final results = await Future.wait([
+    for (final loc in locations)
+      Future.wait([
+        ref.watch(
+          placesForPassageProvider((book: loc.book, chapter: loc.chapter))
+              .future,
+        ),
+        ref.watch(
+          explorerPassageCommentariesProvider(
+              (book: loc.book, chapter: loc.chapter)).future,
+        ),
+        ref.watch(
+          explorerPassageCrossReferencesProvider(
+              (book: loc.book, chapter: loc.chapter)).future,
+        ),
+        ref.watch(
+          chapterNotesFamilyProvider(
+              (bookName: loc.book, chapter: loc.chapter)).future,
+        ),
+        ref.watch(
+          explorerPassageTagsProvider(
+              (book: loc.book, chapter: loc.chapter)).future,
+        ),
+        ref.watch(
+          chapterAttachmentsProvider(
+              (book: loc.book, chapter: loc.chapter)).future,
+        ),
+      ]).then(
+        (r) => ExplorerTopicLocationFacets(
+          book: loc.book,
+          chapter: loc.chapter,
+          places: _placesInScope(r[0] as List<PlaceInPassage>, loc.verses),
+          commentaries: r[1] as List<ExplorerCommentarySection>,
+          crossRefGroups: r[2] as List<ExplorerCrossRefGroup>,
+          notes: r[3] as List<Note>,
+          tags: r[4] as List<ExplorerPassageTag>,
+          videoGroups: ref.watch(
+              chapterMediaProvider((book: loc.book, chapter: loc.chapter))),
+          attachments: r[5] as List<MediaAttachment>,
+        ),
+      ),
+  ]);
+  return results.where((r) => !r.isEmpty).toList();
+});
+
+/// Narrows a chapter's places down to the ones actually mentioned in
+/// [verses] (null means the whole chapter is in scope — no narrowing). A
+/// place's own verse list is trimmed to just the matching verses too, so its
+/// subtitle on the topic page reflects the story's citation, not every verse
+/// in the chapter that happens to mention it.
+List<PlaceInPassage> _placesInScope(
+    List<PlaceInPassage> places, Set<int>? verses) {
+  if (verses == null) return places;
+  return [
+    for (final p in places)
+      if (p.verses.any(verses.contains))
+        PlaceInPassage(
+          id: p.id,
+          name: p.name,
+          lat: p.lat,
+          lng: p.lng,
+          verses: p.verses.where(verses.contains).toList(),
+        ),
+  ];
+}
 
 /// The documents of one type that reference [target], straight from the
 /// persisted `document_references` index (maintained by
