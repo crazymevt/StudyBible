@@ -1542,6 +1542,15 @@ const _storyTopics = <CuratedTopic>[
     ],
   ),
   CuratedTopic(
+    name: 'THE FEEDING OF THE FOUR THOUSAND',
+    category: 'story',
+    description:
+        'Jesus multiplies seven loaves and a few small fish to '
+        'feed a crowd of four thousand in the Gentile region of the '
+        'Decapolis, with seven baskets left over.',
+    refs: [CuratedTopicRef('Mark', 8, 1, 9)],
+  ),
+  CuratedTopic(
     name: "PETER'S CONFESSION AT CAESAREA PHILIPPI",
     category: 'story',
     description:
