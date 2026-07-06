@@ -177,6 +177,11 @@ class _PersonPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(personDetailProvider(personId));
     final placesAsync = ref.watch(explorerPersonPlacesProvider(personId));
+    final stories = ref
+            .watch(explorerPersonStoriesProvider(personId))
+            .asData
+            ?.value ??
+        const <ExplorerTopicHit>[];
     final tags = ref.watch(explorerPersonTagsProvider(personId)).asData?.value ??
         const <ExplorerEntityTag>[];
     return detailAsync.when(
@@ -300,6 +305,19 @@ class _PersonPage extends ConsumerWidget {
                             .read(explorerTrailProvider.notifier)
                             .open(ExplorerRef.event(e.eventId, e.title)),
                       ),
+                  ],
+                ),
+              ),
+            if (stories.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.topic_outlined,
+                title: 'Their stories',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final s in stories)
+                      ExplorerRefChip(ExplorerRef.topic(s.id, s.name)),
                   ],
                 ),
               ),
