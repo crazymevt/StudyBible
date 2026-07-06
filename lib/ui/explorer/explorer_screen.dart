@@ -67,29 +67,33 @@ class ExplorerScreen extends ConsumerWidget {
             ),
         ],
       ),
-      body: ready.when(
-        loading: () => const SkeletonList(),
-        error: (e, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text('Couldn\'t load the study datasets: $e'),
-          ),
-        ),
-        data: (_) => Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (trail.isNotEmpty) const _BreadcrumbBar(),
-            Expanded(
-              child: trail.isEmpty
-                  ? const _ExplorerHome()
-                  : ExplorerEntityPage(
-                      // Key on the entry so drilling into a new entity starts
-                      // its page at the top instead of reusing scroll state.
-                      key: ValueKey(trail.last),
-                      entry: trail.last,
-                    ),
+      body: SafeArea(
+        top: false,
+        child: ready.when(
+          loading: () => const SkeletonList(),
+          error: (e, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text('Couldn\'t load the study datasets: $e'),
             ),
-          ],
+          ),
+          data: (_) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (trail.isNotEmpty) const _BreadcrumbBar(),
+              Expanded(
+                child: trail.isEmpty
+                    ? const _ExplorerHome()
+                    : ExplorerEntityPage(
+                        // Key on the entry so drilling into a new entity
+                        // starts its page at the top instead of reusing
+                        // scroll state.
+                        key: ValueKey(trail.last),
+                        entry: trail.last,
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
