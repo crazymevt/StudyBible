@@ -577,7 +577,10 @@ class _EventPage extends ConsumerWidget {
             if (d.places.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.place_outlined,
-                title: 'Where it happened',
+                title: d.places.length == d.placesTotalCount
+                    ? 'Where it happened'
+                    : 'Where it happened (${d.places.length} of '
+                        '${d.placesTotalCount})',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
