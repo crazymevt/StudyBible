@@ -13,6 +13,7 @@ import 'package:collection/collection.dart';
 
 import '../data/importer/cross_reference_importer.dart';
 import '../data/importer/mybible_verse_parser.dart';
+import '../data/mybible_book_map.dart';
 import '../data/logging.dart';
 import 'package:flutter/widgets.dart';
 
@@ -259,6 +260,23 @@ final bookByNameProvider =
       }).firstOrNull;
     });
 
+/// The book number a MyBible-format module (subheadings, or a Bible imported
+/// via [MyBibleImporter]) would use for [name] — Genesis=10, Exodus=20, …,
+/// spaced by 10 — resolved by reversing [mybibleBookMap]. Tolerates the same
+/// singular/plural drift as [bookByNameProvider] (e.g. "Psalm" vs "Psalms").
+int? _mybibleBookNumberForName(String name) {
+  final target = name.toLowerCase();
+  for (final entry in mybibleBookMap.entries) {
+    final candidate = entry.value.toLowerCase();
+    if (candidate == target ||
+        candidate == '${target}s' ||
+        '${candidate}s' == target) {
+      return entry.key;
+    }
+  }
+  return null;
+}
+
 final chapterSubheadingsProvider =
     FutureProvider.family<
       Map<int, List<String>>,
@@ -269,22 +287,21 @@ final chapterSubheadingsProvider =
         return {};
       }
 
-      final activeVersions = ref.watch(activeVersionsProvider);
-      if (activeVersions.isEmpty) return {};
-
-      final primaryBibleId = activeVersions.first;
-      final book = await ref.watch(
-        bookByNameProvider((
-          versionId: primaryBibleId,
-          name: args.bookName,
-        )).future,
-      );
-      if (book == null) return {};
+      // Subheadings modules always use MyBible's own book numbering, not
+      // whichever scheme produced the active Bible's `books.bookOrder` (e.g.
+      // an OSIS import numbers books sequentially 1..66). Resolving straight
+      // from the book name — instead of joining through the active Bible's
+      // book row — keeps this correct regardless of how that Bible was
+      // imported, and avoids the two numbering schemes silently colliding on
+      // unrelated books (a sequential order of 60 and a MyBible book number
+      // of 60 are both valid, but name different books).
+      final bookNumber = _mybibleBookNumberForName(args.bookName);
+      if (bookNumber == null) return {};
 
       final store = ref.watch(contentStoreProvider);
       final query = store.select(store.subheadings)
         ..where((s) => s.versionId.equals(sourceVersionId))
-        ..where((s) => s.bookOrder.equals(book.bookOrder))
+        ..where((s) => s.bookOrder.equals(bookNumber))
         ..where((s) => s.chapter.equals(args.chapter))
         ..orderBy([
           (s) => OrderingTerm(expression: s.verse),
