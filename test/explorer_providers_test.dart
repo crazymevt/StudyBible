@@ -564,6 +564,10 @@ void main() {
         peopleReadyProvider.overrideWith((ref) async => true),
         placesReadyProvider.overrideWith((ref) async => true),
         topicalIndexReadyProvider.overrideWith((ref) async => true),
+        // Skips the real CuratedTopicsImporter, which would otherwise insert
+        // every curated feast/story into this test's minimal seeded store —
+        // several of which cite 1 Samuel 24, this file's own fixture chapter.
+        curatedTopicsReadyProvider.overrideWith((ref) async => true),
       ],
     );
   });
