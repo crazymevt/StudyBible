@@ -405,6 +405,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 32, 22, 32)],
   ),
   CuratedTopic(
+    name: "JACOB AND ESAU RECONCILE",
+    category: 'story',
+    description:
+        'Dreading revenge for the stolen blessing, Jacob bows '
+        'seven times before Esau — who instead runs to embrace him, kisses '
+        'him, and weeps.',
+    refs: [CuratedTopicRef('Genesis', 33)],
+  ),
+  CuratedTopic(
     name: "JOSEPH'S DREAMS",
     category: 'story',
     description:
@@ -525,6 +534,15 @@ const _storyTopics = <CuratedTopic>[
         'At Massah and Meribah, Moses strikes a rock at Horeb and '
         'water flows out for the thirsty Israelites.',
     refs: [CuratedTopicRef('Exodus', 17, 1, 7)],
+  ),
+  CuratedTopic(
+    name: "AARON AND HUR HOLD UP MOSES' HANDS",
+    category: 'story',
+    description:
+        "As long as Moses holds up his hands, Israel prevails "
+        'against Amalek in battle, so Aaron and Hur hold his arms steady '
+        'until sunset.',
+    refs: [CuratedTopicRef('Exodus', 17, 8, 16)],
   ),
   CuratedTopic(
     name: 'THE GOLDEN CALF',
@@ -702,6 +720,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Judges', 4)],
   ),
   CuratedTopic(
+    name: "GIDEON'S CALL AT THE WINEPRESS",
+    category: 'story',
+    description:
+        'An angel finds Gideon threshing wheat in a winepress to '
+        'hide it from Midian and calls him a "mighty man of valor"; Gideon '
+        'tears down his father\'s altar to Baal in response.',
+    refs: [CuratedTopicRef('Judges', 6, 11, 32)],
+  ),
+  CuratedTopic(
     name: "GIDEON'S FLEECE",
     category: 'story',
     description:
@@ -716,6 +743,15 @@ const _storyTopics = <CuratedTopic>[
         'God pares Gideon\'s army down to three hundred men, who '
         'rout the vast Midianite camp with torches, trumpets, and jars.',
     refs: [CuratedTopicRef('Judges', 7)],
+  ),
+  CuratedTopic(
+    name: "ABIMELECH'S KINGSHIP AND DEATH",
+    category: 'story',
+    description:
+        "Gideon's son Abimelech murders his brothers to seize "
+        "kingship over Shechem, and dies ignobly when a woman drops a "
+        'millstone on his head during a siege.',
+    refs: [CuratedTopicRef('Judges', 9)],
   ),
   CuratedTopic(
     name: "JEPHTHAH'S VOW",
@@ -733,6 +769,15 @@ const _storyTopics = <CuratedTopic>[
         'An angel announces to Manoah\'s barren wife that she will '
         'bear Samson, a Nazirite set apart to deliver Israel.',
     refs: [CuratedTopicRef('Judges', 13)],
+  ),
+  CuratedTopic(
+    name: "SAMSON'S RIDDLE AND WEDDING",
+    category: 'story',
+    description:
+        'Samson poses a riddle from a lion carcass full of honey '
+        'at his wedding feast, and the Philistines coax the answer out of '
+        'his bride to win the bet.',
+    refs: [CuratedTopicRef('Judges', 14)],
   ),
   CuratedTopic(
     name: 'SAMSON AND DELILAH',
@@ -1035,6 +1080,15 @@ const _storyTopics = <CuratedTopic>[
         'seize his vineyard, and Elijah confronts Ahab with God\'s judgment '
         'on the murder.',
     refs: [CuratedTopicRef('1 Kings', 21)],
+  ),
+  CuratedTopic(
+    name: 'MICAIAH PROPHESIES AGAINST AHAB',
+    category: 'story',
+    description:
+        'While four hundred court prophets promise victory, '
+        'Micaiah alone tells Ahab the truth — that he will die in battle — '
+        'and is struck and imprisoned for it.',
+    refs: [CuratedTopicRef('1 Kings', 22, 1, 40)],
   ),
   CuratedTopic(
     name: 'ELIJAH TAKEN UP TO HEAVEN',
@@ -1383,6 +1437,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 4, 18, 22)],
   ),
   CuratedTopic(
+    name: 'JESUS HEALS A LEPER',
+    category: 'story',
+    description:
+        'Moved with compassion, Jesus touches a man covered in '
+        'leprosy — "I am willing; be cleansed" — and he is healed '
+        'instantly.',
+    refs: [CuratedTopicRef('Mark', 1, 40, 45)],
+  ),
+  CuratedTopic(
     name: 'THE PARALYTIC LOWERED THROUGH THE ROOF',
     category: 'story',
     description:
@@ -1414,6 +1477,15 @@ const _storyTopics = <CuratedTopic>[
         'Jesus offers "living water" to a Samaritan woman at '
         "Jacob's well, who becomes one of the first to spread word of him.",
     refs: [CuratedTopicRef('John', 4)],
+  ),
+  CuratedTopic(
+    name: 'THE HEALING AT THE POOL OF BETHESDA',
+    category: 'story',
+    description:
+        'Jesus heals a man who had been an invalid for '
+        'thirty-eight years, waiting by the pool for someone to help him '
+        'in — "Sir, I have no one to put me into the pool."',
+    refs: [CuratedTopicRef('John', 5, 1, 9)],
   ),
   CuratedTopic(
     name: "JESUS HEALS THE CENTURION'S SERVANT",
@@ -1616,6 +1688,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 25, 1, 13)],
   ),
   CuratedTopic(
+    name: 'THE PARABLE OF THE TALENTS',
+    category: 'story',
+    description:
+        'A master entrusts his servants with talents while away; '
+        'those who invest theirs hear, "Well done, good and faithful '
+        'servant," but the one who buried his is condemned.',
+    refs: [CuratedTopicRef('Matthew', 25, 14, 30)],
+  ),
+  CuratedTopic(
     name: 'THE SHEEP AND THE GOATS',
     category: 'story',
     description:
@@ -1716,6 +1797,15 @@ const _storyTopics = <CuratedTopic>[
 
   // --- Acts ---
   CuratedTopic(
+    name: 'PETER AND JOHN BEFORE THE SANHEDRIN',
+    category: 'story',
+    description:
+        'Arrested for healing a lame man and preaching Jesus, '
+        'Peter and John tell the council, "We cannot but speak of what we '
+        'have seen and heard."',
+    refs: [CuratedTopicRef('Acts', 4, 1, 22)],
+  ),
+  CuratedTopic(
     name: 'ANANIAS AND SAPPHIRA',
     category: 'story',
     description:
@@ -1730,6 +1820,15 @@ const _storyTopics = <CuratedTopic>[
         'Stephen is stoned to death for his testimony about '
         'Jesus, praying for his killers as Saul looks on approvingly.',
     refs: [CuratedTopicRef('Acts', 7, 54, 60)],
+  ),
+  CuratedTopic(
+    name: 'SIMON THE SORCERER',
+    category: 'story',
+    description:
+        'A sorcerer named Simon believes and is baptized, then '
+        'tries to buy the power to bestow the Holy Spirit — earning '
+        'Peter\'s rebuke, "Your money perish with you."',
+    refs: [CuratedTopicRef('Acts', 8, 9, 24)],
   ),
   CuratedTopic(
     name: 'PHILIP AND THE ETHIOPIAN EUNUCH',
@@ -1755,6 +1854,15 @@ const _storyTopics = <CuratedTopic>[
         "An angel wakes Peter in chains, and the prison's iron "
         'gate opens by itself as the church prays for his release.',
     refs: [CuratedTopicRef('Acts', 12, 1, 19)],
+  ),
+  CuratedTopic(
+    name: "HEROD AGRIPPA'S DEATH",
+    category: 'story',
+    description:
+        'Herod Agrippa accepts a crowd\'s praise as a god instead '
+        'of giving glory to God, and is struck down and eaten by worms on '
+        'the spot.',
+    refs: [CuratedTopicRef('Acts', 12, 20, 23)],
   ),
   CuratedTopic(
     name: 'PAUL AND BARNABAS MISTAKEN FOR GODS AT LYSTRA',
