@@ -111,6 +111,7 @@ class Subheadings extends Table {
   TextColumn get about => text().nullable()();
 }
 
+@TableIndex(name: 'idx_topics_name_category', columns: {#name, #category})
 @DataClassName('Topic')
 class Topics extends Table {
   IntColumn get id => integer().autoIncrement()();

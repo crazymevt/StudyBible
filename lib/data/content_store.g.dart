@@ -8729,6 +8729,10 @@ abstract class _$ContentStore extends GeneratedDatabase {
     'idx_subheading_location',
     'CREATE INDEX idx_subheading_location ON subheadings (version_id, book_order, chapter)',
   );
+  late final Index idxTopicsNameCategory = Index(
+    'idx_topics_name_category',
+    'CREATE INDEX idx_topics_name_category ON topics (name, category)',
+  );
   late final Index idxTopicEntryTopic = Index(
     'idx_topic_entry_topic',
     'CREATE INDEX idx_topic_entry_topic ON topic_entries (topic_id)',
@@ -8808,6 +8812,7 @@ abstract class _$ContentStore extends GeneratedDatabase {
     idxCommentaryEntryCommentary,
     idxDictionaryEntryWord,
     idxSubheadingLocation,
+    idxTopicsNameCategory,
     idxTopicEntryTopic,
     idxTopicRefLocation,
     idxTopicRefTopic,

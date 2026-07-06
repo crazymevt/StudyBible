@@ -42,7 +42,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration {
@@ -260,6 +260,20 @@ class ContentStore extends _$ContentStore {
         }
         if (from < 15) {
           await _ensureTopicCategoryColumn(m);
+        }
+        if (from < 16) {
+          // topics had no index at all. CuratedTopicsImporter.ensureLoaded()
+          // does one `WHERE name = ? AND category = ?` existence check per
+          // curated topic to stay idempotent — with the curated 'story' list
+          // now in the hundreds, each an unindexed scan of the ~5,700-row
+          // topics table (Nave's Topical Bible plus curated entries), this
+          // was the dominant cost gating every Explorer page load. Mirrors
+          // the @TableIndex annotation in content_tables.dart, which covers
+          // fresh installs via onCreate.
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_topics_name_category '
+            'ON topics (name, category)',
+          );
         }
       },
     );
