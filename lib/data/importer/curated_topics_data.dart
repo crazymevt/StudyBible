@@ -707,6 +707,25 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Exodus', 2, 1, 10)],
   ),
   CuratedTopic(
+    name: 'MOSES FLEES TO MIDIAN',
+    category: 'story',
+    description:
+        'Moses kills an Egyptian he sees beating a Hebrew slave, '
+        'then flees to Midian when Pharaoh seeks his life, settling '
+        'there as a shepherd and marrying Zipporah.',
+    refs: [CuratedTopicRef('Exodus', 2, 11, 22)],
+  ),
+  CuratedTopic(
+    name: 'MOSES CONFRONTS PHARAOH: "LET MY PEOPLE GO"',
+    category: 'story',
+    description:
+        'Moses and Aaron ask Pharaoh to let Israel go worship in '
+        'the wilderness; Pharaoh refuses and punishes the Israelite '
+        'slaves by forcing them to gather their own straw for the same '
+        'quota of bricks.',
+    refs: [CuratedTopicRef('Exodus', 5, 1, 21)],
+  ),
+  CuratedTopic(
     name: 'THE TEN PLAGUES OF EGYPT',
     category: 'story',
     description:
@@ -714,6 +733,98 @@ const _storyTopics = <CuratedTopic>[
         'blood to the death of the firstborn, until Pharaoh releases Israel.',
     refs: [
       CuratedTopicRef('Exodus', 7, 20, 21),
+      CuratedTopicRef('Exodus', 12, 29, 30),
+    ],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF BLOOD',
+    category: 'story',
+    description:
+        'Aaron strikes the Nile with his staff and all its water '
+        '— and every drop in Egypt — turns to blood, killing the fish '
+        'and forcing Egyptians to dig for drinking water.',
+    refs: [CuratedTopicRef('Exodus', 7, 14, 25)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF FROGS',
+    category: 'story',
+    description:
+        'Frogs swarm out of the Nile into every house, bed, and '
+        'oven in Egypt until Pharaoh begs Moses to pray them away, then '
+        'hardens his heart once they are gone.',
+    refs: [CuratedTopicRef('Exodus', 8, 1, 15)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF GNATS',
+    category: 'story',
+    description:
+        'Aaron strikes the dust of the ground and it becomes '
+        'gnats throughout Egypt, and even Pharaoh\'s magicians admit, '
+        '"This is the finger of God."',
+    refs: [CuratedTopicRef('Exodus', 8, 16, 19)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF FLIES',
+    category: 'story',
+    description:
+        'Dense swarms of flies fill Egypt and ruin the land, but '
+        'none enter Goshen where Israel lives — the first plague the '
+        "LORD explicitly separates his people from.",
+    refs: [CuratedTopicRef('Exodus', 8, 20, 32)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE ON LIVESTOCK',
+    category: 'story',
+    description:
+        "A severe plague kills all the Egyptians' livestock in "
+        'the field, while not one animal belonging to Israel dies.',
+    refs: [CuratedTopicRef('Exodus', 9, 1, 7)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF BOILS',
+    category: 'story',
+    description:
+        'Moses tosses soot from a furnace into the air, and it '
+        'breaks out as festering boils on man and beast throughout '
+        'Egypt, even on Pharaoh\'s magicians.',
+    refs: [CuratedTopicRef('Exodus', 9, 8, 12)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF HAIL',
+    category: 'story',
+    description:
+        "The worst hailstorm in Egypt's history, mixed with fire, "
+        'flattens crops and kills any exposed man or beast — sparing '
+        'only Goshen, while Pharaoh again relents and then hardens his '
+        'heart.',
+    refs: [CuratedTopicRef('Exodus', 9, 13, 35)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF LOCUSTS',
+    category: 'story',
+    description:
+        'An east wind drives in a locust swarm thicker than any '
+        'before or since, stripping bare whatever the hail had left.',
+    refs: [CuratedTopicRef('Exodus', 10, 1, 20)],
+  ),
+  CuratedTopic(
+    name: 'THE PLAGUE OF DARKNESS',
+    category: 'story',
+    description:
+        'A darkness that can be felt covers Egypt for three days, '
+        'yet all the Israelites have light where they live.',
+    refs: [CuratedTopicRef('Exodus', 10, 21, 29)],
+  ),
+  CuratedTopic(
+    name: 'THE DEATH OF THE FIRSTBORN',
+    category: 'story',
+    description:
+        "At midnight the LORD strikes down every firstborn in "
+        "Egypt, from Pharaoh's son to the prisoner's and the cattle's, "
+        'and a loud cry goes up throughout the land — until Pharaoh '
+        'finally lets Israel go.',
+    refs: [
+      CuratedTopicRef('Exodus', 11, 1, 10),
       CuratedTopicRef('Exodus', 12, 29, 30),
     ],
   ),
@@ -741,6 +852,16 @@ const _storyTopics = <CuratedTopic>[
         'against Amalek in battle, so Aaron and Hur hold his arms steady '
         'until sunset.',
     refs: [CuratedTopicRef('Exodus', 17, 8, 16)],
+  ),
+  CuratedTopic(
+    name: "JETHRO'S ADVICE TO APPOINT JUDGES",
+    category: 'story',
+    description:
+        "Moses' father-in-law Jethro watches him wear himself out "
+        'judging every dispute alone, and advises him to appoint capable '
+        'men over thousands, hundreds, fifties, and tens to share the '
+        'load.',
+    refs: [CuratedTopicRef('Exodus', 18)],
   ),
   CuratedTopic(
     name: 'THE GOLDEN CALF',
