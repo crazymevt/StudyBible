@@ -3040,6 +3040,212 @@ const _storyTopics = <CuratedTopic>[
         'has seen.',
     refs: [CuratedTopicRef('Revelation', 1, 9, 19)],
   ),
+  CuratedTopic(
+    name: 'THE LETTERS TO THE SEVEN CHURCHES',
+    category: 'story',
+    description:
+        'The risen Christ dictates seven letters to the churches '
+        'of Asia — Ephesus, Smyrna, Pergamum, Thyatira, Sardis, '
+        'Philadelphia, and Laodicea — commending, warning, and calling '
+        'each "to hear what the Spirit says to the churches."',
+    refs: [CuratedTopicRef('Revelation', 2), CuratedTopicRef('Revelation', 3)],
+  ),
+  CuratedTopic(
+    name: 'THE THRONE ROOM IN HEAVEN',
+    category: 'story',
+    description:
+        'John is caught up through an open door in heaven and '
+        'sees a throne encircled by twenty-four elders and four living '
+        'creatures, who cry day and night, "Holy, holy, holy, is the '
+        'Lord God Almighty."',
+    refs: [CuratedTopicRef('Revelation', 4)],
+  ),
+  CuratedTopic(
+    name: 'THE SCROLL AND THE LAMB WHO IS WORTHY',
+    category: 'story',
+    description:
+        'John weeps that no one is found worthy to open the '
+        'sealed scroll, until a Lamb looking as though it had been slain '
+        'takes it, and all creation falls down singing, "Worthy is the '
+        'Lamb who was slain."',
+    refs: [CuratedTopicRef('Revelation', 5)],
+  ),
+  CuratedTopic(
+    name: 'THE SEVEN SEALS AND THE FOUR HORSEMEN',
+    category: 'story',
+    description:
+        'The Lamb opens six of the seven seals, releasing four '
+        'horsemen — conquest, war, famine, and death — followed by the '
+        'cry of martyred souls and a cosmic upheaval that makes the '
+        'mighty hide in the rocks.',
+    refs: [CuratedTopicRef('Revelation', 6)],
+  ),
+  CuratedTopic(
+    name: 'THE 144,000 SEALED AND THE GREAT MULTITUDE',
+    category: 'story',
+    description:
+        '144,000 from the twelve tribes of Israel are sealed on '
+        'their foreheads, and John sees a great multitude from every '
+        'nation, robed in white and washed in the blood of the Lamb, '
+        'worshiping before the throne.',
+    refs: [CuratedTopicRef('Revelation', 7)],
+  ),
+  CuratedTopic(
+    name: 'THE SEVEN TRUMPETS',
+    category: 'story',
+    description:
+        'Seven angels sound seven trumpets, unleashing hail and '
+        'fire, a burning mountain cast into the sea, the star Wormwood, '
+        'darkened skies, and locusts and horsemen from the abyss.',
+    refs: [CuratedTopicRef('Revelation', 8), CuratedTopicRef('Revelation', 9)],
+  ),
+  CuratedTopic(
+    name: 'THE ANGEL AND THE LITTLE SCROLL',
+    category: 'story',
+    description:
+        'A mighty angel wrapped in a cloud gives John a little '
+        'scroll to eat, sweet as honey in his mouth but bitter in his '
+        'stomach, and commissions him to prophesy again.',
+    refs: [CuratedTopicRef('Revelation', 10)],
+  ),
+  CuratedTopic(
+    name: 'THE TWO WITNESSES',
+    category: 'story',
+    description:
+        'Two witnesses prophesy in sackcloth for 1,260 days, are '
+        'killed by the beast and left unburied in the street, then are '
+        'raised to life and taken up to heaven before the watching world.',
+    refs: [CuratedTopicRef('Revelation', 11)],
+  ),
+  CuratedTopic(
+    name: 'THE WOMAN, THE CHILD, AND THE DRAGON',
+    category: 'story',
+    description:
+        'A woman clothed with the sun gives birth to a son while '
+        'a great red dragon waits to devour him; the child is caught up '
+        'to God\'s throne, and Michael and his angels cast the dragon '
+        'down from heaven.',
+    refs: [CuratedTopicRef('Revelation', 12)],
+  ),
+  CuratedTopic(
+    name: 'THE BEAST FROM THE SEA AND THE BEAST FROM THE EARTH',
+    category: 'story',
+    description:
+        'A beast rises from the sea with authority to make war '
+        'on the saints, and a second beast from the earth compels the '
+        'world to worship it and take its mark, "666," on hand or '
+        'forehead.',
+    refs: [CuratedTopicRef('Revelation', 13)],
+  ),
+  CuratedTopic(
+    name: 'THE 144,000 ON MOUNT ZION',
+    category: 'story',
+    description:
+        'John sees the Lamb standing on Mount Zion with the '
+        '144,000, who sing a new song no one else can learn and follow '
+        'the Lamb wherever he goes.',
+    refs: [CuratedTopicRef('Revelation', 14, 1, 5)],
+  ),
+  CuratedTopic(
+    name: 'THE HARVEST OF THE EARTH',
+    category: 'story',
+    description:
+        'One like a son of man reaps the earth with a sickle '
+        "from a cloud, and an angel gathers the grapes of wrath into "
+        "the great winepress of God's judgment.",
+    refs: [CuratedTopicRef('Revelation', 14, 14, 20)],
+  ),
+  CuratedTopic(
+    name: "THE SEVEN BOWLS OF GOD'S WRATH",
+    category: 'story',
+    description:
+        "Seven angels pour out seven bowls of God's wrath on "
+        'the earth — sores, seas and rivers turned to blood, scorching '
+        'sun, darkness, and a final earthquake — culminating in the '
+        'cry, "It is done."',
+    refs: [
+      CuratedTopicRef('Revelation', 15),
+      CuratedTopicRef('Revelation', 16),
+    ],
+  ),
+  CuratedTopic(
+    name: 'THE GREAT PROSTITUTE AND THE BEAST',
+    category: 'story',
+    description:
+        'John sees a woman named "Babylon the Great," drunk '
+        'with the blood of the saints, riding a scarlet beast with seven '
+        'heads and ten horns, who will ultimately be destroyed by the '
+        'beast she rides.',
+    refs: [CuratedTopicRef('Revelation', 17)],
+  ),
+  CuratedTopic(
+    name: 'THE FALL OF BABYLON',
+    category: 'story',
+    description:
+        'An angel announces, "Fallen, fallen is Babylon the '
+        'great," and the kings, merchants, and sailors of the earth '
+        'mourn the sudden destruction of the city that had grown rich '
+        'on her luxury.',
+    refs: [CuratedTopicRef('Revelation', 18)],
+  ),
+  CuratedTopic(
+    name: 'THE MARRIAGE SUPPER OF THE LAMB',
+    category: 'story',
+    description:
+        'Heaven resounds with "Hallelujah" over Babylon\'s fall, '
+        'and an angel announces the marriage supper of the Lamb, where '
+        'his bride has made herself ready, clothed in fine linen.',
+    refs: [CuratedTopicRef('Revelation', 19, 1, 10)],
+  ),
+  CuratedTopic(
+    name: 'THE RIDER ON THE WHITE HORSE',
+    category: 'story',
+    description:
+        'Heaven opens and a rider called Faithful and True, '
+        'robed in blood and named the Word of God, leads heaven\'s '
+        'armies to defeat the beast and false prophet, who are thrown '
+        'alive into the lake of fire.',
+    refs: [CuratedTopicRef('Revelation', 19, 11, 21)],
+  ),
+  CuratedTopic(
+    name: "THE MILLENNIUM AND SATAN'S FINAL DEFEAT",
+    category: 'story',
+    description:
+        'An angel binds Satan for a thousand years while the '
+        'martyrs reign with Christ; released briefly afterward, Satan '
+        'gathers the nations for a final battle before being thrown '
+        'into the lake of fire forever.',
+    refs: [CuratedTopicRef('Revelation', 20, 1, 10)],
+  ),
+  CuratedTopic(
+    name: 'THE GREAT WHITE THRONE JUDGMENT',
+    category: 'story',
+    description:
+        'The dead, great and small, stand before a great white '
+        'throne to be judged by what is written in the books, and '
+        'anyone whose name is not found in the book of life is thrown '
+        'into the lake of fire.',
+    refs: [CuratedTopicRef('Revelation', 20, 11, 15)],
+  ),
+  CuratedTopic(
+    name: 'THE NEW HEAVEN AND THE NEW JERUSALEM',
+    category: 'story',
+    description:
+        'John sees a new heaven and a new earth, and the new '
+        'Jerusalem descending like a bride, as God declares, "Behold, I '
+        'am making all things new," and promises to wipe away every '
+        'tear.',
+    refs: [CuratedTopicRef('Revelation', 21)],
+  ),
+  CuratedTopic(
+    name: 'THE RIVER OF LIFE AND THE TREE OF LIFE',
+    category: 'story',
+    description:
+        'John sees the river of the water of life flowing from '
+        "God's throne, with the tree of life on either side bearing "
+        'fruit each month, its leaves for the healing of the nations.',
+    refs: [CuratedTopicRef('Revelation', 22, 1, 5)],
+  ),
 ];
 
 final curatedTopics = <CuratedTopic>[..._feastTopics, ..._storyTopics];
