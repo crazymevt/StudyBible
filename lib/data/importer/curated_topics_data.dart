@@ -1389,6 +1389,60 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Job', 1), CuratedTopicRef('Job', 2, 1, 10)],
   ),
   CuratedTopic(
+    name: "JOB'S THREE FRIENDS COME TO COMFORT HIM",
+    category: 'story',
+    description:
+        "Job's three friends — Eliphaz, Bildad, and Zophar — "
+        'hear of his suffering and come to comfort him, then sit with '
+        'him on the ground in silence for seven days and nights, seeing '
+        'that his grief was very great.',
+    refs: [CuratedTopicRef('Job', 2, 11, 13)],
+  ),
+  CuratedTopic(
+    name: 'JOB CURSES THE DAY OF HIS BIRTH',
+    category: 'story',
+    description:
+        'Breaking his silence, Job curses the day he was born '
+        'and longs for death, wondering "why is light given to him who '
+        'is in misery."',
+    refs: [CuratedTopicRef('Job', 3)],
+  ),
+  CuratedTopic(
+    name: '"I KNOW THAT MY REDEEMER LIVES"',
+    category: 'story',
+    description:
+        'In the depths of his suffering, Job declares his '
+        'confidence that his Redeemer lives and that he will see God '
+        'with his own eyes, even after his body has decayed.',
+    refs: [CuratedTopicRef('Job', 19, 23, 27)],
+  ),
+  CuratedTopic(
+    name: "JOB'S FINAL DEFENSE OF HIS INTEGRITY",
+    category: 'story',
+    description:
+        'Job swears a detailed oath of innocence, calling down '
+        'curses on himself for every sin he has not committed, and '
+        'rests his case, having said all he has to say.',
+    refs: [CuratedTopicRef('Job', 31)],
+  ),
+  CuratedTopic(
+    name: "ELIHU'S SPEECHES",
+    category: 'story',
+    description:
+        'Young Elihu, angry that Job justified himself and the '
+        "friends found no answer, speaks at length in God's defense, "
+        'insisting that God speaks to people through suffering and that '
+        'his power and justice are beyond question.',
+    refs: [
+      CuratedTopicRef('Job', 32),
+      CuratedTopicRef('Job', 33),
+      CuratedTopicRef('Job', 34),
+      CuratedTopicRef('Job', 35),
+      CuratedTopicRef('Job', 36),
+      CuratedTopicRef('Job', 37),
+    ],
+  ),
+  CuratedTopic(
     name: 'THE LORD ANSWERS JOB OUT OF THE WHIRLWIND',
     category: 'story',
     description:
@@ -1396,6 +1450,25 @@ const _storyTopics = <CuratedTopic>[
         'speaks from a whirlwind, questioning Job with the wonders of '
         'creation until Job repents "in dust and ashes."',
     refs: [CuratedTopicRef('Job', 38, 1, 11), CuratedTopicRef('Job', 42, 1, 6)],
+  ),
+  CuratedTopic(
+    name: "GOD'S SECOND SPEECH: BEHEMOTH AND LEVIATHAN",
+    category: 'story',
+    description:
+        'The LORD speaks a second time, pointing Job to two '
+        'untamable creatures, Behemoth and Leviathan, as proof of a '
+        'wisdom and power far beyond human reach or control.',
+    refs: [CuratedTopicRef('Job', 40), CuratedTopicRef('Job', 41)],
+  ),
+  CuratedTopic(
+    name: "JOB'S RESTORATION",
+    category: 'story',
+    description:
+        "The LORD rebukes Job's three friends and restores Job's "
+        'fortunes twofold after he prays for them, giving him a new '
+        'family and twice what he had before, and Job lives another '
+        'hundred and forty years.',
+    refs: [CuratedTopicRef('Job', 42, 7, 17)],
   ),
   CuratedTopic(
     name: "ISAIAH'S CALL AND VISION",
