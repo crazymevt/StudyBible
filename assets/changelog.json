@@ -1,5 +1,53 @@
 [
   {
+    "version": "26.7.6+4",
+    "date": "2026-07-06",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "keep Explorer content clear of the system nav bar",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "render exported PDFs at the printer's negotiated page format",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add a family tree pedigree chart for Explorer people",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "resolve zero-place events and cap noisy bundled events on Explorer",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add the tabernacle's glory-filling as a curated story",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add ten curated story gaps found against KJV subheadings",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "collapse the Explorer cross-references card by default",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.6+3",
     "date": "2026-07-06",
     "features": [
