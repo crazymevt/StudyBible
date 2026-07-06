@@ -185,6 +185,43 @@ class ExplorerFacetCard extends StatelessWidget {
   }
 }
 
+/// Like [ExplorerFacetCard], but the whole card collapses behind its header
+/// instead of always showing its content — for facets (e.g. cross-references)
+/// that can otherwise dominate the page.
+class ExplorerCollapsibleFacetCard extends StatelessWidget {
+  const ExplorerCollapsibleFacetCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.child,
+  });
+
+  final IconData icon;
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        leading: Icon(icon, size: 18, color: scheme.primary),
+        title: Text(
+          title,
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        children: [child],
+      ),
+    );
+  }
+}
+
 /// A chip that drills into another Explorer entity.
 class ExplorerRefChip extends ConsumerWidget {
   const ExplorerRefChip(this.target, {super.key, this.subtitle});

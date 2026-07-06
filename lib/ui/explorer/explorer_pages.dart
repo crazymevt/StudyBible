@@ -797,9 +797,10 @@ class _TopicPage extends ConsumerWidget {
                 ),
               ),
             if (passageFacets.any((f) => f.crossRefGroups.isNotEmpty))
-              ExplorerFacetCard(
+              ExplorerCollapsibleFacetCard(
                 icon: Icons.compare_arrows_outlined,
-                title: 'Cross-references',
+                title: 'Cross-references '
+                    '(${passageFacets.fold(0, (n, f) => n + f.crossRefGroups.fold(0, (m, g) => m + g.refs.length))})',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1063,7 +1064,7 @@ class _PassagePage extends ConsumerWidget {
                 ),
               ),
             if (crossRefGroups.isNotEmpty)
-              ExplorerFacetCard(
+              ExplorerCollapsibleFacetCard(
                 icon: Icons.compare_arrows_outlined,
                 title: 'Cross-references '
                     '(${crossRefGroups.fold(0, (n, g) => n + g.refs.length)})',
@@ -1551,7 +1552,7 @@ class _TagPage extends ConsumerWidget {
                 ),
               ),
             if (crossRefGroups.isNotEmpty)
-              ExplorerFacetCard(
+              ExplorerCollapsibleFacetCard(
                 icon: Icons.compare_arrows_outlined,
                 title: 'Cross-references '
                     '(${crossRefGroups.fold(0, (n, g) => n + g.refs.length)})',

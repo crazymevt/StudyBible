@@ -552,8 +552,11 @@ void main() {
       await tester.tap(find.textContaining('Explore 1 Samuel 24'));
       await tester.pumpAndSettle();
 
-      // Cross-references, grouped under their source verse and votes-ordered.
+      // Cross-references card, collapsed by default; expanding it reveals
+      // every group, grouped under their source verse and votes-ordered.
       expect(find.text('Cross-references (2)'), findsOneWidget);
+      await tester.tap(find.text('Cross-references (2)'));
+      await tester.pumpAndSettle();
       expect(find.text('v. 1'), findsOneWidget);
       expect(find.text('Genesis 1:1'), findsOneWidget);
       expect(find.text('Psalms 57:1'), findsOneWidget);
@@ -772,6 +775,8 @@ void main() {
       );
 
       expect(find.text('Cross-references (2)'), findsOneWidget);
+      await tester.tap(find.text('Cross-references (2)'));
+      await tester.pumpAndSettle();
       expect(find.text('Genesis 1:1'), findsOneWidget);
       expect(find.text('Psalms 57:1'), findsOneWidget);
     },
