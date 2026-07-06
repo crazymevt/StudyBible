@@ -1388,6 +1388,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Isaiah', 6, 1, 8)],
   ),
   CuratedTopic(
+    name: 'THE SIGN OF IMMANUEL',
+    category: 'story',
+    description:
+        'When King Ahaz refuses to ask for a sign, Isaiah '
+        'declares that the LORD himself will give one: "Behold, the '
+        'virgin shall conceive and bear a son, and shall call his name '
+        'Immanuel."',
+    refs: [CuratedTopicRef('Isaiah', 7, 1, 17)],
+  ),
+  CuratedTopic(
     name: "JEREMIAH'S CALL",
     category: 'story',
     description:
@@ -1404,6 +1414,43 @@ const _storyTopics = <CuratedTopic>[
         "hears the LORD compare Israel to clay in the potter's hand, free "
         'to reshape or destroy as he wills.',
     refs: [CuratedTopicRef('Jeremiah', 18, 1, 11)],
+  ),
+  CuratedTopic(
+    name: "JEREMIAH'S TEMPLE SERMON AND TRIAL",
+    category: 'story',
+    description:
+        'Jeremiah warns that the temple will become like Shiloh '
+        'unless the people repent; the priests and prophets seize him and '
+        'demand his death, but the officials and elders spare his life.',
+    refs: [CuratedTopicRef('Jeremiah', 26)],
+  ),
+  CuratedTopic(
+    name: "JEREMIAH'S LETTER TO THE EXILES",
+    category: 'story',
+    description:
+        'Jeremiah writes to the exiles in Babylon urging them to '
+        'build houses and seek the welfare of the city, promising that '
+        'God knows "the plans I have for you... plans for welfare and '
+        'not for evil."',
+    refs: [CuratedTopicRef('Jeremiah', 29, 1, 14)],
+  ),
+  CuratedTopic(
+    name: 'JEREMIAH BUYS A FIELD AT ANATHOTH',
+    category: 'story',
+    description:
+        "With Jerusalem under siege and the Babylonians at the "
+        "gates, Jeremiah buys his cousin's field at Anathoth as a sign "
+        'that houses and fields will again be bought in the land.',
+    refs: [CuratedTopicRef('Jeremiah', 32, 6, 15)],
+  ),
+  CuratedTopic(
+    name: "THE RECHABITES' FAITHFULNESS",
+    category: 'story',
+    description:
+        "The Rechabites refuse the wine Jeremiah offers, obeying "
+        "their ancestor's centuries-old command, and God holds up their "
+        "obedience to shame Judah's unfaithfulness.",
+    refs: [CuratedTopicRef('Jeremiah', 35)],
   ),
   CuratedTopic(
     name: 'JEREMIAH THROWN INTO THE CISTERN',
@@ -1424,6 +1471,19 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Jeremiah', 36)],
   ),
   CuratedTopic(
+    name: 'THE ASSASSINATION OF GEDALIAH AND THE FLIGHT TO EGYPT',
+    category: 'story',
+    description:
+        "After Jerusalem's fall, Ishmael assassinates Gedaliah, "
+        'the governor appointed over the remnant left in the land; the '
+        'fearful survivors then force Jeremiah to go with them into '
+        'Egypt.',
+    refs: [
+      CuratedTopicRef('Jeremiah', 41, 1, 3),
+      CuratedTopicRef('Jeremiah', 43, 1, 7),
+    ],
+  ),
+  CuratedTopic(
     name: "EZEKIEL'S VISION OF THE LIVING CREATURES",
     category: 'story',
     description:
@@ -1433,6 +1493,36 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Ezekiel', 1), CuratedTopicRef('Ezekiel', 2, 1, 10)],
   ),
   CuratedTopic(
+    name: 'EZEKIEL ACTS OUT THE SIEGE OF JERUSALEM',
+    category: 'story',
+    description:
+        'Ezekiel enacts a living prophecy for the exiles, drawing '
+        'Jerusalem on a brick and laying siege to it, then lying bound on '
+        "his side for over a year to bear the nation's punishment.",
+    refs: [CuratedTopicRef('Ezekiel', 4)],
+  ),
+  CuratedTopic(
+    name: 'THE GLORY OF THE LORD DEPARTS THE TEMPLE',
+    category: 'story',
+    description:
+        "In a vision, Ezekiel watches the glory of the LORD rise "
+        "from the temple's threshold and depart the city, abandoning it "
+        'to judgment.',
+    refs: [
+      CuratedTopicRef('Ezekiel', 10),
+      CuratedTopicRef('Ezekiel', 11, 22, 23),
+    ],
+  ),
+  CuratedTopic(
+    name: "EZEKIEL'S WIFE DIES AS A SIGN",
+    category: 'story',
+    description:
+        "God tells Ezekiel his wife will die suddenly and forbids "
+        'him to mourn openly — a sign to the exiles that they will grieve '
+        'too deeply for tears when Jerusalem falls.',
+    refs: [CuratedTopicRef('Ezekiel', 24, 15, 27)],
+  ),
+  CuratedTopic(
     name: "EZEKIEL'S VALLEY OF DRY BONES",
     category: 'story',
     description:
@@ -1440,6 +1530,16 @@ const _storyTopics = <CuratedTopic>[
         'breath raises them into a vast living army — a vision of Israel\'s '
         'restoration.',
     refs: [CuratedTopicRef('Ezekiel', 37, 1, 14)],
+  ),
+  CuratedTopic(
+    name: 'THE RIVER FROM THE TEMPLE',
+    category: 'story',
+    description:
+        'Ezekiel sees a river flowing from beneath the temple '
+        'threshold, deepening as it goes and bringing life wherever it '
+        'flows, with trees on its banks whose fruit is for food and '
+        'leaves for healing.',
+    refs: [CuratedTopicRef('Ezekiel', 47, 1, 12)],
   ),
   CuratedTopic(
     name: 'DANIEL AND HIS FRIENDS REFUSE THE ROYAL FOOD',
@@ -1483,6 +1583,25 @@ const _storyTopics = <CuratedTopic>[
         'A disembodied hand writes Belshazzar\'s doom on the wall '
         'during a drunken feast, and Daniel interprets it that same night.',
     refs: [CuratedTopicRef('Daniel', 5)],
+  ),
+  CuratedTopic(
+    name: "DANIEL'S VISION OF THE FOUR BEASTS",
+    category: 'story',
+    description:
+        'Daniel sees four great beasts rise from the sea, then '
+        'the Ancient of Days take his throne and give everlasting '
+        'dominion to "one like a son of man."',
+    refs: [CuratedTopicRef('Daniel', 7)],
+  ),
+  CuratedTopic(
+    name: "DANIEL'S VISION BY THE TIGRIS",
+    category: 'story',
+    description:
+        'After three weeks of mourning and fasting, Daniel sees a '
+        'radiant heavenly being who tells him his words were heard from '
+        'the first day, but the "prince of the kingdom of Persia" '
+        'withstood him twenty-one days.',
+    refs: [CuratedTopicRef('Daniel', 10)],
   ),
 
   // --- Minor Prophets ---
