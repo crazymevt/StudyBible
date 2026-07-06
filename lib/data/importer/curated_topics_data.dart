@@ -116,6 +116,15 @@ const _storyTopics = <CuratedTopic>[
     ],
   ),
   CuratedTopic(
+    name: "NOAH'S DRUNKENNESS AND HAM'S SIN",
+    category: 'story',
+    description:
+        'Noah plants a vineyard and gets drunk in his tent; when '
+        'Ham dishonors him by exposing his nakedness, Noah wakes and '
+        "curses Ham's son Canaan while blessing Shem and Japheth.",
+    refs: [CuratedTopicRef('Genesis', 9, 20, 27)],
+  ),
+  CuratedTopic(
     name: 'THE TOWER OF BABEL',
     category: 'story',
     description:
@@ -384,6 +393,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 23, 33, 46)],
   ),
   CuratedTopic(
+    name: 'THE TEMPLE CURTAIN TORN AND THE SAINTS RAISED',
+    category: 'story',
+    description:
+        'At the moment Jesus dies, the temple curtain tears in '
+        'two from top to bottom, the earth shakes and rocks split, and '
+        'tombs open as many bodies of dead saints are raised to life.',
+    refs: [CuratedTopicRef('Matthew', 27, 51, 53)],
+  ),
+  CuratedTopic(
     name: 'JOHN AT THE FOOT OF THE CROSS',
     category: 'story',
     description:
@@ -595,6 +613,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 25, 1, 11)],
   ),
   CuratedTopic(
+    name: "ISAAC'S WELLS AND THE COVENANT WITH ABIMELECH",
+    category: 'story',
+    description:
+        'Isaac reopens his father\'s wells and digs new ones amid '
+        'strife with the Philistines, until Abimelech comes seeking a '
+        'peace treaty, seeing that "the LORD is with you."',
+    refs: [CuratedTopicRef('Genesis', 26)],
+  ),
+  CuratedTopic(
     name: "JACOB'S BIRTHRIGHT AND BLESSING",
     category: 'story',
     description:
@@ -692,6 +719,25 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 30, 1, 24)],
   ),
   CuratedTopic(
+    name: "JACOB'S SPECKLED FLOCKS",
+    category: 'story',
+    description:
+        "Jacob strikes a deal to take only the speckled and "
+        "spotted animals from Laban's flocks, then breeds them into the "
+        'majority using peeled branches, growing exceedingly wealthy.',
+    refs: [CuratedTopicRef('Genesis', 30, 25, 43)],
+  ),
+  CuratedTopic(
+    name: 'THE COVENANT AT MIZPAH',
+    category: 'story',
+    description:
+        'Fleeing Laban with his family and flocks, Jacob is '
+        "overtaken and confronted over his flight and Rachel's theft of "
+        "Laban's household idols, until the two make a covenant and set "
+        'up a heap of stones as a witness between them.',
+    refs: [CuratedTopicRef('Genesis', 31)],
+  ),
+  CuratedTopic(
     name: 'DINAH AND THE SHECHEMITES',
     category: 'story',
     description:
@@ -718,6 +764,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 39)],
   ),
   CuratedTopic(
+    name: "JOSEPH INTERPRETS THE CUPBEARER AND BAKER'S DREAMS",
+    category: 'story',
+    description:
+        "In prison, Joseph interprets dreams for Pharaoh's "
+        'cupbearer and baker exactly as they come to pass — restoration '
+        'for one, execution for the other — and asks the cupbearer to '
+        'remember him, though he forgets for two full years.',
+    refs: [CuratedTopicRef('Genesis', 40)],
+  ),
+  CuratedTopic(
     name: 'JACOB BLESSES HIS SONS',
     category: 'story',
     description:
@@ -725,8 +781,47 @@ const _storyTopics = <CuratedTopic>[
         'and pronounces a blessing and prophecy over each of them.',
     refs: [CuratedTopicRef('Genesis', 49, 1, 28)],
   ),
+  CuratedTopic(
+    name: 'THE DEATH AND BURIAL OF JACOB',
+    category: 'story',
+    description:
+        'Jacob dies in Egypt, is embalmed, and is carried back to '
+        'Canaan in a great funeral procession to be buried with his '
+        'fathers in the cave of Machpelah.',
+    refs: [
+      CuratedTopicRef('Genesis', 49, 29, 33),
+      CuratedTopicRef('Genesis', 50, 1, 14),
+    ],
+  ),
+  CuratedTopic(
+    name: 'JOSEPH REASSURES HIS BROTHERS: "YOU MEANT EVIL AGAINST ME"',
+    category: 'story',
+    description:
+        "Fearing revenge now that their father is dead, Joseph's "
+        'brothers beg his forgiveness; Joseph weeps and reassures them, '
+        '"You meant evil against me, but God meant it for good."',
+    refs: [CuratedTopicRef('Genesis', 50, 15, 21)],
+  ),
+  CuratedTopic(
+    name: 'THE DEATH OF JOSEPH',
+    category: 'story',
+    description:
+        'Joseph, at 110 years old, makes his brothers swear to '
+        'carry his bones up out of Egypt when God brings Israel to the '
+        'promised land, then dies and is embalmed.',
+    refs: [CuratedTopicRef('Genesis', 50, 22, 26)],
+  ),
 
   // --- Exodus – Numbers ---
+  CuratedTopic(
+    name: 'THE MIDWIVES DEFY PHARAOH',
+    category: 'story',
+    description:
+        'Ordered to kill every Hebrew boy at birth, the midwives '
+        'Shiphrah and Puah fear God instead and let the boys live, so '
+        'God deals well with them and gives them families of their own.',
+    refs: [CuratedTopicRef('Exodus', 1, 15, 22)],
+  ),
   CuratedTopic(
     name: 'MOSES FOUND IN THE BASKET',
     category: 'story',
@@ -753,6 +848,16 @@ const _storyTopics = <CuratedTopic>[
         'slaves by forcing them to gather their own straw for the same '
         'quota of bricks.',
     refs: [CuratedTopicRef('Exodus', 5, 1, 21)],
+  ),
+  CuratedTopic(
+    name: "AARON'S STAFF BECOMES A SERPENT",
+    category: 'story',
+    description:
+        "As proof of Moses and Aaron's authority, Aaron's staff "
+        "becomes a serpent before Pharaoh and swallows the serpents of "
+        "Pharaoh's magicians, who had matched the sign with their secret "
+        'arts.',
+    refs: [CuratedTopicRef('Exodus', 7, 8, 13)],
   ),
   CuratedTopic(
     name: 'THE TEN PLAGUES OF EGYPT',
@@ -926,6 +1031,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Numbers', 22, 21, 35)],
   ),
   CuratedTopic(
+    name: "BALAAM'S ORACLES OVER ISRAEL",
+    category: 'story',
+    description:
+        'Hired to curse Israel, Balaam instead blesses them four '
+        'times over, unable to speak anything but what the LORD puts in '
+        'his mouth — including the prophecy that "a star shall come out '
+        'of Jacob."',
+    refs: [CuratedTopicRef('Numbers', 23), CuratedTopicRef('Numbers', 24)],
+  ),
+  CuratedTopic(
     name: "MOSES' FACE SHINES",
     category: 'story',
     description:
@@ -962,6 +1077,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Numbers', 20, 1, 13)],
   ),
   CuratedTopic(
+    name: 'THE DEATH OF AARON',
+    category: 'story',
+    description:
+        'At the LORD\'s command, Moses strips Aaron of his priestly '
+        'garments and clothes his son Eleazar with them atop Mount Hor, '
+        'and Aaron dies there, mourned by all Israel for thirty days.',
+    refs: [CuratedTopicRef('Numbers', 20, 22, 29)],
+  ),
+  CuratedTopic(
     name: 'THE BRONZE SERPENT',
     category: 'story',
     description:
@@ -978,6 +1102,15 @@ const _storyTopics = <CuratedTopic>[
         'man and a Midianite woman caught flagrantly worshiping Baal '
         'together, and is rewarded with a covenant of peace.',
     refs: [CuratedTopicRef('Numbers', 25)],
+  ),
+  CuratedTopic(
+    name: 'THE DAUGHTERS OF ZELOPHEHAD',
+    category: 'story',
+    description:
+        'Five sisters with no brothers petition Moses for the '
+        "right to inherit their father's land, and the LORD rules in "
+        'their favor, establishing a new law of inheritance for Israel.',
+    refs: [CuratedTopicRef('Numbers', 27, 1, 11)],
   ),
 
   // --- Leviticus ---
@@ -1050,6 +1183,15 @@ const _storyTopics = <CuratedTopic>[
         'Joshua commands the sun and moon to stand still over '
         'Gibeon so Israel can finish routing its enemies by daylight.',
     refs: [CuratedTopicRef('Joshua', 10, 1, 15)],
+  ),
+  CuratedTopic(
+    name: 'CALEB CLAIMS HEBRON',
+    category: 'story',
+    description:
+        'At eighty-five, Caleb reminds Joshua of God\'s promise to '
+        'him at Kadesh-barnea and asks for the hill country of Hebron, '
+        'still strong enough to drive out its giants himself.',
+    refs: [CuratedTopicRef('Joshua', 14, 6, 15)],
   ),
   CuratedTopic(
     name: "JOSHUA'S FAREWELL: \"AS FOR ME AND MY HOUSE\"",
@@ -1191,6 +1333,19 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Judges', 16, 23, 30)],
   ),
   CuratedTopic(
+    name: "THE LEVITE'S CONCUBINE AND THE WAR AGAINST BENJAMIN",
+    category: 'story',
+    description:
+        "A Levite's concubine is abused to death by men of Gibeah, "
+        'and his gruesome call to arms plunges Israel into a civil war '
+        'that nearly wipes out the tribe of Benjamin.',
+    refs: [
+      CuratedTopicRef('Judges', 19),
+      CuratedTopicRef('Judges', 20),
+      CuratedTopicRef('Judges', 21),
+    ],
+  ),
+  CuratedTopic(
     name: 'RUTH GLEANS IN THE FIELD OF BOAZ',
     category: 'story',
     description:
@@ -1215,6 +1370,19 @@ const _storyTopics = <CuratedTopic>[
         'The barren Hannah prays for a son and dedicates him to '
         'the LORD\'s service; Samuel is born in answer to her prayer.',
     refs: [CuratedTopicRef('1 Samuel', 1, 9, 20)],
+  ),
+  CuratedTopic(
+    name: "ELI'S WICKED SONS",
+    category: 'story',
+    description:
+        "Eli's sons Hophni and Phinehas abuse their priestly "
+        'office and treat the LORD\'s offering with contempt, and an '
+        "unnamed man of God warns Eli that his sons will die on the same "
+        'day as judgment on his house.',
+    refs: [
+      CuratedTopicRef('1 Samuel', 2, 12, 17),
+      CuratedTopicRef('1 Samuel', 2, 22, 36),
+    ],
   ),
   CuratedTopic(
     name: "SAMUEL'S CALLING",
@@ -1287,6 +1455,16 @@ const _storyTopics = <CuratedTopic>[
     ],
   ),
   CuratedTopic(
+    name: 'DAVID AND THE SHOWBREAD AT NOB',
+    category: 'story',
+    description:
+        'Fleeing Saul and hungry, David asks the priest Ahimelech '
+        'at Nob for bread and a weapon, and is given the consecrated '
+        "showbread and the sword of Goliath, kept wrapped behind the "
+        'ephod.',
+    refs: [CuratedTopicRef('1 Samuel', 21, 1, 9)],
+  ),
+  CuratedTopic(
     name: 'DAVID FEIGNS MADNESS AT GATH',
     category: 'story',
     description:
@@ -1331,6 +1509,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('1 Samuel', 28, 3, 25)],
   ),
   CuratedTopic(
+    name: 'THE DEATH OF SAUL',
+    category: 'story',
+    description:
+        'Wounded by Philistine archers on Mount Gilboa, Saul '
+        'falls on his own sword rather than be captured and abused, and '
+        'dies alongside three of his sons, including Jonathan.',
+    refs: [CuratedTopicRef('1 Samuel', 31)],
+  ),
+  CuratedTopic(
     name: 'DAVID MOURNS SAUL AND JONATHAN',
     category: 'story',
     description:
@@ -1338,6 +1525,15 @@ const _storyTopics = <CuratedTopic>[
         'his clothes, executes the messenger who claims to have killed '
         'Saul, and laments them in song.',
     refs: [CuratedTopicRef('2 Samuel', 1, 1, 27)],
+  ),
+  CuratedTopic(
+    name: 'DAVID CAPTURES JERUSALEM FROM THE JEBUSITES',
+    category: 'story',
+    description:
+        'David and his men take the Jebusite stronghold of Zion '
+        'by surprise, despite the defenders\' taunt that even the blind '
+        'and lame could repel him, and it becomes the City of David.',
+    refs: [CuratedTopicRef('2 Samuel', 5, 6, 10)],
   ),
   CuratedTopic(
     name: 'UZZAH AND THE ARK',
@@ -1527,6 +1723,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('1 Kings', 12, 25, 33)],
   ),
   CuratedTopic(
+    name: "THE MAN OF GOD WHO CONFRONTS JEROBOAM'S ALTAR",
+    category: 'story',
+    description:
+        "A man of God prophesies against Jeroboam's altar at "
+        "Bethel and withers the king's hand, but is later deceived by an "
+        'old prophet into disobeying God\'s command and is killed by a '
+        'lion on the road home.',
+    refs: [CuratedTopicRef('1 Kings', 13)],
+  ),
+  CuratedTopic(
     name: 'ELIJAH FED BY RAVENS',
     category: 'story',
     description:
@@ -1579,12 +1785,30 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('1 Kings', 22, 1, 40)],
   ),
   CuratedTopic(
+    name: "ELIJAH CALLS DOWN FIRE ON AHAZIAH'S SOLDIERS",
+    category: 'story',
+    description:
+        'King Ahaziah sends soldiers to arrest Elijah for '
+        'prophesying his death; fire falls from heaven and consumes two '
+        'companies of fifty before the third captain begs for his life.',
+    refs: [CuratedTopicRef('2 Kings', 1)],
+  ),
+  CuratedTopic(
     name: 'ELIJAH TAKEN UP TO HEAVEN',
     category: 'story',
     description:
         'A chariot and horses of fire carry Elijah up to heaven in '
         'a whirlwind as Elisha watches and receives his mantle.',
     refs: [CuratedTopicRef('2 Kings', 2, 1, 12)],
+  ),
+  CuratedTopic(
+    name: 'ELISHA MOCKED AND THE SHE-BEARS',
+    category: 'story',
+    description:
+        'Young men jeer at Elisha, calling him "baldhead," and '
+        'he curses them in the name of the LORD; two she-bears come out '
+        'of the woods and maul forty-two of them.',
+    refs: [CuratedTopicRef('2 Kings', 2, 23, 25)],
   ),
   CuratedTopic(
     name: "ELISHA AND THE WIDOW'S OIL",
@@ -1636,6 +1860,26 @@ const _storyTopics = <CuratedTopic>[
         "into Samaria, and has the king feed them and send them home in "
         'peace instead of killing them.',
     refs: [CuratedTopicRef('2 Kings', 6, 8, 23)],
+  ),
+  CuratedTopic(
+    name: 'THE FOUR LEPERS AT THE SIEGE OF SAMARIA',
+    category: 'story',
+    description:
+        'Four starving lepers outside besieged Samaria decide to '
+        'risk surrendering to the enemy camp, only to find the LORD had '
+        'already routed the Syrians in panic, leaving the camp full of '
+        'plunder and food.',
+    refs: [CuratedTopicRef('2 Kings', 7)],
+  ),
+  CuratedTopic(
+    name: "ELISHA WEEPS OVER HAZAEL'S FUTURE",
+    category: 'story',
+    description:
+        'Elisha weeps as he foresees the atrocities the Syrian '
+        'official Hazael will commit against Israel once he becomes '
+        'king, and Hazael smothers his master Ben-hadad the next day to '
+        'seize the throne.',
+    refs: [CuratedTopicRef('2 Kings', 8, 7, 15)],
   ),
   CuratedTopic(
     name: "JEHU'S PURGE OF AHAB'S HOUSE",
@@ -1690,6 +1934,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('2 Kings', 20, 1, 11)],
   ),
   CuratedTopic(
+    name: "HEZEKIAH SHOWS OFF HIS TREASURES",
+    category: 'story',
+    description:
+        'Hezekiah proudly shows Babylonian envoys everything in '
+        'his storehouses, prompting Isaiah to prophesy that all of it — '
+        'and his own descendants — will one day be carried off to '
+        'Babylon.',
+    refs: [CuratedTopicRef('2 Kings', 20, 12, 19)],
+  ),
+  CuratedTopic(
     name: 'JOSIAH FINDS THE BOOK OF THE LAW',
     category: 'story',
     description:
@@ -1710,6 +1964,15 @@ const _storyTopics = <CuratedTopic>[
         'confirms coming judgment but promises Josiah he will be spared '
         'in his lifetime.',
     refs: [CuratedTopicRef('2 Kings', 22, 14, 20)],
+  ),
+  CuratedTopic(
+    name: 'THE DEATH OF JOSIAH AT MEGIDDO',
+    category: 'story',
+    description:
+        'Ignoring a warning from Pharaoh Neco, King Josiah goes '
+        'out to battle at Megiddo anyway, is fatally wounded, and dies '
+        'mourned by all Judah and Jerusalem.',
+    refs: [CuratedTopicRef('2 Kings', 23, 29, 30)],
   ),
   CuratedTopic(
     name: 'THE FALL OF JERUSALEM',
@@ -1741,6 +2004,16 @@ const _storyTopics = <CuratedTopic>[
         "ahead of the troops praising God, and the enemy coalition turns "
         'on itself before Judah ever fights.',
     refs: [CuratedTopicRef('2 Chronicles', 20)],
+  ),
+  CuratedTopic(
+    name: 'UZZIAH STRUCK WITH LEPROSY',
+    category: 'story',
+    description:
+        'Proud after many successes, King Uzziah enters the '
+        'temple to burn incense himself; the priests confront him, and '
+        'leprosy breaks out on his forehead on the spot, leaving him '
+        'quarantined for the rest of his life.',
+    refs: [CuratedTopicRef('2 Chronicles', 26, 16, 21)],
   ),
   CuratedTopic(
     name: "MANASSEH'S REPENTANCE",
@@ -3285,6 +3558,17 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Acts', 5, 1, 11)],
   ),
   CuratedTopic(
+    name: 'THE CHOOSING OF THE SEVEN',
+    category: 'story',
+    description:
+        'When Greek-speaking widows are overlooked in the daily '
+        'distribution of food, the apostles have the church choose seven '
+        'men full of the Spirit and wisdom — including Stephen and '
+        'Philip — to oversee it, freeing the apostles for prayer and '
+        'the word.',
+    refs: [CuratedTopicRef('Acts', 6, 1, 7)],
+  ),
+  CuratedTopic(
     name: "STEPHEN'S MARTYRDOM",
     category: 'story',
     description:
@@ -3526,6 +3810,16 @@ const _storyTopics = <CuratedTopic>[
         'recalling the Lord Jesus\' words: "It is more blessed to give '
         'than to receive."',
     refs: [CuratedTopicRef('Acts', 20, 17, 38)],
+  ),
+  CuratedTopic(
+    name: "AGABUS PROPHESIES PAUL'S ARREST",
+    category: 'story',
+    description:
+        "The prophet Agabus binds his own hands and feet with "
+        "Paul's belt, warning that the Jews in Jerusalem will bind its "
+        'owner the same way and hand him to the Gentiles; Paul goes on '
+        'anyway, ready even to die for the name of the Lord Jesus.',
+    refs: [CuratedTopicRef('Acts', 21, 10, 14)],
   ),
   CuratedTopic(
     name: 'PAUL ARRESTED IN THE TEMPLE',
