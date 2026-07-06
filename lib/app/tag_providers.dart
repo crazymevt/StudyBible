@@ -264,7 +264,8 @@ final entitiesForTagProvider = FutureProvider.family<List<SearchResult>, String>
         results.add(SearchResult(
           type: 'sermon',
           referenceId: sermon.id,
-          textContent: sermon.content.replaceAll(RegExp(r'\{[^\}]+\}'), '').replaceAll(RegExp(r'[\[\]\\n"insert:]'), '').trim(),
+          // content is Delta JSON (rich text); show a plain-text snippet.
+          textContent: sermon.contentPlain ?? deltaToPlainText(sermon.content),
           title: 'Sermon: ${sermon.title}',
         ));
       }

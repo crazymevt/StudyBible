@@ -404,7 +404,14 @@ void main() {
             updatedAt: Value(0),
             deviceId: Value('test-device'),
             title: Value('On Caves'),
-            content: Value(''),
+            // Delta JSON with a nested "attributes" object (a bold heading),
+            // like a real sermon would have. Regression coverage for a bug
+            // where the tag-search snippet came from an ad-hoc regex that
+            // deleted each op's text instead of just the JSON braces around
+            // it, leaving debris like "},,},.}" instead of the sermon's words.
+            content: Value(
+              '[{"insert":"Caves of En Gedi"},{"insert":"\\n","attributes":{"bold":true}},{"insert":"David hid there.\\n"}]',
+            ),
           ),
         );
     // Cites 1 Samuel 24 — should show up on that chapter's passage page.
@@ -981,6 +988,10 @@ void main() {
       ]);
       expect(d.notes.single.textContent, 'Saul chooses his men.');
       expect(d.sermons.single.title, 'Sermon: On Caves');
+      expect(
+        d.sermons.single.textContent,
+        'Caves of En Gedi David hid there.',
+      );
       expect(d.journals.single.textContent, 'Thinking about En Gedi.');
       expect(d.prayers.single.title, 'Prayer: For refuge');
       expect(d.notebooks.single.title, 'Notebook: On David');

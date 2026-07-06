@@ -36,21 +36,48 @@ String stripMarkupForIndex(String input) {
 
 /// Extracts plain text from a Quill Delta JSON string (a list of ops, each with
 /// an `insert`). Used to index rich-text content (e.g. sermons) as words rather
-/// than raw JSON. Falls back to returning the input unchanged if it is not
-/// valid Delta JSON.
+/// than raw JSON. Falls back to returning the input unchanged if it doesn't
+/// decode into a recognized Delta shape at all — legacy content from before
+/// this app's editors used Quill is plain text or HTML, not JSON, and should
+/// pass through unchanged rather than being blanked.
 String deltaToPlainText(String deltaJson) {
   if (deltaJson.isEmpty) return deltaJson;
-  try {
-    final decoded = jsonDecode(deltaJson);
-    if (decoded is! List) return deltaJson;
-    final buffer = StringBuffer();
-    for (final op in decoded) {
-      if (op is Map && op['insert'] is String) {
-        buffer.write(op['insert']);
-      }
+  final ops = _decodeDeltaOps(deltaJson);
+  if (ops == null) return deltaJson;
+  final buffer = StringBuffer();
+  for (final op in ops) {
+    if (op is Map && op['insert'] is String) {
+      buffer.write(op['insert']);
     }
-    return buffer.toString().replaceAll(_whitespacePattern, ' ').trim();
-  } catch (_) {
-    return deltaJson;
   }
+  return buffer.toString().replaceAll(_whitespacePattern, ' ').trim();
+}
+
+/// Returns the op list for [deltaJson], accepting both the bare-array shape
+/// this app writes (`[{"insert": ...}, ...]`) and the `{"ops": [...]}` wrapper
+/// some JS Quill clients produce when they JSON.stringify a Delta object
+/// directly (its `ops` field is the only enumerable property). Also unwraps
+/// one extra level of encoding, so content that was accidentally
+/// double-JSON-encoded by an import/export round trip resolves to its real
+/// ops instead of leaving raw JSON text to display. Returns null if
+/// [deltaJson] doesn't decode into a recognized shape.
+List<dynamic>? _decodeDeltaOps(String deltaJson) {
+  dynamic decoded;
+  try {
+    decoded = jsonDecode(deltaJson);
+  } catch (_) {
+    return null;
+  }
+  if (decoded is String) {
+    try {
+      decoded = jsonDecode(decoded);
+    } catch (_) {
+      return null;
+    }
+  }
+  if (decoded is List) return decoded;
+  if (decoded is Map && decoded['ops'] is List) {
+    return decoded['ops'] as List;
+  }
+  return null;
 }

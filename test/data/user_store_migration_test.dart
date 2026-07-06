@@ -116,4 +116,62 @@ void main() {
       await dir.delete(recursive: true);
     }
   });
+
+  test(
+    'upgrade from v29 repairs sermon content_plain that was left as raw '
+    'Delta JSON by the old extractor',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('user_store_v29');
+      final file = File('${dir.path}/user.db');
+      try {
+        // A v29 install with a sermon whose content is the `{"ops": [...]}`
+        // wrapper shape some JS Quill clients produce. The pre-fix
+        // deltaToPlainText only recognized a bare op array, so content_plain
+        // (and the search index built from it) were left holding that raw
+        // JSON verbatim instead of the sermon's actual words.
+        final raw = sqlite.sqlite3.open(file.path);
+        raw.execute(
+          'CREATE TABLE sermons (id TEXT NOT NULL PRIMARY KEY, title TEXT NOT NULL DEFAULT \'\', series TEXT, content TEXT NOT NULL DEFAULT \'\', content_plain TEXT, deleted INTEGER NOT NULL DEFAULT 0);',
+        );
+        raw.execute(
+          'CREATE VIRTUAL TABLE user_search USING fts5(type UNINDEXED, reference_id UNINDEXED, text_content);',
+        );
+        const wrappedDelta = '{"ops":[{"insert":"Grace and truth\\n"}]}';
+        raw.execute(
+          "INSERT INTO sermons (id, title, series, content, content_plain, deleted) "
+          "VALUES ('s1', 'On Grace', NULL, ?, ?, 0);",
+          [wrappedDelta, wrappedDelta],
+        );
+        raw.execute(
+          "INSERT INTO user_search (type, reference_id, text_content) "
+          "VALUES ('sermon', 's1', 'On Grace  ' || ?);",
+          [wrappedDelta],
+        );
+        raw.execute('PRAGMA user_version = 29;');
+        raw.close();
+
+        final store = UserStore(NativeDatabase(file));
+        await store.customSelect('SELECT 1').get();
+
+        final sermon = await store
+            .customSelect(
+              "SELECT content_plain FROM sermons WHERE id = 's1'",
+            )
+            .getSingle();
+        expect(sermon.read<String>('content_plain'), 'Grace and truth');
+
+        final indexed = await store
+            .customSelect(
+              "SELECT text_content FROM user_search WHERE type = 'sermon' AND reference_id = 's1'",
+            )
+            .getSingle();
+        expect(indexed.read<String>('text_content'), isNot(contains('{')));
+        expect(indexed.read<String>('text_content'), contains('Grace and truth'));
+
+        await store.close();
+      } finally {
+        await dir.delete(recursive: true);
+      }
+    },
+  );
 }

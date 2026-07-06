@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:study_bible/data/fts_text.dart';
 
@@ -64,6 +66,29 @@ void main() {
 
     test('handles empty string', () {
       expect(deltaToPlainText(''), '');
+    });
+
+    // Regression: some JS Quill clients JSON.stringify a Delta object
+    // directly, producing `{"ops": [...]}` (its `ops` field is the only
+    // enumerable property) instead of the bare op array this app writes.
+    // The old extractor only recognized a bare List and returned this
+    // wrapped JSON unchanged, leaking raw JSON into search snippets.
+    test('extracts text from the {"ops": [...]} wrapper shape', () {
+      expect(
+        deltaToPlainText('{"ops":[{"insert":"Grace and truth\\n"}]}'),
+        'Grace and truth',
+      );
+    });
+
+    // Regression: content accidentally JSON-encoded twice by an import/export
+    // round trip decodes once into a Dart String (still raw Delta JSON text)
+    // rather than a List — the old extractor gave up at that point and
+    // returned the still-encoded string, showing up as visible braces/quotes
+    // in a search result.
+    test('unwraps content that was double-JSON-encoded', () {
+      final delta = '[{"insert":"Grace and truth\\n"}]';
+      final doubleEncoded = jsonEncode(delta);
+      expect(deltaToPlainText(doubleEncoded), 'Grace and truth');
     });
   });
 }

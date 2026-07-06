@@ -44,7 +44,7 @@ class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 29;
+  int get schemaVersion => 30;
 
   @override
   MigrationStrategy get migration {
@@ -664,8 +664,65 @@ class UserStore extends _$UserStore {
             'ON document_references (entity_type, entity_id)',
           );
         }
+        if (from < 30) {
+          // deltaToPlainText used to return raw JSON unchanged for any Delta
+          // shape it didn't recognize (notably the `{"ops": [...]}` wrapper
+          // some JS Quill clients produce, and content accidentally
+          // double-JSON-encoded by an import/export round trip), so
+          // content_plain — and therefore the search snippet — could be raw
+          // JSON instead of plain text. Recompute it for every rich-text
+          // table with the fixed extractor and rebuild their search rows.
+          await _repairRichTextPlainText('sermons', 'content_plain');
+          await _repairRichTextPlainText('journals', 'content_plain');
+          await _repairRichTextPlainText('notebook_pages', 'content_plain');
+
+          if (await _tableExists('sermons')) {
+            await customStatement(
+              "DELETE FROM user_search WHERE type = 'sermon';",
+            );
+            await customStatement('''
+              INSERT INTO user_search(type, reference_id, text_content)
+              SELECT 'sermon', id, title || ' ' || COALESCE(series, '') || ' ' || COALESCE(content_plain, '') FROM sermons WHERE deleted = 0;
+            ''');
+          }
+          if (await _tableExists('journals')) {
+            await customStatement(
+              "DELETE FROM user_search WHERE type = 'journal';",
+            );
+            await customStatement('''
+              INSERT INTO user_search(type, reference_id, text_content)
+              SELECT 'journal', id, title || ' ' || COALESCE(content_plain, '') FROM journals WHERE deleted = 0;
+            ''');
+          }
+          if (await _tableExists('notebook_pages')) {
+            await customStatement(
+              "DELETE FROM user_search WHERE type = 'notebookPage';",
+            );
+            await customStatement('''
+              INSERT INTO user_search(type, reference_id, text_content)
+              SELECT 'notebookPage', id, title || ' ' || COALESCE(content_plain, '') FROM notebook_pages WHERE deleted = 0;
+            ''');
+          }
+        }
       },
     );
+  }
+
+  /// Recomputes [plainColumn] on every row of [table] from its `content`
+  /// column via the (fixed) [deltaToPlainText]. Shared by the v30 repair
+  /// migration across sermons/journals/notebook_pages.
+  Future<void> _repairRichTextPlainText(String table, String plainColumn) async {
+    if (!await _tableExists(table)) return;
+    final rows = await customSelect('SELECT id, content FROM $table').get();
+    for (final row in rows) {
+      await customStatement(
+        'UPDATE $table SET $plainColumn = ? WHERE id = ?',
+        [
+          deltaToPlainText(row.read<String>('content')),
+          row.read<String>('id'),
+        ],
+      );
+    }
   }
 
   /// The index set shared by the v28 upgrade and the @TableIndex annotations.
