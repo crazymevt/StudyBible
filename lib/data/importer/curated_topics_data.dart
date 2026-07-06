@@ -9,7 +9,12 @@ class CuratedTopicRef {
   final int? verse;
   final int? verseEnd;
 
-  const CuratedTopicRef(this.bookName, this.chapter, [this.verse, this.verseEnd]);
+  const CuratedTopicRef(
+    this.bookName,
+    this.chapter, [
+    this.verse,
+    this.verseEnd,
+  ]);
 }
 
 /// A hand-curated topic layered into the same `topics` table Nave's Topical
@@ -74,21 +79,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'CREATION',
     category: 'story',
-    description: 'God creates the heavens, the earth, and all living things '
+    description:
+        'God creates the heavens, the earth, and all living things '
         'in six days, then rests on the seventh.',
     refs: [CuratedTopicRef('Genesis', 1), CuratedTopicRef('Genesis', 2, 1, 3)],
   ),
   CuratedTopic(
     name: 'THE FALL OF MAN',
     category: 'story',
-    description: 'The serpent tempts Eve, Adam and Eve eat the forbidden '
+    description:
+        'The serpent tempts Eve, Adam and Eve eat the forbidden '
         'fruit, and sin and death enter the world.',
     refs: [CuratedTopicRef('Genesis', 3)],
   ),
   CuratedTopic(
     name: 'NOAH AND THE FLOOD',
     category: 'story',
-    description: 'God floods the earth to judge its wickedness, sparing '
+    description:
+        'God floods the earth to judge its wickedness, sparing '
         'Noah, his family, and the animals aboard the ark.',
     refs: [
       CuratedTopicRef('Genesis', 6, 9, 22),
@@ -100,14 +108,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE TOWER OF BABEL',
     category: 'story',
-    description: 'Humanity builds a tower to make a name for itself; God '
+    description:
+        'Humanity builds a tower to make a name for itself; God '
         'confuses their language and scatters them across the earth.',
     refs: [CuratedTopicRef('Genesis', 11, 1, 9)],
   ),
   CuratedTopic(
     name: "ABRAHAM'S CALL AND COVENANT",
     category: 'story',
-    description: 'God calls Abram out of Haran and repeatedly covenants to '
+    description:
+        'God calls Abram out of Haran and repeatedly covenants to '
         'make him a great nation and give his offspring the land of Canaan.',
     refs: [
       CuratedTopicRef('Genesis', 12, 1, 9),
@@ -118,34 +128,43 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE BINDING OF ISAAC',
     category: 'story',
-    description: 'God tests Abraham by commanding him to sacrifice Isaac, '
+    description:
+        'God tests Abraham by commanding him to sacrifice Isaac, '
         'then provides a ram in his place at the last moment.',
     refs: [CuratedTopicRef('Genesis', 22, 1, 19)],
   ),
   CuratedTopic(
     name: 'JOSEPH SOLD INTO SLAVERY',
     category: 'story',
-    description: "Joseph's jealous brothers throw him into a pit and sell "
+    description:
+        "Joseph's jealous brothers throw him into a pit and sell "
         'him to traders bound for Egypt.',
     refs: [CuratedTopicRef('Genesis', 37, 12, 36)],
   ),
   CuratedTopic(
     name: 'MOSES AND THE BURNING BUSH',
     category: 'story',
-    description: 'God appears to Moses in a bush that burns without being '
+    description:
+        'God appears to Moses in a bush that burns without being '
         'consumed and commissions him to deliver Israel from Egypt.',
     refs: [CuratedTopicRef('Exodus', 3, 1, 15)],
   ),
   CuratedTopic(
     name: 'THE EXODUS FROM EGYPT',
     category: 'story',
-    description: 'After the tenth plague, Pharaoh releases Israel, who '
-        'cross the Red Sea on dry ground as the pursuing Egyptian army '
-        'drowns.',
-    refs: [
-      CuratedTopicRef('Exodus', 12, 29, 42),
-      CuratedTopicRef('Exodus', 14, 21, 31),
-    ],
+    description:
+        'After the tenth plague, Pharaoh finally lets Israel go, '
+        'and they set out from Egypt in haste after four hundred years.',
+    refs: [CuratedTopicRef('Exodus', 12, 29, 42)],
+  ),
+  CuratedTopic(
+    name: 'CROSSING THE RED SEA',
+    category: 'story',
+    description:
+        'Trapped between Pharaoh\'s pursuing army and the sea, '
+        'Israel crosses the Red Sea on dry ground as the waters part, then '
+        'close again to drown the Egyptians.',
+    refs: [CuratedTopicRef('Exodus', 14, 21, 31)],
   ),
   CuratedTopic(
     name: 'THE TEN COMMANDMENTS',
@@ -156,21 +175,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'DAVID AND GOLIATH',
     category: 'story',
-    description: 'The shepherd boy David kills the Philistine champion '
+    description:
+        'The shepherd boy David kills the Philistine champion '
         'Goliath with a sling and a stone.',
     refs: [CuratedTopicRef('1 Samuel', 17)],
   ),
   CuratedTopic(
     name: "DANIEL IN THE LIONS' DEN",
     category: 'story',
-    description: 'Daniel is thrown into a den of lions for praying to God '
+    description:
+        'Daniel is thrown into a den of lions for praying to God '
         'in defiance of a royal decree, and God shuts the lions\' mouths.',
     refs: [CuratedTopicRef('Daniel', 6)],
   ),
   CuratedTopic(
     name: 'THE ANNUNCIATION',
     category: 'story',
-    description: 'The angel Gabriel tells the virgin Mary she will '
+    description:
+        'The angel Gabriel tells the virgin Mary she will '
         'conceive by the Holy Spirit and bear the Son of God, and she '
         'answers, "Let it be to me according to your word."',
     refs: [CuratedTopicRef('Luke', 1, 26, 38)],
@@ -178,15 +200,20 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "ZECHARIAH, ELIZABETH, AND THE BIRTH OF JOHN THE BAPTIST",
     category: 'story',
-    description: 'An angel strikes the priest Zechariah mute for '
+    description:
+        'An angel strikes the priest Zechariah mute for '
         'doubting that his aged wife Elizabeth will bear a son; his '
         'speech returns the moment he names the baby John.',
-    refs: [CuratedTopicRef('Luke', 1, 5, 25), CuratedTopicRef('Luke', 1, 57, 80)],
+    refs: [
+      CuratedTopicRef('Luke', 1, 5, 25),
+      CuratedTopicRef('Luke', 1, 57, 80),
+    ],
   ),
   CuratedTopic(
     name: 'THE BIRTH OF JESUS',
     category: 'story',
-    description: 'Jesus is born to Mary in Bethlehem and laid in a manger; '
+    description:
+        'Jesus is born to Mary in Bethlehem and laid in a manger; '
         'angels announce the news to shepherds keeping watch nearby.',
     refs: [
       CuratedTopicRef('Luke', 2, 1, 20),
@@ -196,14 +223,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE VISIT OF THE MAGI',
     category: 'story',
-    description: 'Magi from the east follow a star to Bethlehem and worship '
+    description:
+        'Magi from the east follow a star to Bethlehem and worship '
         'the infant Jesus with gifts of gold, frankincense, and myrrh.',
     refs: [CuratedTopicRef('Matthew', 2, 1, 12)],
   ),
   CuratedTopic(
     name: 'SIMEON AND ANNA AT THE TEMPLE',
     category: 'story',
-    description: 'The aged Simeon and the prophetess Anna, who had long '
+    description:
+        'The aged Simeon and the prophetess Anna, who had long '
         'awaited Israel\'s redemption, recognize the infant Jesus as the '
         'promised Messiah when Mary and Joseph present him at the temple.',
     refs: [CuratedTopicRef('Luke', 2, 22, 38)],
@@ -211,7 +240,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE BOY JESUS AT THE TEMPLE',
     category: 'story',
-    description: 'Twelve-year-old Jesus stays behind in Jerusalem, found '
+    description:
+        'Twelve-year-old Jesus stays behind in Jerusalem, found '
         'three days later sitting among the teachers in the temple, '
         '"listening to them and asking them questions."',
     refs: [CuratedTopicRef('Luke', 2, 41, 52)],
@@ -219,7 +249,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "JESUS' BAPTISM",
     category: 'story',
-    description: 'John the Baptist baptizes Jesus in the Jordan; the Spirit '
+    description:
+        'John the Baptist baptizes Jesus in the Jordan; the Spirit '
         'descends like a dove and a voice from heaven declares him God\'s '
         'Son.',
     refs: [CuratedTopicRef('Matthew', 3, 13, 17)],
@@ -227,7 +258,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE SERMON ON THE MOUNT',
     category: 'story',
-    description: "Jesus teaches the Beatitudes and the core of his ethical "
+    description:
+        "Jesus teaches the Beatitudes and the core of his ethical "
         'teaching to a crowd gathered on a mountainside.',
     refs: [
       CuratedTopicRef('Matthew', 5, 1, 12),
@@ -237,49 +269,56 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE FEEDING OF THE FIVE THOUSAND',
     category: 'story',
-    description: 'Jesus multiplies five loaves and two fish to feed a crowd '
+    description:
+        'Jesus multiplies five loaves and two fish to feed a crowd '
         'of five thousand, with twelve baskets of food left over.',
     refs: [CuratedTopicRef('John', 6, 1, 14)],
   ),
   CuratedTopic(
     name: 'THE TRANSFIGURATION',
     category: 'story',
-    description: "Jesus is transfigured before Peter, James, and John; his "
+    description:
+        "Jesus is transfigured before Peter, James, and John; his "
         'face and clothes shine, and Moses and Elijah appear with him.',
     refs: [CuratedTopicRef('Matthew', 17, 1, 8)],
   ),
   CuratedTopic(
     name: 'THE LAST SUPPER',
     category: 'story',
-    description: 'Jesus shares a final Passover meal with his disciples '
+    description:
+        'Jesus shares a final Passover meal with his disciples '
         'and institutes the bread and cup in remembrance of him.',
     refs: [CuratedTopicRef('Luke', 22, 14, 20)],
   ),
   CuratedTopic(
     name: 'THE CRUCIFIXION',
     category: 'story',
-    description: 'Jesus is crucified at Golgotha between two criminals and '
+    description:
+        'Jesus is crucified at Golgotha between two criminals and '
         'dies, committing his spirit into the Father\'s hands.',
     refs: [CuratedTopicRef('Luke', 23, 33, 46)],
   ),
   CuratedTopic(
     name: 'THE RESURRECTION',
     category: 'story',
-    description: 'Women find the tomb empty on the third day; angels '
+    description:
+        'Women find the tomb empty on the third day; angels '
         'announce that Jesus has risen.',
     refs: [CuratedTopicRef('Luke', 24, 1, 12)],
   ),
   CuratedTopic(
     name: 'THE ASCENSION',
     category: 'story',
-    description: 'Jesus commissions his disciples and is taken up into '
+    description:
+        'Jesus commissions his disciples and is taken up into '
         'heaven before their eyes.',
     refs: [CuratedTopicRef('Acts', 1, 6, 11)],
   ),
   CuratedTopic(
     name: 'THE DAY OF PENTECOST',
     category: 'story',
-    description: 'The Holy Spirit descends on the gathered believers with '
+    description:
+        'The Holy Spirit descends on the gathered believers with '
         'the sound of wind and tongues of fire, and they speak in other '
         'tongues.',
     refs: [CuratedTopicRef('Acts', 2, 1, 13)],
@@ -287,14 +326,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'PETER HEALS THE LAME MAN AT THE TEMPLE',
     category: 'story',
-    description: 'Peter heals a man lame from birth at the Beautiful Gate '
+    description:
+        'Peter heals a man lame from birth at the Beautiful Gate '
         'of the temple, "in the name of Jesus Christ of Nazareth."',
     refs: [CuratedTopicRef('Acts', 3, 1, 10)],
   ),
   CuratedTopic(
     name: 'THE CONVERSION OF SAUL',
     category: 'story',
-    description: 'A blinding light and the voice of Jesus confront Saul on '
+    description:
+        'A blinding light and the voice of Jesus confront Saul on '
         'the road to Damascus; Ananias restores his sight and he is '
         'baptized.',
     refs: [CuratedTopicRef('Acts', 9, 1, 19)],
@@ -304,14 +345,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'CAIN AND ABEL',
     category: 'story',
-    description: 'Cain murders his brother Abel out of jealousy and is '
+    description:
+        'Cain murders his brother Abel out of jealousy and is '
         'marked and banished by God.',
     refs: [CuratedTopicRef('Genesis', 4, 1, 16)],
   ),
   CuratedTopic(
     name: 'ABRAHAM AND MELCHIZEDEK',
     category: 'story',
-    description: 'The king-priest Melchizedek blesses Abraham with bread '
+    description:
+        'The king-priest Melchizedek blesses Abraham with bread '
         'and wine after his rescue of Lot, and Abraham gives him a tenth '
         'of everything.',
     refs: [CuratedTopicRef('Genesis', 14, 17, 20)],
@@ -319,7 +362,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE DESTRUCTION OF SODOM AND GOMORRAH',
     category: 'story',
-    description: 'Angels rescue Lot and his family before God rains fire '
+    description:
+        'Angels rescue Lot and his family before God rains fire '
         'and sulfur on Sodom and Gomorrah; Lot\'s wife looks back and '
         'becomes a pillar of salt.',
     refs: [CuratedTopicRef('Genesis', 19, 1, 29)],
@@ -327,7 +371,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'HAGAR AND ISHMAEL SENT AWAY',
     category: 'story',
-    description: 'Sarah has Hagar and Ishmael sent into the wilderness, '
+    description:
+        'Sarah has Hagar and Ishmael sent into the wilderness, '
         'where God provides water and promises to make Ishmael a great '
         'nation.',
     refs: [CuratedTopicRef('Genesis', 21, 8, 21)],
@@ -335,14 +380,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'ISAAC AND REBEKAH',
     category: 'story',
-    description: 'Abraham\'s servant prays for a sign at a well and finds '
+    description:
+        'Abraham\'s servant prays for a sign at a well and finds '
         'Rebekah, who returns with him to become Isaac\'s wife.',
     refs: [CuratedTopicRef('Genesis', 24)],
   ),
   CuratedTopic(
     name: "JACOB'S BIRTHRIGHT AND BLESSING",
     category: 'story',
-    description: 'Esau sells his birthright for a bowl of stew, and Jacob '
+    description:
+        'Esau sells his birthright for a bowl of stew, and Jacob '
         'later deceives their blind father Isaac to steal Esau\'s blessing.',
     refs: [
       CuratedTopicRef('Genesis', 25, 29, 34),
@@ -352,14 +399,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'JACOB WRESTLES WITH THE ANGEL',
     category: 'story',
-    description: 'Jacob wrestles with a divine visitor all night at Peniel, '
+    description:
+        'Jacob wrestles with a divine visitor all night at Peniel, '
         'refusing to let go until he is blessed, and is renamed Israel.',
     refs: [CuratedTopicRef('Genesis', 32, 22, 32)],
   ),
   CuratedTopic(
     name: "JOSEPH'S DREAMS",
     category: 'story',
-    description: 'Joseph, favored by his father with a special coat, '
+    description:
+        'Joseph, favored by his father with a special coat, '
         'dreams that his family will one day bow down to him — fueling his '
         'brothers\' jealousy.',
     refs: [CuratedTopicRef('Genesis', 37, 1, 11)],
@@ -367,21 +416,33 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "JOSEPH INTERPRETS PHARAOH'S DREAMS",
     category: 'story',
-    description: 'Joseph interprets Pharaoh\'s dreams of coming famine and '
+    description:
+        'Joseph interprets Pharaoh\'s dreams of coming famine and '
         'is made ruler over all Egypt to prepare for it.',
     refs: [CuratedTopicRef('Genesis', 41, 1, 40)],
   ),
   CuratedTopic(
+    name: "JOSEPH TESTS HIS BROTHERS",
+    category: 'story',
+    description:
+        'Joseph, unrecognized by the brothers who once sold him, '
+        "tests them by planting his silver cup in Benjamin's sack before "
+        'revealing who he is.',
+    refs: [CuratedTopicRef('Genesis', 42), CuratedTopicRef('Genesis', 44)],
+  ),
+  CuratedTopic(
     name: 'JOSEPH REVEALS HIMSELF TO HIS BROTHERS',
     category: 'story',
-    description: 'Joseph, now Egypt\'s governor, breaks down and reveals his '
+    description:
+        'Joseph, now Egypt\'s governor, breaks down and reveals his '
         'identity to the brothers who once sold him into slavery.',
     refs: [CuratedTopicRef('Genesis', 45, 1, 15)],
   ),
   CuratedTopic(
     name: "JACOB'S LADDER",
     category: 'story',
-    description: 'Fleeing Esau, Jacob dreams of a stairway to heaven with '
+    description:
+        'Fleeing Esau, Jacob dreams of a stairway to heaven with '
         'angels ascending and descending, and God renews the covenant '
         'promise to him at Bethel.',
     refs: [CuratedTopicRef('Genesis', 28, 10, 22)],
@@ -389,14 +450,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'JACOB MEETS RACHEL AND SERVES LABAN',
     category: 'story',
-    description: 'Jacob falls in love with Rachel at a well, works seven '
+    description:
+        'Jacob falls in love with Rachel at a well, works seven '
         'years for her, and is deceived into marrying Leah first.',
     refs: [CuratedTopicRef('Genesis', 29, 1, 30)],
   ),
   CuratedTopic(
     name: 'DINAH AND THE SHECHEMITES',
     category: 'story',
-    description: "After Shechem violates Jacob's daughter Dinah, her "
+    description:
+        "After Shechem violates Jacob's daughter Dinah, her "
         'brothers Simeon and Levi avenge her by slaughtering the men of '
         'the city.',
     refs: [CuratedTopicRef('Genesis', 34)],
@@ -404,7 +467,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'JUDAH AND TAMAR',
     category: 'story',
-    description: 'Denied a husband from Judah\'s family, Tamar disguises '
+    description:
+        'Denied a husband from Judah\'s family, Tamar disguises '
         'herself and conceives by Judah himself, who admits, "She is more '
         'righteous than I."',
     refs: [CuratedTopicRef('Genesis', 38)],
@@ -412,14 +476,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "JOSEPH AND POTIPHAR'S WIFE",
     category: 'story',
-    description: 'Joseph flees the advances of his master\'s wife, who then '
+    description:
+        'Joseph flees the advances of his master\'s wife, who then '
         'falsely accuses him and has him thrown into prison.',
     refs: [CuratedTopicRef('Genesis', 39)],
   ),
   CuratedTopic(
     name: 'JACOB BLESSES HIS SONS',
     category: 'story',
-    description: 'On his deathbed in Egypt, Jacob gathers his twelve sons '
+    description:
+        'On his deathbed in Egypt, Jacob gathers his twelve sons '
         'and pronounces a blessing and prophecy over each of them.',
     refs: [CuratedTopicRef('Genesis', 49, 1, 28)],
   ),
@@ -428,14 +494,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'MOSES FOUND IN THE BASKET',
     category: 'story',
-    description: 'To save him from Pharaoh\'s decree, infant Moses is set '
+    description:
+        'To save him from Pharaoh\'s decree, infant Moses is set '
         'adrift in a basket on the Nile and found by Pharaoh\'s daughter.',
     refs: [CuratedTopicRef('Exodus', 2, 1, 10)],
   ),
   CuratedTopic(
     name: 'THE TEN PLAGUES OF EGYPT',
     category: 'story',
-    description: 'God sends ten plagues on Egypt, from the Nile turning to '
+    description:
+        'God sends ten plagues on Egypt, from the Nile turning to '
         'blood to the death of the firstborn, until Pharaoh releases Israel.',
     refs: [
       CuratedTopicRef('Exodus', 7, 20, 21),
@@ -445,42 +513,57 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'MANNA AND QUAIL IN THE WILDERNESS',
     category: 'story',
-    description: 'God feeds the grumbling Israelites with quail in the '
+    description:
+        'God feeds the grumbling Israelites with quail in the '
         'evening and bread-like manna every morning in the wilderness.',
     refs: [CuratedTopicRef('Exodus', 16, 4, 15)],
   ),
   CuratedTopic(
     name: 'WATER FROM THE ROCK',
     category: 'story',
-    description: 'At Massah and Meribah, Moses strikes a rock at Horeb and '
+    description:
+        'At Massah and Meribah, Moses strikes a rock at Horeb and '
         'water flows out for the thirsty Israelites.',
     refs: [CuratedTopicRef('Exodus', 17, 1, 7)],
   ),
   CuratedTopic(
     name: 'THE GOLDEN CALF',
     category: 'story',
-    description: 'While Moses is on Mount Sinai, Israel persuades Aaron to '
+    description:
+        'While Moses is on Mount Sinai, Israel persuades Aaron to '
         'make a golden calf to worship, provoking God\'s anger.',
     refs: [CuratedTopicRef('Exodus', 32)],
   ),
   CuratedTopic(
+    name: "MIRIAM AND AARON'S REBELLION",
+    category: 'story',
+    description:
+        'Miriam and Aaron challenge Moses\' unique authority and '
+        'Miriam is struck with leprosy, healed only after Moses intercedes '
+        'and she is shut out of the camp for seven days.',
+    refs: [CuratedTopicRef('Numbers', 12)],
+  ),
+  CuratedTopic(
     name: 'THE TWELVE SPIES',
     category: 'story',
-    description: 'Twelve spies scout Canaan; ten report giants and defeat, '
+    description:
+        'Twelve spies scout Canaan; ten report giants and defeat, '
         'but Joshua and Caleb urge Israel to trust God and take the land.',
     refs: [CuratedTopicRef('Numbers', 13)],
   ),
   CuratedTopic(
     name: "BALAAM'S DONKEY",
     category: 'story',
-    description: 'Balaam\'s donkey sees the angel of the LORD blocking the '
+    description:
+        'Balaam\'s donkey sees the angel of the LORD blocking the '
         'road and speaks aloud in protest before Balaam himself sees it.',
     refs: [CuratedTopicRef('Numbers', 22, 21, 35)],
   ),
   CuratedTopic(
     name: "MOSES' FACE SHINES",
     category: 'story',
-    description: 'Moses comes down from Sinai with the second set of '
+    description:
+        'Moses comes down from Sinai with the second set of '
         'tablets, his face radiant from speaking with the LORD, and must '
         'veil it before the people.',
     refs: [CuratedTopicRef('Exodus', 34, 29, 35)],
@@ -488,7 +571,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "KORAH'S REBELLION",
     category: 'story',
-    description: "Korah and his followers challenge Moses and Aaron's "
+    description:
+        "Korah and his followers challenge Moses and Aaron's "
         'authority; the earth opens and swallows them, and fire consumes '
         'their company.',
     refs: [CuratedTopicRef('Numbers', 16)],
@@ -496,25 +580,46 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "AARON'S ROD BUDS",
     category: 'story',
-    description: "God confirms Aaron's priesthood when his staff alone, "
+    description:
+        "God confirms Aaron's priesthood when his staff alone, "
         'left overnight before the ark, sprouts buds, blossoms, and '
         'ripe almonds.',
     refs: [CuratedTopicRef('Numbers', 17)],
   ),
   CuratedTopic(
+    name: 'THE WATERS OF MERIBAH',
+    category: 'story',
+    description:
+        'Moses strikes the rock in anger instead of speaking to it '
+        'as commanded, and God bars him from entering the promised land '
+        'because of it.',
+    refs: [CuratedTopicRef('Numbers', 20, 1, 13)],
+  ),
+  CuratedTopic(
     name: 'THE BRONZE SERPENT',
     category: 'story',
-    description: 'When venomous snakes plague the grumbling Israelites, God '
+    description:
+        'When venomous snakes plague the grumbling Israelites, God '
         'has Moses lift up a bronze serpent so that anyone who looks at it '
         'lives.',
     refs: [CuratedTopicRef('Numbers', 21, 4, 9)],
+  ),
+  CuratedTopic(
+    name: "PHINEHAS' ZEAL AT BAAL-PEOR",
+    category: 'story',
+    description:
+        "Phinehas stops a plague on Israel by killing an Israelite "
+        'man and a Midianite woman caught flagrantly worshiping Baal '
+        'together, and is rewarded with a covenant of peace.',
+    refs: [CuratedTopicRef('Numbers', 25)],
   ),
 
   // --- Leviticus ---
   CuratedTopic(
     name: 'THE DEATH OF NADAB AND ABIHU',
     category: 'story',
-    description: "Aaron's sons Nadab and Abihu offer \"strange fire\" "
+    description:
+        "Aaron's sons Nadab and Abihu offer \"strange fire\" "
         'before the LORD and are struck dead on the spot.',
     refs: [CuratedTopicRef('Leviticus', 10, 1, 7)],
   ),
@@ -523,7 +628,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'MOSES VIEWS THE PROMISED LAND AND DIES',
     category: 'story',
-    description: 'Barred from entering Canaan, Moses views it from Mount '
+    description:
+        'Barred from entering Canaan, Moses views it from Mount '
         'Nebo before dying at 120, "his eye undimmed and his vigor '
         'unabated."',
     refs: [CuratedTopicRef('Deuteronomy', 34)],
@@ -533,28 +639,32 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'RAHAB AND THE SPIES',
     category: 'story',
-    description: 'Rahab hides Israel\'s spies in Jericho and is promised '
+    description:
+        'Rahab hides Israel\'s spies in Jericho and is promised '
         'safety for her family when the city falls.',
     refs: [CuratedTopicRef('Joshua', 2)],
   ),
   CuratedTopic(
     name: 'THE BATTLE OF JERICHO',
     category: 'story',
-    description: 'Israel marches around Jericho for seven days; on the '
+    description:
+        'Israel marches around Jericho for seven days; on the '
         'seventh, the walls collapse at the sound of trumpets and a shout.',
     refs: [CuratedTopicRef('Joshua', 6, 1, 20)],
   ),
   CuratedTopic(
     name: "ACHAN'S SIN",
     category: 'story',
-    description: 'Achan\'s theft of devoted plunder from Jericho brings '
+    description:
+        'Achan\'s theft of devoted plunder from Jericho brings '
         'Israel\'s defeat at Ai, until his sin is uncovered and judged.',
     refs: [CuratedTopicRef('Joshua', 7)],
   ),
   CuratedTopic(
     name: 'ISRAEL CROSSES THE JORDAN',
     category: 'story',
-    description: 'The priests carrying the ark step into the flooding '
+    description:
+        'The priests carrying the ark step into the flooding '
         'Jordan and its waters stop, letting Israel cross into Canaan on '
         'dry ground.',
     refs: [CuratedTopicRef('Joshua', 3), CuratedTopicRef('Joshua', 4, 1, 18)],
@@ -562,49 +672,56 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE GIBEONITE DECEPTION',
     category: 'story',
-    description: 'The Gibeonites trick Israel into a treaty of peace by '
+    description:
+        'The Gibeonites trick Israel into a treaty of peace by '
         'disguising themselves as weary travelers from a distant land.',
     refs: [CuratedTopicRef('Joshua', 9)],
   ),
   CuratedTopic(
     name: 'THE SUN STANDS STILL',
     category: 'story',
-    description: 'Joshua commands the sun and moon to stand still over '
+    description:
+        'Joshua commands the sun and moon to stand still over '
         'Gibeon so Israel can finish routing its enemies by daylight.',
     refs: [CuratedTopicRef('Joshua', 10, 1, 15)],
   ),
   CuratedTopic(
     name: 'EHUD THE LEFT-HANDED JUDGE',
     category: 'story',
-    description: 'Ehud smuggles a hidden dagger past the obese Moabite king '
+    description:
+        'Ehud smuggles a hidden dagger past the obese Moabite king '
         'Eglon and delivers Israel from eighteen years of oppression.',
     refs: [CuratedTopicRef('Judges', 3, 12, 30)],
   ),
   CuratedTopic(
     name: 'DEBORAH AND BARAK',
     category: 'story',
-    description: 'The prophetess Deborah leads Israel with Barak against '
+    description:
+        'The prophetess Deborah leads Israel with Barak against '
         'Sisera\'s army, and Jael kills the fleeing Sisera in her tent.',
     refs: [CuratedTopicRef('Judges', 4)],
   ),
   CuratedTopic(
     name: "GIDEON'S FLEECE",
     category: 'story',
-    description: 'Gideon asks God for two confirming signs with a wool '
+    description:
+        'Gideon asks God for two confirming signs with a wool '
         'fleece before leading Israel against the Midianites.',
     refs: [CuratedTopicRef('Judges', 6, 36, 40)],
   ),
   CuratedTopic(
     name: "GIDEON'S THREE HUNDRED",
     category: 'story',
-    description: 'God pares Gideon\'s army down to three hundred men, who '
+    description:
+        'God pares Gideon\'s army down to three hundred men, who '
         'rout the vast Midianite camp with torches, trumpets, and jars.',
     refs: [CuratedTopicRef('Judges', 7)],
   ),
   CuratedTopic(
     name: "JEPHTHAH'S VOW",
     category: 'story',
-    description: 'Jephthah vows to sacrifice whatever comes out of his house '
+    description:
+        'Jephthah vows to sacrifice whatever comes out of his house '
         'first if God grants him victory — and his daughter is the one who '
         'comes out to meet him.',
     refs: [CuratedTopicRef('Judges', 11, 29, 40)],
@@ -612,21 +729,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "SAMSON'S BIRTH",
     category: 'story',
-    description: 'An angel announces to Manoah\'s barren wife that she will '
+    description:
+        'An angel announces to Manoah\'s barren wife that she will '
         'bear Samson, a Nazirite set apart to deliver Israel.',
     refs: [CuratedTopicRef('Judges', 13)],
   ),
   CuratedTopic(
     name: 'SAMSON AND DELILAH',
     category: 'story',
-    description: 'Delilah wears Samson down until he reveals that his '
+    description:
+        'Delilah wears Samson down until he reveals that his '
         'strength lies in his uncut hair, and the Philistines seize him.',
     refs: [CuratedTopicRef('Judges', 16, 4, 22)],
   ),
   CuratedTopic(
     name: "SAMSON'S DEATH",
     category: 'story',
-    description: 'Blinded and mocked in the Philistines\' temple, Samson '
+    description:
+        'Blinded and mocked in the Philistines\' temple, Samson '
         'prays for strength once more and pulls the pillars down on '
         'himself and his captors.',
     refs: [CuratedTopicRef('Judges', 16, 23, 30)],
@@ -634,14 +754,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'RUTH GLEANS IN THE FIELD OF BOAZ',
     category: 'story',
-    description: 'The widowed Ruth gleans leftover grain in the field of '
+    description:
+        'The widowed Ruth gleans leftover grain in the field of '
         'Boaz, a relative of her late husband, who shows her favor.',
     refs: [CuratedTopicRef('Ruth', 2)],
   ),
   CuratedTopic(
     name: 'BOAZ REDEEMS RUTH',
     category: 'story',
-    description: 'Boaz publicly redeems Ruth and her family\'s inheritance '
+    description:
+        'Boaz publicly redeems Ruth and her family\'s inheritance '
         'and marries her; their son Obed becomes David\'s grandfather.',
     refs: [CuratedTopicRef('Ruth', 4)],
   ),
@@ -650,14 +772,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "HANNAH'S PRAYER AND SAMUEL'S BIRTH",
     category: 'story',
-    description: 'The barren Hannah prays for a son and dedicates him to '
+    description:
+        'The barren Hannah prays for a son and dedicates him to '
         'the LORD\'s service; Samuel is born in answer to her prayer.',
     refs: [CuratedTopicRef('1 Samuel', 1, 9, 20)],
   ),
   CuratedTopic(
     name: "SAMUEL'S CALLING",
     category: 'story',
-    description: 'The boy Samuel hears the LORD calling his name in the '
+    description:
+        'The boy Samuel hears the LORD calling his name in the '
         'night and, with Eli\'s guidance, answers, "Speak, for your '
         'servant hears."',
     refs: [CuratedTopicRef('1 Samuel', 3)],
@@ -665,15 +789,20 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE ARK CAPTURED AND THE FALL OF DAGON',
     category: 'story',
-    description: "The Philistines capture the ark of the covenant in "
+    description:
+        "The Philistines capture the ark of the covenant in "
         'battle, and their idol Dagon topples before it until they send it '
         'back with a plague-stricken tribute.',
-    refs: [CuratedTopicRef('1 Samuel', 4, 1, 11), CuratedTopicRef('1 Samuel', 5)],
+    refs: [
+      CuratedTopicRef('1 Samuel', 4, 1, 11),
+      CuratedTopicRef('1 Samuel', 5),
+    ],
   ),
   CuratedTopic(
     name: 'SAUL ANOINTED KING',
     category: 'story',
-    description: 'Samuel privately anoints Saul as Israel\'s first king at '
+    description:
+        'Samuel privately anoints Saul as Israel\'s first king at '
         'God\'s direction, after the people demand a king like the nations.',
     refs: [
       CuratedTopicRef('1 Samuel', 9, 15, 21),
@@ -683,7 +812,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'SAUL REJECTED AS KING',
     category: 'story',
-    description: "Saul's incomplete obedience against Amalek — sparing "
+    description:
+        "Saul's incomplete obedience against Amalek — sparing "
         'King Agag and the best plunder — leads Samuel to declare that '
         'the LORD has rejected him as king.',
     refs: [CuratedTopicRef('1 Samuel', 15)],
@@ -691,14 +821,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'DAVID ANOINTED KING',
     category: 'story',
-    description: 'Samuel passes over David\'s older brothers and secretly '
+    description:
+        'Samuel passes over David\'s older brothers and secretly '
         'anoints the shepherd boy David as Israel\'s future king.',
     refs: [CuratedTopicRef('1 Samuel', 16, 1, 13)],
   ),
   CuratedTopic(
     name: "DAVID AND JONATHAN'S FRIENDSHIP",
     category: 'story',
-    description: 'Jonathan, Saul\'s son, makes a covenant of friendship '
+    description:
+        'Jonathan, Saul\'s son, makes a covenant of friendship '
         'with David and later risks his father\'s wrath to warn him of '
         'danger.',
     refs: [
@@ -709,7 +841,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'DAVID FEIGNS MADNESS AT GATH',
     category: 'story',
-    description: "Fleeing Saul, David seeks refuge with the Philistines but "
+    description:
+        "Fleeing Saul, David seeks refuge with the Philistines but "
         'is recognized, so he pretends to be insane to escape King '
         'Achish unharmed.',
     refs: [CuratedTopicRef('1 Samuel', 21, 10, 15)],
@@ -717,14 +850,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "DAVID SPARES SAUL'S LIFE",
     category: 'story',
-    description: 'David secretly cuts off a corner of Saul\'s robe in a '
+    description:
+        'David secretly cuts off a corner of Saul\'s robe in a '
         'cave at En Gedi rather than kill the king who is hunting him.',
     refs: [CuratedTopicRef('1 Samuel', 24)],
   ),
   CuratedTopic(
     name: 'DAVID AND ABIGAIL',
     category: 'story',
-    description: 'The wise Abigail intercepts David with provisions and '
+    description:
+        'The wise Abigail intercepts David with provisions and '
         'talks him out of avenging himself on her foolish husband Nabal, '
         'and later becomes David\'s wife.',
     refs: [CuratedTopicRef('1 Samuel', 25)],
@@ -732,7 +867,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE MEDIUM OF ENDOR',
     category: 'story',
-    description: 'On the eve of his final battle, a desperate Saul '
+    description:
+        'On the eve of his final battle, a desperate Saul '
         'disguises himself to consult a medium, who summons the spirit of '
         'Samuel.',
     refs: [CuratedTopicRef('1 Samuel', 28, 3, 25)],
@@ -740,7 +876,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'DAVID MOURNS SAUL AND JONATHAN',
     category: 'story',
-    description: 'On hearing of Saul and Jonathan\'s deaths, David tears '
+    description:
+        'On hearing of Saul and Jonathan\'s deaths, David tears '
         'his clothes, executes the messenger who claims to have killed '
         'Saul, and laments them in song.',
     refs: [CuratedTopicRef('2 Samuel', 1, 1, 27)],
@@ -748,21 +885,33 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'DAVID BRINGS THE ARK TO JERUSALEM',
     category: 'story',
-    description: 'David dances before the LORD with all his might as the '
+    description:
+        'David dances before the LORD with all his might as the '
         'ark of the covenant is brought into Jerusalem.',
     refs: [CuratedTopicRef('2 Samuel', 6)],
   ),
   CuratedTopic(
+    name: 'DAVID AND MEPHIBOSHETH',
+    category: 'story',
+    description:
+        "For Jonathan's sake, David shows kindness to his lame son "
+        "Mephibosheth, restoring Saul's land to him and seating him always "
+        "at the king's table.",
+    refs: [CuratedTopicRef('2 Samuel', 9)],
+  ),
+  CuratedTopic(
     name: 'DAVID AND BATHSHEBA',
     category: 'story',
-    description: 'David commits adultery with Bathsheba and then arranges '
+    description:
+        'David commits adultery with Bathsheba and then arranges '
         'the death of her husband Uriah to cover it up.',
     refs: [CuratedTopicRef('2 Samuel', 11)],
   ),
   CuratedTopic(
     name: "NATHAN'S REBUKE OF DAVID",
     category: 'story',
-    description: 'The prophet Nathan confronts David with a parable of a '
+    description:
+        'The prophet Nathan confronts David with a parable of a '
         "rich man's theft of a poor man's ewe lamb, and David confesses, "
         '"I have sinned against the LORD."',
     refs: [CuratedTopicRef('2 Samuel', 12, 1, 14)],
@@ -770,21 +919,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "ABSALOM'S REBELLION",
     category: 'story',
-    description: 'David\'s son Absalom steals the hearts of Israel and '
+    description:
+        'David\'s son Absalom steals the hearts of Israel and '
         'drives his father from Jerusalem in an attempted coup.',
     refs: [CuratedTopicRef('2 Samuel', 15)],
   ),
   CuratedTopic(
     name: "ABSALOM'S DEATH",
     category: 'story',
-    description: "David's rebellious son Absalom is caught by his hair in "
+    description:
+        "David's rebellious son Absalom is caught by his hair in "
         'an oak tree and killed by Joab against David\'s explicit orders.',
     refs: [CuratedTopicRef('2 Samuel', 18, 9, 15)],
   ),
   CuratedTopic(
     name: "DAVID'S CENSUS AND THE PLAGUE",
     category: 'story',
-    description: "David's census of Israel brings a plague as judgment; it "
+    description:
+        "David's census of Israel brings a plague as judgment; it "
         'stops when he buys a threshing floor and offers sacrifices there.',
     refs: [CuratedTopicRef('2 Samuel', 24)],
   ),
@@ -793,28 +945,32 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "SOLOMON'S WISDOM AND THE TWO MOTHERS",
     category: 'story',
-    description: 'Solomon exposes the true mother of a disputed infant by '
+    description:
+        'Solomon exposes the true mother of a disputed infant by '
         'proposing to cut the child in two, revealing his famous wisdom.',
     refs: [CuratedTopicRef('1 Kings', 3, 16, 28)],
   ),
   CuratedTopic(
     name: 'SOLOMON BUILDS THE TEMPLE',
     category: 'story',
-    description: 'Solomon constructs the temple in Jerusalem as a '
+    description:
+        'Solomon constructs the temple in Jerusalem as a '
         'permanent house for the LORD, fulfilling David\'s wish.',
     refs: [CuratedTopicRef('1 Kings', 6)],
   ),
   CuratedTopic(
     name: 'THE QUEEN OF SHEBA VISITS SOLOMON',
     category: 'story',
-    description: 'The Queen of Sheba tests Solomon with hard questions and '
+    description:
+        'The Queen of Sheba tests Solomon with hard questions and '
         'is left breathless by his wisdom and wealth.',
     refs: [CuratedTopicRef('1 Kings', 10, 1, 13)],
   ),
   CuratedTopic(
     name: "SOLOMON'S DOWNFALL",
     category: 'story',
-    description: "Solomon's foreign wives turn his heart after other gods "
+    description:
+        "Solomon's foreign wives turn his heart after other gods "
         'in his old age, provoking the LORD to tear most of the kingdom '
         'from his son.',
     refs: [CuratedTopicRef('1 Kings', 11, 1, 13)],
@@ -822,7 +978,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE KINGDOM DIVIDED',
     category: 'story',
-    description: "Rehoboam's harshness splits Solomon's kingdom in two: "
+    description:
+        "Rehoboam's harshness splits Solomon's kingdom in two: "
         'Jeroboam rules the northern ten tribes as Israel, Rehoboam the '
         'south as Judah.',
     refs: [CuratedTopicRef('1 Kings', 12, 1, 24)],
@@ -830,7 +987,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "JEROBOAM'S GOLDEN CALVES",
     category: 'story',
-    description: 'To keep Israel from worshiping at Jerusalem, Jeroboam '
+    description:
+        'To keep Israel from worshiping at Jerusalem, Jeroboam '
         'sets up golden calves at Bethel and Dan, launching the northern '
         'kingdom into idolatry.',
     refs: [CuratedTopicRef('1 Kings', 12, 25, 33)],
@@ -838,14 +996,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'ELIJAH FED BY RAVENS',
     category: 'story',
-    description: 'During a drought, ravens bring Elijah bread and meat by '
+    description:
+        'During a drought, ravens bring Elijah bread and meat by '
         'the brook Cherith at God\'s command.',
     refs: [CuratedTopicRef('1 Kings', 17, 1, 6)],
   ),
   CuratedTopic(
     name: 'ELIJAH AND THE WIDOW OF ZAREPHATH',
     category: 'story',
-    description: "A widow's jar of flour and jug of oil never run out "
+    description:
+        "A widow's jar of flour and jug of oil never run out "
         'through the famine after she feeds Elijah, and he later raises '
         'her dead son.',
     refs: [CuratedTopicRef('1 Kings', 17, 8, 24)],
@@ -853,7 +1013,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'ELIJAH AND THE PROPHETS OF BAAL',
     category: 'story',
-    description: 'Elijah challenges 450 prophets of Baal to a contest of '
+    description:
+        'Elijah challenges 450 prophets of Baal to a contest of '
         'fire at Mount Carmel; the LORD answers with fire from heaven and '
         'Elijah has the false prophets put to death.',
     refs: [CuratedTopicRef('1 Kings', 18)],
@@ -861,49 +1022,65 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'ELIJAH AT HOREB',
     category: 'story',
-    description: 'Fleeing Jezebel in despair, Elijah encounters God not in '
+    description:
+        'Fleeing Jezebel in despair, Elijah encounters God not in '
         'wind, earthquake, or fire, but in a still small voice at Horeb.',
     refs: [CuratedTopicRef('1 Kings', 19)],
   ),
   CuratedTopic(
+    name: "AHAB AND NABOTH'S VINEYARD",
+    category: 'story',
+    description:
+        "Jezebel has Naboth falsely accused and stoned so Ahab can "
+        'seize his vineyard, and Elijah confronts Ahab with God\'s judgment '
+        'on the murder.',
+    refs: [CuratedTopicRef('1 Kings', 21)],
+  ),
+  CuratedTopic(
     name: 'ELIJAH TAKEN UP TO HEAVEN',
     category: 'story',
-    description: 'A chariot and horses of fire carry Elijah up to heaven in '
+    description:
+        'A chariot and horses of fire carry Elijah up to heaven in '
         'a whirlwind as Elisha watches and receives his mantle.',
     refs: [CuratedTopicRef('2 Kings', 2, 1, 12)],
   ),
   CuratedTopic(
     name: "ELISHA AND THE WIDOW'S OIL",
     category: 'story',
-    description: "A widow's small jar of oil miraculously fills every "
+    description:
+        "A widow's small jar of oil miraculously fills every "
         'vessel she can borrow, enough to pay her debts and live on.',
     refs: [CuratedTopicRef('2 Kings', 4, 1, 7)],
   ),
   CuratedTopic(
     name: "ELISHA RAISES THE SHUNAMMITE'S SON",
     category: 'story',
-    description: 'Elisha restores to life the son of the Shunammite woman '
+    description:
+        'Elisha restores to life the son of the Shunammite woman '
         'who had provided him a room to stay in.',
     refs: [CuratedTopicRef('2 Kings', 4, 8, 37)],
   ),
   CuratedTopic(
     name: 'NAAMAN HEALED OF LEPROSY',
     category: 'story',
-    description: 'The Aramean commander Naaman is healed of leprosy after '
+    description:
+        'The Aramean commander Naaman is healed of leprosy after '
         'reluctantly dipping seven times in the Jordan at Elisha\'s word.',
     refs: [CuratedTopicRef('2 Kings', 5)],
   ),
   CuratedTopic(
     name: 'ELISHA AND THE FLOATING AXE HEAD',
     category: 'story',
-    description: 'When a borrowed axe head sinks in the Jordan, Elisha '
+    description:
+        'When a borrowed axe head sinks in the Jordan, Elisha '
         'throws in a stick and makes the iron float.',
     refs: [CuratedTopicRef('2 Kings', 6, 1, 7)],
   ),
   CuratedTopic(
     name: 'ELISHA BLINDS THE SYRIAN ARMY',
     category: 'story',
-    description: "Elisha prays the pursuing Syrian army blind, leads them "
+    description:
+        "Elisha prays the pursuing Syrian army blind, leads them "
         "into Samaria, and has the king feed them and send them home in "
         'peace instead of killing them.',
     refs: [CuratedTopicRef('2 Kings', 6, 8, 23)],
@@ -911,23 +1088,32 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "JEHU'S PURGE OF AHAB'S HOUSE",
     category: 'story',
-    description: 'Anointed king by a prophet, Jehu drives furiously against '
+    description:
+        'Anointed king by a prophet, Jehu drives furiously against '
         "Jezebel and Ahab's entire dynasty, ending Baal worship in Israel "
         'by force.',
-    refs: [CuratedTopicRef('2 Kings', 9), CuratedTopicRef('2 Kings', 10, 18, 28)],
+    refs: [
+      CuratedTopicRef('2 Kings', 9),
+      CuratedTopicRef('2 Kings', 10, 18, 28),
+    ],
   ),
   CuratedTopic(
     name: "SENNACHERIB'S SIEGE OF JERUSALEM",
     category: 'story',
-    description: "Assyria's Sennacherib besieges Jerusalem and mocks the "
+    description:
+        "Assyria's Sennacherib besieges Jerusalem and mocks the "
         "LORD; Hezekiah prays in the temple, and the angel of the LORD "
         "strikes down the Assyrian camp overnight.",
-    refs: [CuratedTopicRef('2 Kings', 18, 13, 37), CuratedTopicRef('2 Kings', 19)],
+    refs: [
+      CuratedTopicRef('2 Kings', 18, 13, 37),
+      CuratedTopicRef('2 Kings', 19),
+    ],
   ),
   CuratedTopic(
     name: "HEZEKIAH'S ILLNESS AND SIGN",
     category: 'story',
-    description: 'Hezekiah weeps and prays when told he will die; God adds '
+    description:
+        'Hezekiah weeps and prays when told he will die; God adds '
         'fifteen years to his life and confirms it by turning back a '
         'sundial\'s shadow.',
     refs: [CuratedTopicRef('2 Kings', 20, 1, 11)],
@@ -935,15 +1121,20 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'JOSIAH FINDS THE BOOK OF THE LAW',
     category: 'story',
-    description: 'A forgotten Book of the Law turns up during temple '
+    description:
+        'A forgotten Book of the Law turns up during temple '
         'repairs; hearing it read, young King Josiah tears his clothes '
         'and leads Judah in sweeping religious reform.',
-    refs: [CuratedTopicRef('2 Kings', 22, 1, 20), CuratedTopicRef('2 Kings', 23, 1, 3)],
+    refs: [
+      CuratedTopicRef('2 Kings', 22, 1, 20),
+      CuratedTopicRef('2 Kings', 23, 1, 3),
+    ],
   ),
   CuratedTopic(
     name: 'THE FALL OF JERUSALEM',
     category: 'story',
-    description: "Nebuchadnezzar's army breaches Jerusalem, burns the "
+    description:
+        "Nebuchadnezzar's army breaches Jerusalem, burns the "
         'temple, and carries Judah into exile in Babylon.',
     refs: [CuratedTopicRef('2 Kings', 25, 1, 21)],
   ),
@@ -952,15 +1143,29 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'DAVID PREPARES FOR THE TEMPLE',
     category: 'story',
-    description: 'Barred from building the temple himself, David gathers '
+    description:
+        'Barred from building the temple himself, David gathers '
         'materials and charges Solomon and the people to build "a house '
         'not for man but for the LORD God."',
-    refs: [CuratedTopicRef('1 Chronicles', 28), CuratedTopicRef('1 Chronicles', 29, 1, 20)],
+    refs: [
+      CuratedTopicRef('1 Chronicles', 28),
+      CuratedTopicRef('1 Chronicles', 29, 1, 20),
+    ],
+  ),
+  CuratedTopic(
+    name: "JEHOSHAPHAT'S SINGERS WIN THE BATTLE",
+    category: 'story',
+    description:
+        "Facing a vast invading army, Jehoshaphat sends singers "
+        "ahead of the troops praising God, and the enemy coalition turns "
+        'on itself before Judah ever fights.',
+    refs: [CuratedTopicRef('2 Chronicles', 20)],
   ),
   CuratedTopic(
     name: "MANASSEH'S REPENTANCE",
     category: 'story',
-    description: 'The wicked king Manasseh is dragged to Babylon in '
+    description:
+        'The wicked king Manasseh is dragged to Babylon in '
         'chains, humbles himself before God, and is restored to his '
         'throne in Jerusalem.',
     refs: [CuratedTopicRef('2 Chronicles', 33, 1, 13)],
@@ -970,7 +1175,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE TEMPLE REBUILT UNDER ZERUBBABEL',
     category: 'story',
-    description: 'Returning exiles lay the foundation of a new temple amid '
+    description:
+        'Returning exiles lay the foundation of a new temple amid '
         'mixed shouts of joy and weeping, and finish it years later '
         'despite fierce local opposition.',
     refs: [CuratedTopicRef('Ezra', 3), CuratedTopicRef('Ezra', 6, 13, 22)],
@@ -978,15 +1184,21 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'NEHEMIAH REBUILDS THE WALL',
     category: 'story',
-    description: "Nehemiah leads Jerusalem's exiles in rebuilding its "
+    description:
+        "Nehemiah leads Jerusalem's exiles in rebuilding its "
         'broken walls in fifty-two days, working with a sword in one hand '
         'despite constant threats and mockery.',
-    refs: [CuratedTopicRef('Nehemiah', 2, 11, 20), CuratedTopicRef('Nehemiah', 4), CuratedTopicRef('Nehemiah', 6)],
+    refs: [
+      CuratedTopicRef('Nehemiah', 2, 11, 20),
+      CuratedTopicRef('Nehemiah', 4),
+      CuratedTopicRef('Nehemiah', 6),
+    ],
   ),
   CuratedTopic(
     name: 'EZRA READS THE LAW TO THE PEOPLE',
     category: 'story',
-    description: 'Ezra reads the Law aloud to the assembled people from '
+    description:
+        'Ezra reads the Law aloud to the assembled people from '
         'daybreak till noon; they weep at hearing it, then celebrate with '
         'a feast at Nehemiah\'s urging.',
     refs: [CuratedTopicRef('Nehemiah', 8)],
@@ -996,24 +1208,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'ESTHER BECOMES QUEEN',
     category: 'story',
-    description: 'The Jewish orphan Esther is chosen queen of Persia, '
+    description:
+        'The Jewish orphan Esther is chosen queen of Persia, '
         'setting the stage for her to later intercede for her people.',
     refs: [CuratedTopicRef('Esther', 2, 1, 18)],
   ),
   CuratedTopic(
     name: "ESTHER SAVES HER PEOPLE",
     category: 'story',
-    description: 'Esther risks her life to approach the king unbidden and '
+    description:
+        'Esther risks her life to approach the king unbidden and '
         'exposes Haman\'s plot to destroy the Jews, who are saved instead.',
-    refs: [
-      CuratedTopicRef('Esther', 4, 12, 16),
-      CuratedTopicRef('Esther', 7),
-    ],
+    refs: [CuratedTopicRef('Esther', 4, 12, 16), CuratedTopicRef('Esther', 7)],
   ),
   CuratedTopic(
     name: "JOB'S TRIALS",
     category: 'story',
-    description: 'Job loses his children, wealth, and health in rapid '
+    description:
+        'Job loses his children, wealth, and health in rapid '
         'succession, yet refuses to curse God despite his wife\'s and '
         'friends\' urging.',
     refs: [CuratedTopicRef('Job', 1), CuratedTopicRef('Job', 2, 1, 10)],
@@ -1021,7 +1233,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE LORD ANSWERS JOB OUT OF THE WHIRLWIND',
     category: 'story',
-    description: 'After Job demands an answer for his suffering, the LORD '
+    description:
+        'After Job demands an answer for his suffering, the LORD '
         'speaks from a whirlwind, questioning Job with the wonders of '
         'creation until Job repents "in dust and ashes."',
     refs: [CuratedTopicRef('Job', 38, 1, 11), CuratedTopicRef('Job', 42, 1, 6)],
@@ -1029,14 +1242,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "ISAIAH'S CALL AND VISION",
     category: 'story',
-    description: 'Isaiah sees the LORD high and lifted up in the temple '
+    description:
+        'Isaiah sees the LORD high and lifted up in the temple '
         'and, cleansed by a burning coal, answers, "Here am I; send me."',
     refs: [CuratedTopicRef('Isaiah', 6, 1, 8)],
   ),
   CuratedTopic(
     name: "JEREMIAH'S CALL",
     category: 'story',
-    description: 'God tells the young Jeremiah, "Before I formed you in '
+    description:
+        'God tells the young Jeremiah, "Before I formed you in '
         'the womb I knew you," and appoints him a prophet to the nations '
         'despite his protest that he is only a child.',
     refs: [CuratedTopicRef('Jeremiah', 1, 4, 19)],
@@ -1044,7 +1259,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "JEREMIAH AT THE POTTER'S HOUSE",
     category: 'story',
-    description: "Watching a potter rework a spoiled clay vessel, Jeremiah "
+    description:
+        "Watching a potter rework a spoiled clay vessel, Jeremiah "
         "hears the LORD compare Israel to clay in the potter's hand, free "
         'to reshape or destroy as he wills.',
     refs: [CuratedTopicRef('Jeremiah', 18, 1, 11)],
@@ -1052,7 +1268,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'JEREMIAH THROWN INTO THE CISTERN',
     category: 'story',
-    description: 'Jeremiah is lowered into a muddy cistern to die for his '
+    description:
+        'Jeremiah is lowered into a muddy cistern to die for his '
         'unwelcome prophecies, then rescued by the Cushite official '
         'Ebed-melech.',
     refs: [CuratedTopicRef('Jeremiah', 38, 1, 13)],
@@ -1060,7 +1277,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'KING JEHOIAKIM BURNS THE SCROLL',
     category: 'story',
-    description: "As Jeremiah's scroll of prophecies is read to him, King "
+    description:
+        "As Jeremiah's scroll of prophecies is read to him, King "
         "Jehoiakim slices off each column with a knife and burns it in a "
         'firepot, then has the scroll rewritten with even more added.',
     refs: [CuratedTopicRef('Jeremiah', 36)],
@@ -1068,7 +1286,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "EZEKIEL'S VISION OF THE LIVING CREATURES",
     category: 'story',
-    description: "By the Kebar River, the exiled priest Ezekiel sees a "
+    description:
+        "By the Kebar River, the exiled priest Ezekiel sees a "
         "storm-driven vision of four living creatures and wheels within "
         'wheels, and is commissioned as a prophet to the exiles.',
     refs: [CuratedTopicRef('Ezekiel', 1), CuratedTopicRef('Ezekiel', 2, 1, 10)],
@@ -1076,7 +1295,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "EZEKIEL'S VALLEY OF DRY BONES",
     category: 'story',
-    description: "Ezekiel prophesies to a valley of dry bones, and God's "
+    description:
+        "Ezekiel prophesies to a valley of dry bones, and God's "
         'breath raises them into a vast living army — a vision of Israel\'s '
         'restoration.',
     refs: [CuratedTopicRef('Ezekiel', 37, 1, 14)],
@@ -1084,7 +1304,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'DANIEL AND HIS FRIENDS REFUSE THE ROYAL FOOD',
     category: 'story',
-    description: 'Daniel and his three friends resolve not to defile '
+    description:
+        'Daniel and his three friends resolve not to defile '
         'themselves with the king\'s food, and are found healthier than '
         'the rest on a diet of vegetables.',
     refs: [CuratedTopicRef('Daniel', 1, 8, 21)],
@@ -1092,21 +1313,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "DANIEL INTERPRETS NEBUCHADNEZZAR'S DREAM",
     category: 'story',
-    description: 'Daniel reveals and interprets Nebuchadnezzar\'s forgotten '
+    description:
+        'Daniel reveals and interprets Nebuchadnezzar\'s forgotten '
         'dream of a great statue, when none of the king\'s wise men could.',
     refs: [CuratedTopicRef('Daniel', 2)],
   ),
   CuratedTopic(
     name: 'SHADRACH, MESHACH, AND ABEDNEGO IN THE FIERY FURNACE',
     category: 'story',
-    description: 'Three young Hebrews refuse to bow to Nebuchadnezzar\'s '
+    description:
+        'Three young Hebrews refuse to bow to Nebuchadnezzar\'s '
         'golden image and walk unharmed out of a blazing furnace.',
     refs: [CuratedTopicRef('Daniel', 3)],
   ),
   CuratedTopic(
     name: "NEBUCHADNEZZAR'S MADNESS",
     category: 'story',
-    description: 'Boasting over his own greatness, Nebuchadnezzar is '
+    description:
+        'Boasting over his own greatness, Nebuchadnezzar is '
         'struck with madness and lives like a beast for seven years, '
         "until he acknowledges that \"the Most High rules the kingdom of "
         'men."',
@@ -1115,7 +1339,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "BELSHAZZAR'S FEAST",
     category: 'story',
-    description: 'A disembodied hand writes Belshazzar\'s doom on the wall '
+    description:
+        'A disembodied hand writes Belshazzar\'s doom on the wall '
         'during a drunken feast, and Daniel interprets it that same night.',
     refs: [CuratedTopicRef('Daniel', 5)],
   ),
@@ -1124,14 +1349,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'HOSEA MARRIES GOMER',
     category: 'story',
-    description: 'God commands Hosea to marry the unfaithful Gomer as a '
+    description:
+        'God commands Hosea to marry the unfaithful Gomer as a '
         "living parable of the LORD's persistent love for wayward Israel.",
     refs: [CuratedTopicRef('Hosea', 1), CuratedTopicRef('Hosea', 3)],
   ),
   CuratedTopic(
     name: 'JONAH AND THE GREAT FISH',
     category: 'story',
-    description: 'Fleeing God\'s call to preach to Nineveh, Jonah is '
+    description:
+        'Fleeing God\'s call to preach to Nineveh, Jonah is '
         'thrown overboard in a storm and swallowed by a great fish, '
         'praying from its belly for three days and nights.',
     refs: [CuratedTopicRef('Jonah', 1), CuratedTopicRef('Jonah', 2)],
@@ -1139,7 +1366,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "NINEVEH REPENTS AND JONAH'S ANGER",
     category: 'story',
-    description: 'Nineveh repents at Jonah\'s preaching and God relents of '
+    description:
+        'Nineveh repents at Jonah\'s preaching and God relents of '
         'judgment, but Jonah sulks over God\'s mercy until a withered '
         'plant teaches him a lesson in compassion.',
     refs: [CuratedTopicRef('Jonah', 3), CuratedTopicRef('Jonah', 4)],
@@ -1149,42 +1377,57 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE CALLING OF THE FIRST DISCIPLES',
     category: 'story',
-    description: 'Jesus calls Peter, Andrew, James, and John from their '
+    description:
+        'Jesus calls Peter, Andrew, James, and John from their '
         'fishing nets to follow him and become "fishers of men."',
     refs: [CuratedTopicRef('Matthew', 4, 18, 22)],
   ),
   CuratedTopic(
+    name: 'THE PARALYTIC LOWERED THROUGH THE ROOF',
+    category: 'story',
+    description:
+        "Four friends dig through a roof to lower a paralyzed man "
+        "in front of Jesus, who forgives his sins and heals him, to the "
+        'crowd\'s astonishment.',
+    refs: [CuratedTopicRef('Mark', 2, 1, 12)],
+  ),
+  CuratedTopic(
     name: 'THE WEDDING AT CANA',
     category: 'story',
-    description: "Jesus turns water into wine at a wedding in Cana, his "
+    description:
+        "Jesus turns water into wine at a wedding in Cana, his "
         'first public sign.',
     refs: [CuratedTopicRef('John', 2, 1, 11)],
   ),
   CuratedTopic(
     name: 'NICODEMUS VISITS JESUS',
     category: 'story',
-    description: 'A Pharisee named Nicodemus comes to Jesus by night and '
+    description:
+        'A Pharisee named Nicodemus comes to Jesus by night and '
         'is told he must be "born again" to see the kingdom of God.',
     refs: [CuratedTopicRef('John', 3)],
   ),
   CuratedTopic(
     name: 'THE WOMAN AT THE WELL',
     category: 'story',
-    description: 'Jesus offers "living water" to a Samaritan woman at '
+    description:
+        'Jesus offers "living water" to a Samaritan woman at '
         "Jacob's well, who becomes one of the first to spread word of him.",
     refs: [CuratedTopicRef('John', 4)],
   ),
   CuratedTopic(
     name: "JESUS HEALS THE CENTURION'S SERVANT",
     category: 'story',
-    description: 'A Roman centurion asks Jesus only to "say the word" to '
+    description:
+        'A Roman centurion asks Jesus only to "say the word" to '
         'heal his servant, and Jesus marvels at his faith.',
     refs: [CuratedTopicRef('Matthew', 8, 5, 13)],
   ),
   CuratedTopic(
     name: "THE WIDOW OF NAIN'S SON",
     category: 'story',
-    description: 'Moved with compassion at a funeral procession, Jesus '
+    description:
+        'Moved with compassion at a funeral procession, Jesus '
         'touches the coffin of a widow\'s only son and raises him back to '
         'life.',
     refs: [CuratedTopicRef('Luke', 7, 11, 17)],
@@ -1192,21 +1435,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'JESUS CALMS THE STORM',
     category: 'story',
-    description: 'Jesus rebukes a violent storm on the Sea of Galilee — '
+    description:
+        'Jesus rebukes a violent storm on the Sea of Galilee — '
         '"Peace! Be still!" — and the wind and waves obey him.',
     refs: [CuratedTopicRef('Mark', 4, 35, 41)],
   ),
   CuratedTopic(
     name: 'THE GERASENE DEMONIAC',
     category: 'story',
-    description: 'Jesus casts a legion of demons out of a tormented man '
+    description:
+        'Jesus casts a legion of demons out of a tormented man '
         'into a herd of pigs, which rush into the sea.',
     refs: [CuratedTopicRef('Mark', 5, 1, 20)],
   ),
   CuratedTopic(
     name: 'THE DEATH OF JOHN THE BAPTIST',
     category: 'story',
-    description: 'Herod beheads John the Baptist at a birthday banquet '
+    description:
+        'Herod beheads John the Baptist at a birthday banquet '
         "after his stepdaughter's dance earns her a rash promise, at her "
         "mother Herodias's urging.",
     refs: [CuratedTopicRef('Mark', 6, 14, 29)],
@@ -1214,15 +1460,29 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'JESUS WALKS ON WATER',
     category: 'story',
-    description: 'Jesus comes to his disciples walking on the sea in the '
+    description:
+        'Jesus comes to his disciples walking on the sea in the '
         'fourth watch of the night, and Peter briefly walks toward him '
         'before losing faith and sinking.',
-    refs: [CuratedTopicRef('Mark', 6, 45, 52), CuratedTopicRef('John', 6, 16, 21)],
+    refs: [
+      CuratedTopicRef('Mark', 6, 45, 52),
+      CuratedTopicRef('John', 6, 16, 21),
+    ],
+  ),
+  CuratedTopic(
+    name: "PETER'S CONFESSION AT CAESAREA PHILIPPI",
+    category: 'story',
+    description:
+        'Asked who people say he is, Peter declares, "You are the '
+        'Christ, the Son of the living God," and Jesus begins to foretell '
+        'his coming death and resurrection.',
+    refs: [CuratedTopicRef('Matthew', 16, 13, 20)],
   ),
   CuratedTopic(
     name: "JAIRUS'S DAUGHTER AND THE WOMAN WITH THE ISSUE OF BLOOD",
     category: 'story',
-    description: 'On the way to raise a synagogue leader\'s dying daughter, '
+    description:
+        'On the way to raise a synagogue leader\'s dying daughter, '
         'Jesus is touched by and heals a woman who had bled for twelve '
         'years.',
     refs: [CuratedTopicRef('Mark', 5, 21, 43)],
@@ -1230,28 +1490,32 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE PARABLE OF THE SOWER',
     category: 'story',
-    description: 'Jesus teaches how a sower\'s seed meets four kinds of '
+    description:
+        'Jesus teaches how a sower\'s seed meets four kinds of '
         'soil, then explains it as the ways people receive God\'s word.',
     refs: [CuratedTopicRef('Matthew', 13, 1, 23)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE GOOD SAMARITAN',
     category: 'story',
-    description: 'A despised Samaritan, not a priest or Levite, proves to '
+    description:
+        'A despised Samaritan, not a priest or Levite, proves to '
         'be the true "neighbor" who stops to help a beaten traveler.',
     refs: [CuratedTopicRef('Luke', 10, 25, 37)],
   ),
   CuratedTopic(
     name: 'MARY AND MARTHA',
     category: 'story',
-    description: 'Martha busies herself serving while her sister Mary sits '
+    description:
+        'Martha busies herself serving while her sister Mary sits '
         'at Jesus\' feet, and Jesus commends Mary\'s choice.',
     refs: [CuratedTopicRef('Luke', 10, 38, 42)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE LOST SHEEP',
     category: 'story',
-    description: 'A shepherd leaves ninety-nine sheep to search for one '
+    description:
+        'A shepherd leaves ninety-nine sheep to search for one '
         'lost sheep, rejoicing over its recovery like heaven over one '
         'repentant sinner.',
     refs: [CuratedTopicRef('Luke', 15, 1, 7)],
@@ -1259,21 +1523,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE PARABLE OF THE PRODIGAL SON',
     category: 'story',
-    description: 'A wayward son squanders his inheritance and returns home '
+    description:
+        'A wayward son squanders his inheritance and returns home '
         'in shame, only to be welcomed back by his father with open arms.',
     refs: [CuratedTopicRef('Luke', 15, 11, 32)],
   ),
   CuratedTopic(
     name: 'THE RICH MAN AND LAZARUS',
     category: 'story',
-    description: "A parable of a poor beggar carried to Abraham's side "
+    description:
+        "A parable of a poor beggar carried to Abraham's side "
         'after death, while the rich man who ignored him suffers in torment.',
     refs: [CuratedTopicRef('Luke', 16, 19, 31)],
   ),
   CuratedTopic(
     name: 'THE PHARISEE AND THE TAX COLLECTOR',
     category: 'story',
-    description: 'A boastful Pharisee\'s prayer is contrasted with a tax '
+    description:
+        'A boastful Pharisee\'s prayer is contrasted with a tax '
         'collector\'s humble plea, "God, be merciful to me, a sinner!" — '
         'and it is the latter who goes home justified.',
     refs: [CuratedTopicRef('Luke', 18, 9, 14)],
@@ -1281,14 +1548,16 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE RICH YOUNG RULER',
     category: 'story',
-    description: 'A wealthy young man walks away sorrowful when Jesus '
+    description:
+        'A wealthy young man walks away sorrowful when Jesus '
         'tells him to sell all he has and follow him.',
     refs: [CuratedTopicRef('Matthew', 19, 16, 30)],
   ),
   CuratedTopic(
     name: 'ZACCHAEUS',
     category: 'story',
-    description: 'A short, despised tax collector climbs a tree to see '
+    description:
+        'A short, despised tax collector climbs a tree to see '
         'Jesus, who invites himself to Zacchaeus\'s house and changes his '
         'life.',
     refs: [CuratedTopicRef('Luke', 19, 1, 10)],
@@ -1296,7 +1565,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE WOMAN CAUGHT IN ADULTERY',
     category: 'story',
-    description: '"Let him who is without sin among you be the first to '
+    description:
+        '"Let him who is without sin among you be the first to '
         'throw a stone," Jesus tells the woman\'s accusers, and they leave '
         'one by one.',
     refs: [CuratedTopicRef('John', 8, 1, 11)],
@@ -1304,7 +1574,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE MAN BORN BLIND',
     category: 'story',
-    description: 'Jesus heals a man born blind, whose simple testimony — '
+    description:
+        'Jesus heals a man born blind, whose simple testimony — '
         '"I was blind, now I see" — confounds the religious leaders who '
         'question him.',
     refs: [CuratedTopicRef('John', 9)],
@@ -1312,14 +1583,34 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE RAISING OF LAZARUS',
     category: 'story',
-    description: 'Jesus weeps at the tomb of his friend Lazarus, then '
+    description:
+        'Jesus weeps at the tomb of his friend Lazarus, then '
         'calls him back to life four days after his death.',
     refs: [CuratedTopicRef('John', 11, 1, 44)],
   ),
   CuratedTopic(
+    name: 'THE TRIUMPHAL ENTRY',
+    category: 'story',
+    description:
+        'Jesus rides into Jerusalem on a donkey\'s colt as crowds '
+        'spread their cloaks and palm branches before him, shouting '
+        '"Hosanna to the Son of David!"',
+    refs: [CuratedTopicRef('Matthew', 21, 1, 11)],
+  ),
+  CuratedTopic(
+    name: 'JESUS CLEANSES THE TEMPLE',
+    category: 'story',
+    description:
+        'Jesus drives out the money changers and merchants from '
+        'the temple courts, declaring, "My house shall be called a house '
+        'of prayer, but you have made it a den of robbers."',
+    refs: [CuratedTopicRef('Matthew', 21, 12, 17)],
+  ),
+  CuratedTopic(
     name: 'THE PARABLE OF THE TEN VIRGINS',
     category: 'story',
-    description: 'Five wise virgins keep enough oil for their lamps while '
+    description:
+        'Five wise virgins keep enough oil for their lamps while '
         'five foolish ones run out, waiting for a bridegroom who comes at '
         'an unexpected hour.',
     refs: [CuratedTopicRef('Matthew', 25, 1, 13)],
@@ -1327,22 +1618,43 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE SHEEP AND THE GOATS',
     category: 'story',
-    description: 'Jesus describes a final judgment separating "sheep" from '
+    description:
+        'Jesus describes a final judgment separating "sheep" from '
         '"goats" by how they treated "the least of these" — the hungry, '
         'the stranger, the prisoner.',
     refs: [CuratedTopicRef('Matthew', 25, 31, 46)],
   ),
   CuratedTopic(
+    name: 'MARY ANOINTS JESUS AT BETHANY',
+    category: 'story',
+    description:
+        'Mary pours expensive perfume on Jesus\' feet and wipes '
+        "them with her hair; Judas objects to the waste, but Jesus says "
+        'she has anointed him beforehand for burial.',
+    refs: [CuratedTopicRef('John', 12, 1, 8)],
+  ),
+  CuratedTopic(
     name: 'JESUS WASHES THE DISCIPLES\' FEET',
     category: 'story',
-    description: 'At the Last Supper, Jesus takes a towel and basin and '
+    description:
+        'At the Last Supper, Jesus takes a towel and basin and '
         'washes his disciples\' feet, modeling humble service.',
     refs: [CuratedTopicRef('John', 13, 1, 17)],
   ),
   CuratedTopic(
+    name: 'JESUS PRAYS IN GETHSEMANE',
+    category: 'story',
+    description:
+        'In anguish before his arrest, Jesus prays "let this cup '
+        'pass from me... yet not as I will, but as you will" while his '
+        'disciples fall asleep instead of keeping watch.',
+    refs: [CuratedTopicRef('Matthew', 26, 36, 46)],
+  ),
+  CuratedTopic(
     name: "JUDAS'S BETRAYAL",
     category: 'story',
-    description: 'Judas Iscariot agrees to betray Jesus for thirty pieces '
+    description:
+        'Judas Iscariot agrees to betray Jesus for thirty pieces '
         'of silver, then identifies him to the arresting crowd with a '
         'kiss.',
     refs: [
@@ -1353,14 +1665,25 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "PETER'S DENIAL",
     category: 'story',
-    description: 'Just as Jesus predicted, Peter denies knowing him three '
+    description:
+        'Just as Jesus predicted, Peter denies knowing him three '
         'times before the rooster crows, then weeps bitterly.',
     refs: [CuratedTopicRef('Luke', 22, 54, 62)],
   ),
   CuratedTopic(
+    name: 'JESUS BEFORE PILATE AND THE RELEASE OF BARABBAS',
+    category: 'story',
+    description:
+        'Pilate finds no fault in Jesus but yields to the crowd, '
+        'releasing the rebel Barabbas in his place and handing Jesus over '
+        'to be crucified.',
+    refs: [CuratedTopicRef('Matthew', 27, 11, 26)],
+  ),
+  CuratedTopic(
     name: 'DOUBTING THOMAS',
     category: 'story',
-    description: 'Thomas refuses to believe the resurrection until he can '
+    description:
+        'Thomas refuses to believe the resurrection until he can '
         'touch Jesus\' wounds himself — and then confesses, "My Lord and '
         'my God!"',
     refs: [CuratedTopicRef('John', 20, 24, 29)],
@@ -1368,21 +1691,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'THE ROAD TO EMMAUS',
     category: 'story',
-    description: 'The risen Jesus walks unrecognized with two disciples to '
+    description:
+        'The risen Jesus walks unrecognized with two disciples to '
         'Emmaus, and is finally known to them in the breaking of bread.',
     refs: [CuratedTopicRef('Luke', 24, 13, 35)],
   ),
   CuratedTopic(
     name: 'THE GREAT COMMISSION',
     category: 'story',
-    description: 'The risen Jesus commissions his disciples to "go and '
+    description:
+        'The risen Jesus commissions his disciples to "go and '
         'make disciples of all nations," promising to be with them always.',
     refs: [CuratedTopicRef('Matthew', 28, 16, 20)],
   ),
   CuratedTopic(
     name: "PETER RESTORED ON THE SHORE",
     category: 'story',
-    description: 'After a miraculous catch of fish and breakfast on the '
+    description:
+        'After a miraculous catch of fish and breakfast on the '
         'beach, the risen Jesus asks Peter three times, "Do you love me?" '
         'restoring him and commissioning him to "feed my sheep."',
     refs: [CuratedTopicRef('John', 21)],
@@ -1392,21 +1718,24 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: 'ANANIAS AND SAPPHIRA',
     category: 'story',
-    description: 'A husband and wife fall dead in turn after lying to the '
+    description:
+        'A husband and wife fall dead in turn after lying to the '
         'Holy Spirit about money they claimed to have given in full.',
     refs: [CuratedTopicRef('Acts', 5, 1, 11)],
   ),
   CuratedTopic(
     name: "STEPHEN'S MARTYRDOM",
     category: 'story',
-    description: 'Stephen is stoned to death for his testimony about '
+    description:
+        'Stephen is stoned to death for his testimony about '
         'Jesus, praying for his killers as Saul looks on approvingly.',
     refs: [CuratedTopicRef('Acts', 7, 54, 60)],
   ),
   CuratedTopic(
     name: 'PHILIP AND THE ETHIOPIAN EUNUCH',
     category: 'story',
-    description: 'Philip explains the prophet Isaiah to an Ethiopian '
+    description:
+        'Philip explains the prophet Isaiah to an Ethiopian '
         'official on a desert road, who then asks to be baptized on the '
         'spot.',
     refs: [CuratedTopicRef('Acts', 8, 26, 40)],
@@ -1414,43 +1743,76 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "PETER'S VISION AND CORNELIUS",
     category: 'story',
-    description: 'A vision of unclean animals prepares Peter to visit the '
+    description:
+        'A vision of unclean animals prepares Peter to visit the '
         'Roman centurion Cornelius, opening the gospel to the Gentiles.',
     refs: [CuratedTopicRef('Acts', 10)],
   ),
   CuratedTopic(
     name: "PETER'S ESCAPE FROM PRISON",
     category: 'story',
-    description: "An angel wakes Peter in chains, and the prison's iron "
+    description:
+        "An angel wakes Peter in chains, and the prison's iron "
         'gate opens by itself as the church prays for his release.',
     refs: [CuratedTopicRef('Acts', 12, 1, 19)],
   ),
   CuratedTopic(
+    name: 'PAUL AND BARNABAS MISTAKEN FOR GODS AT LYSTRA',
+    category: 'story',
+    description:
+        'After Paul heals a lame man, the crowd at Lystra hails '
+        'Paul and Barnabas as Hermes and Zeus and tries to sacrifice to '
+        'them, until the two tear their clothes in protest.',
+    refs: [CuratedTopicRef('Acts', 14, 8, 18)],
+  ),
+  CuratedTopic(
     name: 'THE JERUSALEM COUNCIL',
     category: 'story',
-    description: 'The apostles and elders meet in Jerusalem to settle '
+    description:
+        'The apostles and elders meet in Jerusalem to settle '
         'whether Gentile believers must keep the law of Moses.',
     refs: [CuratedTopicRef('Acts', 15)],
   ),
   CuratedTopic(
     name: 'PAUL AND SILAS IN PRISON AT PHILIPPI',
     category: 'story',
-    description: 'An earthquake breaks open the prison doors after Paul '
+    description:
+        'An earthquake breaks open the prison doors after Paul '
         'and Silas sing hymns at midnight, and their jailer is converted.',
     refs: [CuratedTopicRef('Acts', 16, 16, 34)],
   ),
   CuratedTopic(
     name: 'PAUL AT THE AREOPAGUS',
     category: 'story',
-    description: 'Paul addresses the philosophers of Athens at the '
+    description:
+        'Paul addresses the philosophers of Athens at the '
         'Areopagus, proclaiming the "unknown god" they already worship in '
         'ignorance.',
     refs: [CuratedTopicRef('Acts', 17, 16, 34)],
   ),
   CuratedTopic(
+    name: 'THE SONS OF SCEVA',
+    category: 'story',
+    description:
+        'Seven Jewish exorcists try to invoke "the Jesus whom '
+        'Paul preaches" over a demon-possessed man, who overpowers them '
+        'all, sending them fleeing naked and wounded.',
+    refs: [CuratedTopicRef('Acts', 19, 13, 20)],
+  ),
+  CuratedTopic(
+    name: 'THE RIOT OF THE SILVERSMITHS AT EPHESUS',
+    category: 'story',
+    description:
+        'A silversmith named Demetrius incites a riot over lost '
+        'idol-making business, and the city\'s theater erupts in two hours '
+        'of chanting, "Great is Artemis of the Ephesians!"',
+    refs: [CuratedTopicRef('Acts', 19, 23, 41)],
+  ),
+  CuratedTopic(
     name: 'EUTYCHUS FALLS FROM THE WINDOW',
     category: 'story',
-    description: "A young man named Eutychus dozes off during Paul's "
+    description:
+        "A young man named Eutychus dozes off during Paul's "
         'long midnight sermon, falls three stories from a window, and is '
         'taken up dead — until Paul embraces him and he lives.',
     refs: [CuratedTopicRef('Acts', 20, 7, 12)],
@@ -1458,7 +1820,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "PAUL BEFORE FESTUS AND AGRIPPA",
     category: 'story',
-    description: 'Paul defends himself before King Agrippa and Governor '
+    description:
+        'Paul defends himself before King Agrippa and Governor '
         'Festus, recounting his conversion, until Agrippa remarks he is '
         'almost persuaded to become a Christian.',
     refs: [CuratedTopicRef('Acts', 25, 13, 27), CuratedTopicRef('Acts', 26)],
@@ -1466,7 +1829,8 @@ const _storyTopics = <CuratedTopic>[
   CuratedTopic(
     name: "PAUL'S SHIPWRECK",
     category: 'story',
-    description: 'A violent storm wrecks the ship carrying Paul to Rome, '
+    description:
+        'A violent storm wrecks the ship carrying Paul to Rome, '
         'and everyone aboard reaches shore safely on Malta as he had '
         'promised.',
     refs: [CuratedTopicRef('Acts', 27, 13, 44)],
