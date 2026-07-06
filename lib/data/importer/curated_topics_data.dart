@@ -167,6 +167,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Exodus', 14, 21, 31)],
   ),
   CuratedTopic(
+    name: "MIRIAM'S SONG AT THE SEA",
+    category: 'story',
+    description:
+        'After Israel crosses the Red Sea, the prophetess Miriam '
+        'takes up a tambourine and leads the women in dancing, singing, '
+        '"Sing to the LORD, for he has triumphed gloriously."',
+    refs: [CuratedTopicRef('Exodus', 15, 20, 21)],
+  ),
+  CuratedTopic(
     name: 'THE TEN COMMANDMENTS',
     category: 'story',
     description: 'God gives Israel the ten commandments at Mount Sinai.',
@@ -196,6 +205,15 @@ const _storyTopics = <CuratedTopic>[
         'conceive by the Holy Spirit and bear the Son of God, and she '
         'answers, "Let it be to me according to your word."',
     refs: [CuratedTopicRef('Luke', 1, 26, 38)],
+  ),
+  CuratedTopic(
+    name: "THE VISITATION AND MARY'S MAGNIFICAT",
+    category: 'story',
+    description:
+        'Mary visits her relative Elizabeth, whose unborn son '
+        'leaps at her greeting, and Mary responds with her song of '
+        'praise: "My soul magnifies the Lord."',
+    refs: [CuratedTopicRef('Luke', 1, 39, 56)],
   ),
   CuratedTopic(
     name: "ZECHARIAH, ELIZABETH, AND THE BIRTH OF JOHN THE BAPTIST",
@@ -464,6 +482,18 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 14, 17, 20)],
   ),
   CuratedTopic(
+    name: "SARAH'S LAUGHTER AND THE BIRTH OF ISAAC",
+    category: 'story',
+    description:
+        'Sarah laughs to herself at the promise that she will '
+        'bear a son in her old age, then laughs again for joy when Isaac '
+        '— "he laughs" — is born just as the LORD had said.',
+    refs: [
+      CuratedTopicRef('Genesis', 18, 1, 15),
+      CuratedTopicRef('Genesis', 21, 1, 7),
+    ],
+  ),
+  CuratedTopic(
     name: 'THE DESTRUCTION OF SODOM AND GOMORRAH',
     category: 'story',
     description:
@@ -518,6 +548,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 33)],
   ),
   CuratedTopic(
+    name: 'THE DEATH OF RACHEL',
+    category: 'story',
+    description:
+        'Rachel dies giving birth to Benjamin on the road to '
+        'Bethlehem, naming him with her last breath before Jacob buries '
+        'her and sets up a pillar over her tomb.',
+    refs: [CuratedTopicRef('Genesis', 35, 16, 20)],
+  ),
+  CuratedTopic(
     name: "JOSEPH'S DREAMS",
     category: 'story',
     description:
@@ -567,6 +606,15 @@ const _storyTopics = <CuratedTopic>[
         'Jacob falls in love with Rachel at a well, works seven '
         'years for her, and is deceived into marrying Leah first.',
     refs: [CuratedTopicRef('Genesis', 29, 1, 30)],
+  ),
+  CuratedTopic(
+    name: "RACHEL AND LEAH'S RIVALRY",
+    category: 'story',
+    description:
+        'Rachel envies her fertile sister Leah and gives Jacob '
+        'her servant to bear children in her place, until God finally '
+        '"remembers" Rachel and she bears Joseph.',
+    refs: [CuratedTopicRef('Genesis', 30, 1, 24)],
   ),
   CuratedTopic(
     name: 'DINAH AND THE SHECHEMITES',
@@ -824,6 +872,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Judges', 4)],
   ),
   CuratedTopic(
+    name: 'JAEL KILLS SISERA',
+    category: 'story',
+    description:
+        "Fleeing the battle, the Canaanite general Sisera takes "
+        "refuge in Jael's tent, where she lulls him to sleep with milk "
+        'and drives a tent peg through his temple.',
+    refs: [CuratedTopicRef('Judges', 4, 17, 22)],
+  ),
+  CuratedTopic(
     name: "GIDEON'S CALL AT THE WINEPRESS",
     category: 'story',
     description:
@@ -1040,6 +1097,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('2 Samuel', 6)],
   ),
   CuratedTopic(
+    name: "MICHAL DESPISES DAVID'S DANCING",
+    category: 'story',
+    description:
+        'Watching David dance before the LORD as the ark enters '
+        'Jerusalem, his wife Michal despises him in her heart for it, '
+        'and is left childless the rest of her life.',
+    refs: [CuratedTopicRef('2 Samuel', 6, 16, 23)],
+  ),
+  CuratedTopic(
     name: 'DAVID AND MEPHIBOSHETH',
     category: 'story',
     description:
@@ -1091,6 +1157,15 @@ const _storyTopics = <CuratedTopic>[
   ),
 
   // --- 1–2 Kings ---
+  CuratedTopic(
+    name: 'BATHSHEBA SECURES THE THRONE FOR SOLOMON',
+    category: 'story',
+    description:
+        "As the aging David's son Adonijah moves to seize the "
+        'throne, Bathsheba goes to David and reminds him of his oath '
+        'that Solomon would reign after him.',
+    refs: [CuratedTopicRef('1 Kings', 1, 11, 31)],
+  ),
   CuratedTopic(
     name: "SOLOMON'S WISDOM AND THE TWO MOTHERS",
     category: 'story',
@@ -1256,6 +1331,25 @@ const _storyTopics = <CuratedTopic>[
     ],
   ),
   CuratedTopic(
+    name: 'THE DEATH OF JEZEBEL',
+    category: 'story',
+    description:
+        'Painted and adorned, Jezebel taunts Jehu from a window '
+        'as he arrives, until her own eunuchs throw her down at his '
+        'command and dogs devour her body, just as Elijah had prophesied.',
+    refs: [CuratedTopicRef('2 Kings', 9, 30, 37)],
+  ),
+  CuratedTopic(
+    name: "ATHALIAH'S USURPATION AND FALL",
+    category: 'story',
+    description:
+        'Queen Athaliah murders the royal family to seize the '
+        'throne, but her infant grandson Joash is hidden away in the '
+        'temple for six years until the priest Jehoiada crowns him king '
+        'and has her put to death.',
+    refs: [CuratedTopicRef('2 Kings', 11)],
+  ),
+  CuratedTopic(
     name: "SENNACHERIB'S SIEGE OF JERUSALEM",
     category: 'story',
     description:
@@ -1287,6 +1381,16 @@ const _storyTopics = <CuratedTopic>[
       CuratedTopicRef('2 Kings', 22, 1, 20),
       CuratedTopicRef('2 Kings', 23, 1, 3),
     ],
+  ),
+  CuratedTopic(
+    name: 'HULDAH THE PROPHETESS',
+    category: 'story',
+    description:
+        "King Josiah sends his officials to the prophetess "
+        'Huldah to inquire about the newly found Book of the Law; she '
+        'confirms coming judgment but promises Josiah he will be spared '
+        'in his lifetime.',
+    refs: [CuratedTopicRef('2 Kings', 22, 14, 20)],
   ),
   CuratedTopic(
     name: 'THE FALL OF JERUSALEM',
@@ -1363,6 +1467,15 @@ const _storyTopics = <CuratedTopic>[
   ),
 
   // --- Esther – Daniel ---
+  CuratedTopic(
+    name: 'VASHTI REFUSES THE KING',
+    category: 'story',
+    description:
+        "Queen Vashti refuses King Ahasuerus's summons to "
+        "display her beauty before his drunken guests, and is deposed — "
+        'opening the way for Esther to become queen.',
+    refs: [CuratedTopicRef('Esther', 1)],
+  ),
   CuratedTopic(
     name: 'ESTHER BECOMES QUEEN',
     category: 'story',
@@ -2112,6 +2225,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 12, 22, 28)],
   ),
   CuratedTopic(
+    name: "THE WOMEN WHO SUPPORTED JESUS' MINISTRY",
+    category: 'story',
+    description:
+        'Mary Magdalene, healed of seven demons, along with '
+        'Joanna, Susanna, and many other women, travel with Jesus and '
+        'the Twelve and provide for them out of their own means.',
+    refs: [CuratedTopicRef('Luke', 8, 1, 3)],
+  ),
+  CuratedTopic(
     name: 'THE PARABLE OF THE SOWER',
     category: 'story',
     description:
@@ -2724,6 +2846,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Luke', 23, 6, 12)],
   ),
   CuratedTopic(
+    name: "PILATE'S WIFE'S WARNING",
+    category: 'story',
+    description:
+        'While Pilate is seated on the judgment seat, his wife '
+        'sends word urging him to have nothing to do with "that '
+        'righteous man," for she had suffered much that day in a dream '
+        'because of him.',
+    refs: [CuratedTopicRef('Matthew', 27, 19)],
+  ),
+  CuratedTopic(
     name: 'JESUS BEFORE PILATE AND THE RELEASE OF BARABBAS',
     category: 'story',
     description:
@@ -2828,6 +2960,15 @@ const _storyTopics = <CuratedTopic>[
         'official on a desert road, who then asks to be baptized on the '
         'spot.',
     refs: [CuratedTopicRef('Acts', 8, 26, 40)],
+  ),
+  CuratedTopic(
+    name: 'DORCAS RAISED TO LIFE',
+    category: 'story',
+    description:
+        'When the beloved disciple Dorcas, known for her charity '
+        'to widows, falls sick and dies, Peter kneels to pray and then '
+        'commands her, "Tabitha, arise" — and she opens her eyes.',
+    refs: [CuratedTopicRef('Acts', 9, 36, 42)],
   ),
   CuratedTopic(
     name: "PETER'S VISION AND CORNELIUS",
