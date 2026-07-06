@@ -36,6 +36,7 @@ See the **Backup & Restore** topic for the full story on syncing and backups.
 ## Maintenance & More
 - **Rebuild Search Index:** If search results ever look odd or contain stray formatting, rebuild the index here.
 - **Landing Page:** Choose what the app opens to—the Reader or the Dashboard.
+- **Show Feast Days on Journal Entries:** Turn off the banner that notes when a Journal entry's day falls on a biblical feast (see **Feasts & Calendar** in Study Tools).
 - **Replay Tutorial:** Walk through the introductory tutorial again any time.
 - **What's New:** Review the latest features and fixes.
 - **Acknowledgments:** Credits and open-source licenses.

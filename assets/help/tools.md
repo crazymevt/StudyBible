@@ -2,7 +2,7 @@
 
 The side panel (or the bottom sheet on mobile) contains a powerful suite of tools to help you study the Scriptures. On desktop, the rail shows your **favorite** tools (seven, by default) so the most-used ones are always one tap away:
 
-- Tap the **⋯ (More Tools)** button to open a grouped menu of every tool that isn't currently a favorite. It's grouped into the same four sections used throughout the app: **Study** (reference works), **My Work** (your notes, highlights, scratch pad, sermons, and notebooks), **Plans** (reading plans and devotionals), and **Explore** (topics, places, people, harmony, and media). Tap any tool there to open it.
+- Tap the **⋯ (More Tools)** button to open a grouped menu of every tool that isn't currently a favorite. It's grouped into the same four sections used throughout the app: **Study** (reference works), **My Work** (your notes, highlights, scratch pad, sermons, and notebooks), **Plans** (reading plans and devotionals), and **Explore** (topics, places, people, harmony, media, and feasts). Tap any tool there to open it.
 - Tap the **pencil (Edit Favorites)** button below it to choose which tools are pinned to the rail.
 
 On mobile, the tools drawer always lists every tool (grouped the same way)—there's no favorites step to take.
@@ -26,7 +26,7 @@ Track your progress through reading plans, with a checklist for each day and a p
 Read daily devotionals (like Spurgeon's *Morning and Evening*). Use the day arrows to move through the readings, or jump back to **Today** at any time. Install devotional modules from the Content Manager.
 
 ## Topics
-Explore the Biblical topics referenced in the chapter you are reading, with the related passages for each.
+Explore the Biblical topics referenced in the chapter you are reading, with the related passages for each. Alongside Nave's ~5,000 subject headings, this includes hand-curated feasts and well-known Bible stories (like "David and Goliath")—open one and you get the same facets as a passage page (places, commentaries, cross-references, your notes, tags, and media) aggregated across every chapter its account touches.
 
 ## Places
 See the geographical locations mentioned in the current passage on an interactive map, and jump between the verses that mention them. Tap the expand icon on the map for the full-screen **Atlas**—see below.
@@ -36,6 +36,9 @@ Meet the people in the passage you're reading—over 3,000 individuals from the 
 
 ### Timeline
 From the People panel, tap **Timeline** for a full-screen, interactive chart of Bible history: a lifespan bar for every dated person over a shared time axis you can pan and zoom, with dated events marked along it. Tap a bar to open that person, or an event marker to read its account. The **Events** toggle switches to a searchable, chronological list of events—handy when the chart gets dense—with jump-to-passage and jump-to-timeline buttons on each one.
+
+### Family Tree
+Next to **Timeline**, tap **Family tree** for a full-screen, pannable/zoomable pedigree chart: ancestors above the selected person, descendants below, spouses and siblings alongside them, all connected by lines. It's bounded to two generations in each direction—some lines run 75+ generations deep and some people have 20+ recorded children, so an unbounded tree isn't usable—but tapping any node re-centers the chart on them, so you can walk as far as the data goes one hop at a time. An AppBar button (or a long-press on any node, or tapping the root) opens that person's full Explorer page; **Close family tree** exits back out however many nodes you've re-centered through, in one tap.
 
 ### Atlas
 Every place map in the app—here, on a person's page, and in the Explorer—has an expand icon that opens the full-screen **Atlas**. In **Browse** mode it plots every geocoded place in the Bible; tap one for its name and a **Center here** button. Tap the search icon to **follow a person's journey** instead: pick anyone, and the Atlas connects their dated events into a path with an animated marker you can step through (previous/next/play/scrub), each stop showing the event, year, and a **Read passage** button back to the Reader. Journeys are auto-derived from dated events with a mappable location, not hand-curated—tap the **?** for details on what's included and excluded.
@@ -62,6 +65,9 @@ Browse and play related video media (such as teaching clips and dramatizations) 
 Tap **Add Attachment** to attach your own images or PDFs (a photo of your study notes, a handout, a map you've marked up) to specific verses. Pick a file, then fill in the **Configure Attachment** dialog: a title, one or more **Scripture References** (with a verse range if it applies), and optionally **Manage Tags** so it also shows up on that tag's Explorer page. Tap an existing attachment to view it, or its pencil icon to edit those details.
 
 Attachments sync like any other data—if cloud or folder sync is set up, they reach your other devices; otherwise they stay on this device only. Review or delete every attachment you've added, across the whole Bible, from the **User Content** tab in the Content Manager.
+
+## Feasts & Calendar
+Browse the biblical feasts (Passover through Hanukkah) with descriptions, passages, and their Gregorian dates through 2055—computed from the Hebrew lunar calendar and bundled offline, so no connection is needed. Search by name, or toggle between **A–Z** and **Date** sorting; open a feast for its full description, passages (tap to jump to the Reader), and upcoming dates. When a Journal entry's day falls on a feast, a banner notes it there too—turn that off with **Show Feast Days on Journal Entries** in Settings.
 
 ## Scratch
 A quick, no-friction pad for rough notes and half-formed ideas. It uses the same rich-text editor as Sermons and Journals, saves as you type, and turns any Bible reference you type (like `John 3:16`) into a tappable link.

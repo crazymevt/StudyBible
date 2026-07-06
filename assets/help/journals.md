@@ -12,6 +12,8 @@ The Journals tab lets you track your daily walk with God, write your personal th
 
 > 🔗 **Auto-linking:** Type a Bible reference with its verse—like `John 3:16` or `Rom 8:28-30`—and it turns into a link automatically. Tap the link to jump straight to that passage in the Reader. Capitalize the book name (`John`, not `john`) so it's recognized.
 
+> 📅 **Feast days:** If an entry's date falls on a biblical feast, a banner says so at the top of the editor—**Hide** dismisses it, or turn it off for good under **Show Feast Days on Journal Entries** in Settings. See **Feasts & Calendar** in Study Tools.
+
 ## Prayer Tracker
 - Add prayer requests to keep track of what you are praying for.
 - Keep notes on how a prayer request evolves over time.
