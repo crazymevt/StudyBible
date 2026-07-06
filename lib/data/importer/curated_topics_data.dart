@@ -473,6 +473,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 4, 1, 16)],
   ),
   CuratedTopic(
+    name: 'ENOCH WALKS WITH GOD',
+    category: 'story',
+    description:
+        'Enoch walks with God for three hundred years, and then '
+        'is not, for God takes him — the second man in Genesis, after '
+        'Adam, whose death is never recorded.',
+    refs: [CuratedTopicRef('Genesis', 5, 21, 24)],
+  ),
+  CuratedTopic(
     name: 'ABRAHAM AND LOT SEPARATE',
     category: 'story',
     description:
@@ -1023,6 +1032,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Joshua', 10, 1, 15)],
   ),
   CuratedTopic(
+    name: "JOSHUA'S FAREWELL: \"AS FOR ME AND MY HOUSE\"",
+    category: 'story',
+    description:
+        'The aged Joshua gathers Israel at Shechem, recounts the '
+        "LORD's faithfulness, and challenges them to choose whom they "
+        'will serve, declaring, "As for me and my house, we will serve '
+        'the LORD."',
+    refs: [CuratedTopicRef('Joshua', 24)],
+  ),
+  CuratedTopic(
     name: 'EHUD THE LEFT-HANDED JUDGE',
     category: 'story',
     description:
@@ -1197,6 +1216,15 @@ const _storyTopics = <CuratedTopic>[
       CuratedTopicRef('1 Samuel', 4, 1, 11),
       CuratedTopicRef('1 Samuel', 5),
     ],
+  ),
+  CuratedTopic(
+    name: 'THE DEATH OF ELI',
+    category: 'story',
+    description:
+        'When a messenger reports that his sons are dead and the '
+        'ark is captured, the aged priest Eli falls backward off his '
+        'seat, breaks his neck, and dies.',
+    refs: [CuratedTopicRef('1 Samuel', 4, 12, 22)],
   ),
   CuratedTopic(
     name: 'SAUL ANOINTED KING',
@@ -1544,6 +1572,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('2 Kings', 5)],
   ),
   CuratedTopic(
+    name: "GEHAZI'S GREED AND LEPROSY",
+    category: 'story',
+    description:
+        "Elisha's servant Gehazi secretly chases down Naaman to "
+        'extort payment he refused, lying about it to Elisha, who '
+        "pronounces that Naaman's leprosy will cling to Gehazi and his "
+        'descendants forever.',
+    refs: [CuratedTopicRef('2 Kings', 5, 20, 27)],
+  ),
+  CuratedTopic(
     name: 'ELISHA AND THE FLOATING AXE HEAD',
     category: 'story',
     description:
@@ -1677,6 +1715,16 @@ const _storyTopics = <CuratedTopic>[
 
   // --- Ezra – Nehemiah ---
   CuratedTopic(
+    name: "CYRUS'S DECREE TO REBUILD THE TEMPLE",
+    category: 'story',
+    description:
+        'Stirred by the LORD, King Cyrus of Persia issues a decree '
+        'freeing the Jewish exiles to return to Jerusalem and rebuild '
+        "the LORD's temple, and returns the temple articles Nebuchadnezzar "
+        'had taken.',
+    refs: [CuratedTopicRef('Ezra', 1, 1, 4)],
+  ),
+  CuratedTopic(
     name: 'THE TEMPLE REBUILT UNDER ZERUBBABEL',
     category: 'story',
     description:
@@ -1725,6 +1773,16 @@ const _storyTopics = <CuratedTopic>[
         'The Jewish orphan Esther is chosen queen of Persia, '
         'setting the stage for her to later intercede for her people.',
     refs: [CuratedTopicRef('Esther', 2, 1, 18)],
+  ),
+  CuratedTopic(
+    name: 'MORDECAI UNCOVERS A PLOT AND IS HONORED',
+    category: 'story',
+    description:
+        "Mordecai exposes a plot to assassinate the king, going "
+        'unrewarded until a sleepless King Ahasuerus rereads the '
+        'chronicles and has Haman himself lead Mordecai through the '
+        'streets in royal honor.',
+    refs: [CuratedTopicRef('Esther', 2, 19, 23), CuratedTopicRef('Esther', 6)],
   ),
   CuratedTopic(
     name: "ESTHER SAVES HER PEOPLE",
@@ -3311,6 +3369,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Acts', 15, 36, 41)],
   ),
   CuratedTopic(
+    name: 'THE CALLING OF TIMOTHY',
+    category: 'story',
+    description:
+        'Paul finds the young disciple Timothy well spoken of by '
+        'the believers at Lystra and Iconium, and takes him along on the '
+        'journey, circumcising him first for the sake of the Jews in '
+        'the region.',
+    refs: [CuratedTopicRef('Acts', 16, 1, 5)],
+  ),
+  CuratedTopic(
     name: 'THE MACEDONIAN CALL',
     category: 'story',
     description:
@@ -3362,6 +3430,16 @@ const _storyTopics = <CuratedTopic>[
         'Priscilla, and when the Jews bring him before the proconsul '
         'Gallio, Gallio dismisses the case as an internal Jewish dispute.',
     refs: [CuratedTopicRef('Acts', 18, 1, 17)],
+  ),
+  CuratedTopic(
+    name: 'APOLLOS INSTRUCTED BY PRISCILLA AND AQUILA',
+    category: 'story',
+    description:
+        'The eloquent, Scripture-versed Apollos preaches boldly '
+        'but knows only the baptism of John, until Priscilla and Aquila '
+        'take him aside and explain the way of God to him more '
+        'accurately.',
+    refs: [CuratedTopicRef('Acts', 18, 24, 28)],
   ),
   CuratedTopic(
     name: 'THE SONS OF SCEVA',
