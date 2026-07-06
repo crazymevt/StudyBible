@@ -1098,6 +1098,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Exodus', 34, 29, 35)],
   ),
   CuratedTopic(
+    name: 'THE GLORY OF THE LORD FILLS THE TABERNACLE',
+    category: 'story',
+    description:
+        'When the completed tabernacle is raised, the cloud '
+        "covers it and the LORD's glory fills it so densely that even "
+        'Moses cannot enter; the cloud and fire that rest on it from '
+        "then on guide every stage of Israel's journey.",
+    refs: [CuratedTopicRef('Exodus', 40, 34, 38)],
+  ),
+  CuratedTopic(
     name: "KORAH'S REBELLION",
     category: 'story',
     description:
