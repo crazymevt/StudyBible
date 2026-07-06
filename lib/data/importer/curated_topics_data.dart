@@ -85,6 +85,16 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Genesis', 1), CuratedTopicRef('Genesis', 2, 1, 3)],
   ),
   CuratedTopic(
+    name: 'THE GARDEN OF EDEN: ADAM NAMES THE ANIMALS AND EVE IS CREATED',
+    category: 'story',
+    description:
+        'The LORD forms the man from the dust and places him in '
+        'Eden, has him name every animal, then puts him into a deep '
+        'sleep and builds Eve from his rib as "bone of my bones and '
+        'flesh of my flesh."',
+    refs: [CuratedTopicRef('Genesis', 2, 4, 25)],
+  ),
+  CuratedTopic(
     name: 'THE FALL OF MAN',
     category: 'story',
     description:
@@ -321,6 +331,16 @@ const _storyTopics = <CuratedTopic>[
         'blessings — "Blessed are the poor in spirit... the meek... the '
         'merciful..." — describing the character of the kingdom of heaven.',
     refs: [CuratedTopicRef('Matthew', 5, 1, 12)],
+  ),
+  CuratedTopic(
+    name: "THE LORD'S PRAYER",
+    category: 'story',
+    description:
+        'Teaching his disciples how to pray, Jesus gives them the '
+        'model prayer: "Our Father in heaven, hallowed be your name... '
+        'give us this day our daily bread... and forgive us our debts, '
+        'as we forgive our debtors."',
+    refs: [CuratedTopicRef('Matthew', 6, 9, 13)],
   ),
   CuratedTopic(
     name: 'THE PARABLE OF THE WISE AND FOOLISH BUILDERS',
@@ -1320,6 +1340,15 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('2 Samuel', 1, 1, 27)],
   ),
   CuratedTopic(
+    name: 'UZZAH AND THE ARK',
+    category: 'story',
+    description:
+        'As the ark is carried toward Jerusalem on a cart, Uzzah '
+        'reaches out to steady it when the oxen stumble, and the LORD '
+        'strikes him dead on the spot for touching it.',
+    refs: [CuratedTopicRef('2 Samuel', 6, 1, 8)],
+  ),
+  CuratedTopic(
     name: 'DAVID BRINGS THE ARK TO JERUSALEM',
     category: 'story',
     description:
@@ -1451,6 +1480,16 @@ const _storyTopics = <CuratedTopic>[
         'Solomon constructs the temple in Jerusalem as a '
         'permanent house for the LORD, fulfilling David\'s wish.',
     refs: [CuratedTopicRef('1 Kings', 6)],
+  ),
+  CuratedTopic(
+    name: "THE DEDICATION OF SOLOMON'S TEMPLE",
+    category: 'story',
+    description:
+        'As the ark is brought into the finished temple, the '
+        "glory of the LORD fills it in a cloud so thick the priests "
+        "cannot stand to minister, and Solomon prays, \"Will God indeed "
+        'dwell on the earth?"',
+    refs: [CuratedTopicRef('1 Kings', 8)],
   ),
   CuratedTopic(
     name: 'THE QUEEN OF SHEBA VISITS SOLOMON',
@@ -2317,6 +2356,16 @@ const _storyTopics = <CuratedTopic>[
         "Jesus turns water into wine at a wedding in Cana, his "
         'first public sign.',
     refs: [CuratedTopicRef('John', 2, 1, 11)],
+  ),
+  CuratedTopic(
+    name: 'JESUS CLEANSES THE TEMPLE (EARLY MINISTRY)',
+    category: 'story',
+    description:
+        'Early in his ministry, Jesus drives the money changers '
+        'and animal sellers from the temple with a whip of cords, '
+        'declaring, "Destroy this temple, and in three days I will raise '
+        'it up" — a sign of his own coming death and resurrection.',
+    refs: [CuratedTopicRef('John', 2, 13, 22)],
   ),
   CuratedTopic(
     name: 'NICODEMUS VISITS JESUS',
