@@ -1,5 +1,71 @@
 [
   {
+    "version": "26.7.5+3",
+    "date": "2026-07-05",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "stop sermon search snippets from showing raw/mangled Delta JSON",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "resolve chapter subheadings by book name, not book-order number",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "don't crash the commentary panel on a stale selected-commentary id",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "flatten card surfaces and centralize component theming",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "match Actions panel/dialog layout to Prayer Tracker's mobile fixes",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add session-only view-only mode to the sermon editor",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct Jericho event ordering on atlas map",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct nativity event ordering on atlas map",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "skip malformed rows during MyBible import instead of aborting",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "show approximate data size on Content Manager's Installed panel",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.5+2",
     "date": "2026-07-05",
     "features": [
