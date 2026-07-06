@@ -256,11 +256,12 @@ const _storyTopics = <CuratedTopic>[
     refs: [CuratedTopicRef('Matthew', 3, 13, 17)],
   ),
   CuratedTopic(
-    name: 'THE SERMON ON THE MOUNT',
+    name: 'THE BEATITUDES',
     category: 'story',
     description:
-        "Jesus teaches the Beatitudes and the core of his ethical "
-        'teaching to a crowd gathered on a mountainside.',
+        'Jesus opens the Sermon on the Mount with a series of '
+        'blessings — "Blessed are the poor in spirit... the meek... the '
+        'merciful..." — describing the character of the kingdom of heaven.',
     refs: [CuratedTopicRef('Matthew', 5, 1, 12)],
   ),
   CuratedTopic(
