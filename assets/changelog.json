@@ -1,5 +1,41 @@
 [
   {
+    "version": "26.7.6+1",
+    "date": "2026-07-06",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "greatly expand curated Bible stories across nearly every narrative book",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "surface curated stories on the person page",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "greatly expand the curated Bible stories list",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add curated feast/story topics and expand topic pages with passage facets",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add a Feasts & Calendar reader tool",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.5+3",
     "date": "2026-07-05",
     "features": [
