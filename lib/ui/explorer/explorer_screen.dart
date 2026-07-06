@@ -11,6 +11,36 @@ import '../tags/tag_palette.dart';
 import 'explorer_common.dart';
 import 'explorer_pages.dart';
 
+/// Opens [target] in a fresh, full-page [ExplorerScreen] pushed on top of
+/// whatever's currently showing — e.g. from a family tree node, or an
+/// `sbent:` entity link in a notebook page (see
+/// `entity_autolink.dart`'s `handleEntityLinkLaunch`).
+///
+/// The exploration trail is one global, session-wide stack (see
+/// [explorerTrailProvider]'s doc comment), not one per pushed
+/// [ExplorerScreen]. If an [ExplorerScreen] is already open somewhere below
+/// in the navigation stack (its person page is what led here, directly or
+/// indirectly) and this just cleared and reused that same shared trail, the
+/// earlier instance would come back showing this new destination instead of
+/// whatever it had before once the user backs out of this one. So: save the
+/// trail as it stood, hijack it for the new screen, then restore it the
+/// moment that screen is popped.
+Future<void> openInFreshExplorer(
+  BuildContext context,
+  WidgetRef ref,
+  ExplorerRef target,
+) async {
+  final notifier = ref.read(explorerTrailProvider.notifier);
+  final previousTrail = ref.read(explorerTrailProvider);
+  notifier
+    ..clear()
+    ..open(target);
+  await Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => const ExplorerScreen()),
+  );
+  notifier.restore(previousTrail);
+}
+
 /// Full-page knowledge-web browser over the bundled study datasets: every
 /// person, place, event, topic, and passage is a page, and the pages
 /// cross-link so one search can be explored in any direction. Navigation

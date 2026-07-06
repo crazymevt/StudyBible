@@ -102,6 +102,60 @@ class PersonDetail {
   });
 }
 
+/// Fetch a single [BiblePerson] by id, or null for a null id. Shared by
+/// [personDetailProvider] and the family tree provider.
+Future<BiblePerson?> personByIdOrNull(ContentStore store, int? id) async =>
+    id == null
+        ? null
+        : await (store.select(
+            store.biblePeople,
+          )..where((p) => p.id.equals(id))).getSingleOrNull();
+
+/// Fetch [BiblePerson] rows for [ids], oldest-first where years are known
+/// then by name. Shared by [personDetailProvider] and the family tree
+/// provider.
+Future<List<BiblePerson>> peopleByIdsYearSorted(
+  ContentStore store,
+  List<int> ids,
+) async {
+  if (ids.isEmpty) return const [];
+  final rows = await (store.select(
+    store.biblePeople,
+  )..where((p) => p.id.isIn(ids))).get();
+  rows.sort((a, b) {
+    final ay = a.minYear, by = b.minYear;
+    if (ay != null && by != null && ay != by) return ay.compareTo(by);
+    return a.name.compareTo(b.name);
+  });
+  return rows;
+}
+
+/// Ids of people sharing a parent with [person] (excluding [person] itself).
+/// Shared by [personDetailProvider] and the family tree provider.
+Future<Set<int>> siblingIdsOf(
+  ContentStore store,
+  BiblePerson person,
+) async {
+  final siblingIds = <int>{};
+  if (person.fatherId == null && person.motherId == null) return siblingIds;
+  final rows =
+      await (store.select(store.biblePeople)..where((p) {
+            Expression<bool> sharesParent = const Constant(false);
+            if (person.fatherId != null) {
+              sharesParent = sharesParent | p.fatherId.equals(person.fatherId!);
+            }
+            if (person.motherId != null) {
+              sharesParent = sharesParent | p.motherId.equals(person.motherId!);
+            }
+            return sharesParent;
+          }))
+          .get();
+  for (final r in rows) {
+    if (r.id != person.id) siblingIds.add(r.id);
+  }
+  return siblingIds;
+}
+
 final personDetailProvider = FutureProvider.family<PersonDetail?, int>((
   ref,
   personId,
@@ -112,26 +166,6 @@ final personDetailProvider = FutureProvider.family<PersonDetail?, int>((
     store.biblePeople,
   )..where((p) => p.id.equals(personId))).getSingleOrNull();
   if (person == null) return null;
-
-  Future<BiblePerson?> byId(int? id) async => id == null
-      ? null
-      : await (store.select(
-          store.biblePeople,
-        )..where((p) => p.id.equals(id))).getSingleOrNull();
-
-  Future<List<BiblePerson>> byIds(List<int> ids) async {
-    if (ids.isEmpty) return const [];
-    final rows = await (store.select(
-      store.biblePeople,
-    )..where((p) => p.id.isIn(ids))).get();
-    // Oldest-first where years are known, then by name.
-    rows.sort((a, b) {
-      final ay = a.minYear, by = b.minYear;
-      if (ay != null && by != null && ay != by) return ay.compareTo(by);
-      return a.name.compareTo(b.name);
-    });
-    return rows;
-  }
 
   // Spouses are stored one-directional in places; match either side.
   final partnerLinks =
@@ -151,26 +185,7 @@ final personDetailProvider = FutureProvider.family<PersonDetail?, int>((
           .get();
 
   // Siblings share a parent; derived rather than stored.
-  final siblingIds = <int>{};
-  if (person.fatherId != null || person.motherId != null) {
-    final rows =
-        await (store.select(store.biblePeople)..where((p) {
-              Expression<bool> sharesParent = const Constant(false);
-              if (person.fatherId != null) {
-                sharesParent =
-                    sharesParent | p.fatherId.equals(person.fatherId!);
-              }
-              if (person.motherId != null) {
-                sharesParent =
-                    sharesParent | p.motherId.equals(person.motherId!);
-              }
-              return sharesParent;
-            }))
-            .get();
-    for (final r in rows) {
-      if (r.id != personId) siblingIds.add(r.id);
-    }
-  }
+  final siblingIds = await siblingIdsOf(store, person);
 
   final groupRows = await store
       .customSelect(
@@ -201,14 +216,17 @@ final personDetailProvider = FutureProvider.family<PersonDetail?, int>((
             ..orderBy([(v) => OrderingTerm.asc(v.id)]))
           .get();
 
-  final children = await byIds(childRows.map((c) => c.id).toList());
+  final children = await peopleByIdsYearSorted(
+    store,
+    childRows.map((c) => c.id).toList(),
+  );
   return PersonDetail(
     person: person,
-    father: await byId(person.fatherId),
-    mother: await byId(person.motherId),
-    partners: await byIds(partnerIds.toList()),
+    father: await personByIdOrNull(store, person.fatherId),
+    mother: await personByIdOrNull(store, person.motherId),
+    partners: await peopleByIdsYearSorted(store, partnerIds.toList()),
     children: children,
-    siblings: await byIds(siblingIds.toList()),
+    siblings: await peopleByIdsYearSorted(store, siblingIds.toList()),
     groups: groupRows.map((r) => r.read<String>('name')).toList(),
     events: eventRows
         .map(

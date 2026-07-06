@@ -9,6 +9,7 @@ import '../../data/content_store.dart';
 import '../common/breakpoints.dart';
 import '../common/skeleton.dart';
 import '../explorer/explorer_common.dart';
+import '../explorer/family_tree_screen.dart';
 import 'people_timeline_screen.dart';
 
 /// Open [personId] in the People tool: the side panel on wide layouts, a
@@ -144,6 +145,13 @@ class _PeoplePanelState extends ConsumerState<PeoplePanel> {
                                 builder: (_) => const PeopleTimelineScreen(),
                               ),
                             ),
+                          ),
+                        if (selectedPerson != null)
+                          IconButton(
+                            icon: const Icon(Icons.account_tree_outlined),
+                            tooltip: 'Family tree',
+                            onPressed: () => Navigator.of(context)
+                                .push(familyTreeRoute(selectedPerson)),
                           ),
                         IconButton(
                           icon: const Icon(Icons.close),

@@ -22,6 +22,7 @@ import '../reader/image_viewer_dialog.dart';
 import '../reader/media_video_list.dart';
 import '../reader/pdf_viewer_dialog.dart';
 import 'explorer_common.dart';
+import 'family_tree_screen.dart';
 
 /// The page body for one trail entry — dispatches on the entity type.
 class ExplorerEntityPage extends StatelessWidget {
@@ -241,6 +242,16 @@ class _PersonPage extends ConsumerWidget {
               ExplorerFacetCard(
                 icon: Icons.family_restroom,
                 title: 'Family',
+                trailing: d.father == null &&
+                        d.mother == null &&
+                        d.children.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.account_tree_outlined),
+                        tooltip: 'View family tree',
+                        onPressed: () => Navigator.of(context)
+                            .push(familyTreeRoute(p.id)),
+                      ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

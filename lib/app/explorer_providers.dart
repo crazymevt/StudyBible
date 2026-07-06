@@ -91,6 +91,15 @@ class ExplorerTrailNotifier extends Notifier<List<ExplorerRef>> {
   }
 
   void clear() => state = const [];
+
+  /// Replaces the trail wholesale. Used to put back whatever a temporarily
+  /// hijacked trail held before — see `openInFreshExplorer` in
+  /// `explorer_common.dart`: the trail is one global, session-wide stack,
+  /// not one per pushed [ExplorerScreen], so a second Explorer instance
+  /// pushed on top of a first must restore the first's trail on the way
+  /// back out, or popping back to it would show whatever the second one
+  /// left behind instead.
+  void restore(List<ExplorerRef> trail) => state = trail;
 }
 
 final explorerTrailProvider =

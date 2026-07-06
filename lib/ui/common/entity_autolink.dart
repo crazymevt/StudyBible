@@ -4,7 +4,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/content_providers.dart';
-import '../../app/explorer_providers.dart';
 import '../../domain/explorer/entity_link.dart';
 import '../../domain/explorer/explorer_ref.dart';
 import '../explorer/explorer_screen.dart';
@@ -85,9 +84,5 @@ Future<void> handleEntityLinkLaunch(
   };
   if (entityRef == null) return;
 
-  ref.read(explorerTrailProvider.notifier)
-    ..clear()
-    ..open(entityRef);
-  Navigator.of(context)
-      .push(MaterialPageRoute(builder: (_) => const ExplorerScreen()));
+  openInFreshExplorer(context, ref, entityRef);
 }
