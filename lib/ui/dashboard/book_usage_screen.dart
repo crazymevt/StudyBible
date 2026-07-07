@@ -14,6 +14,7 @@ const highlightActivityColor = Colors.amber;
 const noteActivityColor = Colors.blue;
 const sermonActivityColor = Colors.deepPurple;
 const notebookActivityColor = Colors.teal;
+const tagActivityColor = Colors.pink;
 
 /// Sets the reader's selection to [book]/[chapter], switches to the Reader
 /// module, and pops every pushed dashboard route so the module switch is
@@ -254,6 +255,11 @@ class ActivityBar extends StatelessWidget {
                       flex: counts.notebookRefs,
                       child: Container(color: notebookActivityColor),
                     ),
+                  if (counts.taggedVerses > 0)
+                    Expanded(
+                      flex: counts.taggedVerses,
+                      child: Container(color: tagActivityColor),
+                    ),
                 ],
               ),
             ),
@@ -281,6 +287,8 @@ class ActivityChips extends StatelessWidget {
           _chip(sermonActivityColor, '${counts.sermonRefs} sermons'),
         if (counts.notebookRefs > 0)
           _chip(notebookActivityColor, '${counts.notebookRefs} notebook'),
+        if (counts.taggedVerses > 0)
+          _chip(tagActivityColor, '${counts.taggedVerses} tagged'),
       ],
     );
   }

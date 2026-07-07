@@ -746,8 +746,8 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Highlight a verse, add a note, or reference a passage in a '
-                  'sermon or notebook page to see it here.',
+                  'Highlight a verse, add a note, tag a verse, or reference '
+                  'a passage in a sermon or notebook page to see it here.',
                   style: TextStyle(color: Colors.grey),
                 ),
               ] else ...[
@@ -767,7 +767,8 @@ class DashboardScreen extends ConsumerWidget {
                   '${mostUsed.counts.highlights} highlights · '
                   '${mostUsed.counts.notes} notes · '
                   '${mostUsed.counts.sermonRefs} sermons · '
-                  '${mostUsed.counts.notebookRefs} notebook pages',
+                  '${mostUsed.counts.notebookRefs} notebook pages · '
+                  '${mostUsed.counts.taggedVerses} tagged',
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
               ],

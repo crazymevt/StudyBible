@@ -1,20 +1,23 @@
-/// Per-book (or per-chapter) study-activity tally across the four v1
-/// categories. Journals are deliberately excluded — journal entries carry no
+/// Per-book (or per-chapter) study-activity tally across five categories.
+/// Journals are deliberately excluded — journal entries carry no
 /// scripture-reference index yet.
 class ActivityCounts {
   final int highlights;
   final int notes;
   final int sermonRefs;
   final int notebookRefs;
+  final int taggedVerses;
 
   const ActivityCounts({
     this.highlights = 0,
     this.notes = 0,
     this.sermonRefs = 0,
     this.notebookRefs = 0,
+    this.taggedVerses = 0,
   });
 
-  int get total => highlights + notes + sermonRefs + notebookRefs;
+  int get total =>
+      highlights + notes + sermonRefs + notebookRefs + taggedVerses;
   bool get isEmpty => total == 0;
 }
 

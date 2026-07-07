@@ -53,6 +53,28 @@ void main() {
         );
   }
 
+  Future<void> insertVerseTag(String book, int chapter, {int verse = 1}) async {
+    final tagId = 'tag-${DateTime.now().microsecondsSinceEpoch}-${book.hashCode}';
+    await userStore.into(userStore.tags).insert(
+          TagsCompanion.insert(
+            id: tagId,
+            updatedAt: 1,
+            deviceId: 'test-device',
+            name: 'faith',
+          ),
+        );
+    await userStore.into(userStore.entityTags).insert(
+          EntityTagsCompanion.insert(
+            id: '$tagId-link',
+            updatedAt: 1,
+            deviceId: 'test-device',
+            tagId: tagId,
+            entityId: 'Verse:$book|$chapter|$verse',
+            entityType: 'verse',
+          ),
+        );
+  }
+
   Future<void> insertSermon(
     String id,
     String plain, {
@@ -200,6 +222,17 @@ void main() {
       );
     });
 
+    test('counts tagged verses per book', () async {
+      await insertVerseTag('Romans', 8);
+      await insertVerseTag('Romans', 8, verse: 2);
+
+      await expectBookCounts(
+        'Romans',
+        isA<ActivityCounts>()
+            .having((c) => c.taggedVerses, 'taggedVerses', 2),
+      );
+    });
+
     test('soft-deleting a highlight updates counts live', () async {
       await insertHighlight('Romans', 8);
       await expectBookCounts(
@@ -250,6 +283,19 @@ void main() {
               chapters[12]!.highlights == 1 &&
               chapters[1]!.isEmpty,
           'chapter 8/12 counts placed correctly, chapter 1 empty',
+        ),
+      );
+    });
+
+    test('places a tagged verse on the right chapter', () async {
+      await insertVerseTag('Romans', 8);
+
+      await expectChapterCounts(
+        'Romans',
+        predicate<Map<int, ActivityCounts>>(
+          (chapters) =>
+              chapters[8]!.taggedVerses == 1 && chapters[1]!.isEmpty,
+          'chapter 8 has one tagged verse, chapter 1 empty',
         ),
       );
     });

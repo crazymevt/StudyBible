@@ -59,14 +59,15 @@ void main() {
   });
 
   group('ActivityCounts', () {
-    test('total sums all four categories', () {
+    test('total sums all five categories', () {
       const counts = ActivityCounts(
         highlights: 1,
         notes: 2,
         sermonRefs: 3,
         notebookRefs: 4,
+        taggedVerses: 5,
       );
-      expect(counts.total, 10);
+      expect(counts.total, 15);
       expect(counts.isEmpty, isFalse);
     });
 

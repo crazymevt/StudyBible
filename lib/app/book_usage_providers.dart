@@ -34,6 +34,36 @@ final _noteCountsByBookProvider = StreamProvider<Map<String, int>>((ref) {
       });
 });
 
+/// Extracts the book name from a tag's `entityId` when `entityType` is
+/// 'verse', e.g. `'Verse:Gen|1|1'` -> `'Gen'`. Mirrors the parsing
+/// [entitiesForTagProvider] already does for the same format.
+String? _verseBookFromEntityId(String entityId) {
+  final parts = entityId.split(':');
+  if (parts.length < 2) return null;
+  final data = parts[1].split('|');
+  return data.isNotEmpty ? data[0] : null;
+}
+
+/// Per-book count of tag applications on verses (`entity_tags` rows with
+/// `entityType == 'verse'`), one per tag/verse pairing — the same
+/// per-row granularity as highlight and note counts. Tags on other entity
+/// types (notes, sermons, ...) aren't counted here since those documents
+/// already contribute via their own category.
+final _taggedVerseCountsByBookProvider = StreamProvider<Map<String, int>>((ref) {
+  final store = ref.watch(userStoreProvider);
+  final q = store.select(store.entityTags)
+    ..where((et) => et.entityType.equals('verse'))
+    ..where((et) => et.deleted.equals(false));
+  return q.watch().map((rows) {
+    final counts = <String, int>{};
+    for (final row in rows) {
+      final book = _verseBookFromEntityId(row.entityId);
+      if (book != null) counts[book] = (counts[book] ?? 0) + 1;
+    }
+    return counts;
+  });
+});
+
 /// Per-book distinct-document counts for sermons and notebook pages, sourced
 /// from the persisted `document_references` index (kept fresh by
 /// [documentReferenceIndexProvider]). `COUNT(DISTINCT doc_id)` so a document
@@ -64,6 +94,7 @@ final bookActivityBreakdownProvider =
     FutureProvider<Map<String, ActivityCounts>>((ref) async {
   final highlightCounts = ref.watch(_highlightCountsByBookProvider).value ?? {};
   final noteCounts = ref.watch(_noteCountsByBookProvider).value ?? {};
+  final tagCounts = ref.watch(_taggedVerseCountsByBookProvider).value ?? {};
   await ref.watch(documentReferenceIndexProvider.future);
   final docRefCounts = await _docRefCountsByBook(ref.watch(userStoreProvider));
   return {
@@ -73,6 +104,7 @@ final bookActivityBreakdownProvider =
         notes: noteCounts[book] ?? 0,
         sermonRefs: docRefCounts.sermon[book] ?? 0,
         notebookRefs: docRefCounts.notebook[book] ?? 0,
+        taggedVerses: tagCounts[book] ?? 0,
       ),
   };
 });
@@ -119,6 +151,21 @@ final bookChapterActivityProvider =
     for (final r in noteRows) r.read(store.notes.chapter)!: r.read(noteCountExpr)!,
   };
 
+  final tagRows = await (store.select(store.entityTags)
+        ..where((et) => et.entityType.equals('verse'))
+        ..where((et) => et.deleted.equals(false))
+        ..where((et) => et.entityId.like('Verse:$book|%')))
+      .get();
+  final tagCounts = <int, int>{};
+  for (final row in tagRows) {
+    final parts = row.entityId.split(':');
+    if (parts.length < 2) continue;
+    final data = parts[1].split('|');
+    if (data.length < 2) continue;
+    final chapter = int.tryParse(data[1]);
+    if (chapter != null) tagCounts[chapter] = (tagCounts[chapter] ?? 0) + 1;
+  }
+
   await ref.watch(documentReferenceIndexProvider.future);
   final docRefRows = await store.customSelect(
     'SELECT doc_type AS doc_type, doc_id AS doc_id, '
@@ -152,6 +199,7 @@ final bookChapterActivityProvider =
         notes: noteCounts[chapter] ?? 0,
         sermonRefs: sermonDocsByChapter[chapter]?.length ?? 0,
         notebookRefs: notebookDocsByChapter[chapter]?.length ?? 0,
+        taggedVerses: tagCounts[chapter] ?? 0,
       ),
   };
 });
