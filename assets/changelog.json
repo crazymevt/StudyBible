@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.6+5",
+    "date": "2026-07-06",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "rasterize the print path so printer font engines can't garble text",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.6+4",
     "date": "2026-07-06",
     "features": [
