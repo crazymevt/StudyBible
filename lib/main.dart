@@ -151,8 +151,38 @@ void main() {
       await autoUpdater.setScheduledCheckInterval(3600);
     }
   }, (Object error, StackTrace stack) {
+    if (_isBenignRiverpodTickerModeResume(error, stack)) {
+      // riverpod's Consumer auto-pauses provider subscriptions on routes
+      // covered by a pushed route (via TickerMode) and resumes them when
+      // uncovered; resuming can synchronously flush a provider that needs to
+      // setState() the root ProviderScope while Flutter is mid-build for the
+      // same frame — illegal, but non-fatal (the frame is simply retried).
+      // Riverpod's maintainer has confirmed this exact assertion is handled,
+      // not a runtime bug: https://github.com/rrousselGit/riverpod/issues/4285.
+      // Logged quietly so it doesn't read as a crash; any *other*
+      // setState-during-build won't match this narrow signature below.
+      debugPrint(
+        '[Riverpod] benign TickerMode-resume assertion suppressed (see main.dart)',
+      );
+      return;
+    }
     logError(error, stack, context: 'Uncaught');
   });
+}
+
+/// Narrowly matches the "setState() or markNeedsBuild() called during
+/// build." assertion that fires specifically from riverpod's TickerMode
+/// resume path (see the call site above) — not any other build-phase error.
+bool _isBenignRiverpodTickerModeResume(Object error, StackTrace stack) {
+  if (error is! FlutterError) return false;
+  if (!error.toString().contains(
+        'setState() or markNeedsBuild() called during build',
+      )) {
+    return false;
+  }
+  final trace = stack.toString();
+  return trace.contains('_updateTickerMode') &&
+      trace.contains('package:flutter_riverpod');
 }
 
 /// Opens the user database and runs any pending schema migration to completion
