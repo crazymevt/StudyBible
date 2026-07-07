@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.7.7+2",
+    "date": "2026-07-07",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "stabilize Quill editor focus across rebuilds",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "estimate sermon reading/preaching time",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "group Explorer's Bible Stories A-Z with a jump strip, restore feast calendar order",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.7+1",
     "date": "2026-07-07",
     "features": [
