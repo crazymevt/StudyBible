@@ -34,6 +34,7 @@ class SermonExporter {
         await PrintService.printPdf(
           (format) => _generatePdf(sermons, pageFormat: format),
           documentName: name,
+          buildHtml: () async => utf8.decode(await _generateHtml(sermons)),
         );
         return;
       }

@@ -92,6 +92,40 @@ Future<Uint8List> buildPlainTextPdf({
   return pdf.save();
 }
 
+String _escapeHtml(String text) => text
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+
+/// The same document as [buildPlainTextPdf], as a standalone HTML page.
+/// `white-space: pre-wrap` keeps the plain-text line breaks.
+String buildPlainTextHtml({
+  required String title,
+  required List<PdfDocSection> sections,
+}) {
+  final buffer = StringBuffer()
+    ..writeln('<!DOCTYPE html>')
+    ..writeln('<html><head><meta charset="utf-8">'
+        '<title>${_escapeHtml(title)}</title>')
+    ..writeln('<style>'
+        'body { font-family: sans-serif; padding: 20px; } '
+        'h2 { margin-bottom: 0; } '
+        '.sub { color: #555; font-style: italic; margin: 2px 0 4px; } '
+        '.body { white-space: pre-wrap; line-height: 1.4; margin-bottom: 16px; }'
+        '</style>')
+    ..writeln('</head><body>')
+    ..writeln('<h1>${_escapeHtml(title)}</h1><hr>');
+  for (final s in sections) {
+    buffer.writeln('<h2>${_escapeHtml(s.heading)}</h2>');
+    if (s.subheading != null && s.subheading!.isNotEmpty) {
+      buffer.writeln('<div class="sub">${_escapeHtml(s.subheading!)}</div>');
+    }
+    buffer.writeln('<div class="body">${_escapeHtml(s.body)}</div>');
+  }
+  buffer.writeln('</body></html>');
+  return buffer.toString();
+}
+
 /// Builds a plain-text PDF and opens the system print sheet.
 Future<void> printPlainTextDocument({
   required String title,
@@ -100,6 +134,7 @@ Future<void> printPlainTextDocument({
   await PrintService.printPdf(
     (format) => buildPlainTextPdf(title: title, sections: sections, pageFormat: format),
     documentName: title,
+    buildHtml: () async => buildPlainTextHtml(title: title, sections: sections),
   );
 }
 

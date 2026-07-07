@@ -39,6 +39,7 @@ class NotebookExporter {
         await PrintService.printPdf(
           (format) => _generatePdf(notebook, pages, pageFormat: format),
           documentName: notebook.title.isEmpty ? 'Notebook' : notebook.title,
+          buildHtml: () async => utf8.decode(await _generateHtml(notebook, pages)),
         );
         return;
       }
