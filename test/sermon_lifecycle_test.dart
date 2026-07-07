@@ -5,7 +5,9 @@ import 'package:flutter_quill/flutter_quill.dart'
     show FlutterQuillLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_bible/app/achievement_service.dart';
+import 'package:study_bible/app/shared_prefs.dart';
 import 'package:study_bible/app/sync_service.dart';
 import 'package:study_bible/app/user_providers.dart';
 import 'package:study_bible/data/user_store.dart';
@@ -41,9 +43,13 @@ void main() {
     final user = UserStore(NativeDatabase.memory());
     addTearDown(user.close);
 
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
     final container = ProviderContainer(
       overrides: [
         userStoreProvider.overrideWithValue(user),
+        sharedPreferencesProvider.overrideWithValue(prefs),
         // path_provider-backed; would throw MissingPluginException in tests.
         deviceIdProvider.overrideWith((ref) async => 'test-device'),
         achievementServiceProvider.overrideWith(

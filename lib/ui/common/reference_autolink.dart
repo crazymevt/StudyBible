@@ -26,29 +26,59 @@ const String _scheme = 'sbref';
 /// `onLaunchUrl`, so the tap silently does nothing.
 const List<String> referenceLinkPrefixes = <String>[_scheme];
 
-/// Encodes a reference as `sbref:<book>|<chapter>|<verse>` (verse may be empty).
-/// The book name is percent-encoded so `|` in a name can't corrupt the URL.
-String buildReferenceUrl(Book book, int chapter, int? verse) =>
-    '$_scheme:${Uri.encodeComponent(book.name)}|$chapter|${verse ?? ''}';
+/// Encodes a reference as `sbref:<book>|<chapter>|<verse>|<endChapter>|<endVerse>`
+/// (verse/endChapter/endVerse may be empty). The trailing pair is only
+/// non-empty for a range ("John 3:16-18"); older links without them still
+/// parse as 3-part (see [parseReferenceUrl]). The book name is
+/// percent-encoded so `|` in a name can't corrupt the URL.
+String buildReferenceUrl(
+  Book book,
+  int chapter,
+  int? verse, {
+  int? endChapter,
+  int? endVerse,
+}) =>
+    '$_scheme:${Uri.encodeComponent(book.name)}|$chapter|${verse ?? ''}'
+    '|${endChapter ?? ''}|${endVerse ?? ''}';
 
 /// A reference parsed back out of an [buildReferenceUrl] string.
 class ParsedReferenceUrl {
   final String bookName;
   final int chapter;
   final int? verse;
-  const ParsedReferenceUrl(this.bookName, this.chapter, this.verse);
+  final int? endChapter;
+  final int? endVerse;
+  const ParsedReferenceUrl(
+    this.bookName,
+    this.chapter,
+    this.verse, {
+    this.endChapter,
+    this.endVerse,
+  });
 }
 
 /// Parses an `sbref:` URL, or returns null if [url] isn't one of ours.
+/// Accepts both the current 5-part format and the legacy 3-part format
+/// (no range) saved by earlier versions of the app.
 ParsedReferenceUrl? parseReferenceUrl(String url) {
   if (!url.startsWith('$_scheme:')) return null;
   final body = url.substring(_scheme.length + 1);
   final parts = body.split('|');
-  if (parts.length != 3) return null;
+  if (parts.length != 3 && parts.length != 5) return null;
   final chapter = int.tryParse(parts[1]);
   if (chapter == null) return null;
   final verse = parts[2].isEmpty ? null : int.tryParse(parts[2]);
-  return ParsedReferenceUrl(Uri.decodeComponent(parts[0]), chapter, verse);
+  final endChapter =
+      parts.length == 5 && parts[3].isNotEmpty ? int.tryParse(parts[3]) : null;
+  final endVerse =
+      parts.length == 5 && parts[4].isNotEmpty ? int.tryParse(parts[4]) : null;
+  return ParsedReferenceUrl(
+    Uri.decodeComponent(parts[0]),
+    chapter,
+    verse,
+    endChapter: endChapter,
+    endVerse: endVerse,
+  );
 }
 
 /// Applies reference links to any not-yet-linked references in [controller]'s
@@ -72,7 +102,15 @@ bool applyReferenceAutolinks(QuillController controller, List<Book> books) {
     controller.formatText(
       ref.start,
       len,
-      LinkAttribute(buildReferenceUrl(ref.book, ref.chapter, ref.verse)),
+      LinkAttribute(
+        buildReferenceUrl(
+          ref.book,
+          ref.chapter,
+          ref.verse,
+          endChapter: ref.endChapter,
+          endVerse: ref.endVerse,
+        ),
+      ),
     );
     changed = true;
   }

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/scripture_nav_providers.dart';
 import '../../app/sermon_providers.dart';
 import '../common/reference_autolink.dart';
+import 'sermon_reading_time_estimator.dart';
 import '../../app/revision_common.dart';
 import '../../app/user_providers.dart';
 import '../../data/export/sermon_exporter.dart';
@@ -44,6 +45,15 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   final _titleController = TextEditingController();
   final _seriesController = TextEditingController();
 
+  /// Passed explicitly to QuillEditor.basic below. Without it, the factory
+  /// mints a brand-new default FocusNode on every call — i.e. every rebuild
+  /// — which churns the editor's focus identity. That's normally rare enough
+  /// not to matter, but the reading-time estimate's setState (on every
+  /// autolink debounce tick) rebuilds this screen far more often, making the
+  /// churn frequent enough to have caused a "DeleteCharacterIntent has no
+  /// Actions mapping" crash when a keypress landed mid-handoff.
+  final _editorFocusNode = FocusNode();
+
   /// Mirrors [sermonViewOnlyProvider] for this sermon — kept as a field so the
   /// rest of the widget can read it without threading `ref` everywhere.
   /// Reassigned from the provider at the top of every [build], which also
@@ -80,6 +90,17 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   /// than mid-word on every keystroke (unlike the immediate content save).
   Timer? _autolinkDebounce;
 
+  /// Estimated time to read/preach the sermon aloud, recomputed alongside
+  /// auto-linking (it depends on which citations are linked). Null until the
+  /// first computation finishes.
+  Duration? _estimatedReadingTime;
+
+  /// Bumped on every [_recalculateReadingTime] call so a slow, superseded
+  /// lookup (it awaits a citation's verse text from the content store) can
+  /// tell it's stale and skip setState instead of clobbering a newer result
+  /// — or firing mid-edit — once it finally resolves.
+  int _readingTimeGeneration = 0;
+
   @override
   void initState() {
     super.initState();
@@ -115,11 +136,17 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       setState(() {
         _isInitialized = true;
       });
+      unawaited(_recalculateReadingTime());
     }
   }
 
   String _currentContentJson() =>
       jsonEncode(_controller.document.toDelta().toJson());
+
+  String _formatReadingTime(Duration d) {
+    final minutes = (d.inSeconds / 60).round();
+    return minutes < 1 ? '< 1 min' : '~$minutes min';
+  }
 
   /// Restarts the auto-link debounce. Applying links mutates the document,
   /// which re-fires this listener; the pass is idempotent, so the follow-up
@@ -129,7 +156,19 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     _autolinkDebounce = Timer(const Duration(milliseconds: 600), () {
       if (!mounted || _conflictDetected || _internalWrite) return;
       applyReferenceAutolinks(_controller, autolinkBooks(ref));
+      unawaited(_recalculateReadingTime());
     });
+  }
+
+  Future<void> _recalculateReadingTime() async {
+    final generation = ++_readingTimeGeneration;
+    final estimate = await estimateSermonReadingTime(_controller.document, ref);
+    if (!mounted ||
+        generation != _readingTimeGeneration ||
+        estimate == _estimatedReadingTime) {
+      return;
+    }
+    setState(() => _estimatedReadingTime = estimate);
   }
 
   Future<void> _saveSermonContent() async {
@@ -248,6 +287,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
           kind: RevisionKind.restore,
         );
     setState(() => _applySermonToEditor(remote));
+    unawaited(_recalculateReadingTime());
     _internalWrite = false;
     if (mounted) {
       setState(() {
@@ -288,6 +328,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       _conflictDetected = false;
       _incomingRemote = null;
     });
+    if (changed) unawaited(_recalculateReadingTime());
     _internalWrite = false;
     _fullScreenChildOpen = false;
   }
@@ -311,6 +352,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         .getSingleOrNull();
     if (sermon != null && mounted) {
       setState(() => _applySermonToEditor(sermon));
+      unawaited(_recalculateReadingTime());
     }
     _internalWrite = false;
     if (mounted) {
@@ -481,6 +523,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   @override
   void dispose() {
     _autolinkDebounce?.cancel();
+    _editorFocusNode.dispose();
     if (_isInitialized) {
       _controller.removeListener(_saveSermonContent);
       _controller.removeListener(_scheduleAutolink);
@@ -521,11 +564,16 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         const twoRowToolbarHeight = 96.0;
         const minEditorHeight = 140.0;
         final bannerHeight = _conflictDetected ? 88.0 : 0.0;
+        final estimateRowHeight =
+            _estimatedReadingTime != null && _estimatedReadingTime != Duration.zero
+                ? 24.0
+                : 0.0;
         final multiRowToolbar = constraints.maxHeight >=
             bannerHeight +
                 titleFieldsHeight +
                 twoRowToolbarHeight +
-                minEditorHeight;
+                minEditorHeight +
+                estimateRowHeight;
 
         return Column(
           children: [
@@ -568,6 +616,18 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                   ),
                 ],
               ),
+            // Always present at this position (never conditionally inserted)
+            // so the editor below it is never shifted in the sibling list —
+            // only its child swaps between the label and nothing.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: _estimatedReadingTime != null && _estimatedReadingTime != Duration.zero
+                  ? Text(
+                      'Est. reading time: ${_formatReadingTime(_estimatedReadingTime!)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    )
+                  : const SizedBox.shrink(),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -595,6 +655,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                             : null,
                         child: QuillEditor.basic(
                           controller: _controller,
+                          focusNode: _editorFocusNode,
                           config: QuillEditorConfig(
                             customLinkPrefixes: [
                               ...referenceLinkPrefixes,
