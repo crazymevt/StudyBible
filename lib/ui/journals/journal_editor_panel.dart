@@ -38,6 +38,13 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
   Timer? _debounce;
   String? _currentId;
 
+  /// Passed explicitly to QuillEditor.basic below. Without it, the factory
+  /// mints a brand-new default FocusNode on every call — i.e. every rebuild —
+  /// which churns the editor's focus identity (the sermon editor hit a real
+  /// "DeleteCharacterIntent has no Actions mapping" crash from this once its
+  /// rebuilds got frequent enough to race a keypress).
+  final _editorFocusNode = FocusNode();
+
   /// What the editor last persisted/loaded for [_currentId]. A watched row that
   /// differs from this came from elsewhere (a sync). Journals can't use a
   /// timestamp signal like sermons do — their updatedAt is the entry's date and
@@ -143,6 +150,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
     _docChangesSub?.cancel();
     _controller?.dispose();
     _debounce?.cancel();
+    _editorFocusNode.dispose();
     super.dispose();
   }
 
@@ -530,6 +538,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                             padding: const EdgeInsets.all(16.0),
                             child: QuillEditor.basic(
                               controller: controller,
+                              focusNode: _editorFocusNode,
                               config: QuillEditorConfig(
                                 customLinkPrefixes: referenceLinkPrefixes,
                                 customRecognizerBuilder:

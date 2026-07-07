@@ -58,6 +58,13 @@ class _NotebookPageEditorScreenState
   bool _fullScreenChildOpen = false;
   Timer? _autolinkDebounce;
 
+  /// Passed explicitly to QuillEditor.basic below. Without it, the factory
+  /// mints a brand-new default FocusNode on every call — i.e. every rebuild —
+  /// which churns the editor's focus identity (the sermon editor hit a real
+  /// "DeleteCharacterIntent has no Actions mapping" crash from this once its
+  /// rebuilds got frequent enough to race a keypress).
+  final _editorFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -394,6 +401,7 @@ class _NotebookPageEditorScreenState
   @override
   void dispose() {
     _autolinkDebounce?.cancel();
+    _editorFocusNode.dispose();
     if (_isInitialized) {
       _controller.removeListener(_savePageContent);
       _controller.removeListener(_scheduleAutolink);
@@ -478,6 +486,7 @@ class _NotebookPageEditorScreenState
                             : null,
                         child: QuillEditor.basic(
                           controller: _controller,
+                          focusNode: _editorFocusNode,
                           config: QuillEditorConfig(
                             customLinkPrefixes: [
                               ...referenceLinkPrefixes,

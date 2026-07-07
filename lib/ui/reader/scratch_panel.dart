@@ -44,6 +44,13 @@ class _ScratchPanelState extends ConsumerState<ScratchPanel> {
   // change doesn't re-schedule a save.
   bool _internalWrite = false;
 
+  /// Passed explicitly to QuillEditor.basic below. Without it, the factory
+  /// mints a brand-new default FocusNode on every call — i.e. every rebuild —
+  /// which churns the editor's focus identity (the sermon editor hit a real
+  /// "DeleteCharacterIntent has no Actions mapping" crash from this once its
+  /// rebuilds got frequent enough to race a keypress).
+  final _editorFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -94,6 +101,7 @@ class _ScratchPanelState extends ConsumerState<ScratchPanel> {
     _docSub?.cancel();
     _controller?.dispose();
     _debounce?.cancel();
+    _editorFocusNode.dispose();
     super.dispose();
   }
 
@@ -403,6 +411,7 @@ class _ScratchPanelState extends ConsumerState<ScratchPanel> {
                                         : null,
                                     child: QuillEditor.basic(
                                       controller: controller,
+                                      focusNode: _editorFocusNode,
                                       config: QuillEditorConfig(
                                         placeholder:
                                             'Jot rough notes here. They stay on this '
