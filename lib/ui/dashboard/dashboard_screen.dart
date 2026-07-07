@@ -19,6 +19,9 @@ import '../../app/sync_service.dart';
 import '../common/breakpoints.dart';
 import 'action_items_widget.dart';
 import 'continue_reading_card.dart';
+import '../../app/book_usage_providers.dart';
+import '../../domain/dashboard/book_activity.dart';
+import 'book_usage_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -32,6 +35,7 @@ class DashboardScreen extends ConsumerWidget {
     final achievementsAsync = ref.watch(achievementsProvider);
     final updateCheckAsync = ref.watch(updateCheckerProvider);
     final prefs = ref.watch(dashboardPrefsProvider);
+    final mostUsed = ref.watch(mostUsedBookProvider);
 
     int chaptersRead = 0;
     for (final chapters in coverage.values) {
@@ -241,8 +245,12 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 16),
                             ],
-                            if (prefs['showReadingPlans'] ?? true)
+                            if (prefs['showReadingPlans'] ?? true) ...[
                               _buildReadingPlansSection(context, ref),
+                              const SizedBox(height: 16),
+                            ],
+                            if (prefs['showMostUsedBook'] ?? true)
+                              _buildMostUsedBookCard(context, mostUsed),
                           ],
                         ),
                       ),
@@ -288,6 +296,10 @@ class DashboardScreen extends ConsumerWidget {
                       ],
                       if (prefs['showReadingPlans'] ?? true) ...[
                         _buildReadingPlansSection(context, ref),
+                        const SizedBox(height: 16),
+                      ],
+                      if (prefs['showMostUsedBook'] ?? true) ...[
+                        _buildMostUsedBookCard(context, mostUsed),
                         const SizedBox(height: 16),
                       ],
                       if (prefs['showActionItems'] ?? true) ...[
@@ -685,6 +697,86 @@ class DashboardScreen extends ConsumerWidget {
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMostUsedBookCard(
+    BuildContext context,
+    RankedBookActivity? mostUsed,
+  ) {
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.of(context).push(bookUsageRoute());
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Most Used Book',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              if (mostUsed == null) ...[
+                Row(
+                  children: [
+                    Icon(
+                      Icons.auto_stories_outlined,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        'No study activity yet',
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Highlight a verse, add a note, or reference a passage in a '
+                  'sermon or notebook page to see it here.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ] else ...[
+                Text(
+                  mostUsed.bookName,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${mostUsed.counts.total} total references',
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '${mostUsed.counts.highlights} highlights · '
+                  '${mostUsed.counts.notes} notes · '
+                  '${mostUsed.counts.sermonRefs} sermons · '
+                  '${mostUsed.counts.notebookRefs} notebook pages',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ],
+              const SizedBox(height: 16),
+              Text(
+                'Tap to view full breakdown',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],

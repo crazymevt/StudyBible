@@ -356,6 +356,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             value: ref.watch(dashboardPrefsProvider)['showAchievements'] ?? true,
             onChanged: (val) => ref.read(dashboardPrefsProvider.notifier).toggle('showAchievements', val),
           ),
+          SwitchListTile(
+            title: const Text('Most Used Book'),
+            subtitle: const Text('Which book has the most study activity'),
+            value: ref.watch(dashboardPrefsProvider)['showMostUsedBook'] ?? true,
+            onChanged: (val) => ref.read(dashboardPrefsProvider.notifier).toggle('showMostUsedBook', val),
+          ),
           const Divider(),
 
           // ── Theme ──

@@ -20,6 +20,7 @@ class DashboardPrefsNotifier extends Notifier<Map<String, bool>> {
       'showActionItems': prefs.getBool('showActionItems') ?? true,
       'showTimeAnalytics': prefs.getBool('showTimeAnalytics') ?? true,
       'showAchievements': prefs.getBool('showAchievements') ?? true,
+      'showMostUsedBook': prefs.getBool('showMostUsedBook') ?? true,
     };
   }
 
