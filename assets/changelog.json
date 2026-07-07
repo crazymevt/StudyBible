@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.7.7+1",
+    "date": "2026-07-07",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "rework family tree layout and connectors for readability",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "print via the OS WebView on Android/iOS so printer font engines can't garble text",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "revert print-path rasterization",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.6+5",
     "date": "2026-07-06",
     "features": [
