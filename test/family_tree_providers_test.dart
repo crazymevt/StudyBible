@@ -124,4 +124,41 @@ void main() {
     final tree = await container.read(familyTreeProvider(999).future);
     expect(tree, null);
   });
+
+  group('cross-generation marriage (Amram & his aunt Jochebed)', () {
+    setUp(() async {
+      // Levi(50) -> Kohath(51) and Jochebed(53); Kohath -> Amram(52);
+      // Amram + Jochebed -> Moses(54). Moses is reachable from Levi in two
+      // steps via his mother, but sits three father-steps down.
+      await person(50, 'Levi');
+      await person(51, 'Kohath', father: 50);
+      await person(53, 'Jochebed', father: 50);
+      await person(52, 'Amram', father: 51);
+      await person(54, 'Moses', father: 52, mother: 53);
+    });
+
+    test("a child sits one generation below its lowest parent, so it falls "
+        'outside a window that includes that parent at the edge', () async {
+      final tree = (await container.read(familyTreeProvider(50).future))!;
+      final byName = {for (final n in tree.nodes) n.displayTitle: n};
+
+      expect(byName['Amram']!.generation, 2);
+      expect(byName['Jochebed']!.generation, 1);
+      // Moses is generation 3 from Levi (below Amram), not 2 via Jochebed —
+      // which puts him past the 2-generation window entirely.
+      expect(byName.containsKey('Moses'), isFalse);
+    });
+
+    test('re-centered a generation closer, the child appears below both '
+        'parents', () async {
+      final tree = (await container.read(familyTreeProvider(51).future))!;
+      final byName = {for (final n in tree.nodes) n.displayTitle: n};
+
+      expect(byName['Jochebed']!.generation, 0); // Kohath's sibling
+      expect(byName['Amram']!.generation, 1);
+      expect(byName['Moses']!.generation, 2);
+      expect(byName['Moses']!.fatherNodeId, 52);
+      expect(byName['Moses']!.motherNodeId, 53);
+    });
+  });
 }

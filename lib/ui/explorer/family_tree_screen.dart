@@ -140,10 +140,13 @@ class _FamilyTreeChartState extends State<_FamilyTreeChart> {
     final canvasWidth = (maxX - minX) * _pxPerColumn + _nodeWidth + padding * 2;
     final canvasHeight = (maxY - minY) * _pxPerRow + _nodeHeight + padding * 2;
 
-    Offset pixelCenter(int id) {
-      final p = positions[id]!;
-      return Offset(originX + p.x * _pxPerColumn, originY + p.y * _pxPerRow);
-    }
+    final centers = <int, Offset>{
+      for (final e in positions.entries)
+        e.key: Offset(
+          originX + e.value.x * _pxPerColumn,
+          originY + e.value.y * _pxPerRow,
+        ),
+    };
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -151,7 +154,7 @@ class _FamilyTreeChartState extends State<_FamilyTreeChart> {
         // with — otherwise a deep ancestor/descendant window lands the
         // person you actually asked for off-screen, at the canvas's origin.
         final viewport = constraints.biggest;
-        final rootCenter = pixelCenter(tree.rootId);
+        final rootCenter = centers[tree.rootId]!;
         _controller ??= TransformationController(
           Matrix4.translationValues(
             viewport.width / 2 - rootCenter.dx,
@@ -175,15 +178,15 @@ class _FamilyTreeChartState extends State<_FamilyTreeChart> {
                   size: Size(canvasWidth, canvasHeight),
                   painter: _FamilyTreeEdgePainter(
                     tree: tree,
-                    pixelCenter: pixelCenter,
-                    lineColor: Theme.of(context).colorScheme.outlineVariant,
+                    centers: centers,
+                    brightness: Theme.of(context).brightness,
                   ),
                 ),
                 for (final node in tree.nodes)
-                  if (positions.containsKey(node.id))
+                  if (centers.containsKey(node.id))
                     Positioned(
-                      left: pixelCenter(node.id).dx - _nodeWidth / 2,
-                      top: pixelCenter(node.id).dy - _nodeHeight / 2,
+                      left: centers[node.id]!.dx - _nodeWidth / 2,
+                      top: centers[node.id]!.dy - _nodeHeight / 2,
                       width: _nodeWidth,
                       height: _nodeHeight,
                       child: _FamilyTreeNodeCard(
@@ -205,35 +208,294 @@ class _FamilyTreeChartState extends State<_FamilyTreeChart> {
   }
 }
 
+/// Hues for the family connectors — every family unit gets its own, cycled
+/// when a chart has more couples than colors, so adjacent families always
+/// read apart (children of a multi-marriage patriarch, many sibling blocks
+/// on the grandchildren row).
+const _coupleBaseColors = <MaterialColor>[
+  Colors.blue,
+  Colors.orange,
+  Colors.green,
+  Colors.purple,
+  Colors.pink,
+  Colors.teal,
+  Colors.indigo,
+  Colors.brown,
+];
+
+/// Draws one orthogonal "family bus" per parental couple instead of a
+/// diagonal line per child-parent pair: short stubs down from each parent
+/// meet a marriage join, a single drop line falls to a horizontal rail above
+/// the children's row, and a stub rises into each child. Sibling groups read
+/// as blocks, and every family gets its own color.
 class _FamilyTreeEdgePainter extends CustomPainter {
   _FamilyTreeEdgePainter({
     required this.tree,
-    required this.pixelCenter,
-    required this.lineColor,
+    required this.centers,
+    required this.brightness,
   });
 
   final FamilyTree tree;
-  final Offset Function(int id) pixelCenter;
-  final Color lineColor;
+  final Map<int, Offset> centers;
+  final Brightness brightness;
+
+  /// Marriage join's distance below the parents' row.
+  static const _junctionDrop = 12.0;
+
+  /// Extra join depth per level, for joins that overlap horizontally (one
+  /// person's several marriages, or families pushed right of their parents).
+  static const _junctionStagger = 8.0;
+
+  /// How many join depth levels fit in the gap between two rows.
+  static const _junctionLevels = 5;
+
+  /// Sibling rail's distance above the children's row.
+  static const _railRise = 16.0;
+
+  /// Horizontal gap between marriage stubs leaving the same parent card.
+  static const _stubSpread = 14.0;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = lineColor
-      ..strokeWidth = 1.5;
-    for (final node in tree.nodes) {
-      final childCenter = pixelCenter(node.id);
-      if (node.fatherNodeId != null) {
-        canvas.drawLine(childCenter, pixelCenter(node.fatherNodeId!), paint);
+    final generationOf = {for (final n in tree.nodes) n.id: n.generation};
+    final palette = [
+      for (final c in _coupleBaseColors)
+        brightness == Brightness.dark ? c.shade300 : c.shade600,
+    ];
+
+    // Bucket units by the row their children live on (for a childless
+    // marriage of the root, the row below generation 0): colors and join
+    // stagger are assigned within a row, since that's where families can
+    // visually collide.
+    final byRow = <int, List<FamilyUnit>>{};
+    for (final unit in familyUnitsOf(tree)) {
+      if (!unit.parentIds.any(centers.containsKey)) continue;
+      if (_isSameRowParentChild(unit)) continue;
+      final row = unit.childIds.isNotEmpty
+          ? generationOf[unit.childIds.first]!
+          : generationOf[unit.parentIds.first]! + 1;
+      byRow.putIfAbsent(row, () => []).add(unit);
+    }
+
+    // Row order top-to-bottom, so color assignment is stable and reads in
+    // the same order the eye scans the chart.
+    final rows = byRow.keys.toList()..sort();
+    var colorIndex = 0;
+    for (final row in rows) {
+      final rowUnits = byRow[row]!;
+      double anchorX(FamilyUnit u) {
+        final xs = [
+          for (final p in u.parentIds)
+            if (centers[p] != null) centers[p]!.dx,
+        ];
+        return xs.reduce((a, b) => a + b) / xs.length;
       }
-      if (node.motherNodeId != null) {
-        canvas.drawLine(childCenter, pixelCenter(node.motherNodeId!), paint);
+
+      rowUnits.sort((a, b) => anchorX(a).compareTo(anchorX(b)));
+
+      // Stub slot per (parent, unit): a person with several marriages gets
+      // side-by-side stubs under their card instead of one overdrawn line.
+      final unitCountByParent = <int, int>{};
+      final slotByParent = <FamilyUnit, Map<int, int>>{};
+      for (final unit in rowUnits) {
+        for (final p in unit.parentIds) {
+          if (!centers.containsKey(p)) continue;
+          slotByParent.putIfAbsent(unit, () => {})[p] =
+              unitCountByParent[p] ?? 0;
+          unitCountByParent[p] = (unitCountByParent[p] ?? 0) + 1;
+        }
+      }
+
+      // Join depth per unit, assigned like an interval schedule: a level is
+      // reused only once the previous join on it ends left of the next
+      // one's start. Nested joins (one person's marriages) stack downward;
+      // long chains of families pushed right of their parents reuse the
+      // shallow levels instead of colliding on them.
+      final levelEnds =
+          List<double>.filled(_junctionLevels, double.negativeInfinity);
+      for (var i = 0; i < rowUnits.length; i++) {
+        final unit = rowUnits[i];
+        final (start, end) = _joinSpanOf(unit);
+        var level = -1;
+        for (var l = 0; l < _junctionLevels; l++) {
+          if (levelEnds[l] + 40 <= start) {
+            level = l;
+            break;
+          }
+        }
+        if (level == -1) level = i % _junctionLevels;
+        if (end > levelEnds[level]) levelEnds[level] = end;
+        _drawUnit(
+          canvas,
+          unit,
+          color: palette[colorIndex++ % palette.length],
+          staggerIndex: level,
+          slots: slotByParent[unit]!,
+          counts: unitCountByParent,
+        );
       }
     }
   }
 
+  void _drawUnit(
+    Canvas canvas,
+    FamilyUnit unit, {
+    required Color color,
+    required int staggerIndex,
+    required Map<int, int> slots,
+    required Map<int, int> counts,
+  }) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+
+    final parentCenters = [
+      for (final p in unit.parentIds)
+        if (centers[p] != null) (p, centers[p]!),
+    ];
+    final childCenters = [
+      for (final c in unit.childIds)
+        if (centers[c] != null) centers[c]!,
+    ];
+    if (parentCenters.isEmpty) return;
+    if (childCenters.isEmpty && parentCenters.length < 2) return;
+
+    // The join sits below the *lowest* parent row — partners aren't always
+    // level (Amram married his aunt Jochebed, one generation up).
+    var lowestParentBottomY = double.negativeInfinity;
+    for (final (_, center) in parentCenters) {
+      final bottom = center.dy + _nodeHeight / 2;
+      if (bottom > lowestParentBottomY) lowestParentBottomY = bottom;
+    }
+
+    final junctionY = lowestParentBottomY +
+        _junctionDrop +
+        (staggerIndex % _junctionLevels) * _junctionStagger;
+
+    const maxStubOffset = _nodeWidth / 2 - 10;
+    final stubXs = <double>[];
+    for (final (p, center) in parentCenters) {
+      final slotCount = counts[p]!;
+      final offset = ((slots[p]! - (slotCount - 1) / 2) * _stubSpread)
+          .clamp(-maxStubOffset, maxStubOffset);
+      final stubX = center.dx + offset;
+      final stubTopY = center.dy + _nodeHeight / 2;
+      // An off-row partner reaches the join with a long stub, but only when
+      // no card sits in its path — a line disappearing under an unrelated
+      // card would read as that card's marriage instead.
+      if (stubTopY < lowestParentBottomY &&
+          _stubBlocked(stubX, center.dy, junctionY)) {
+        continue;
+      }
+      stubXs.add(stubX);
+      canvas.drawLine(Offset(stubX, stubTopY), Offset(stubX, junctionY), paint);
+    }
+    if (stubXs.isEmpty) return;
+    stubXs.sort();
+
+    if (childCenters.isEmpty) {
+      // A recorded marriage with no children inside the window: the join
+      // between the couple is the whole drawing.
+      canvas.drawLine(
+        Offset(stubXs.first, junctionY),
+        Offset(stubXs.last, junctionY),
+        paint,
+      );
+      return;
+    }
+
+    final childXs = childCenters.map((c) => c.dx).toList()..sort();
+    final railY = childCenters.first.dy - _nodeHeight / 2 - _railRise;
+    final dropX = (stubXs.reduce((a, b) => a + b) / stubXs.length)
+        .clamp(childXs.first, childXs.last);
+
+    final joinLeft = stubXs.first < dropX ? stubXs.first : dropX;
+    final joinRight = stubXs.last > dropX ? stubXs.last : dropX;
+    if (joinRight > joinLeft) {
+      canvas.drawLine(
+        Offset(joinLeft, junctionY),
+        Offset(joinRight, junctionY),
+        paint,
+      );
+    }
+    canvas.drawLine(Offset(dropX, junctionY), Offset(dropX, railY), paint);
+    if (childXs.last > childXs.first) {
+      canvas.drawLine(
+        Offset(childXs.first, railY),
+        Offset(childXs.last, railY),
+        paint,
+      );
+    }
+    for (final child in childCenters) {
+      canvas.drawLine(
+        Offset(child.dx, railY),
+        Offset(child.dx, child.dy - _nodeHeight / 2),
+        paint,
+      );
+    }
+  }
+
+  /// The horizontal span [unit]'s join will occupy: from its leftmost to
+  /// its rightmost of (parent stubs, drop line). Approximate — it ignores
+  /// the few-pixel stub slot offsets — but plenty for level scheduling.
+  (double, double) _joinSpanOf(FamilyUnit unit) {
+    final parentXs = [
+      for (final p in unit.parentIds)
+        if (centers[p] != null) centers[p]!.dx,
+    ];
+    var dropX = parentXs.reduce((a, b) => a + b) / parentXs.length;
+    final childXs = [
+      for (final c in unit.childIds)
+        if (centers[c] != null) centers[c]!.dx,
+    ];
+    if (childXs.isNotEmpty) {
+      childXs.sort();
+      dropX = dropX.clamp(childXs.first, childXs.last);
+    }
+    var start = dropX, end = dropX;
+    for (final px in parentXs) {
+      if (px < start) start = px;
+      if (px > end) end = px;
+    }
+    return (start, end);
+  }
+
+  /// Whether one of [unit]'s children sits level with (or above) one of its
+  /// own parents — it happens when someone married across generations
+  /// (Kohath shares a row with his son Amram in Jochebed's tree, where
+  /// Kohath is her brother and Amram her husband). No line between two
+  /// same-row cards can read as parent-child, so these units are left to
+  /// the re-centered charts, where the pair lands on separate rows.
+  bool _isSameRowParentChild(FamilyUnit unit) {
+    var lowestParentBottomY = double.negativeInfinity;
+    for (final parentId in unit.parentIds) {
+      final center = centers[parentId];
+      if (center != null && center.dy + _nodeHeight / 2 > lowestParentBottomY) {
+        lowestParentBottomY = center.dy + _nodeHeight / 2;
+      }
+    }
+    for (final childId in unit.childIds) {
+      final center = centers[childId];
+      if (center != null && center.dy <= lowestParentBottomY) return true;
+    }
+    return false;
+  }
+
+  /// Whether a vertical stub from a card at [parentCenterY] down to
+  /// [junctionY] would pass through any other node's card.
+  bool _stubBlocked(double stubX, double parentCenterY, double junctionY) {
+    for (final center in centers.values) {
+      if (center.dy <= parentCenterY + 1) continue;
+      if (center.dy - _nodeHeight / 2 >= junctionY) continue;
+      if ((center.dx - stubX).abs() < _nodeWidth / 2 + 8) return true;
+    }
+    return false;
+  }
+
   @override
-  bool shouldRepaint(_FamilyTreeEdgePainter old) => old.tree != tree;
+  bool shouldRepaint(_FamilyTreeEdgePainter old) =>
+      old.tree != tree || old.brightness != brightness;
 }
 
 class _FamilyTreeNodeCard extends StatelessWidget {

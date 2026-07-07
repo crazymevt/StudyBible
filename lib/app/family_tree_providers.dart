@@ -59,7 +59,8 @@ final familyTreeProvider = FutureProvider.family<FamilyTree?, int>((
     for (final r in partnerLinks)
       r.personId == rootId ? r.partnerId : r.personId,
   }..remove(rootId);
-  for (final spouse in await peopleByIdsYearSorted(store, partnerIds.toList())) {
+  final spouses = await peopleByIdsYearSorted(store, partnerIds.toList());
+  for (final spouse in spouses) {
     people[spouse.id] = spouse;
     generationOf[spouse.id] = 0;
   }
@@ -89,6 +90,30 @@ final familyTreeProvider = FutureProvider.family<FamilyTree?, int>((
     descendantFrontier = children;
   }
 
+  // A descendant's generation is one below its *lowest* in-tree parent. The
+  // breadth-first fetch above assigns the depth a child was first reached
+  // at, which is too shallow when someone married across generations —
+  // Amram married his aunt Jochebed (Exodus 6:20), so in Levi's tree their
+  // children are reachable at depth 2 via Jochebed while their father Amram
+  // is himself a depth-2 node. Settle to a fixpoint, then drop anything
+  // pushed past the window (it reappears when re-centered closer).
+  for (var pass = 0; pass < familyTreeDescendantGenerations; pass++) {
+    for (final p in people.values) {
+      if (generationOf[p.id]! <= 0) continue;
+      final parentGens = [
+        if (generationOf.containsKey(p.fatherId)) generationOf[p.fatherId]!,
+        if (generationOf.containsKey(p.motherId)) generationOf[p.motherId]!,
+      ];
+      if (parentGens.isEmpty) continue;
+      final expected = parentGens.reduce((a, b) => a > b ? a : b) + 1;
+      if (expected > generationOf[p.id]!) generationOf[p.id] = expected;
+    }
+  }
+  people.removeWhere(
+    (id, _) => generationOf[id]! > familyTreeDescendantGenerations,
+  );
+  generationOf.removeWhere((_, gen) => gen > familyTreeDescendantGenerations);
+
   final nodes = [
     for (final id in people.keys)
       FamilyTreeNode(
@@ -108,5 +133,9 @@ final familyTreeProvider = FutureProvider.family<FamilyTree?, int>((
       ),
   ];
 
-  return FamilyTree(rootId: rootId, nodes: nodes);
+  return FamilyTree(
+    rootId: rootId,
+    nodes: nodes,
+    rootPartnerIds: [for (final s in spouses) s.id],
+  );
 });

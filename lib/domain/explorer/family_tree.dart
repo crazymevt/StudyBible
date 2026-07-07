@@ -36,5 +36,15 @@ class FamilyTreeNode {
 class FamilyTree {
   final int rootId;
   final List<FamilyTreeNode> nodes;
-  const FamilyTree({required this.rootId, required this.nodes});
+
+  /// The root's recorded spouses/partners (all of whom are generation-0
+  /// nodes) — lets the diagram draw a marriage connector even for a couple
+  /// with no shared children inside this window.
+  final List<int> rootPartnerIds;
+
+  const FamilyTree({
+    required this.rootId,
+    required this.nodes,
+    this.rootPartnerIds = const [],
+  });
 }
