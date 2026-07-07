@@ -6,6 +6,7 @@ import '../../app/reader_state.dart';
 import '../../app/topic_providers.dart';
 import '../../data/content_store.dart' show Topic;
 import '../../domain/explorer/explorer_ref.dart';
+import '../../domain/feasts/feast_data.dart' show feasts;
 import '../common/skeleton.dart';
 import '../tags/tag_palette.dart';
 import 'explorer_common.dart';
@@ -279,9 +280,17 @@ class _HomeIntro extends ConsumerWidget {
     final book = ref.watch(selectedBookNameProvider);
     final chapter = ref.watch(selectedChapterProvider);
     final stats = ref.watch(explorerStatsProvider).asData?.value;
-    final feasts =
+    // Re-sort into the Leviticus 23 calendar order (`feasts`, the domain
+    // list) rather than the DB query's alphabetical order — "Day of
+    // Atonement" first reads as nonsense next to the actual liturgical
+    // sequence.
+    final feastOrder = [for (final f in feasts) f.name.toUpperCase()];
+    final feastTopics =
         ref.watch(curatedTopicsByCategoryProvider('feast')).asData?.value ??
             const <Topic>[];
+    final sortedFeasts = [...feastTopics]
+      ..sort((a, b) =>
+          feastOrder.indexOf(a.name).compareTo(feastOrder.indexOf(b.name)));
     final stories =
         ref.watch(curatedTopicsByCategoryProvider('story')).asData?.value ??
             const <Topic>[];
@@ -301,9 +310,9 @@ class _HomeIntro extends ConsumerWidget {
                 .open(ExplorerRef.passage(book, chapter)),
           ),
         ),
-        if (feasts.isNotEmpty) ...[
+        if (sortedFeasts.isNotEmpty) ...[
           const SizedBox(height: 20),
-          _CuratedTopicsSection(title: 'Feasts', topics: feasts),
+          _CuratedTopicsSection(title: 'Feasts', topics: sortedFeasts),
         ],
         if (stories.isNotEmpty) ...[
           const SizedBox(height: 20),
@@ -342,11 +351,44 @@ class _HomeIntro extends ConsumerWidget {
 
 /// A row of curated topics (feasts or well-known stories) on the Explorer
 /// home page, for browsing without already knowing what to search for.
-class _CuratedTopicsSection extends StatelessWidget {
+/// Lists long enough that an alphabetical scroll gets unwieldy (the hundreds
+/// of curated stories, not the handful of feasts) are broken into per-letter
+/// groups with a tappable A-Z jump strip above them, instead of one flat wrap.
+class _CuratedTopicsSection extends StatefulWidget {
   const _CuratedTopicsSection({required this.title, required this.topics});
+
+  static const _groupThreshold = 20;
 
   final String title;
   final List<Topic> topics;
+
+  /// The first alphabetic character of [name], for grouping — titles like
+  /// `"I KNOW THAT MY REDEEMER LIVES"` start with punctuation, not a letter.
+  static String _groupLetter(String name) {
+    final m = RegExp('[A-Za-z]').firstMatch(name);
+    return m == null ? '#' : name[m.start].toUpperCase();
+  }
+
+  @override
+  State<_CuratedTopicsSection> createState() => _CuratedTopicsSectionState();
+}
+
+class _CuratedTopicsSectionState extends State<_CuratedTopicsSection> {
+  // One GlobalKey per letter header, kept stable across rebuilds so the jump
+  // strip can scroll to it — created lazily since which letters appear is
+  // fixed for the life of this widget (the topic list doesn't change).
+  final _letterKeys = <String, GlobalKey>{};
+
+  void _jumpTo(String letter) {
+    final ctx = _letterKeys[letter]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -354,7 +396,7 @@ class _CuratedTopicsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title.toUpperCase(),
+          widget.title.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
@@ -362,17 +404,77 @@ class _CuratedTopicsSection extends StatelessWidget {
               ),
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            for (final t in topics)
-              ExplorerRefChip(ExplorerRef.topic(t.id, t.name)),
-          ],
-        ),
+        if (widget.topics.length > _CuratedTopicsSection._groupThreshold)
+          _buildGrouped(context)
+        else
+          _buildWrap(widget.topics),
       ],
     );
   }
+
+  Widget _buildGrouped(BuildContext context) {
+    final byLetter = <String, List<Topic>>{};
+    for (final t in widget.topics) {
+      byLetter
+          .putIfAbsent(_CuratedTopicsSection._groupLetter(t.name), () => [])
+          .add(t);
+    }
+    final letters = byLetter.keys.toList()..sort();
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 2,
+          runSpacing: 2,
+          children: [
+            for (final letter in letters)
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => _jumpTo(letter),
+                child: SizedBox(
+                  width: kMinInteractiveDimension,
+                  height: kMinInteractiveDimension,
+                  child: Center(
+                    child: Text(
+                      letter,
+                      style:
+                          Theme.of(context).textTheme.labelMedium?.copyWith(
+                                color: scheme.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        for (final letter in letters) ...[
+          Padding(
+            key: _letterKeys.putIfAbsent(letter, () => GlobalKey()),
+            padding: const EdgeInsets.only(top: 12, bottom: 6),
+            child: Text(
+              letter,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ),
+          _buildWrap(byLetter[letter]!),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildWrap(List<Topic> topics) => Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          for (final t in topics) ExplorerRefChip(ExplorerRef.topic(t.id, t.name)),
+        ],
+      );
 }
 
 class _StatChip extends StatelessWidget {
