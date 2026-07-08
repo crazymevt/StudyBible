@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- flutter_local_notifications requires its small icon to be a `drawable`
+     resource specifically — a `mipmap` (like launcher_icon) doesn't satisfy
+     its resource-type lookup and fails with an "invalid_icon"
+     PlatformException. This aliases the existing launcher icon into a
+     drawable so the daily reading reminder has a valid icon to show.
+     TODO: swap for a proper white-on-transparent notification silhouette;
+     Android renders full-color icons like this one as a plain white blob in
+     the status bar on API 21-25. -->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@mipmap/launcher_icon" />

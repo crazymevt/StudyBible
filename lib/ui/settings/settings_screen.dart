@@ -10,6 +10,7 @@ import '../../domain/scripture/verse_share_format.dart';
 import '../../app/sync_service.dart';
 import '../../app/dashboard_providers.dart';
 import '../../app/feast_providers.dart';
+import '../../app/notification_providers.dart';
 import '../../data/logging.dart';
 import '../../theme/app_themes.dart';
 import 'package:file_selector/file_selector.dart';
@@ -59,6 +60,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   int? draftDarkAppBar;
   bool _isDraftInitialized = false;
   bool _rebuildingSearchIndex = false;
+
+  Future<void> _onReminderToggle(bool enabled) async {
+    if (enabled) {
+      final granted = await ref
+          .read(notificationServiceProvider)
+          .requestPermission();
+      if (!granted) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Notification permission was denied — enable it in system settings to receive the reminder.',
+            ),
+          ),
+        );
+      }
+    }
+    ref.read(reminderEnabledProvider.notifier).set(enabled);
+    await ref.read(reminderControllerProvider).reschedule();
+  }
+
+  Future<void> _pickReminderTime() async {
+    final current = ref.read(reminderTimeProvider);
+    final picked = await showTimePicker(context: context, initialTime: current);
+    if (picked == null) return;
+    ref.read(reminderTimeProvider.notifier).set(picked);
+    await ref.read(reminderControllerProvider).reschedule();
+  }
 
   Future<void> _rebuildSearchIndex() async {
     setState(() => _rebuildingSearchIndex = true);
@@ -216,6 +245,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final fontSizeDelta = ref.watch(appFontSizeDeltaProvider);
     final themeMode = ref.watch(themeModeProvider);
     final appColorTheme = ref.watch(appColorThemeProvider);
+    final reminderEnabled = ref.watch(reminderEnabledProvider);
+    final reminderTime = ref.watch(reminderTimeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -274,6 +305,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onChanged: (val) =>
                 ref.read(showFeastOnJournalProvider.notifier).setEnabled(val),
           ),
+          SwitchListTile(
+            title: const Text('Daily Reading Reminder'),
+            subtitle: const Text(
+              "A daily notification with today's reading plan passage, or a general nudge if you don't have one",
+            ),
+            value: reminderEnabled,
+            onChanged: _onReminderToggle,
+          ),
+          if (reminderEnabled)
+            ListTile(
+              title: const Text('Reminder Time'),
+              subtitle: Text(reminderTime.format(context)),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: _pickReminderTime,
+            ),
           ListTile(
             title: const Text("What's New"),
             subtitle: const Text('View the latest features and updates'),

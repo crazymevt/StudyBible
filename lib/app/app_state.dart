@@ -929,3 +929,46 @@ final verseShareFormatProvider =
     NotifierProvider<VerseShareFormatNotifier, VerseShareFormat>(
       () => VerseShareFormatNotifier(),
     );
+
+class ReminderEnabledNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool('dailyReminderEnabled') ?? false;
+  }
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool('dailyReminderEnabled', value);
+  }
+}
+
+final reminderEnabledProvider =
+    NotifierProvider<ReminderEnabledNotifier, bool>(
+      () => ReminderEnabledNotifier(),
+    );
+
+class ReminderTimeNotifier extends Notifier<TimeOfDay> {
+  static const _hourKey = 'dailyReminderHour';
+  static const _minuteKey = 'dailyReminderMinute';
+
+  @override
+  TimeOfDay build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return TimeOfDay(
+      hour: prefs.getInt(_hourKey) ?? 8,
+      minute: prefs.getInt(_minuteKey) ?? 0,
+    );
+  }
+
+  void set(TimeOfDay value) {
+    state = value;
+    final prefs = ref.read(sharedPreferencesProvider);
+    prefs.setInt(_hourKey, value.hour);
+    prefs.setInt(_minuteKey, value.minute);
+  }
+}
+
+final reminderTimeProvider = NotifierProvider<ReminderTimeNotifier, TimeOfDay>(
+  () => ReminderTimeNotifier(),
+);

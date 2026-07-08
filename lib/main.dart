@@ -14,7 +14,9 @@ import 'app/user_providers.dart';
 import 'app/app_state.dart';
 import 'app/action_providers.dart';
 import 'app/highlight_palette.dart';
+import 'app/notification_providers.dart';
 import 'data/app_paths.dart';
+import 'data/notification_service.dart';
 import 'data/user_store.dart';
 import 'data/logging.dart';
 import 'theme/app_themes.dart';
@@ -106,13 +108,31 @@ void main() {
 
     final prefs = await SharedPreferences.getInstance();
 
+    // `container` is referenced by the notification tap callback below before
+    // it's assigned — safe because the callback only runs (well) after
+    // `container` is set, the same self-referencing-closure pattern used for
+    // e.g. GlobalKey callbacks.
+    late final ProviderContainer container;
+    final notificationService = NotificationService(
+      onTap: (payload) {
+        container.read(appModuleProvider.notifier).setModule(AppModule.reader);
+      },
+    );
+
     // Own the ProviderContainer directly (rather than letting ProviderScope
     // create it) so the user database can be opened and migrated once, up
     // front, before any widget subscribes to it. See [_warmUpUserDatabase].
-    final container = ProviderContainer(
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+    container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        notificationServiceProvider.overrideWithValue(notificationService),
+      ],
     );
     await _warmUpUserDatabase(container);
+    // Idempotent: safe to call again on every resume (see
+    // ReminderController.reschedule's doc comment) and on a build where the
+    // reminder is disabled (it just cancels).
+    unawaited(container.read(reminderControllerProvider).reschedule());
 
     runApp(
       UncontrolledProviderScope(
@@ -227,7 +247,7 @@ class StudyBibleApp extends ConsumerStatefulWidget {
 }
 
 class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
-    with WindowListener {
+    with WindowListener, WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -235,6 +255,7 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
         (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
       windowManager.addListener(this);
     }
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -243,7 +264,18 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
         (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
       windowManager.removeListener(this);
     }
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Refreshes the reminder's scheduled content (e.g. a new day's reading
+      // plan passage) and recovers a reboot-dropped Android alarm — see
+      // ReminderController.reschedule's doc comment.
+      ref.read(reminderControllerProvider).reschedule();
+    }
   }
 
   void _saveWindowBounds() async {
