@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.8+3",
+    "date": "2026-07-08",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "surface real errors when enabling notifications, add settings deep link",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.8+2",
     "date": "2026-07-08",
     "features": [
