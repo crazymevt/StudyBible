@@ -39,6 +39,42 @@
              reminder) — the AlarmManager PendingIntent targets this receiver. -->
         <receiver android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <!-- Home-screen widgets. Rendered natively from JSON payloads the app
+             mirrors into shared storage (lib/app/widget_sync_providers.dart);
+             see docs/home-screen-widgets-plan.md. -->
+        <receiver
+            android:name=".VerseOfTheDayWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_votd_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/verse_of_the_day_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".UpcomingActionsWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_actions_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/upcoming_actions_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".RibbonsWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_ribbons_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ribbons_widget_info" />
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- updatePeriodMillis (1h) exists only so the day's verse rolls over near
+     midnight without the app running — the payload holds the whole curated
+     list and the provider picks by date at render time. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_votd_description"
+    android:initialLayout="@layout/widget_verse_of_the_day"
+    android:minWidth="180dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="140dp"
+    android:minResizeHeight="70dp"
+    android:previewLayout="@layout/widget_verse_of_the_day"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="3"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="3600000"
+    android:widgetCategory="home_screen" />

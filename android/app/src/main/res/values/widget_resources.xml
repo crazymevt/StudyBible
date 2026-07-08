@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget resources. Night variants in values-night/; the
+     launcher re-inflates widget layouts on theme change, so XML-referenced
+     colors track dark mode (programmatic ones refresh on the next update). -->
+<resources>
+    <color name="widget_background">#FFFFFBFE</color>
+    <color name="widget_title">#FF1C1B1F</color>
+    <color name="widget_subtitle">#FF49454F</color>
+    <color name="widget_overdue">#FFB3261E</color>
+
+    <!-- Overridden on API 31+ to follow the system's widget corner radius. -->
+    <dimen name="widget_corner_radius">16dp</dimen>
+
+    <string name="widget_votd_label">Verse of the Day</string>
+    <string name="widget_votd_description">Today’s verse — tap to read it in context.</string>
+    <string name="widget_votd_empty">Open Study Bible once to load today’s verse.</string>
+
+    <string name="widget_actions_label">Upcoming Actions</string>
+    <string name="widget_actions_description">Your next action items and their due dates.</string>
+    <string name="widget_actions_empty">No upcoming actions.</string>
+
+    <string name="widget_ribbons_label">Ribbons</string>
+    <string name="widget_ribbons_description">Jump back to your ribbon-marked verses.</string>
+    <string name="widget_ribbons_empty">No ribbons placed yet.</string>
+</resources>

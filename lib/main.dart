@@ -14,6 +14,7 @@ import 'app/user_providers.dart';
 import 'app/app_state.dart';
 import 'app/action_providers.dart';
 import 'app/action_notification_providers.dart';
+import 'app/widget_sync_providers.dart';
 import 'app/highlight_palette.dart';
 import 'app/notification_providers.dart';
 import 'data/app_paths.dart';
@@ -138,6 +139,10 @@ void main() {
     // action item's due-date notifications to match the current list and
     // setting.
     unawaited(container.read(actionNotificationSchedulerProvider).syncAll());
+    // Home-screen widget taps (no-op on platforms without widgets). Runs
+    // before runApp so a cold-start tap lands on its verse instead of the
+    // last-open screen; the providers it touches are plain state setters.
+    initHomeWidgetDeepLinks(container);
 
     runApp(
       UncontrolledProviderScope(
@@ -396,6 +401,9 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
                   // Kept alive here purely so its `ref.listen`s stay
                   // registered; it has no state of its own worth reading.
                   ref.watch(actionNotificationSyncProvider);
+                  // Same keep-alive trick: mirrors user data into the
+                  // home-screen widgets' storage on every change.
+                  ref.watch(homeWidgetSyncProvider);
                   final showing =
                       ref.watch(actionDueControllerProvider).isNotEmpty;
                   return showing
