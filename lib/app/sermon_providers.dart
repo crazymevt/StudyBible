@@ -85,6 +85,28 @@ final selectedSermonIdProvider =
       () => SelectedSermonIdNotifier(),
     );
 
+/// The sermon most recently opened for editing this session, if any. Powers the
+/// reader's "return to sermon" quick-switch on compact layouts (phone / portrait
+/// tablet), where the editor is a full-screen route rather than a docked panel —
+/// so stepping into the reader to look something up, or to walk a sermon's
+/// scripture-navigation route, hides the sermon with no one-tap way back.
+///
+/// Session-only: never persisted, cleared on restart or when the user dismisses
+/// the chip. Holds just the id so the title is always resolved live (through
+/// [allSermonsProvider]) and stays correct across renames and deletes.
+class LastOpenedSermonIdNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String id) => state = id;
+  void clear() => state = null;
+}
+
+final lastOpenedSermonIdProvider =
+    NotifierProvider<LastOpenedSermonIdNotifier, String?>(
+      () => LastOpenedSermonIdNotifier(),
+    );
+
 /// Whether a sermon's editor is in view-only mode: in-memory only, never
 /// persisted or synced, and reset the moment the app restarts. Keyed by
 /// sermon id (not a single flag) so the docked panel and a full-screen editor

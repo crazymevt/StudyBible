@@ -27,6 +27,7 @@ import '../../app/tts_providers.dart';
 import '../../data/tts_service.dart';
 import 'commentary_panel.dart';
 import 'dictionary_panel.dart';
+import 'return_to_sermon_chip.dart';
 import '../common/search_title_bar.dart';
 import '../onboarding/tutorial_keys.dart';
 import '../common/sync_button.dart';
@@ -825,6 +826,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     left: 0,
                     right: 0,
                     child: const Center(child: VerseActionBar()),
+                  ),
+                // Quick-return to the sermon being edited. Compact layouts only
+                // (the sermon is a full-screen route there, not a docked panel),
+                // and yielded to the verse action bar when a selection is
+                // active so the two bottom affordances never overlap.
+                if (selectedVerses.isEmpty &&
+                    MediaQuery.sizeOf(context).width <= Breakpoints.compact)
+                  Positioned(
+                    right: 12,
+                    bottom: 16 + MediaQuery.viewPaddingOf(context).bottom,
+                    child: const ReturnToSermonChip(),
                   ),
               ],
             ),

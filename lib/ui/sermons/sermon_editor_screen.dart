@@ -111,6 +111,10 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     final store = ref.read(userStoreProvider);
     final sermon = await (store.select(store.sermons)..where((t) => t.id.equals(widget.sermonId))).getSingleOrNull();
     if (sermon != null) {
+      // Remember this as the sermon to quick-return to from the reader. Every
+      // way of opening a sermon mounts this editor, so setting it here is the
+      // single choke point (harmless on wide layouts, where the chip is absent).
+      ref.read(lastOpenedSermonIdProvider.notifier).set(widget.sermonId);
       _titleController.text = sermon.title;
       _seriesController.text = sermon.series ?? '';
       _loadedUpdatedAt = sermon.updatedAt;
