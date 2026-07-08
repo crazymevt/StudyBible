@@ -984,6 +984,23 @@ class NavigationController {
     recordHistory();
   }
 
+  /// Jumps the reader to [bookName] [chapter]:[verse] from anywhere in the
+  /// app: sets the chapter, queues the scroll, selects the verse, records
+  /// history, and switches to the reader module. Shared by the dashboard
+  /// verse-of-the-day card, the ribbons panel, and home-screen-widget deep
+  /// links.
+  void openVerse({required String bookName, required int chapter, int? verse}) {
+    ref.read(selectedBookNameProvider.notifier).set(bookName);
+    ref.read(selectedChapterProvider.notifier).set(chapter);
+    if (verse != null) {
+      ref.read(targetVerseToScrollProvider.notifier).set(verse);
+      ref.read(selectedVersesProvider.notifier).clear();
+      ref.read(selectedVersesProvider.notifier).toggle(verse);
+    }
+    recordHistory(verse: verse);
+    ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+  }
+
   Future<void> nextChapter() async {
     final activeVersions = ref.read(activeVersionsProvider);
     if (activeVersions.isEmpty) return;

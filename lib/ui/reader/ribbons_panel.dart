@@ -107,12 +107,11 @@ class _RibbonTile extends ConsumerWidget {
   const _RibbonTile({required this.ribbon});
 
   void _goTo(WidgetRef ref, BuildContext context) {
-    ref.read(selectedBookNameProvider.notifier).set(ribbon.bookName);
-    ref.read(selectedChapterProvider.notifier).set(ribbon.chapter);
-    ref.read(targetVerseToScrollProvider.notifier).set(ribbon.verse);
-    ref.read(selectedVersesProvider.notifier).clear();
-    ref.read(selectedVersesProvider.notifier).toggle(ribbon.verse);
-    ref.read(navigationControllerProvider).recordHistory(verse: ribbon.verse);
+    ref.read(navigationControllerProvider).openVerse(
+          bookName: ribbon.bookName,
+          chapter: ribbon.chapter,
+          verse: ribbon.verse,
+        );
 
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();

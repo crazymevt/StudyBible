@@ -21,6 +21,7 @@ import 'action_items_widget.dart';
 import 'continue_reading_card.dart';
 import '../../app/book_usage_providers.dart';
 import '../../domain/dashboard/book_activity.dart';
+import '../../domain/home_widgets/widget_payload.dart';
 import 'book_usage_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -930,40 +931,13 @@ extension on DashboardScreen {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          final reference = verse.reference;
-          final lastSpaceIdx = reference.lastIndexOf(' ');
-          if (lastSpaceIdx == -1) return;
-
-          final bookName = reference.substring(0, lastSpaceIdx);
-          final chapterVerse = reference.substring(lastSpaceIdx + 1);
-
-          final colonIdx = chapterVerse.indexOf(':');
-          if (colonIdx == -1) return;
-
-          final chapterStr = chapterVerse.substring(0, colonIdx);
-          final chapter = int.tryParse(chapterStr);
-
-          if (chapter != null) {
-            ref.read(selectedBookNameProvider.notifier).set(bookName);
-            ref.read(selectedChapterProvider.notifier).set(chapter);
-
-            final verseStr = chapterVerse.substring(colonIdx + 1);
-            final dashIdx = verseStr.indexOf('-');
-            final startVerseStr = dashIdx == -1
-                ? verseStr
-                : verseStr.substring(0, dashIdx);
-            final verseNum = int.tryParse(startVerseStr);
-
-            if (verseNum != null) {
-              ref.read(targetVerseToScrollProvider.notifier).set(verseNum);
-              ref.read(selectedVersesProvider.notifier).clear();
-              ref.read(selectedVersesProvider.notifier).toggle(verseNum);
-            }
-
-            ref.read(navigationControllerProvider).recordHistory(verse: verseNum);
-
-            ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-          }
+          final parsed = parseVerseDayReference(verse.reference);
+          if (parsed == null) return;
+          ref.read(navigationControllerProvider).openVerse(
+                bookName: parsed.bookName,
+                chapter: parsed.chapter,
+                verse: parsed.verse,
+              );
         },
         child: Container(
           decoration: BoxDecoration(
