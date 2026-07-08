@@ -106,6 +106,9 @@ Map<String, Object?> buildUpcomingActionsPayload(
         {
           'id': a.id,
           'title': a.title,
+          // The epoch is included so the native renderer can recompute
+          // overdue-ness at draw time; `overdue` is the build-time fallback.
+          'dueAt': a.dueAt,
           'dueLabel': _dueFormat
               .format(DateTime.fromMillisecondsSinceEpoch(a.dueAt!)),
           'overdue': nowMs >= a.dueAt!,

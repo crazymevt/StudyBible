@@ -12,7 +12,6 @@ import '../../data/models/achievement_def.dart';
 import '../../app/reading_plan_providers.dart';
 import '../../app/app_state.dart';
 import '../../data/verse_of_the_day_list.dart';
-import '../../app/reader_state.dart';
 import '../../app/content_providers.dart';
 import '../common/search_title_bar.dart';
 import '../../app/sync_service.dart';

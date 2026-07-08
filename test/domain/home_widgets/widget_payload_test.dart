@@ -92,6 +92,7 @@ void main() {
       );
       final item = (payload['items'] as List).single as Map;
       expect(item['overdue'], isTrue);
+      expect(item['dueAt'], due);
       expect(item['dueLabel'], 'Jul 8, 2026 · 3:30 PM');
     });
 

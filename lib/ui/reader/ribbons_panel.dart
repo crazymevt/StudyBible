@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/user_providers.dart';
 import '../../app/content_providers.dart';
-import '../../app/reader_state.dart';
 import '../../data/user_store.dart';
 import '../common/empty_state.dart';
 import '../common/skeleton.dart';
