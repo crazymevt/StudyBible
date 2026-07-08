@@ -84,6 +84,12 @@ const List<ToolGroup> toolGroups = [
     ToolItem(ActiveTool.people, Icons.people, 'People'),
     ToolItem(ActiveTool.media, Icons.video_library, 'Media'),
     ToolItem(ActiveTool.feasts, Icons.event, 'Feasts'),
+    ToolItem(
+      ActiveTool.stories,
+      Icons.book,
+      'Bible Stories',
+      railLabel: 'Stories',
+    ),
   ]),
 ];
 
