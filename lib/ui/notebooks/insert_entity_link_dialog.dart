@@ -11,6 +11,7 @@ IconData _iconFor(ExplorerEntityType type) => switch (type) {
       ExplorerEntityType.topic => Icons.topic_outlined,
       ExplorerEntityType.passage => Icons.menu_book_outlined,
       ExplorerEntityType.tag => Icons.label_outline,
+      ExplorerEntityType.browse => Icons.list_alt_outlined,
     };
 
 /// Picks a person, place, event, or topic from the bundled Explorer datasets

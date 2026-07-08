@@ -30,7 +30,23 @@ IconData explorerEntityIcon(ExplorerEntityType type) => switch (type) {
       ExplorerEntityType.topic => Icons.topic_outlined,
       ExplorerEntityType.passage => Icons.menu_book_outlined,
       ExplorerEntityType.tag => Icons.label_outline,
+      ExplorerEntityType.browse => Icons.list_alt_outlined,
     };
+
+/// Icon for a browse index: curated topic categories get their own icons;
+/// every other kind borrows its entity icon.
+IconData explorerBrowseIcon(ExplorerEntityType kind, String? category) =>
+    switch (category) {
+      'feast' => Icons.celebration_outlined,
+      'story' => Icons.auto_stories_outlined,
+      _ => explorerEntityIcon(kind),
+    };
+
+/// Like [explorerEntityIcon], but a browse ref borrows the icon of what it
+/// lists — a "People" crumb should look like a person, not a list.
+IconData explorerRefIcon(ExplorerRef ref) => ref.browseKind == null
+    ? explorerEntityIcon(ref.type)
+    : explorerBrowseIcon(ref.browseKind!, ref.browseCategory);
 
 /// Jump the reader to a verse and unwind back to the shell so it's visible.
 void explorerOpenVerseInReader(
@@ -238,7 +254,7 @@ class ExplorerRefChip extends ConsumerWidget {
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       avatar: Icon(
-        explorerEntityIcon(target.type),
+        explorerRefIcon(target),
         size: 16,
         color: scheme.primary,
       ),

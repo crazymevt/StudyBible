@@ -3,10 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/explorer_providers.dart';
 import '../../app/reader_state.dart';
-import '../../app/topic_providers.dart';
-import '../../data/content_store.dart' show Topic;
 import '../../domain/explorer/explorer_ref.dart';
-import '../../domain/feasts/feast_data.dart' show feasts;
 import '../common/skeleton.dart';
 import '../tags/tag_palette.dart';
 import 'explorer_common.dart';
@@ -168,7 +165,7 @@ class _BreadcrumbBar extends ConsumerWidget {
                           child: Row(
                             children: [
                               Icon(
-                                explorerEntityIcon(trail[i].type),
+                                explorerRefIcon(trail[i]),
                                 size: 16,
                                 color: scheme.onSurfaceVariant,
                               ),
@@ -280,20 +277,6 @@ class _HomeIntro extends ConsumerWidget {
     final book = ref.watch(selectedBookNameProvider);
     final chapter = ref.watch(selectedChapterProvider);
     final stats = ref.watch(explorerStatsProvider).asData?.value;
-    // Re-sort into the Leviticus 23 calendar order (`feasts`, the domain
-    // list) rather than the DB query's alphabetical order — "Day of
-    // Atonement" first reads as nonsense next to the actual liturgical
-    // sequence.
-    final feastOrder = [for (final f in feasts) f.name.toUpperCase()];
-    final feastTopics =
-        ref.watch(curatedTopicsByCategoryProvider('feast')).asData?.value ??
-            const <Topic>[];
-    final sortedFeasts = [...feastTopics]
-      ..sort((a, b) =>
-          feastOrder.indexOf(a.name).compareTo(feastOrder.indexOf(b.name)));
-    final stories =
-        ref.watch(curatedTopicsByCategoryProvider('story')).asData?.value ??
-            const <Topic>[];
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -310,13 +293,52 @@ class _HomeIntro extends ConsumerWidget {
                 .open(ExplorerRef.passage(book, chapter)),
           ),
         ),
-        if (sortedFeasts.isNotEmpty) ...[
-          const SizedBox(height: 20),
-          _CuratedTopicsSection(title: 'Feasts', topics: sortedFeasts),
-        ],
-        if (stories.isNotEmpty) ...[
-          const SizedBox(height: 20),
-          _CuratedTopicsSection(title: 'Bible Stories', topics: stories),
+        if (stats != null) ...[
+          const SizedBox(height: 24),
+          Text(
+            'BROWSE THE LIBRARY',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.8,
+                ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.person, 'People'),
+                '${stats.people} people',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.place, 'Places'),
+                '${stats.places} places',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.event, 'Events'),
+                '${stats.events} events',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(
+                    ExplorerEntityType.topic, 'Bible Stories',
+                    category: 'story'),
+                '${stats.stories} stories',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.topic, 'Feasts',
+                    category: 'feast'),
+                '${stats.feasts} feasts',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.topic, 'Topics'),
+                '${stats.topics} topics',
+              ),
+            ],
+          ),
         ],
         const SizedBox(height: 20),
         Text(
@@ -330,166 +352,41 @@ class _HomeIntro extends ConsumerWidget {
                 color: scheme.onSurfaceVariant,
               ),
         ),
-        if (stats != null) ...[
-          const SizedBox(height: 16),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _StatChip(Icons.person_outline, '${stats.people} people'),
-              _StatChip(Icons.place_outlined, '${stats.places} places'),
-              _StatChip(Icons.flag_outlined, '${stats.events} events'),
-              _StatChip(Icons.topic_outlined, '${stats.topics} topics'),
-            ],
-          ),
-        ],
       ],
     );
   }
 }
 
-/// A row of curated topics (feasts or well-known stories) on the Explorer
-/// home page, for browsing without already knowing what to search for.
-/// Lists long enough that an alphabetical scroll gets unwieldy (the hundreds
-/// of curated stories, not the handful of feasts) are broken into per-letter
-/// groups with a tappable A-Z jump strip above them, instead of one flat wrap.
-class _CuratedTopicsSection extends StatefulWidget {
-  const _CuratedTopicsSection({required this.title, required this.topics});
+/// One dataset's size on the home page; tapping opens a browsable index of
+/// that whole dataset ([ExplorerIndexPage] via the trail). Reads as a button
+/// — leading dataset icon, trailing chevron — so the count is visibly a door
+/// into the index, not just a statistic.
+class _StatChip extends ConsumerWidget {
+  const _StatChip(this.target, this.label);
 
-  static const _groupThreshold = 20;
+  /// The browse destination; its label doubles as the breadcrumb crumb
+  /// ("People", "Feasts", …).
+  final ExplorerRef target;
 
-  final String title;
-  final List<Topic> topics;
-
-  /// The first alphabetic character of [name], for grouping — titles like
-  /// `"I KNOW THAT MY REDEEMER LIVES"` start with punctuation, not a letter.
-  static String _groupLetter(String name) {
-    final m = RegExp('[A-Za-z]').firstMatch(name);
-    return m == null ? '#' : name[m.start].toUpperCase();
-  }
-
-  @override
-  State<_CuratedTopicsSection> createState() => _CuratedTopicsSectionState();
-}
-
-class _CuratedTopicsSectionState extends State<_CuratedTopicsSection> {
-  // One GlobalKey per letter header, kept stable across rebuilds so the jump
-  // strip can scroll to it — created lazily since which letters appear is
-  // fixed for the life of this widget (the topic list doesn't change).
-  final _letterKeys = <String, GlobalKey>{};
-
-  void _jumpTo(String letter) {
-    final ctx = _letterKeys[letter]?.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(
-      ctx,
-      alignment: 0,
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOut,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.title.toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.8,
-              ),
-        ),
-        const SizedBox(height: 8),
-        if (widget.topics.length > _CuratedTopicsSection._groupThreshold)
-          _buildGrouped(context)
-        else
-          _buildWrap(widget.topics),
-      ],
-    );
-  }
-
-  Widget _buildGrouped(BuildContext context) {
-    final byLetter = <String, List<Topic>>{};
-    for (final t in widget.topics) {
-      byLetter
-          .putIfAbsent(_CuratedTopicsSection._groupLetter(t.name), () => [])
-          .add(t);
-    }
-    final letters = byLetter.keys.toList()..sort();
-    final scheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 2,
-          runSpacing: 2,
-          children: [
-            for (final letter in letters)
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () => _jumpTo(letter),
-                child: SizedBox(
-                  width: kMinInteractiveDimension,
-                  height: kMinInteractiveDimension,
-                  child: Center(
-                    child: Text(
-                      letter,
-                      style:
-                          Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: scheme.primary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-        for (final letter in letters) ...[
-          Padding(
-            key: _letterKeys.putIfAbsent(letter, () => GlobalKey()),
-            padding: const EdgeInsets.only(top: 12, bottom: 6),
-            child: Text(
-              letter,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: scheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-          ),
-          _buildWrap(byLetter[letter]!),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildWrap(List<Topic> topics) => Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          for (final t in topics) ExplorerRefChip(ExplorerRef.topic(t.id, t.name)),
-        ],
-      );
-}
-
-class _StatChip extends StatelessWidget {
-  const _StatChip(this.icon, this.label);
-
-  final IconData icon;
   final String label;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    return Chip(
+    return ActionChip(
       visualDensity: VisualDensity.compact,
-      avatar: Icon(icon, size: 16, color: scheme.primary),
-      label: Text(label),
+      avatar: Icon(explorerRefIcon(target), size: 16, color: scheme.primary),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label),
+          const SizedBox(width: 2),
+          Icon(Icons.chevron_right, size: 14, color: scheme.onSurfaceVariant),
+        ],
+      ),
+      tooltip: 'Browse all ${target.label.toLowerCase()}',
+      onPressed: () =>
+          ref.read(explorerTrailProvider.notifier).open(target),
     );
   }
 }
@@ -505,14 +402,37 @@ class _SearchResultsList extends ConsumerWidget {
       error: (e, _) => Center(child: Text('Search failed: $e')),
       data: (r) {
         if (r.isEmpty) {
+          final hint = Text(
+            r.suggestions.isEmpty
+                ? 'No matches. Try a name ("Moses"), a place ("Jericho"), '
+                    'or a reference ("Acts 9").'
+                : 'No exact matches. Did you mean:',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          );
           return Center(
-            child: Text(
-              'No matches. Try a name ("Moses"), a place ("Jericho"), '
-              'or a reference ("Acts 9").',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  hint,
+                  if (r.suggestions.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (final s in r.suggestions)
+                          ExplorerRefChip(s.ref),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
             ),
           );
         }

@@ -49,6 +49,19 @@ void main() {
         );
     await person(1, 'David', 3);
     await person(2, 'Saul', 1);
+    // Nabal has an Easton's bio but no verse links — exercises the search's
+    // bio-text second pass and the index's weight sort.
+    await store.into(store.biblePeople).insert(
+          const BiblePeopleCompanion(
+            id: Value(3),
+            slug: Value('nabal'),
+            name: Value('Nabal'),
+            displayTitle: Value('Nabal'),
+            verseCount: Value(2),
+            bio: Value('A wealthy sheepmaster of Maon,\n'
+                'churlish and ill-behaved.'),
+          ),
+        );
 
     Future<void> personVerse(int id, int p, String book, int ch, int v) => store
         .into(store.personVerses)
@@ -153,6 +166,22 @@ void main() {
             section: Value('C'),
           ),
         );
+    // Curated topics layered over Nave's: two feasts (alphabetically
+    // reversed from their calendar order, to prove the re-sort) and one
+    // story — split out of the plain topics index/count.
+    Future<void> curated(int id, String name, String category) => store
+        .into(store.topics)
+        .insert(
+          TopicsCompanion(
+            id: Value(id),
+            name: Value(name),
+            section: Value(name[0]),
+            category: Value(category),
+          ),
+        );
+    await curated(2, 'DAY OF ATONEMENT', 'feast');
+    await curated(3, 'PASSOVER', 'feast');
+    await curated(4, 'NOAH AND THE FLOOD', 'story');
     await store
         .into(store.topicEntries)
         .insert(
@@ -972,6 +1001,109 @@ void main() {
 
     test('deleted tags never surface', () async {
       expect((await search('gone')).tags, isEmpty);
+    });
+
+    test('bio text matches at word starts, with a snippet subtitle', () async {
+      final r = await search('churlish');
+      expect(r.people.single.ref.label, 'Nabal');
+      expect(r.people.single.subtitle, contains('churlish'));
+      // The snippet flattens the bio's newline away.
+      expect(r.people.single.subtitle, isNot(contains('\n')));
+
+      // "hurlish" appears mid-word only ("churlish"), so no hit — LIKE's
+      // substring match alone isn't enough.
+      expect((await search('hurlish')).isEmpty, isTrue);
+    });
+
+    test('a misspelled name comes back as a Did-you-mean suggestion',
+        () async {
+      final r = await search('Davad');
+      expect(r.isEmpty, isTrue);
+      // The event "David spares Saul" matches through its "David" word at
+      // the same distance; the person's verse-count weight ranks him first.
+      expect(
+        r.suggestions.map((s) => s.ref.label).toList(),
+        ['David', 'David spares Saul'],
+      );
+
+      // Transposition counts as one edit.
+      final sual = await search('Sual');
+      expect(sual.suggestions.map((s) => s.ref.label), contains('Saul'));
+
+      // Multi-word names match on their individual words too.
+      final gedy = await search('Gedy');
+      expect(gedy.suggestions.single.ref.label, 'En Gedi');
+    });
+
+    test('tag-prefixed queries never suggest dataset entities', () async {
+      final r = await search('#davad');
+      expect(r.isEmpty, isTrue);
+      expect(r.suggestions, isEmpty);
+    });
+  });
+
+  group('browse indexes', () {
+    Future<List<ExplorerIndexEntry>> index(ExplorerEntityType kind,
+            {String? category}) =>
+        container
+            .read(explorerIndexProvider((kind: kind, category: category))
+                .future);
+
+    test('people index is A-Z with verse-count weights', () async {
+      final entries = await index(ExplorerEntityType.person);
+      expect(
+        entries.map((e) => e.ref.label).toList(),
+        ['David', 'Nabal', 'Saul'],
+      );
+      expect(entries.first.subtitle, '3 verses');
+      expect(entries.map((e) => e.weight).toList(), [3, 2, 1]);
+    });
+
+    test('places index is A-Z, counting each place\'s verse refs', () async {
+      final entries = await index(ExplorerEntityType.place);
+      expect(entries.map((e) => e.ref.label).toList(), ['En Gedi', 'Ziph']);
+      expect(entries.first.subtitle, '1 verse');
+    });
+
+    test('events index is chronological with year subtitles', () async {
+      final entries = await index(ExplorerEntityType.event);
+      expect(
+        entries.map((e) => e.ref.label).toList(),
+        ['Creation', 'David spares Saul'],
+      );
+      expect(entries.first.subtitle, '4003 BC');
+    });
+
+    test('topics index is Nave\'s alone — curated categories excluded',
+        () async {
+      final entries = await index(ExplorerEntityType.topic);
+      expect(entries.single.ref.label, 'CAVES');
+      expect(entries.single.subtitle, isNull);
+    });
+
+    test('feasts index follows the Leviticus 23 calendar, not the alphabet',
+        () async {
+      final entries =
+          await index(ExplorerEntityType.topic, category: 'feast');
+      expect(
+        entries.map((e) => e.ref.label).toList(),
+        ['PASSOVER', 'DAY OF ATONEMENT'],
+      );
+    });
+
+    test('stories index lists only the story category', () async {
+      final entries =
+          await index(ExplorerEntityType.topic, category: 'story');
+      expect(entries.single.ref.label, 'NOAH AND THE FLOOD');
+    });
+
+    test('stats split curated feasts and stories out of the topics count',
+        () async {
+      final stats = await container.read(explorerStatsProvider.future);
+      expect(stats.topics, 1);
+      expect(stats.feasts, 2);
+      expect(stats.stories, 1);
+      expect(stats.people, 3);
     });
   });
 

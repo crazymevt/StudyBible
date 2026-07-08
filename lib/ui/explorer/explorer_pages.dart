@@ -22,6 +22,7 @@ import '../reader/image_viewer_dialog.dart';
 import '../reader/media_video_list.dart';
 import '../reader/pdf_viewer_dialog.dart';
 import 'explorer_common.dart';
+import 'explorer_index_page.dart';
 import 'family_tree_screen.dart';
 
 /// The page body for one trail entry — dispatches on the entity type.
@@ -40,6 +41,8 @@ class ExplorerEntityPage extends StatelessWidget {
       ExplorerEntityType.passage =>
         _PassagePage(book: entry.book!, chapter: entry.chapter!),
       ExplorerEntityType.tag => _TagPage(tagId: entry.tagId!),
+      ExplorerEntityType.browse => ExplorerIndexPage(
+          kind: entry.browseKind!, category: entry.browseCategory),
     };
   }
 }

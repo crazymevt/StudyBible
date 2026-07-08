@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/content_store.dart';
 import '../data/user_store.dart';
 import '../domain/explorer/explorer_ref.dart';
+import '../domain/explorer/fuzzy_suggest.dart';
+import '../domain/feasts/feast_data.dart' show feasts;
 import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
 import 'document_reference_providers.dart';
@@ -28,26 +30,32 @@ final explorerReadyProvider = FutureProvider<bool>((ref) async {
   return true;
 });
 
-/// Dataset sizes shown on the Explorer home page.
+/// Dataset sizes shown on the Explorer home page. Curated feasts and stories
+/// are counted apart from the plain (Nave's) topics — each of the three gets
+/// its own browse chip.
 class ExplorerStats {
   final int people;
   final int places;
   final int events;
   final int topics;
+  final int feasts;
+  final int stories;
   const ExplorerStats({
     required this.people,
     required this.places,
     required this.events,
     required this.topics,
+    required this.feasts,
+    required this.stories,
   });
 }
 
 final explorerStatsProvider = FutureProvider<ExplorerStats>((ref) async {
   await ref.watch(explorerReadyProvider.future);
   final store = ref.watch(contentStoreProvider);
-  Future<int> count(String table) async {
+  Future<int> count(String from) async {
     final row = await store
-        .customSelect('SELECT COUNT(*) AS c FROM $table')
+        .customSelect('SELECT COUNT(*) AS c FROM $from')
         .getSingle();
     return row.read<int>('c');
   }
@@ -56,14 +64,117 @@ final explorerStatsProvider = FutureProvider<ExplorerStats>((ref) async {
     count('bible_people'),
     count('places'),
     count('timeline_events'),
-    count('topics'),
+    count('topics WHERE category IS NULL'),
+    count("topics WHERE category = 'feast'"),
+    count("topics WHERE category = 'story'"),
   ]);
   return ExplorerStats(
     people: counts[0],
     places: counts[1],
     events: counts[2],
     topics: counts[3],
+    feasts: counts[4],
+    stories: counts[5],
   );
+});
+
+// --- Browsable indexes (the pages behind the home page's dataset chips) ---
+
+/// One row of a browsable index over an entity kind.
+class ExplorerIndexEntry {
+  final ExplorerRef ref;
+  final String? subtitle;
+
+  /// Rank for the index page's "most mentioned" sort (verse counts); 0 where
+  /// that sort doesn't apply (topics, events — events rank chronologically
+  /// by their position in the returned list instead).
+  final int weight;
+  const ExplorerIndexEntry(this.ref, {this.subtitle, this.weight = 0});
+}
+
+String _countLabel(int n, String noun) => '$n $noun${n == 1 ? '' : 's'}';
+
+/// Family key for [explorerIndexProvider]: the entity kind to list and — for
+/// topics — optionally one curated category ('feast' or 'story') instead of
+/// the plain Nave's entries.
+typedef ExplorerIndexSpec = ({ExplorerEntityType kind, String? category});
+
+/// Every entity of one kind, as index rows. People, places, and topics come
+/// back A-Z; events come back in timeline order and feasts in Leviticus 23
+/// calendar order (their natural browse orders).
+final explorerIndexProvider = FutureProvider.family<List<ExplorerIndexEntry>,
+    ExplorerIndexSpec>((ref, spec) async {
+  await ref.watch(explorerReadyProvider.future);
+  final store = ref.watch(contentStoreProvider);
+  switch (spec.kind) {
+    case ExplorerEntityType.person:
+      final rows = await (store.select(store.biblePeople)
+            ..orderBy([(p) => OrderingTerm.asc(p.displayTitle)]))
+          .get();
+      return [
+        for (final p in rows)
+          ExplorerIndexEntry(
+            ExplorerRef.person(p.id, p.displayTitle),
+            subtitle: _countLabel(p.verseCount, 'verse') +
+                (p.alsoCalled == null ? '' : ' · also ${p.alsoCalled}'),
+            weight: p.verseCount,
+          ),
+      ];
+    case ExplorerEntityType.place:
+      final rows = await store.customSelect(
+        'SELECT p.id AS id, p.name AS name, COUNT(pv.id) AS refs '
+        'FROM places p LEFT JOIN place_verses pv ON pv.place_id = p.id '
+        'GROUP BY p.id, p.name ORDER BY p.name',
+      ).get();
+      return [
+        for (final r in rows)
+          ExplorerIndexEntry(
+            ExplorerRef.place(r.read<int>('id'), r.read<String>('name')),
+            subtitle: _countLabel(r.read<int>('refs'), 'verse'),
+            weight: r.read<int>('refs'),
+          ),
+      ];
+    case ExplorerEntityType.event:
+      final rows = await (store.select(store.timelineEvents)
+            ..orderBy([
+              (e) => OrderingTerm(expression: e.sortKey.isNull()),
+              (e) => OrderingTerm.asc(e.sortKey),
+              (e) => OrderingTerm.asc(e.title),
+            ]))
+          .get();
+      return [
+        for (final e in rows)
+          ExplorerIndexEntry(
+            ExplorerRef.event(e.id, e.title),
+            subtitle: e.startYear == null ? null : _isoYear(e.startYear!),
+          ),
+      ];
+    case ExplorerEntityType.topic:
+      // Curated feasts/stories have their own indexes, so the plain Topics
+      // index is Nave's Topical Bible alone.
+      final query = store.select(store.topics)
+        ..where((t) => spec.category == null
+            ? t.category.isNull()
+            : t.category.equals(spec.category!))
+        ..orderBy([(t) => OrderingTerm.asc(t.name)]);
+      final rows = await query.get();
+      if (spec.category == 'feast') {
+        // Re-sort into the Leviticus 23 calendar order (`feasts`, the domain
+        // list) — "Day of Atonement" first reads as nonsense next to the
+        // actual liturgical sequence.
+        final order = [for (final f in feasts) f.name.toUpperCase()];
+        rows.sort(
+            (a, b) => order.indexOf(a.name).compareTo(order.indexOf(b.name)));
+      }
+      return [
+        for (final t in rows)
+          ExplorerIndexEntry(ExplorerRef.topic(t.id, t.name)),
+      ];
+    case ExplorerEntityType.passage:
+    case ExplorerEntityType.tag:
+    case ExplorerEntityType.browse:
+      throw ArgumentError('no index for ${spec.kind.name}');
+  }
 });
 
 // --- Exploration trail (breadcrumb navigation stack) ---
@@ -142,6 +253,11 @@ class ExplorerSearchResults {
   final List<ExplorerSearchItem> events;
   final List<ExplorerSearchItem> topics;
   final List<ExplorerTagHit> tags;
+
+  /// "Did you mean …?" entities near the query by edit distance. Only
+  /// populated when everything above is empty (see [isEmpty], which
+  /// deliberately ignores these — they're an offer, not a result).
+  final List<ExplorerSearchItem> suggestions;
   ExplorerSearchResults({
     this.passage,
     this.people = const [],
@@ -149,6 +265,7 @@ class ExplorerSearchResults {
     this.events = const [],
     this.topics = const [],
     this.tags = const [],
+    this.suggestions = const [],
   });
 
   bool get isEmpty =>
@@ -223,6 +340,67 @@ void _rankByPrefix<T>(
   });
 }
 
+/// Every dataset entity's name variants, preloaded once for the fuzzy
+/// "Did you mean …?" pass — only consulted when a search comes back empty,
+/// but scanning four tables per keystroke would be wasteful, so the
+/// candidate list is built a single time and cached.
+final _explorerFuzzyCandidatesProvider =
+    FutureProvider<List<FuzzyCandidate<ExplorerRef>>>((ref) async {
+  await ref.watch(explorerReadyProvider.future);
+  final store = ref.watch(contentStoreProvider);
+  final candidates = <FuzzyCandidate<ExplorerRef>>[];
+
+  final people = await store.select(store.biblePeople).get();
+  for (final p in people) {
+    candidates.add(FuzzyCandidate(
+      ExplorerRef.person(p.id, p.displayTitle),
+      [
+        p.name,
+        p.displayTitle,
+        if (p.alsoCalled != null) ...p.alsoCalled!.split(RegExp('[,;]')),
+      ],
+      weight: p.verseCount,
+    ));
+  }
+
+  final places = await store.select(store.places).get();
+  for (final p in places) {
+    candidates.add(FuzzyCandidate(ExplorerRef.place(p.id, p.name), [p.name]));
+  }
+
+  final events = await store.select(store.timelineEvents).get();
+  for (final e in events) {
+    candidates.add(FuzzyCandidate(ExplorerRef.event(e.id, e.title), [e.title]));
+  }
+
+  final topics = await store.select(store.topics).get();
+  for (final t in topics) {
+    candidates.add(FuzzyCandidate(ExplorerRef.topic(t.id, t.name), [t.name]));
+  }
+
+  return candidates;
+});
+
+/// A short window of bio text around the first [query] match, for the result
+/// tile's subtitle — so a hit found through Easton's prose shows *why* it
+/// matched ("…the shepherd king of Israel…").
+String bioSnippet(String bio, String query, {int radius = 40}) {
+  final flat = bio.replaceAll(RegExp(r'\s+'), ' ');
+  final i = flat.toLowerCase().indexOf(query.toLowerCase());
+  if (i < 0) return flat;
+  final start = i - radius < 0 ? 0 : i - radius;
+  final end = i + query.length + radius > flat.length
+      ? flat.length
+      : i + query.length + radius;
+  return '${start > 0 ? '…' : ''}${flat.substring(start, end).trim()}'
+      '${end < flat.length ? '…' : ''}';
+}
+
+/// Bio search only kicks in for queries long enough that a substring match
+/// against prose still means something — `%son%` would match nearly every
+/// Easton's entry.
+const _kMinBioQueryLength = 4;
+
 /// Fans one query out across every entity kind: a scripture-reference parse
 /// plus name searches over people, places, events, and topics.
 ///
@@ -268,6 +446,28 @@ final explorerSearchResultsForProvider =
         ..limit(_kSearchLimitPerKind))
       .get();
   _rankByPrefix(peopleRows, query, (p) => p.name, (p) => p.verseCount);
+
+  // Second pass: people whose name didn't match but whose Easton's bio
+  // mentions the query at a word start ("shepherd" finds David, not every
+  // bio containing "…herds…"). Fills whatever the name search left of the
+  // per-kind limit; SQL over-fetches because the word-start filter only
+  // happens here, after LIKE's substring matching.
+  var bioHits = <BiblePerson>[];
+  if (query.length >= _kMinBioQueryLength &&
+      peopleRows.length < _kSearchLimitPerKind) {
+    final room = _kSearchLimitPerKind - peopleRows.length;
+    final wordStart =
+        RegExp('\\b${RegExp.escape(query)}', caseSensitive: false);
+    final rows = await (store.select(store.biblePeople)
+          ..where((p) =>
+              p.bio.like(pattern) &
+              p.id.isNotIn([for (final p in peopleRows) p.id]))
+          ..orderBy([(p) => OrderingTerm.desc(p.verseCount)])
+          ..limit(room * 3))
+        .get();
+    bioHits =
+        rows.where((p) => wordStart.hasMatch(p.bio!)).take(room).toList();
+  }
 
   final placeRows = await store.customSelect(
     'SELECT p.id AS id, p.name AS name, COUNT(pv.id) AS refs '
@@ -339,7 +539,7 @@ final explorerSearchResultsForProvider =
     _rankByPrefix(tagHits, tagQuery, (t) => t.tag.name, (t) => t.itemCount);
   }
 
-  return ExplorerSearchResults(
+  final results = ExplorerSearchResults(
     passage: passage,
     people: [
       for (final p in peopleRows)
@@ -347,6 +547,11 @@ final explorerSearchResultsForProvider =
           ExplorerRef.person(p.id, p.displayTitle),
           '${p.verseCount} ${p.verseCount == 1 ? 'verse' : 'verses'}'
           '${p.alsoCalled != null ? ' · also ${p.alsoCalled}' : ''}',
+        ),
+      for (final p in bioHits)
+        ExplorerSearchItem(
+          ExplorerRef.person(p.id, p.displayTitle),
+          bioSnippet(p.bio!, query),
         ),
     ],
     places: [
@@ -369,6 +574,16 @@ final explorerSearchResultsForProvider =
     ],
     tags: tagHits,
   );
+  if (!results.isEmpty || query.startsWith('#')) return results;
+
+  // Nothing matched anywhere: offer the nearest entity names by edit
+  // distance instead of a dead-end "No matches".
+  final candidates =
+      await ref.watch(_explorerFuzzyCandidatesProvider.future);
+  return ExplorerSearchResults(suggestions: [
+    for (final s in fuzzySuggest(query, candidates))
+      ExplorerSearchItem(s.item),
+  ]);
 });
 
 // --- Event page ---

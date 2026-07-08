@@ -57,6 +57,7 @@ Future<String?> _entityLabel(
       return t?.name;
     case ExplorerEntityType.passage:
     case ExplorerEntityType.tag:
+    case ExplorerEntityType.browse:
       return null;
   }
 }
@@ -80,7 +81,10 @@ Future<void> handleEntityLinkLaunch(
     ExplorerEntityType.place => ExplorerRef.place(parsed.id, label),
     ExplorerEntityType.event => ExplorerRef.event(parsed.id, label),
     ExplorerEntityType.topic => ExplorerRef.topic(parsed.id, label),
-    ExplorerEntityType.passage || ExplorerEntityType.tag => null,
+    ExplorerEntityType.passage ||
+    ExplorerEntityType.tag ||
+    ExplorerEntityType.browse =>
+      null,
   };
   if (entityRef == null) return;
 
