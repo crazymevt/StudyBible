@@ -11,6 +11,7 @@ import '../../app/sync_service.dart';
 import '../../app/dashboard_providers.dart';
 import '../../app/feast_providers.dart';
 import '../../app/notification_providers.dart';
+import '../../app/action_notification_providers.dart';
 import '../../data/logging.dart';
 import '../../theme/app_themes.dart';
 import 'package:file_selector/file_selector.dart';
@@ -79,6 +80,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
     ref.read(reminderEnabledProvider.notifier).set(enabled);
     await ref.read(reminderControllerProvider).reschedule();
+  }
+
+  Future<void> _onActionDueNotificationsToggle(bool enabled) async {
+    if (enabled) {
+      final granted = await ref
+          .read(notificationServiceProvider)
+          .requestPermission();
+      if (!granted) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Notification permission was denied — enable it in system settings to receive action-item reminders.',
+            ),
+          ),
+        );
+      }
+    }
+    ref.read(actionDueNotificationsEnabledProvider.notifier).set(enabled);
+    await ref.read(actionNotificationSchedulerProvider).syncAll();
   }
 
   Future<void> _pickReminderTime() async {
@@ -320,6 +341,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: _pickReminderTime,
             ),
+          SwitchListTile(
+            title: const Text('Action Item Due Notifications'),
+            subtitle: const Text(
+              'Notify when an action item is due soon (24h ahead) and again when it becomes due',
+            ),
+            value: ref.watch(actionDueNotificationsEnabledProvider),
+            onChanged: _onActionDueNotificationsToggle,
+          ),
           ListTile(
             title: const Text("What's New"),
             subtitle: const Text('View the latest features and updates'),

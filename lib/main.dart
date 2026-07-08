@@ -13,6 +13,7 @@ import 'app/shared_prefs.dart';
 import 'app/user_providers.dart';
 import 'app/app_state.dart';
 import 'app/action_providers.dart';
+import 'app/action_notification_providers.dart';
 import 'app/highlight_palette.dart';
 import 'app/notification_providers.dart';
 import 'data/app_paths.dart';
@@ -133,6 +134,10 @@ void main() {
     // ReminderController.reschedule's doc comment) and on a build where the
     // reminder is disabled (it just cancels).
     unawaited(container.read(reminderControllerProvider).reschedule());
+    // Same idempotency story as the reminder above — schedules/cancels each
+    // action item's due-date notifications to match the current list and
+    // setting.
+    unawaited(container.read(actionNotificationSchedulerProvider).syncAll());
 
     runApp(
       UncontrolledProviderScope(
@@ -275,6 +280,7 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
       // plan passage) and recovers a reboot-dropped Android alarm — see
       // ReminderController.reschedule's doc comment.
       ref.read(reminderControllerProvider).reschedule();
+      ref.read(actionNotificationSchedulerProvider).syncAll();
     }
   }
 
@@ -387,6 +393,9 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
                   // When the banner is showing it has already consumed the top
                   // (status-bar) inset, so strip it from the app below to avoid
                   // a double gap above each screen's app bar.
+                  // Kept alive here purely so its `ref.listen`s stay
+                  // registered; it has no state of its own worth reading.
+                  ref.watch(actionNotificationSyncProvider);
                   final showing =
                       ref.watch(actionDueControllerProvider).isNotEmpty;
                   return showing
