@@ -28,6 +28,7 @@ import 'dashboard/dashboard_screen.dart';
 import 'content_manager/content_manager_screen.dart';
 import 'settings/backup_restore_screen.dart';
 import 'reader/reading_plan_panel.dart';
+import 'common/keep_alive_switcher.dart';
 
 import 'onboarding/onboarding_screen.dart';
 import 'onboarding/tutorial_overlay.dart';
@@ -281,66 +282,12 @@ class _DesktopLayout extends ConsumerWidget {
           if (activeTool != ActiveTool.none)
             Expanded(
               flex: 4,
-              child: Builder(
-                builder: (context) {
-                  if (activeTool == ActiveTool.compare) {
-                    return const ComparePanel();
-                  }
-                  if (activeTool == ActiveTool.sermons) {
-                    return const SermonsPanel();
-                  }
-                  if (activeTool == ActiveTool.notebooks) {
-                    return const NotebooksPanel();
-                  }
-                  if (activeTool == ActiveTool.crossReference) {
-                    return const CrossReferencePanel();
-                  }
-                  if (activeTool == ActiveTool.commentaries) {
-                    return const CommentaryPanel();
-                  }
-                  if (activeTool == ActiveTool.notes) {
-                    return const NotesPanel();
-                  }
-                  if (activeTool == ActiveTool.dictionary) {
-                    return const DictionaryPanel();
-                  }
-                  if (activeTool == ActiveTool.search) {
-                    return const SearchPanel();
-                  }
-                  if (activeTool == ActiveTool.media) {
-                    final book = ref.watch(selectedBookNameProvider);
-                    final chap = ref.watch(selectedChapterProvider);
-                    return MediaPanel(bookName: book, chapter: chap);
-                  }
-                  if (activeTool == ActiveTool.readingPlans) {
-                    return const ReadingPlanPanel();
-                  }
-                  if (activeTool == ActiveTool.devotionals) {
-                    return const DevotionalsPanel();
-                  }
-                  if (activeTool == ActiveTool.topics) {
-                    return const TopicsPanel();
-                  }
-                  if (activeTool == ActiveTool.harmony) {
-                    return const HarmonyPanel();
-                  }
-                  if (activeTool == ActiveTool.places) {
-                    return const PlacesPanel();
-                  }
-                  if (activeTool == ActiveTool.people) {
-                    return const PeoplePanel();
-                  }
-                  if (activeTool == ActiveTool.highlights) {
-                    return const HighlightsPanel();
-                  }
-                  if (activeTool == ActiveTool.scratch) {
-                    return const ScratchPanel();
-                  }
-                  if (activeTool == ActiveTool.feasts) {
-                    return const FeastsPanel();
-                  }
-                  return const SizedBox.shrink();
-                },
+              // Recently used panels stay alive offstage so switching tools
+              // keeps their scroll positions, expansions, and drafts. Closing
+              // the panel area entirely (ActiveTool.none) unmounts them.
+              child: KeepAliveSwitcher<ActiveTool>(
+                active: activeTool,
+                builder: (context, tool) => _toolPanel(tool),
               ),
             ),
         ],
@@ -370,6 +317,61 @@ class _DesktopLayout extends ConsumerWidget {
     );
   }
 
+  /// The docked panel widget for [tool]. Called from inside
+  /// [KeepAliveSwitcher]'s build, so provider reads that should track state
+  /// (e.g. the media panel's book/chapter) use their own [Consumer] rather
+  /// than this widget's `ref`.
+  static Widget _toolPanel(ActiveTool tool) {
+    switch (tool) {
+      case ActiveTool.compare:
+        return const ComparePanel();
+      case ActiveTool.sermons:
+        return const SermonsPanel();
+      case ActiveTool.notebooks:
+        return const NotebooksPanel();
+      case ActiveTool.crossReference:
+        return const CrossReferencePanel();
+      case ActiveTool.commentaries:
+        return const CommentaryPanel();
+      case ActiveTool.notes:
+        return const NotesPanel();
+      case ActiveTool.dictionary:
+        return const DictionaryPanel();
+      case ActiveTool.search:
+        return const SearchPanel();
+      case ActiveTool.media:
+        return Consumer(
+          builder: (context, ref, _) {
+            final book = ref.watch(selectedBookNameProvider);
+            final chap = ref.watch(selectedChapterProvider);
+            return MediaPanel(bookName: book, chapter: chap);
+          },
+        );
+      case ActiveTool.readingPlans:
+        return const ReadingPlanPanel();
+      case ActiveTool.devotionals:
+        return const DevotionalsPanel();
+      case ActiveTool.topics:
+        return const TopicsPanel();
+      case ActiveTool.harmony:
+        return const HarmonyPanel();
+      case ActiveTool.places:
+        return const PlacesPanel();
+      case ActiveTool.people:
+        return const PeoplePanel();
+      case ActiveTool.highlights:
+        return const HighlightsPanel();
+      case ActiveTool.scratch:
+        return const ScratchPanel();
+      case ActiveTool.feasts:
+        return const FeastsPanel();
+      case ActiveTool.history:
+      case ActiveTool.none:
+        // History isn't offered on the desktop rail (matches the old
+        // if-chain's silent fall-through and mobile_tools_drawer.dart).
+        return const SizedBox.shrink();
+    }
+  }
 }
 
 /// Wraps a fixed-height [child] (e.g. the tools [NavigationRail]) in a vertical
