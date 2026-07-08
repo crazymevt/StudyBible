@@ -1,5 +1,41 @@
 [
   {
+    "version": "26.7.8+1",
+    "date": "2026-07-08",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add Explorer dataset browsing and typo-tolerant search",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "keep desktop tool panels alive across switches",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "quiet a benign riverpod TickerMode-resume assertion in logs",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "surface tagged verses in the Most Used Book widget",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add Most Used Book dashboard card and study-activity breakdown",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.7+2",
     "date": "2026-07-07",
     "features": [
