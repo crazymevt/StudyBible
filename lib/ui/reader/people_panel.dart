@@ -6,9 +6,11 @@ import '../../app/explorer_providers.dart';
 import '../../app/people_providers.dart';
 import '../../app/reader_state.dart';
 import '../../data/content_store.dart';
+import '../../domain/explorer/explorer_ref.dart';
 import '../common/breakpoints.dart';
 import '../common/skeleton.dart';
 import '../explorer/explorer_common.dart';
+import '../explorer/explorer_screen.dart';
 import '../explorer/family_tree_screen.dart';
 import 'people_timeline_screen.dart';
 
@@ -96,6 +98,14 @@ class _PeoplePanelState extends ConsumerState<PeoplePanel> {
   Widget build(BuildContext context) {
     final selectedPerson = ref.watch(selectedPersonProvider);
     final ready = ref.watch(peopleReadyProvider);
+    final selectedPersonName = selectedPerson == null
+        ? null
+        : ref
+            .watch(personDetailProvider(selectedPerson))
+            .asData
+            ?.value
+            ?.person
+            .displayTitle;
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -152,6 +162,19 @@ class _PeoplePanelState extends ConsumerState<PeoplePanel> {
                             tooltip: 'Family tree',
                             onPressed: () => Navigator.of(context)
                                 .push(familyTreeRoute(selectedPerson)),
+                          ),
+                        if (selectedPerson != null)
+                          IconButton(
+                            icon: const Icon(Icons.explore_outlined),
+                            tooltip: 'Open in Explorer',
+                            onPressed: () => openInFreshExplorer(
+                              context,
+                              ref,
+                              ExplorerRef.person(
+                                selectedPerson,
+                                selectedPersonName ?? 'Person',
+                              ),
+                            ),
                           ),
                         IconButton(
                           icon: const Icon(Icons.close),

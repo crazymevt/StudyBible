@@ -6,10 +6,12 @@ import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/place_providers.dart';
 import '../../app/reader_state.dart';
+import '../../domain/explorer/explorer_ref.dart';
 import '../common/breakpoints.dart';
 import '../common/empty_state.dart';
 import '../common/place_marker_map.dart';
 import '../common/skeleton.dart';
+import '../explorer/explorer_screen.dart';
 import 'atlas_screen.dart';
 
 /// Maps the geographic places mentioned in the active passage (OpenBible.info
@@ -181,6 +183,16 @@ class _PlacesPanelState extends ConsumerState<PlacesPanel> {
                       onPressed: () => _goToVerse(book, chapter, v),
                     ),
                 ],
+              ),
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.explore_outlined),
+              tooltip: 'Open in Explorer',
+              visualDensity: VisualDensity.compact,
+              onPressed: () => openInFreshExplorer(
+                context,
+                ref,
+                ExplorerRef.place(p.id, p.name),
               ),
             ),
             onTap: () => _focusPlace(p),

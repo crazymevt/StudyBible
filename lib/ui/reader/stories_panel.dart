@@ -6,8 +6,10 @@ import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 import '../../app/topic_providers.dart';
 import '../../data/content_store.dart';
+import '../../domain/explorer/explorer_ref.dart';
 import '../common/breakpoints.dart';
 import '../common/skeleton.dart';
+import '../explorer/explorer_screen.dart';
 
 /// Bible Stories: a searchable list of the hand-curated story topics (see
 /// curated_topics_data.dart), each with a summary and its passage(s).
@@ -212,12 +214,28 @@ class _StoryDetailView extends ConsumerWidget {
             if (i == 0) {
               return Padding(
                 padding: const EdgeInsets.only(top: 4, bottom: 12),
-                child: Text(
-                  _titleCase(d.topic.name),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: scheme.primary,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _titleCase(d.topic.name),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: scheme.primary,
+                            ),
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.explore_outlined),
+                      tooltip: 'Open in Explorer',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => openInFreshExplorer(
+                        context,
+                        ref,
+                        ExplorerRef.topic(d.topic.id, _titleCase(d.topic.name)),
+                      ),
+                    ),
+                  ],
                 ),
               );
             }
