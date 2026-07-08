@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.8+4",
+    "date": "2026-07-08",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "keep notification_icon resource from being stripped by release shrinking",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.8+3",
     "date": "2026-07-08",
     "features": [
