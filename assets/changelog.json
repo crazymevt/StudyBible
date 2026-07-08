@@ -1,5 +1,53 @@
 [
   {
+    "version": "26.7.8+2",
+    "date": "2026-07-08",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add Android home-screen widgets — Verse of the Day, Upcoming Actions, and Ribbons",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "route verse-of-the-day and ribbon taps through one openVerse helper",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "New Features",
+        "title": "add \"Open in Explorer\" button to People, Places, Topics, and Stories tools",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add a Bible Stories reader tool",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add one-tap print button to notebook page editor",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add due-date notifications for action items",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add daily reading reminder notifications",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.8+1",
     "date": "2026-07-08",
     "features": [
