@@ -1,6 +1,7 @@
 # Home-screen widgets — implementation plan
 
-Status: **planned, not started** (written 2026-07-08).
+Status: **Phase 0 + Phase 1 (Android) implemented** on `feat/home-screen-widgets`
+(2026-07-08); awaiting on-device verification. Phase 2 (iOS/macOS) not started.
 
 Goal: ship three home-screen widgets — **Verse of the Day**, **Upcoming
 Actions**, and **Ribbons** — where tapping a verse reference (VOTD card or a
