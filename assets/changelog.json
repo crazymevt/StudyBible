@@ -5,7 +5,13 @@
     "features": [
       {
         "category": "New Features",
-        "title": "add Explorer dataset browsing and typo-tolerant search",
+        "title": "browse Explorer's people, places, events, feasts, and stories as searchable A-Z lists",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Explorer search now tolerates typos and matches Bible dictionary bios",
         "description": "",
         "icon": "star"
       },
