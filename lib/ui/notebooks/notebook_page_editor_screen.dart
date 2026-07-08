@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/notebook_providers.dart';
 import '../../app/revision_common.dart';
 import '../../app/user_providers.dart';
+import '../../data/export/notebook_exporter.dart';
+import '../../data/export/sermon_exporter.dart' show ExportFormat, ExportAction;
 import '../../data/logging.dart';
 import '../../data/user_store.dart';
 import '../../domain/explorer/entity_link.dart';
@@ -23,7 +25,7 @@ import 'notebook_page_revisions_dialog.dart';
 
 /// Secondary actions collapsed into the editor's overflow menu on narrow
 /// layouts (phones, the inline panel beside the reader).
-enum _PageAction { insertScripture, linkEntity, tags, revisions, export }
+enum _PageAction { insertScripture, linkEntity, tags, revisions, export, print }
 
 /// Rich-text editor for a single [NotebookPage]. A close clone of
 /// SermonEditorScreen (autosave, reference auto-linking, remote-conflict banner,
@@ -326,6 +328,27 @@ class _NotebookPageEditorScreenState
     NotebookExportDialog.show(context, notebook, onlyPages: [page]);
   }
 
+  Future<void> _printPage() async {
+    final store = ref.read(userStoreProvider);
+    final page = await (store.select(
+      store.notebookPages,
+    )..where((t) => t.id.equals(widget.pageId))).getSingleOrNull();
+    if (page == null || !mounted) return;
+    final notebook = await (store.select(
+      store.notebooks,
+    )..where((t) => t.id.equals(page.notebookId))).getSingleOrNull();
+    if (notebook == null || !mounted) return;
+    // Printing always produces a PDF, so we skip the export dialog's format
+    // selection entirely.
+    NotebookExporter.exportNotebook(
+      context,
+      notebook,
+      [page],
+      ExportFormat.pdf,
+      ExportAction.print,
+    );
+  }
+
   void _manageTags() {
     showDialog(
       context: context,
@@ -346,6 +369,8 @@ class _NotebookPageEditorScreenState
         _openRevisions();
       case _PageAction.export:
         _exportPage();
+      case _PageAction.print:
+        _printPage();
     }
   }
 
@@ -391,6 +416,14 @@ class _NotebookPageEditorScreenState
           child: ListTile(
             leading: Icon(Icons.file_upload),
             title: Text('Export Page'),
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem(
+          value: _PageAction.print,
+          child: ListTile(
+            leading: Icon(Icons.print),
+            title: Text('Print'),
             contentPadding: EdgeInsets.zero,
           ),
         ),
@@ -551,6 +584,11 @@ class _NotebookPageEditorScreenState
                 icon: const Icon(Icons.file_upload),
                 tooltip: 'Export Page',
                 onPressed: _exportPage,
+              ),
+              IconButton(
+                icon: const Icon(Icons.print),
+                tooltip: 'Print',
+                onPressed: _printPage,
               ),
             ],
             const SizedBox(width: 8),
