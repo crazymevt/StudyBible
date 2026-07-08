@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
@@ -15,6 +16,14 @@ const int kDailyReminderNotificationId = 1;
 /// channel. Generated once — must never change, or existing scheduled
 /// notifications would be orphaned under a new identity.
 const String _kWindowsNotificationGuid = '22b8c78f-eb7d-45a5-9eb2-002bcfb67aa8';
+
+/// Native side (Android only) opens this app's notification settings page
+/// directly, for when the OS has permanently denied the permission prompt
+/// and re-requesting it would silently no-op — see [NotificationService.
+/// openNotificationSettings].
+const MethodChannel _kNotificationSettingsChannel = MethodChannel(
+  'io.github.crazymevt.studybible/notification_settings',
+);
 
 /// Thin wrapper over the platform local-notifications plugin, used for the
 /// daily reading reminder. Mirrors [TtsService]'s shape: plugin calls are
@@ -96,10 +105,18 @@ class NotificationService {
     _initialized = true;
   }
 
+  /// Set by [requestPermission] when it returns `false` because of a
+  /// thrown exception (e.g. plugin init failing) rather than an actual OS
+  /// permission denial — the two look identical as a bare `bool` otherwise,
+  /// which previously misreported unrelated failures as "permission
+  /// denied" with no way to tell the difference from the UI.
+  Object? lastPermissionError;
+
   /// Requests permission to show notifications. Android/iOS/macOS require an
   /// explicit runtime grant; Linux/Windows don't, so this returns `true`
   /// there without prompting.
   Future<bool> requestPermission() async {
+    lastPermissionError = null;
     try {
       await _ensureInit();
       switch (defaultTargetPlatform) {
@@ -129,7 +146,27 @@ class NotificationService {
       }
     } catch (e, stack) {
       logError(e, stack, context: 'NotificationService.requestPermission');
+      lastPermissionError = e;
       return false;
+    }
+  }
+
+  /// Opens this app's notification settings page directly (Android only).
+  /// Once Android has permanently denied the runtime permission prompt,
+  /// [requestPermission] silently returns `false` with no dialog at all —
+  /// the only way back is the system settings UI, so this jumps straight
+  /// there instead of leaving the user to find it via App Info manually.
+  /// No-op on other platforms.
+  Future<void> openNotificationSettings() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return;
+    try {
+      await _kNotificationSettingsChannel.invokeMethod('open');
+    } catch (e, stack) {
+      logError(
+        e,
+        stack,
+        context: 'NotificationService.openNotificationSettings',
+      );
     }
   }
 

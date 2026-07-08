@@ -62,6 +62,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _isDraftInitialized = false;
   bool _rebuildingSearchIndex = false;
 
+  void _showPermissionFailureSnackBar(String deniedMessage) {
+    final service = ref.read(notificationServiceProvider);
+    final error = service.lastPermissionError;
+    if (error != null) {
+      // Not an OS denial — something threw during setup, so "open settings"
+      // wouldn't help. Show the actual error so it's diagnosable without
+      // needing to plug the device in for logs.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not enable notifications: $error')),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(deniedMessage),
+        action: SnackBarAction(
+          label: 'Open settings',
+          onPressed: () => service.openNotificationSettings(),
+        ),
+      ),
+    );
+  }
+
   Future<void> _onReminderToggle(bool enabled) async {
     if (enabled) {
       final granted = await ref
@@ -69,13 +92,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           .requestPermission();
       if (!granted) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Notification permission was denied — enable it in system settings to receive the reminder.',
-            ),
-          ),
+        _showPermissionFailureSnackBar(
+          'Notification permission was denied — enable it in system settings to receive the reminder.',
         );
+        return;
       }
     }
     ref.read(reminderEnabledProvider.notifier).set(enabled);
@@ -89,13 +109,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           .requestPermission();
       if (!granted) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Notification permission was denied — enable it in system settings to receive action-item reminders.',
-            ),
-          ),
+        _showPermissionFailureSnackBar(
+          'Notification permission was denied — enable it in system settings to receive action-item reminders.',
         );
+        return;
       }
     }
     ref.read(actionDueNotificationsEnabledProvider.notifier).set(enabled);
