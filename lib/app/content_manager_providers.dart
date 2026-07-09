@@ -99,18 +99,26 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
   /// the affected version's books/verses with new row ids, so without this an
   /// already-open reader keeps serving the old copy — stale footnote markers,
   /// mismatched ids, and the occasional read error — until the app restarts.
+  ///
+  /// Deferred a frame via [Future.microtask]: an import can finish (and this
+  /// can run) at the same moment an already-mounted ReaderScreen is mid-build
+  /// watching one of these providers for the first time, and invalidating
+  /// inline throws "setState()/markNeedsBuild() called during build" — same
+  /// issue and fix as ActiveVersionsNotifier.build() in reader_state.dart.
   void _refreshReaderContent() {
-    ref.invalidate(booksForVersionProvider);
-    ref.invalidate(chapterCountProvider);
-    ref.invalidate(bookByNameProvider);
-    ref.invalidate(chapterSubheadingsProvider);
-    ref.invalidate(chapterVersesProvider);
-    ref.invalidate(parallelVersesProvider);
-    ref.invalidate(chapterIndexProvider);
-    ref.invalidate(compareVersesProvider);
-    ref.invalidate(hasBookIntroProvider);
-    ref.invalidate(commentaryEntriesProvider);
-    ref.invalidate(dictionaryEntriesProvider);
+    Future.microtask(() {
+      ref.invalidate(booksForVersionProvider);
+      ref.invalidate(chapterCountProvider);
+      ref.invalidate(bookByNameProvider);
+      ref.invalidate(chapterSubheadingsProvider);
+      ref.invalidate(chapterVersesProvider);
+      ref.invalidate(parallelVersesProvider);
+      ref.invalidate(chapterIndexProvider);
+      ref.invalidate(compareVersesProvider);
+      ref.invalidate(hasBookIntroProvider);
+      ref.invalidate(commentaryEntriesProvider);
+      ref.invalidate(dictionaryEntriesProvider);
+    });
   }
 
   /// Download and import a single ph4.org MyBible [module]. When [onProgress]
