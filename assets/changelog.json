@@ -1,5 +1,35 @@
 [
   {
+    "version": "26.7.9+1",
+    "date": "2026-07-09",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add Prophecies reader tool with Explorer integration",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "defer reader-content invalidation after import to avoid build-phase crash",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "unstick audio player voice picker and hide it for single-voice bibles",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "validate goto reference against real chapter/verse counts",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.8+6",
     "date": "2026-07-08",
     "features": [
