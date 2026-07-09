@@ -96,6 +96,7 @@ const List<ToolGroup> toolGroups = [
       'Prophecies',
       railLabel: 'Prophecy',
     ),
+    ToolItem(ActiveTool.reference, Icons.table_chart, 'Reference'),
   ]),
 ];
 

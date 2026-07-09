@@ -18,6 +18,7 @@ import 'reader/harmony_panel.dart';
 import 'reader/places_panel.dart';
 import 'reader/feasts_panel.dart';
 import 'reader/prophecies_panel.dart';
+import 'reader/reference_panel.dart';
 import 'reader/stories_panel.dart';
 import 'reader/people_panel.dart';
 import 'reader/highlights_panel.dart';
@@ -371,6 +372,8 @@ class _DesktopLayout extends ConsumerWidget {
         return const StoriesPanel();
       case ActiveTool.prophecies:
         return const PropheciesPanel();
+      case ActiveTool.reference:
+        return const ReferencePanel();
       case ActiveTool.history:
       case ActiveTool.none:
         // History isn't offered on the desktop rail (matches the old
