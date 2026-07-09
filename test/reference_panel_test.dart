@@ -11,9 +11,10 @@ import 'package:study_bible/data/content_store.dart';
 import 'package:study_bible/data/user_store.dart';
 import 'package:study_bible/ui/reader/reference_panel.dart';
 
-/// Renders the Reference panel against in-memory stores: the searchable
-/// kings & reigns list grouped by realm, a king's detail view, and tapping a
-/// passage chip navigating the reader to it. Modeled on feasts_panel_test.dart.
+/// Renders the Reference panel against in-memory stores: the tabbed Kings &
+/// Reigns / Measures & Money lists, each grouped by category with search,
+/// a detail view, and passage-chip navigation. Modeled on
+/// feasts_panel_test.dart.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -57,20 +58,31 @@ void main() {
     return container;
   }
 
+  // Both tabs' TextFields can coexist in the tree (TabBarView keeps
+  // neighboring pages built), so find by hint text rather than by type.
+  Finder searchFieldWithHint(String hint) => find.byWidgetPredicate(
+        (w) => w is TextField && w.decoration?.hintText == hint,
+      );
+
+  const kingsHint = 'Search kings & reigns (e.g. Hezekiah, Babylon)…';
+  const measuresHint = 'Search measures & money (e.g. cubit, denarius)…';
+
   testWidgets('lists kings grouped by realm', (tester) async {
     await pumpPanel(tester);
 
     expect(find.text('Reference'), findsOneWidget);
+    expect(find.text('Kings & Reigns'), findsOneWidget);
+    expect(find.text('Measures & Money'), findsOneWidget);
     expect(find.text('UNITED KINGDOM'), findsOneWidget);
     expect(find.text('NORTHERN KINGDOM (ISRAEL)'), findsOneWidget);
     expect(find.text('SOUTHERN KINGDOM (JUDAH)'), findsOneWidget);
     expect(find.textContaining('David'), findsWidgets);
   });
 
-  testWidgets('search filters the list', (tester) async {
+  testWidgets('search filters the kings list', (tester) async {
     await pumpPanel(tester);
 
-    await tester.enterText(find.byType(TextField), 'Hezekiah');
+    await tester.enterText(searchFieldWithHint(kingsHint), 'Hezekiah');
     await tester.pumpAndSettle();
 
     expect(find.text('Hezekiah — King'), findsOneWidget);
@@ -80,7 +92,7 @@ void main() {
   testWidgets('opening a king shows notes and citations', (tester) async {
     await pumpPanel(tester);
 
-    await tester.enterText(find.byType(TextField), 'Hezekiah');
+    await tester.enterText(searchFieldWithHint(kingsHint), 'Hezekiah');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Hezekiah — King'));
     await tester.pumpAndSettle();
@@ -89,10 +101,12 @@ void main() {
     expect(find.text('2 Kings 18:1-6'), findsOneWidget);
   });
 
-  testWidgets('tapping a passage navigates the reader to it', (tester) async {
+  testWidgets('tapping a king passage navigates the reader to it', (
+    tester,
+  ) async {
     final container = await pumpPanel(tester);
 
-    await tester.enterText(find.byType(TextField), 'Hezekiah');
+    await tester.enterText(searchFieldWithHint(kingsHint), 'Hezekiah');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Hezekiah — King'));
     await tester.pumpAndSettle();
@@ -102,5 +116,63 @@ void main() {
     expect(container.read(selectedBookNameProvider), '2 Kings');
     expect(container.read(selectedChapterProvider), 18);
     expect(container.read(targetVerseToScrollProvider), 1);
+  });
+
+  testWidgets('Measures & Money tab lists units grouped by category', (
+    tester,
+  ) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Measures & Money'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('LENGTH'), findsOneWidget);
+    expect(find.text('MONEY'), findsOneWidget);
+    expect(find.text('Cubit'), findsOneWidget);
+  });
+
+  testWidgets('search filters the measures list', (tester) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Measures & Money'));
+    await tester.pumpAndSettle();
+    await tester.enterText(searchFieldWithHint(measuresHint), 'Denarius');
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(ListTile, 'Denarius'), findsOneWidget);
+    expect(find.text('Cubit'), findsNothing);
+  });
+
+  testWidgets('opening a measure shows notes and citations', (tester) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Measures & Money'));
+    await tester.pumpAndSettle();
+    await tester.enterText(searchFieldWithHint(measuresHint), 'Denarius');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Denarius'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('vineyard'), findsOneWidget);
+    expect(find.text('Matthew 20:2'), findsOneWidget);
+  });
+
+  testWidgets('tapping a measure passage navigates the reader to it', (
+    tester,
+  ) async {
+    final container = await pumpPanel(tester);
+
+    await tester.tap(find.text('Measures & Money'));
+    await tester.pumpAndSettle();
+    await tester.enterText(searchFieldWithHint(measuresHint), 'Denarius');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Denarius'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Matthew 20:2'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(selectedBookNameProvider), 'Matthew');
+    expect(container.read(selectedChapterProvider), 20);
+    expect(container.read(targetVerseToScrollProvider), 2);
   });
 }

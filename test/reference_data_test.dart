@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:study_bible/domain/reference/kings_data.dart';
+import 'package:study_bible/domain/reference/measures_data.dart';
 import 'package:study_bible/data/importer/sword/sword_versification.dart';
 
 /// Same reference grammar the Feasts/Prophecies/curated-topic data and the
@@ -45,6 +46,22 @@ void main() {
 
   test('ids are unique', () {
     final ids = kingReigns.map((k) => k.id).toList();
+    expect(ids.toSet().length, ids.length);
+  });
+
+  test('every measure citation resolves against the KJV versification', () {
+    final failures = <String>[];
+    for (final m in measures) {
+      for (final ref in m.citations) {
+        final issue = problem(ref);
+        if (issue != null) failures.add('${m.id}: "$ref" — $issue');
+      }
+    }
+    expect(failures, isEmpty, reason: failures.join('\n'));
+  });
+
+  test('measure ids are unique', () {
+    final ids = measures.map((m) => m.id).toList();
     expect(ids.toSet().length, ids.length);
   });
 }
