@@ -220,4 +220,63 @@ void main() {
     expect(container.read(selectedChapterProvider), 7);
     expect(container.read(targetVerseToScrollProvider), 12);
   });
+
+  testWidgets('Named Groups tab defaults to the 12 tribes', (tester) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Named Groups'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reuben'), findsOneWidget);
+    expect(find.text('Judah'), findsOneWidget);
+    expect(find.text('Benjamin'), findsOneWidget);
+  });
+
+  testWidgets('switching the sub-list shows the 12 apostles', (tester) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Named Groups'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('12 Apostles'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Simon Peter'), findsOneWidget);
+    expect(find.text('Judas Iscariot'), findsOneWidget);
+    expect(find.text('Reuben'), findsNothing);
+  });
+
+  testWidgets('opening a named-group entry shows notes and citations', (
+    tester,
+  ) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Named Groups'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('12 Apostles'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Simon Peter'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Denied Jesus'), findsOneWidget);
+    expect(find.text('John 21:15-17'), findsOneWidget);
+  });
+
+  testWidgets('tapping a named-group passage navigates the reader to it', (
+    tester,
+  ) async {
+    final container = await pumpPanel(tester);
+
+    await tester.tap(find.text('Named Groups'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('12 Apostles'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Simon Peter'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('John 21:15-17'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(selectedBookNameProvider), 'John');
+    expect(container.read(selectedChapterProvider), 21);
+    expect(container.read(targetVerseToScrollProvider), 15);
+  });
 }
