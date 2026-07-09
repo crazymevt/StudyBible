@@ -80,7 +80,7 @@ dependencies:
   # or Linux implementation, so the button is hidden on those platforms.
   speech_to_text: ^7.0.0
   flutter_map: ^8.3.0
-  latlong2: ^0.9.1
+  latlong2: ^0.10.1
   just_audio_windows: ^0.2.3
   flutter_markdown_plus: ^1.0.7
   auto_updater: ^1.0.0
