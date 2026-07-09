@@ -114,7 +114,19 @@ final chapterAudioProvider = Provider<ChapterAudioData?>((ref) {
   final audioMap = activeBible.getAudioForChapter(bookName, chapter);
   if (audioMap == null || audioMap.isEmpty) return null;
 
-  final availableVoices = audioMap.keys.toList()..sort();
+  // Some sources (e.g. the KJV manifest, which has only ever had one real
+  // narration) list that same recording under every voice-actor key instead
+  // of offering distinct narrations. Collapse those down to one entry so the
+  // picker never offers a "voice" that plays audio identical to one already
+  // listed.
+  final seenUrls = <String>{};
+  final availableVoices = <String>[];
+  for (final voice in audioMap.keys.toList()..sort()) {
+    if (seenUrls.add(audioMap[voice]!)) {
+      availableVoices.add(voice);
+    }
+  }
+
   String? selectedVoice = ref.watch(selectedVoiceProvider);
 
   // If user hasn't selected a voice, or the selected voice isn't available for this chapter, pick the first one

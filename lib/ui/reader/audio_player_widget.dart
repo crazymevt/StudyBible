@@ -65,39 +65,41 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
     );
   }
 
+  // A PopupMenuButton, not a DropdownButton, to match _buildSleepChip below:
+  // DropdownButton tries to align the selected item with the button when it
+  // opens, and this chip sits near the bottom of a modal bottom sheet, so
+  // opening on an item near the end of the list (e.g. the alphabetically-last
+  // voice) can push the overlay off-screen and leave it un-tappable —
+  // effectively locking the picker onto whatever was selected. PopupMenuButton
+  // doesn't try to align a selected item, so it isn't subject to that.
   Widget _buildVoiceChip(BuildContext context, ChapterAudioData audioData) {
     final scheme = Theme.of(context).colorScheme;
-    return _chip(
-      context,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.record_voice_over, size: 16, color: scheme.onSurfaceVariant),
-          const SizedBox(width: 6),
-          DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: audioData.activeVoice,
-              icon: Icon(Icons.arrow_drop_down, size: 20, color: scheme.onSurfaceVariant),
+    return PopupMenuButton<String>(
+      tooltip: 'Voice',
+      onSelected: (voice) =>
+          ref.read(selectedVoiceProvider.notifier).setVoice(voice),
+      itemBuilder: (context) => audioData.availableVoices.map((voice) {
+        final formattedName = voice[0].toUpperCase() + voice.substring(1);
+        return PopupMenuItem<String>(value: voice, child: Text(formattedName));
+      }).toList(),
+      child: _chip(
+        context,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.record_voice_over, size: 16, color: scheme.onSurfaceVariant),
+            const SizedBox(width: 6),
+            Text(
+              audioData.activeVoice[0].toUpperCase() +
+                  audioData.activeVoice.substring(1),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: scheme.onSurfaceVariant,
                   ),
-              isDense: true,
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  ref.read(selectedVoiceProvider.notifier).setVoice(newValue);
-                }
-              },
-              items: audioData.availableVoices.map<DropdownMenuItem<String>>((String value) {
-                final formattedName = value[0].toUpperCase() + value.substring(1);
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(formattedName),
-                );
-              }).toList(),
             ),
-          ),
-        ],
+            Icon(Icons.arrow_drop_down, size: 20, color: scheme.onSurfaceVariant),
+          ],
+        ),
       ),
     );
   }
@@ -371,7 +373,8 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
               runSpacing: 8,
               children: [
                 _buildSpeedChip(context, uiState.playbackSpeed),
-                _buildVoiceChip(context, audioData),
+                if (audioData.availableVoices.length > 1)
+                  _buildVoiceChip(context, audioData),
                 _buildSleepChip(context, uiState.sleepMinutes),
               ],
             ),
