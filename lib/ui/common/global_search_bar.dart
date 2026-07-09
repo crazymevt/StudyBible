@@ -138,17 +138,48 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
             final parsed = ReferenceParser.parse(refStr, books);
             
             if (parsed != null) {
-              ref.read(selectedBookNameProvider.notifier).set(parsed.book.name);
-              ref.read(selectedChapterProvider.notifier).set(parsed.chapter);
-              if (parsed.verse != null) {
-                ref.read(targetVerseToScrollProvider.notifier).set(parsed.verse!);
-                ref.read(selectedVersesProvider.notifier).clear();
-                ref.read(selectedVersesProvider.notifier).toggle(parsed.verse!);
+              final chapterCount = await ref.read(
+                chapterCountProvider(parsed.book.id).future,
+              );
+              if (parsed.chapter <= chapterCount) {
+                ref.read(selectedBookNameProvider.notifier).set(parsed.book.name);
+                ref.read(selectedChapterProvider.notifier).set(parsed.chapter);
+                if (parsed.verse != null) {
+                  final versesInChapter = await ref.read(
+                    versesForChapterProvider((
+                      bookId: parsed.book.id,
+                      chapter: parsed.chapter,
+                    )).future,
+                  );
+                  final verseExists =
+                      versesInChapter.any((v) => v.verse == parsed.verse);
+                  if (verseExists) {
+                    ref.read(targetVerseToScrollProvider.notifier).set(parsed.verse!);
+                    ref.read(selectedVersesProvider.notifier).clear();
+                    ref.read(selectedVersesProvider.notifier).toggle(parsed.verse!);
+                  }
+                }
+                ref
+                    .read(navigationControllerProvider)
+                    .recordHistory(verse: parsed.verse);
+                ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                _focusNode.unfocus();
+                _controller.clear();
+                return;
               }
-              ref
-                  .read(navigationControllerProvider)
-                  .recordHistory(verse: parsed.verse);
-              ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+              // Chapter doesn't exist in this book. Bail out here rather than
+              // falling into the word-completion fallback below, which is
+              // built to append a single suggested word and instead garbles
+              // this whole "Go to: ..." string into the field.
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${parsed.book.name} only has $chapterCount chapters.',
+                    ),
+                  ),
+                );
+              }
               _focusNode.unfocus();
               _controller.clear();
               return;
