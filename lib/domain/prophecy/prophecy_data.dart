@@ -44,8 +44,7 @@ const List<Prophecy> prophecies = [
     prophecyText:
         'God confirms that the covenant line runs through Isaac, not Ishmael.',
     prophecy: ['Genesis 21:12'],
-    fulfillmentText:
-        'Matthew\'s genealogy traces Jesus through Isaac.',
+    fulfillmentText: 'Matthew\'s genealogy traces Jesus through Isaac.',
     fulfillment: ['Matthew 1:2', 'Luke 3:34'],
   ),
   Prophecy(
@@ -56,8 +55,7 @@ const List<Prophecy> prophecies = [
         'At Bethel God renews the covenant to Jacob: in his seed all the '
         'families of the earth will be blessed.',
     prophecy: ['Genesis 28:14'],
-    fulfillmentText:
-        'The genealogies record Jesus\' descent through Jacob.',
+    fulfillmentText: 'The genealogies record Jesus\' descent through Jacob.',
     fulfillment: ['Matthew 1:2', 'Luke 3:34'],
   ),
   Prophecy(
@@ -178,8 +176,7 @@ const List<Prophecy> prophecies = [
     id: 'out_of_egypt',
     title: 'Called out of Egypt',
     category: ProphecyCategory.birth,
-    prophecyText:
-        'Hosea recalls that out of Egypt God called his son.',
+    prophecyText: 'Hosea recalls that out of Egypt God called his son.',
     prophecy: ['Hosea 11:1'],
     fulfillmentText:
         'The holy family flees to Egypt and returns, which Matthew reads as '
@@ -236,8 +233,7 @@ const List<Prophecy> prophecies = [
         'Moses promises that God will raise up a prophet like him from among '
         'their brethren, and they must listen to him.',
     prophecy: ['Deuteronomy 18:15', 'Deuteronomy 18:18'],
-    fulfillmentText:
-        'Peter and Stephen identify Jesus as that prophet.',
+    fulfillmentText: 'Peter and Stephen identify Jesus as that prophet.',
     fulfillment: ['Acts 3:22', 'Acts 7:37'],
   ),
   Prophecy(
@@ -248,8 +244,7 @@ const List<Prophecy> prophecies = [
         'David hears the Lord swear that the coming king is a priest forever '
         'after the order of Melchizedek.',
     prophecy: ['Psalms 110:4'],
-    fulfillmentText:
-        'Hebrews expounds Jesus as this eternal high priest.',
+    fulfillmentText: 'Hebrews expounds Jesus as this eternal high priest.',
     fulfillment: ['Hebrews 5:6', 'Hebrews 7:17'],
   ),
   Prophecy(
@@ -414,8 +409,7 @@ const List<Prophecy> prophecies = [
         'The psalmist is beset by false witnesses who lay to his charge things '
         'he did not know.',
     prophecy: ['Psalms 35:11', 'Psalms 27:12'],
-    fulfillmentText:
-        'At his trial false witnesses come forward against Jesus.',
+    fulfillmentText: 'At his trial false witnesses come forward against Jesus.',
     fulfillment: ['Matthew 26:59', 'Mark 14:57'],
   ),
   Prophecy(
@@ -506,8 +500,7 @@ const List<Prophecy> prophecies = [
         'Psalm 22 opens with the cry, "My God, my God, why hast thou forsaken '
         'me?"',
     prophecy: ['Psalms 22:1'],
-    fulfillmentText:
-        'Jesus cries out these very words from the cross.',
+    fulfillmentText: 'Jesus cries out these very words from the cross.',
     fulfillment: ['Matthew 27:46', 'Mark 15:34'],
   ),
   Prophecy(
@@ -538,8 +531,7 @@ const List<Prophecy> prophecies = [
     id: 'i_thirst',
     title: '"I thirst"',
     category: ProphecyCategory.crucifixion,
-    prophecyText:
-        'The sufferer\'s tongue cleaves to his jaws in Psalm 22.',
+    prophecyText: 'The sufferer\'s tongue cleaves to his jaws in Psalm 22.',
     prophecy: ['Psalms 22:15'],
     fulfillmentText:
         'Jesus says "I thirst" so that the scripture might be fulfilled.',
@@ -600,11 +592,9 @@ const List<Prophecy> prophecies = [
     id: 'commit_my_spirit',
     title: '"Into your hands I commit my spirit"',
     category: ProphecyCategory.crucifixion,
-    prophecyText:
-        'The psalmist commits his spirit into the Lord\'s hand.',
+    prophecyText: 'The psalmist commits his spirit into the Lord\'s hand.',
     prophecy: ['Psalms 31:5'],
-    fulfillmentText:
-        'Jesus prays these words as he dies.',
+    fulfillmentText: 'Jesus prays these words as he dies.',
     fulfillment: ['Luke 23:46'],
   ),
   Prophecy(
@@ -797,8 +787,7 @@ const List<Prophecy> prophecies = [
     id: 'justified_by_faith',
     title: 'The just shall live by faith',
     category: ProphecyCategory.church,
-    prophecyText:
-        'Habakkuk declares that the just shall live by his faith.',
+    prophecyText: 'Habakkuk declares that the just shall live by his faith.',
     prophecy: ['Habakkuk 2:4'],
     fulfillmentText:
         'Paul makes this the heart of the gospel in Romans and Galatians, and '
@@ -1779,8 +1768,7 @@ const List<Prophecy> prophecies = [
         'Samuel anoints the young David among his brothers, and the Spirit of '
         'the Lord comes upon him.',
     prophecy: ['1 Samuel 16:12', '1 Samuel 16:13'],
-    fulfillmentText:
-        'Years later all Israel anoints David king at Hebron.',
+    fulfillmentText: 'Years later all Israel anoints David king at Hebron.',
     fulfillment: ['2 Samuel 5:3'],
   ),
   Prophecy(
@@ -1803,8 +1791,7 @@ const List<Prophecy> prophecies = [
         'Micaiah sees Israel scattered like sheep without a shepherd, warning '
         'that Ahab will not return in peace.',
     prophecy: ['1 Kings 22:17'],
-    fulfillmentText:
-        'A random arrow strikes Ahab, and he dies that evening.',
+    fulfillmentText: 'A random arrow strikes Ahab, and he dies that evening.',
     fulfillment: ['1 Kings 22:37'],
   ),
   Prophecy(
@@ -2254,7 +2241,8 @@ const List<Prophecy> prophecies = [
     id: 'dead_men_shall_live',
     title: 'Thy dead men shall live',
     category: ProphecyCategory.ministry,
-    prophecyText: 'Isaiah promises, "Thy dead men shall live... awake and sing."',
+    prophecyText:
+        'Isaiah promises, "Thy dead men shall live... awake and sing."',
     prophecy: ['Isaiah 26:19'],
     fulfillmentText:
         'At Nain, Jesus touches the bier of a widow\'s dead son and raises '
@@ -2305,7 +2293,8 @@ const List<Prophecy> prophecies = [
         'The sufferer laments becoming "a stranger unto my brethren, and an '
         'alien unto my mother\'s children."',
     prophecy: ['Psalms 69:8'],
-    fulfillmentText: 'John records that even Jesus\' own brothers did not believe in him.',
+    fulfillmentText:
+        'John records that even Jesus\' own brothers did not believe in him.',
     fulfillment: ['John 7:5'],
   ),
   Prophecy(
@@ -2729,7 +2718,8 @@ const List<Prophecy> prophecies = [
         'Daniel sees the kingdom and dominion under the whole heaven given '
         'to "the people of the saints of the most High."',
     prophecy: ['Daniel 7:27'],
-    fulfillmentText: 'Paul writes, "if we suffer, we shall also reign with him."',
+    fulfillmentText:
+        'Paul writes, "if we suffer, we shall also reign with him."',
     fulfillment: ['2 Timothy 2:12'],
   ),
   Prophecy(
@@ -3143,7 +3133,8 @@ const List<Prophecy> prophecies = [
     id: 'blood_that_speaketh_better_things',
     title: 'Blood that speaketh better things than Abel',
     category: ProphecyCategory.crucifixion,
-    prophecyText: 'Abel\'s blood, spilled by his brother, cries out from the ground.',
+    prophecyText:
+        'Abel\'s blood, spilled by his brother, cries out from the ground.',
     prophecy: ['Genesis 4:10'],
     fulfillmentText:
         'Hebrews contrasts that cry with "the blood of sprinkling, that '
@@ -3237,5 +3228,598 @@ const List<Prophecy> prophecies = [
         'top to bottom; Hebrews later calls it "a new and living way... '
         'through the veil, that is to say, his flesh."',
     fulfillment: ['Matthew 27:51', 'Hebrews 10:19-20'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Birth & Incarnation (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'i_will_be_his_father',
+    title: 'God will be his Father, and he His Son',
+    category: ProphecyCategory.birth,
+    prophecyText:
+        'In the covenant given through Nathan, God promises that David\'s '
+        'offspring will be his own son: "I will be his father, and he shall '
+        'be my son."',
+    prophecy: ['2 Samuel 7:14'],
+    fulfillmentText:
+        'Hebrews sets this promise beside "Thou art my Son" to show that God '
+        'has spoken this way of no angel, only of his own Son.',
+    fulfillment: ['Hebrews 1:5'],
+  ),
+  Prophecy(
+    id: 'gods_only_son_given',
+    title: 'The Father gives his only, beloved Son',
+    category: ProphecyCategory.birth,
+    prophecyText:
+        'God tests Abraham by commanding him to offer "thy son, thine only '
+        'son Isaac, whom thou lovest" — a father surrendering his beloved '
+        'son that later ages read as a shadow of a far greater gift.',
+    prophecy: ['Genesis 22:2'],
+    fulfillmentText:
+        'John writes that God so loved the world that he gave his only '
+        'begotten Son.',
+    fulfillment: ['John 3:16'],
+  ),
+  Prophecy(
+    id: 'horn_of_salvation_for_david',
+    title: 'A horn of salvation for David\'s house',
+    category: ProphecyCategory.birth,
+    prophecyText:
+        'The Lord promises David, "There will I make the horn of David to '
+        'bud," raising up strength and salvation within his line.',
+    prophecy: ['Psalms 132:17'],
+    fulfillmentText:
+        'At his son\'s birth, Zechariah prophesies that God "hath raised up '
+        'an horn of salvation for us in the house of his servant David."',
+    fulfillment: ['Luke 1:69'],
+  ),
+  Prophecy(
+    id: 'good_tidings_of_great_joy',
+    title: 'Good tidings proclaimed from on high',
+    category: ProphecyCategory.birth,
+    prophecyText:
+        'Isaiah calls Zion to climb the high mountain and lift up her voice '
+        'with good tidings, crying, "Behold your God!"',
+    prophecy: ['Isaiah 40:9'],
+    fulfillmentText:
+        'An angel brings the shepherds "good tidings of great joy, which '
+        'shall be to all people" — that a Saviour is born.',
+    fulfillment: ['Luke 2:10'],
+  ),
+  Prophecy(
+    id: 'he_shall_save_his_people',
+    title: 'He shall redeem Israel from its sins',
+    category: ProphecyCategory.birth,
+    prophecyText:
+        'The psalmist trusts that the Lord "shall redeem Israel from all '
+        'his iniquities."',
+    prophecy: ['Psalms 130:8'],
+    fulfillmentText:
+        'Peter proclaims that God has exalted Jesus "to be a Prince and a '
+        'Saviour, for to give repentance to Israel, and forgiveness of '
+        'sins" — the very redemption named for him at his birth.',
+    fulfillment: ['Acts 5:31'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Life & Ministry (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'preached_in_the_great_congregation',
+    title: 'Preached righteousness in the great assembly',
+    category: ProphecyCategory.ministry,
+    prophecyText:
+        'The psalmist speaks as one who has "preached righteousness in the '
+        'great congregation," his lips not restrained.',
+    prophecy: ['Psalms 40:9'],
+    fulfillmentText:
+        'Jesus begins his public ministry proclaiming, "Repent: for the '
+        'kingdom of heaven is at hand."',
+    fulfillment: ['Matthew 4:17'],
+  ),
+  Prophecy(
+    id: 'faithful_priest_raised_up',
+    title: 'A faithful priest raised up',
+    category: ProphecyCategory.ministry,
+    prophecyText:
+        'The Lord promises to raise up a faithful priest who will act '
+        'according to his own heart and mind, walking before his anointed '
+        'forever.',
+    prophecy: ['1 Samuel 2:35'],
+    fulfillmentText:
+        'Hebrews calls Jesus a merciful and faithful high priest, made like '
+        'his brethren to make reconciliation for the sins of the people.',
+    fulfillment: ['Hebrews 2:17'],
+  ),
+  Prophecy(
+    id: 'key_of_david',
+    title: 'The key of the house of David',
+    category: ProphecyCategory.ministry,
+    prophecyText:
+        'Isaiah pictures the key of David\'s house laid on a steward\'s '
+        'shoulder, so that what he opens none can shut, and what he shuts '
+        'none can open.',
+    prophecy: ['Isaiah 22:22'],
+    fulfillmentText:
+        'The risen Christ takes this very title for himself, holding "the '
+        'key of David, he that openeth, and no man shutteth."',
+    fulfillment: ['Revelation 3:7'],
+  ),
+  Prophecy(
+    id: 'comfort_for_those_who_mourn',
+    title: 'Comfort for those who mourn',
+    category: ProphecyCategory.ministry,
+    prophecyText: 'Isaiah\'s anointed one is sent "to comfort all that mourn."',
+    prophecy: ['Isaiah 61:2'],
+    fulfillmentText:
+        'Jesus opens his ministry teaching, "Blessed are they that mourn: '
+        'for they shall be comforted."',
+    fulfillment: ['Matthew 5:4'],
+  ),
+  Prophecy(
+    id: 'opened_ear_not_rebellious',
+    title: 'The opened ear, not rebellious',
+    category: ProphecyCategory.ministry,
+    prophecyText:
+        'Isaiah\'s servant says, "The Lord God hath opened mine ear, and I '
+        'was not rebellious, neither turned away back."',
+    prophecy: ['Isaiah 50:5'],
+    fulfillmentText:
+        'Jesus says the Father has not left him alone, "for I do always '
+        'those things that please him."',
+    fulfillment: ['John 8:29'],
+  ),
+  Prophecy(
+    id: 'he_maketh_the_storm_a_calm',
+    title: 'He maketh the storm a calm',
+    category: ProphecyCategory.ministry,
+    prophecyText:
+        'The psalmist praises the Lord who "maketh the storm a calm, so '
+        'that the waves thereof are still."',
+    prophecy: ['Psalms 107:29'],
+    fulfillmentText:
+        'Jesus rebukes the wind and sea, "Peace, be still," and the storm '
+        'subsides into a great calm.',
+    fulfillment: ['Mark 4:39'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Betrayal, Trial & Suffering (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'sold_by_brothers_for_envy',
+    title: 'Sold by his own, moved with envy',
+    category: ProphecyCategory.passion,
+    prophecyText:
+        'Joseph\'s own brothers, moved with envy, sell him to strangers for '
+        'twenty pieces of silver.',
+    prophecy: ['Genesis 37:11', 'Genesis 37:28'],
+    fulfillmentText:
+        'Pilate perceives that it was for envy the chief priests had '
+        'delivered Jesus up, betrayed by his own people.',
+    fulfillment: ['Matthew 27:18'],
+  ),
+  Prophecy(
+    id: 'visage_marred_more_than_any_man',
+    title: 'His visage marred more than any man',
+    category: ProphecyCategory.passion,
+    prophecyText:
+        'Isaiah says many will be astonished at the servant, for his visage '
+        'is marred more than any man, and his form more than the sons of '
+        'men.',
+    prophecy: ['Isaiah 52:14'],
+    fulfillmentText:
+        'Pilate has Jesus scourged and crowned with thorns, then presents '
+        'the bloodied, battered man to the crowd: "Behold the man!"',
+    fulfillment: ['John 19:1', 'John 19:5'],
+  ),
+  Prophecy(
+    id: 'isaac_bound_on_the_altar',
+    title: 'Isaac bound on the altar',
+    category: ProphecyCategory.passion,
+    prophecyText:
+        'Abraham builds the altar, lays the wood in order, and binds Isaac '
+        'his son upon it.',
+    prophecy: ['Genesis 22:9'],
+    fulfillmentText:
+        'At Gethsemane the band of soldiers and officers take Jesus and '
+        'bind him.',
+    fulfillment: ['John 18:12'],
+  ),
+  Prophecy(
+    id: 'cup_of_the_lords_fury',
+    title: 'The cup of the Lord\'s fury',
+    category: ProphecyCategory.passion,
+    prophecyText:
+        'The Lord hands Jeremiah the wine cup of his fury, to make the '
+        'nations drink it to the dregs.',
+    prophecy: ['Jeremiah 25:15', 'Jeremiah 25:17'],
+    fulfillmentText:
+        'In Gethsemane Jesus prays that the cup might pass from him, then '
+        'accepts it: "if this cup may not pass away from me, except I '
+        'drink it, thy will be done."',
+    fulfillment: ['Matthew 26:39', 'Matthew 26:42'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Crucifixion & Death (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'red_heifer_ashes_purify',
+    title: 'The ashes of the red heifer',
+    category: ProphecyCategory.crucifixion,
+    prophecyText:
+        'The law calls for a red heifer without spot or blemish; its ashes, '
+        'kept outside the camp, become water of purification for sin.',
+    prophecy: ['Numbers 19:2', 'Numbers 19:9'],
+    fulfillmentText:
+        'Hebrews argues that if the ashes of a heifer sanctify to the '
+        'purifying of the flesh, how much more the blood of Christ, '
+        'offered without spot, purges the conscience from dead works.',
+    fulfillment: ['Hebrews 9:13', 'Hebrews 9:14'],
+  ),
+  Prophecy(
+    id: 'ram_in_the_thicket',
+    title: 'A ram offered in his son\'s stead',
+    category: ProphecyCategory.crucifixion,
+    prophecyText:
+        'Abraham lifts up his eyes and sees a ram caught in a thicket, and '
+        'offers it up for a burnt offering in the stead of his son.',
+    prophecy: ['Genesis 22:13'],
+    fulfillmentText:
+        'Paul says God commends his love toward us in this: while we were '
+        'yet sinners, Christ died for us — a substitute in our place.',
+    fulfillment: ['Romans 5:8'],
+  ),
+  Prophecy(
+    id: 'they_shaked_their_heads',
+    title: 'They shaked their heads at him',
+    category: ProphecyCategory.crucifixion,
+    prophecyText:
+        'The psalmist becomes a reproach; when his enemies see him, they '
+        'shake their heads.',
+    prophecy: ['Psalms 109:25'],
+    fulfillmentText:
+        'Those who pass the cross rail on Jesus, wagging their heads.',
+    fulfillment: ['Mark 15:29'],
+  ),
+  Prophecy(
+    id: 'unleavened_bread_of_sincerity',
+    title: 'Unleavened bread of sincerity and truth',
+    category: ProphecyCategory.crucifixion,
+    prophecyText:
+        'At Passover Israel must put away all leaven and eat unleavened '
+        'bread for seven days.',
+    prophecy: ['Exodus 12:15'],
+    fulfillmentText:
+        'Paul reasons that since Christ our passover is sacrificed for us, '
+        'believers are to keep the feast not with the old leaven of '
+        'malice, but with the unleavened bread of sincerity and truth.',
+    fulfillment: ['1 Corinthians 5:8'],
+  ),
+  Prophecy(
+    id: 'blood_frees_prisoners_from_the_pit',
+    title: 'Prisoners freed by the blood of the covenant',
+    category: ProphecyCategory.crucifixion,
+    prophecyText:
+        'By the blood of his covenant, the Lord promises to send forth '
+        'prisoners out of the waterless pit.',
+    prophecy: ['Zechariah 9:11'],
+    fulfillmentText:
+        'Paul says the Father has delivered believers from the power of '
+        'darkness, in whom we have redemption through his blood, the '
+        'forgiveness of sins.',
+    fulfillment: ['Colossians 1:13', 'Colossians 1:14'],
+  ),
+  Prophecy(
+    id: 'redeemed_not_with_silver_or_gold',
+    title: 'Not redeemed with silver or gold',
+    category: ProphecyCategory.crucifixion,
+    prophecyText:
+        'The psalmist observes that no man can by any means redeem his '
+        'brother, nor give to God a ransom for him, for the redemption of '
+        'the soul is precious.',
+    prophecy: ['Psalms 49:7', 'Psalms 49:8'],
+    fulfillmentText:
+        'Peter says believers were redeemed not with corruptible things '
+        'like silver and gold, but with the precious blood of Christ, a '
+        'lamb without blemish.',
+    fulfillment: ['1 Peter 1:18', '1 Peter 1:19'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Resurrection & Ascension (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'isaac_received_in_a_figure',
+    title: 'Isaac received back "in a figure"',
+    category: ProphecyCategory.resurrection,
+    prophecyText:
+        'On the third day of the journey to Moriah, Abraham lifts up his '
+        'eyes and sees the place where he must offer up his only son, '
+        'having already reckoned Isaac as good as dead.',
+    prophecy: ['Genesis 22:4'],
+    fulfillmentText:
+        'Hebrews explains that Abraham believed God could raise Isaac from '
+        'the dead, and so received him back "in a figure" — a shadow of '
+        'the greater Son raised on the third day.',
+    fulfillment: ['Hebrews 11:17-19'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // The Church & New Covenant (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'tongues_a_sign_to_unbelief',
+    title: 'Foreign tongues, a sign to unbelief',
+    category: ProphecyCategory.church,
+    prophecyText:
+        'Because Israel would not hear the Lord\'s plain word, Isaiah warns '
+        'that God will instead speak to them "with stammering lips and '
+        'another tongue" — a sign of judgment on their unbelief.',
+    prophecy: ['Isaiah 28:11', 'Isaiah 28:12'],
+    fulfillmentText:
+        'Paul quotes this warning to explain the gift of tongues at '
+        'Corinth: a sign not to believers but to those who refuse to '
+        'believe.',
+    fulfillment: ['1 Corinthians 14:21', '1 Corinthians 14:22'],
+  ),
+  Prophecy(
+    id: 'father_of_many_nations',
+    title: 'Father of many nations',
+    category: ProphecyCategory.church,
+    prophecyText:
+        'God renames Abram "Abraham," declaring, "a father of many nations '
+        'have I made thee" — a promise reaching beyond his physical '
+        'descendants.',
+    prophecy: ['Genesis 17:5'],
+    fulfillmentText:
+        'Paul quotes this directly: Abraham is "the father of us all," of '
+        'everyone who shares his faith and not his bloodline only.',
+    fulfillment: ['Romans 4:16', 'Romans 4:17'],
+  ),
+  Prophecy(
+    id: 'sing_o_barren_woman',
+    title: 'Sing, O barren — more children than the married wife',
+    category: ProphecyCategory.church,
+    prophecyText:
+        'Isaiah calls the barren woman to sing and cry aloud, for her '
+        'children will be more than the children of her that has a '
+        'husband.',
+    prophecy: ['Isaiah 54:1'],
+    fulfillmentText:
+        'Paul quotes this of "Jerusalem which is above," the free woman '
+        'whose children — born by promise, not by the law — are the '
+        'church.',
+    fulfillment: ['Galatians 4:26', 'Galatians 4:27'],
+  ),
+  Prophecy(
+    id: 'praise_the_lord_all_ye_gentiles',
+    title: 'Praise the Lord, all ye Gentiles',
+    category: ProphecyCategory.church,
+    prophecyText:
+        'The shortest psalm summons not Israel alone but all nations and '
+        'all people to praise the Lord.',
+    prophecy: ['Psalms 117:1'],
+    fulfillmentText:
+        'Paul quotes this psalm as scriptural proof that the gospel was '
+        'always meant to reach — and be received by — the Gentiles.',
+    fulfillment: ['Romans 15:11'],
+  ),
+  Prophecy(
+    id: 'eight_souls_saved_by_water',
+    title: 'Eight souls saved by water',
+    category: ProphecyCategory.church,
+    prophecyText:
+        'Noah, his wife, his three sons, and their wives — eight souls in '
+        'all — enter the ark and are carried safely through the flood '
+        'waters.',
+    prophecy: ['Genesis 7:13'],
+    fulfillmentText:
+        'Peter calls this "the like figure" of baptism, which now saves '
+        'through the resurrection of Jesus Christ.',
+    fulfillment: ['1 Peter 3:20', '1 Peter 3:21'],
+  ),
+  Prophecy(
+    id: 'wave_loaves_of_pentecost',
+    title: 'The wave loaves of Pentecost',
+    category: ProphecyCategory.church,
+    prophecyText:
+        'The law appoints a grain offering of two wave loaves, the '
+        'firstfruits of the wheat harvest, fifty days after the wave '
+        'sheaf — the feast later called Pentecost.',
+    prophecy: ['Leviticus 23:15', 'Leviticus 23:16'],
+    fulfillmentText:
+        'On that very feast day the Spirit is poured out and the church '
+        'is born: "when the day of Pentecost was fully come."',
+    fulfillment: ['Acts 2:1'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // His Reign & Return (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'king_reigns_in_righteousness',
+    title: 'A king shall reign in righteousness',
+    category: ProphecyCategory.kingdom,
+    prophecyText:
+        'Isaiah foresees a king who will reign in righteousness, with princes '
+        'ruling in judgment.',
+    prophecy: ['Isaiah 32:1'],
+    fulfillmentText:
+        'Before Pilate, Jesus owns the title: "Thou sayest that I am a '
+        'king," come into the world to bear witness to the truth.',
+    fulfillment: ['John 18:37'],
+  ),
+  Prophecy(
+    id: 'settled_in_an_everlasting_kingdom',
+    title: 'Settled in an everlasting kingdom',
+    category: ProphecyCategory.kingdom,
+    prophecyText:
+        'In Nathan\'s oracle to David, the Lord promises to settle David\'s '
+        'heir in his house and kingdom for ever, his throne established for '
+        'evermore.',
+    prophecy: ['1 Chronicles 17:14'],
+    fulfillmentText:
+        'Peter promises believers an entrance "ministered unto you '
+        'abundantly into the everlasting kingdom of our Lord and Saviour '
+        'Jesus Christ."',
+    fulfillment: ['2 Peter 1:11'],
+  ),
+  Prophecy(
+    id: 'nations_worship_the_king',
+    title: 'All nations worship the King',
+    category: ProphecyCategory.kingdom,
+    prophecyText:
+        'Zechariah foresees the survivors of every nation going up year by '
+        'year to worship the King, the Lord of hosts.',
+    prophecy: ['Zechariah 14:16'],
+    fulfillmentText:
+        'John hears the redeemed sing that all nations will come and '
+        'worship before the Lord, for his judgments are made manifest.',
+    fulfillment: ['Revelation 15:4'],
+  ),
+  Prophecy(
+    id: 'shepherd_king_ends_of_earth',
+    title: 'Great unto the ends of the earth',
+    category: ProphecyCategory.kingdom,
+    prophecyText:
+        'Micah\'s ruler from Bethlehem will stand and shepherd his flock in '
+        'the strength of the Lord, and his greatness will reach the ends of '
+        'the earth.',
+    prophecy: ['Micah 5:4'],
+    fulfillmentText:
+        'John sees the Lamb at the centre of the throne shepherding the '
+        'redeemed of every nation, feeding them and wiping every tear from '
+        'their eyes.',
+    fulfillment: ['Revelation 7:17'],
+  ),
+  Prophecy(
+    id: 'sun_and_moon_darkened_at_his_return',
+    title: 'Sun and moon darkened before his return',
+    category: ProphecyCategory.kingdom,
+    prophecyText:
+        'Joel foretells the sun turned to darkness and the moon to blood '
+        'before the great and terrible day of the Lord comes.',
+    prophecy: ['Joel 2:31'],
+    fulfillmentText:
+        'Jesus describes his own return in the same terms: immediately '
+        'after the tribulation the sun will be darkened, the moon will not '
+        'give her light, and the stars will fall.',
+    fulfillment: ['Matthew 24:29'],
+  ),
+  Prophecy(
+    id: 'refiners_fire_purifies',
+    title: 'Who may abide the day of his coming?',
+    category: ProphecyCategory.kingdom,
+    prophecyText:
+        'Malachi warns that when the Lord suddenly comes to his temple, '
+        'none can abide the day of his coming, for he is like a refiner\'s '
+        'fire who will purify and purge.',
+    prophecy: ['Malachi 3:2', 'Malachi 3:3'],
+    fulfillmentText:
+        'Paul says the day will declare every man\'s work, since it will be '
+        'revealed by fire, and the fire will test what sort it is.',
+    fulfillment: ['1 Corinthians 3:13'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Fulfilled in the Old Testament (batch 9)
+  // ---------------------------------------------------------------------------
+  Prophecy(
+    id: 'isaac_born_in_old_age',
+    title: 'Isaac born in Sarah\'s old age',
+    category: ProphecyCategory.oldTestament,
+    prophecyText:
+        'God tells Abraham that Sarah will bear him a son, to be named '
+        'Isaac, at the set time the following year.',
+    prophecy: ['Genesis 17:19', 'Genesis 18:10'],
+    fulfillmentText:
+        'Sarah conceives and bears Abraham a son in his old age, "at the '
+        'set time of which God had spoken to him," and he names him Isaac.',
+    fulfillment: ['Genesis 21:2', 'Genesis 21:3'],
+  ),
+  Prophecy(
+    id: 'shunammites_son_promised',
+    title: 'The Shunammite promised a son',
+    category: ProphecyCategory.oldTestament,
+    prophecyText:
+        'Elisha tells the childless Shunammite woman that about that '
+        'season, the following year, she will embrace a son.',
+    prophecy: ['2 Kings 4:16'],
+    fulfillmentText:
+        'The woman conceives and bears a son at that very season, '
+        '"according to the time of life" that Elisha had spoken.',
+    fulfillment: ['2 Kings 4:17'],
+  ),
+  Prophecy(
+    id: 'moses_barred_from_canaan',
+    title: 'Moses barred from the promised land',
+    category: ProphecyCategory.oldTestament,
+    prophecyText:
+        'Because Moses failed to sanctify the Lord at Meribah, God tells him '
+        'he will see the land of Canaan but not enter it.',
+    prophecy: ['Numbers 20:12'],
+    fulfillmentText:
+        'The Lord shows Moses the land from Pisgah, and he dies there in '
+        'Moab, "according to the word of the Lord," without crossing over.',
+    fulfillment: ['Deuteronomy 34:4', 'Deuteronomy 34:5'],
+  ),
+  Prophecy(
+    id: 'kingdom_torn_from_solomon',
+    title: 'Ten tribes torn from Solomon\'s son',
+    category: ProphecyCategory.oldTestament,
+    prophecyText:
+        'The prophet Ahijah tears his new garment into twelve pieces and '
+        'gives ten to Jeroboam, declaring that the Lord will rend the '
+        'kingdom from Solomon and give him ten tribes.',
+    prophecy: ['1 Kings 11:29', '1 Kings 11:31'],
+    fulfillmentText:
+        'When Rehoboam\'s harsh answer drives Israel to revolt, the ten '
+        'tribes make Jeroboam king, leaving only Judah loyal to David\'s '
+        'house.',
+    fulfillment: ['1 Kings 12:20'],
+  ),
+  Prophecy(
+    id: 'baasha_house_cut_off',
+    title: 'The house of Baasha destroyed',
+    category: ProphecyCategory.oldTestament,
+    prophecyText:
+        'The prophet Jehu son of Hanani declares that the Lord will take '
+        'away Baasha\'s posterity and make his house like Jeroboam\'s.',
+    prophecy: ['1 Kings 16:1-4'],
+    fulfillmentText:
+        'When Zimri seizes the throne he slays every survivor of Baasha\'s '
+        'house, "according to the word of the Lord, which he spake against '
+        'Baasha by Jehu the prophet."',
+    fulfillment: ['1 Kings 16:11', '1 Kings 16:12'],
+  ),
+  Prophecy(
+    id: 'davids_child_by_bathsheba_dies',
+    title: 'The child born to David and Bathsheba dies',
+    category: ProphecyCategory.oldTestament,
+    prophecyText:
+        'Nathan tells David that because of his sin, the child born to him '
+        'will surely die.',
+    prophecy: ['2 Samuel 12:14'],
+    fulfillmentText:
+        'The Lord strikes the child, and on the seventh day he dies, just '
+        'as Nathan had said.',
+    fulfillment: ['2 Samuel 12:18'],
+  ),
+  Prophecy(
+    id: 'evil_raised_from_his_own_house',
+    title: 'Evil raised up out of David\'s own house',
+    category: ProphecyCategory.oldTestament,
+    prophecyText:
+        'Nathan warns David that the Lord will raise up evil against him '
+        'out of his own house, and will do before all Israel and the sun '
+        'what David did in secret.',
+    prophecy: ['2 Samuel 12:11', '2 Samuel 12:12'],
+    fulfillmentText:
+        'Absalom pitches a tent on the roof of the palace and goes in to '
+        'his father\'s concubines "in the sight of all Israel."',
+    fulfillment: ['2 Samuel 16:22'],
   ),
 ];
