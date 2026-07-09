@@ -175,4 +175,49 @@ void main() {
     expect(container.read(selectedChapterProvider), 20);
     expect(container.read(targetVerseToScrollProvider), 2);
   });
+
+  testWidgets('Covenants tab lists all five covenants', (tester) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Covenants'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Noahic Covenant'), findsOneWidget);
+    expect(find.text('Abrahamic Covenant'), findsOneWidget);
+    expect(find.text('Mosaic Covenant'), findsOneWidget);
+    expect(find.text('Davidic Covenant'), findsOneWidget);
+    expect(find.text('New Covenant'), findsOneWidget);
+  });
+
+  testWidgets('opening a covenant shows its parties, terms, and citations', (
+    tester,
+  ) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Covenants'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Davidic Covenant'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('King David'), findsOneWidget);
+    expect(find.textContaining('established forever'), findsOneWidget);
+    expect(find.text('2 Samuel 7:12-16'), findsOneWidget);
+  });
+
+  testWidgets('tapping a covenant passage navigates the reader to it', (
+    tester,
+  ) async {
+    final container = await pumpPanel(tester);
+
+    await tester.tap(find.text('Covenants'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Davidic Covenant'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2 Samuel 7:12-16'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(selectedBookNameProvider), '2 Samuel');
+    expect(container.read(selectedChapterProvider), 7);
+    expect(container.read(targetVerseToScrollProvider), 12);
+  });
 }

@@ -5,6 +5,7 @@ import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 import '../../app/reference_providers.dart';
+import '../../domain/reference/covenant.dart';
 import '../../domain/reference/king_reign.dart';
 import '../../domain/reference/measure.dart';
 import '../common/breakpoints.dart';
@@ -45,7 +46,7 @@ class ReferencePanel extends ConsumerWidget {
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -82,9 +83,12 @@ class ReferencePanel extends ConsumerWidget {
                     ),
                   ),
                   const TabBar(
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
                     tabs: [
                       Tab(text: 'Kings & Reigns'),
                       Tab(text: 'Measures & Money'),
+                      Tab(text: 'Covenants'),
                     ],
                   ),
                 ],
@@ -92,7 +96,11 @@ class ReferencePanel extends ConsumerWidget {
             ),
             const Expanded(
               child: TabBarView(
-                children: [_KingsReignsTab(), _MeasuresMoneyTab()],
+                children: [
+                  _KingsReignsTab(),
+                  _MeasuresMoneyTab(),
+                  _CovenantsTab(),
+                ],
               ),
             ),
           ],
@@ -541,6 +549,150 @@ class _NotesSection extends StatelessWidget {
                   .toList(),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// Only 5 covenants exist, so this tab skips the search field the larger
+/// datasets use — just a plain list and a detail view with a back button.
+class _CovenantsTab extends ConsumerStatefulWidget {
+  const _CovenantsTab();
+
+  @override
+  ConsumerState<_CovenantsTab> createState() => _CovenantsTabState();
+}
+
+class _CovenantsTabState extends ConsumerState<_CovenantsTab> {
+  String? _selectedId;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedId = _selectedId;
+    final all = ref.watch(covenantsProvider);
+    final selected =
+        selectedId == null ? null : all.firstWhere((c) => c.id == selectedId);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (selected != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  tooltip: 'Back to results',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => setState(() => _selectedId = null),
+                ),
+                Text('Back to results', style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+          ),
+        Expanded(
+          child: selected != null
+              ? _CovenantDetailView(
+                  covenant: selected,
+                  onPassageTap: (p) => _goToPassage(context, ref, p),
+                )
+              : _CovenantList(onSelect: (id) => setState(() => _selectedId = id)),
+        ),
+      ],
+    );
+  }
+}
+
+class _CovenantList extends ConsumerWidget {
+  const _CovenantList({required this.onSelect});
+
+  final void Function(String id) onSelect;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final all = ref.watch(covenantsProvider);
+    return ListView(
+      children: [
+        for (final c in all)
+          ListTile(
+            title: Text(c.name),
+            subtitle: Text(
+              c.parties,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            trailing: const Icon(Icons.chevron_right, size: 18),
+            onTap: () => onSelect(c.id),
+          ),
+      ],
+    );
+  }
+}
+
+class _CovenantDetailView extends StatelessWidget {
+  const _CovenantDetailView({required this.covenant, required this.onPassageTap});
+
+  final Covenant covenant;
+  final void Function(String passage) onPassageTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      children: [
+        Text(
+          covenant.name,
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        _Field(label: 'Parties', value: covenant.parties),
+        const SizedBox(height: 10),
+        _Field(label: 'Terms', value: covenant.terms),
+        if (covenant.sign != null) ...[
+          const SizedBox(height: 10),
+          _Field(label: 'Sign', value: covenant.sign!),
+        ],
+        const SizedBox(height: 16),
+        _NotesSection(
+          notes: covenant.notes,
+          citations: covenant.citations,
+          onPassageTap: onPassageTap,
+        ),
+      ],
+    );
+  }
+}
+
+class _Field extends StatelessWidget {
+  const _Field({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: scheme.primary,
+                letterSpacing: 0.6,
+              ),
+        ),
+        const SizedBox(height: 2),
+        Text(value, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }

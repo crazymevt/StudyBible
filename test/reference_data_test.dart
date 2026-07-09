@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:study_bible/domain/reference/covenants_data.dart';
 import 'package:study_bible/domain/reference/kings_data.dart';
 import 'package:study_bible/domain/reference/measures_data.dart';
 import 'package:study_bible/data/importer/sword/sword_versification.dart';
@@ -62,6 +63,22 @@ void main() {
 
   test('measure ids are unique', () {
     final ids = measures.map((m) => m.id).toList();
+    expect(ids.toSet().length, ids.length);
+  });
+
+  test('every covenant citation resolves against the KJV versification', () {
+    final failures = <String>[];
+    for (final c in covenants) {
+      for (final ref in c.citations) {
+        final issue = problem(ref);
+        if (issue != null) failures.add('${c.id}: "$ref" — $issue');
+      }
+    }
+    expect(failures, isEmpty, reason: failures.join('\n'));
+  });
+
+  test('covenant ids are unique', () {
+    final ids = covenants.map((c) => c.id).toList();
     expect(ids.toSet().length, ids.length);
   });
 }
