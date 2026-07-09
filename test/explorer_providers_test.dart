@@ -983,6 +983,21 @@ void main() {
       expect(topics.topics.single.ref.label, 'CAVES');
     });
 
+    test('finds prophecies by title and by reference', () async {
+      final byTitle = await search('Bethlehem');
+      expect(
+        byTitle.prophecies.map((i) => i.ref.label),
+        contains('Born in Bethlehem'),
+      );
+      expect(byTitle.prophecies.first.ref.type, ExplorerEntityType.prophecy);
+
+      final byRef = await search('Micah 5');
+      expect(
+        byRef.prophecies.map((i) => i.ref.label),
+        contains('Born in Bethlehem'),
+      );
+    });
+
     test('short queries return nothing', () async {
       expect((await search('d')).isEmpty, isTrue);
     });

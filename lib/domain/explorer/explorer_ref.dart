@@ -1,7 +1,16 @@
 /// The kinds of things the Explorer can open as a page. [browse] is a
 /// browsable A-Z listing of one of the other kinds (see [ExplorerRef.browse]),
 /// not an entity itself.
-enum ExplorerEntityType { person, place, event, topic, passage, tag, browse }
+enum ExplorerEntityType {
+  person,
+  place,
+  event,
+  topic,
+  passage,
+  tag,
+  browse,
+  prophecy,
+}
 
 /// An addressable Explorer destination — one entry in the exploration trail.
 ///
@@ -68,6 +77,17 @@ class ExplorerRef {
         browseKind = null,
         browseCategory = null;
 
+  /// A single prophecy, addressed by its 0-based index in the pure-Dart
+  /// `prophecies` list (the Prophecies dataset isn't in the content store, so
+  /// there is no row id to use).
+  const ExplorerRef.prophecy(int this.id, this.label)
+      : type = ExplorerEntityType.prophecy,
+        book = null,
+        chapter = null,
+        tagId = null,
+        browseKind = null,
+        browseCategory = null;
+
   ExplorerRef.passage(String this.book, int this.chapter)
       : type = ExplorerEntityType.passage,
         id = null,
@@ -96,7 +116,8 @@ class ExplorerRef {
       : assert(kind == ExplorerEntityType.person ||
             kind == ExplorerEntityType.place ||
             kind == ExplorerEntityType.event ||
-            kind == ExplorerEntityType.topic),
+            kind == ExplorerEntityType.topic ||
+            kind == ExplorerEntityType.prophecy),
         assert(category == null || kind == ExplorerEntityType.topic),
         type = ExplorerEntityType.browse,
         browseKind = kind,

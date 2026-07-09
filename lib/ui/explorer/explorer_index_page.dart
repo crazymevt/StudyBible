@@ -52,6 +52,7 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
             ExplorerEntityType.person => 'people',
             ExplorerEntityType.place => 'places',
             ExplorerEntityType.event => 'events',
+            ExplorerEntityType.prophecy => 'prophecies',
             _ => 'topics',
           },
       };

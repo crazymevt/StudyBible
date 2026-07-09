@@ -90,6 +90,12 @@ const List<ToolGroup> toolGroups = [
       'Bible Stories',
       railLabel: 'Stories',
     ),
+    ToolItem(
+      ActiveTool.prophecies,
+      Icons.auto_awesome,
+      'Prophecies',
+      railLabel: 'Prophecy',
+    ),
   ]),
 ];
 

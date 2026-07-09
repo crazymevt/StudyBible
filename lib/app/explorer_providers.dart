@@ -6,6 +6,8 @@ import '../data/user_store.dart';
 import '../domain/explorer/explorer_ref.dart';
 import '../domain/explorer/fuzzy_suggest.dart';
 import '../domain/feasts/feast_data.dart' show feasts;
+import '../domain/prophecy/prophecy_data.dart' show prophecies;
+import '../domain/prophecy/prophecy_index.dart' show searchProphecies;
 import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
 import 'document_reference_providers.dart';
@@ -40,6 +42,7 @@ class ExplorerStats {
   final int topics;
   final int feasts;
   final int stories;
+  final int prophecies;
   const ExplorerStats({
     required this.people,
     required this.places,
@@ -47,6 +50,7 @@ class ExplorerStats {
     required this.topics,
     required this.feasts,
     required this.stories,
+    required this.prophecies,
   });
 }
 
@@ -75,6 +79,9 @@ final explorerStatsProvider = FutureProvider<ExplorerStats>((ref) async {
     topics: counts[3],
     feasts: counts[4],
     stories: counts[5],
+    // Prophecies aren't a content-store table — they're the pure-Dart
+    // `prophecies` dataset, so this count is just its length.
+    prophecies: prophecies.length,
   );
 });
 
@@ -169,6 +176,16 @@ final explorerIndexProvider = FutureProvider.family<List<ExplorerIndexEntry>,
       return [
         for (final t in rows)
           ExplorerIndexEntry(ExplorerRef.topic(t.id, t.name)),
+      ];
+    case ExplorerEntityType.prophecy:
+      // Pure-Dart dataset, addressed by list index; the index page re-sorts
+      // A-Z, so file order here doesn't matter.
+      return [
+        for (var i = 0; i < prophecies.length; i++)
+          ExplorerIndexEntry(
+            ExplorerRef.prophecy(i, prophecies[i].title),
+            subtitle: prophecies[i].category.label,
+          ),
       ];
     case ExplorerEntityType.passage:
     case ExplorerEntityType.tag:
@@ -268,6 +285,7 @@ class ExplorerSearchResults {
   final List<ExplorerSearchItem> places;
   final List<ExplorerSearchItem> events;
   final List<ExplorerSearchItem> topics;
+  final List<ExplorerSearchItem> prophecies;
   final List<ExplorerTagHit> tags;
 
   /// "Did you mean …?" entities near the query by edit distance. Only
@@ -280,6 +298,7 @@ class ExplorerSearchResults {
     this.places = const [],
     this.events = const [],
     this.topics = const [],
+    this.prophecies = const [],
     this.tags = const [],
     this.suggestions = const [],
   });
@@ -290,6 +309,7 @@ class ExplorerSearchResults {
       places.isEmpty &&
       events.isEmpty &&
       topics.isEmpty &&
+      prophecies.isEmpty &&
       tags.isEmpty;
 }
 
@@ -393,6 +413,11 @@ final _explorerFuzzyCandidatesProvider =
   for (final t in topics) {
     candidates.add(FuzzyCandidate(ExplorerRef.topic(t.id, t.name), [t.name]));
   }
+
+  // Prophecies are intentionally left out of the fuzzy "did you mean" pool:
+  // their titles are phrases, not names, so matching a misspelled word against
+  // them ("David" inside "Heir to the throne of David") only adds noise. Direct
+  // search (searchProphecies) already covers them by title, reference, or prose.
 
   return candidates;
 });
@@ -555,6 +580,9 @@ final explorerSearchResultsForProvider =
     _rankByPrefix(tagHits, tagQuery, (t) => t.tag.name, (t) => t.itemCount);
   }
 
+  // Prophecies: matched over the pure-Dart dataset (see searchProphecies).
+  final prophecyHits = searchProphecies(query, limit: _kSearchLimitPerKind);
+
   final results = ExplorerSearchResults(
     passage: passage,
     people: [
@@ -587,6 +615,10 @@ final explorerSearchResultsForProvider =
     topics: [
       for (final t in topicRows)
         ExplorerSearchItem(ExplorerRef.topic(t.id, t.name)),
+    ],
+    prophecies: [
+      for (final h in prophecyHits)
+        ExplorerSearchItem(ExplorerRef.prophecy(h.index, h.title), h.subtitle),
     ],
     tags: tagHits,
   );

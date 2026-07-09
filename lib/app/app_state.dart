@@ -26,6 +26,7 @@ enum ActiveTool {
   harmony,
   feasts,
   stories,
+  prophecies,
 }
 
 class ActiveToolNotifier extends Notifier<ActiveTool> {

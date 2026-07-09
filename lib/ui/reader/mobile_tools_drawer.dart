@@ -18,6 +18,7 @@ import 'people_panel.dart';
 import 'highlights_panel.dart';
 import 'scratch_panel.dart';
 import 'feasts_panel.dart';
+import 'prophecies_panel.dart';
 import 'stories_panel.dart';
 import '../common/tool_groups.dart';
 import '../../app/app_state.dart';
@@ -83,6 +84,8 @@ class MobileToolsDrawer extends ConsumerWidget {
         return const FeastsPanel();
       case ActiveTool.stories:
         return const StoriesPanel();
+      case ActiveTool.prophecies:
+        return const PropheciesPanel();
       case ActiveTool.compare:
       case ActiveTool.history:
       case ActiveTool.none:

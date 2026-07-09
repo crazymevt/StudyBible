@@ -352,6 +352,11 @@ class _HomeIntro extends ConsumerWidget {
                 '${stats.feasts} feasts',
               ),
               _StatChip(
+                const ExplorerRef.browse(
+                    ExplorerEntityType.prophecy, 'Prophecies'),
+                '${stats.prophecies} prophecies',
+              ),
+              _StatChip(
                 const ExplorerRef.browse(ExplorerEntityType.topic, 'Topics'),
                 '${stats.topics} topics',
               ),
@@ -471,6 +476,7 @@ class _SearchResultsList extends ConsumerWidget {
         section('Places', r.places);
         section('Events', r.events);
         section('Topics', r.topics);
+        section('Prophecies', r.prophecies);
         if (r.tags.isNotEmpty) {
           sections
             ..add(const _ResultsHeader('Your Tags'))
