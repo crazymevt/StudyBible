@@ -9,34 +9,52 @@ import '../tags/tag_palette.dart';
 import 'explorer_common.dart';
 import 'explorer_pages.dart';
 
-/// Opens [target] in a fresh, full-page [ExplorerScreen] pushed on top of
-/// whatever's currently showing — e.g. from a family tree node, or an
-/// `sbent:` entity link in a notebook page (see
-/// `entity_autolink.dart`'s `handleEntityLinkLaunch`).
+/// Opens [target] in a full-page [ExplorerScreen] pushed on top of whatever's
+/// currently showing — e.g. from a family tree node, an "Open in Explorer"
+/// button on a Reader panel, or an `sbent:` entity link in a notebook page
+/// (see `entity_autolink.dart`'s `handleEntityLinkLaunch`).
 ///
 /// The exploration trail is one global, session-wide stack (see
 /// [explorerTrailProvider]'s doc comment), not one per pushed
-/// [ExplorerScreen]. If an [ExplorerScreen] is already open somewhere below
-/// in the navigation stack (its person page is what led here, directly or
-/// indirectly) and this just cleared and reused that same shared trail, the
-/// earlier instance would come back showing this new destination instead of
-/// whatever it had before once the user backs out of this one. So: save the
-/// trail as it stood, hijack it for the new screen, then restore it the
-/// moment that screen is popped.
+/// [ExplorerScreen], so this behaves differently depending on whether an
+/// [ExplorerScreen] is already open somewhere below in the navigation stack
+/// ([insideExplorerProvider]):
+///
+/// - Nested (already inside an Explorer — e.g. a family tree node opened
+///   from a person's Explorer page): reusing the shared trail as-is would
+///   make the earlier instance come back showing this new destination
+///   instead of whatever it had before. So the trail is saved, hijacked for
+///   the new screen, then restored the moment that screen is popped.
+/// - Fresh (opened from the Reader or a side panel, with no Explorer open
+///   yet): there's nothing to protect, so [target] just extends the
+///   persistent trail and is left in place when the screen is popped —
+///   backing out, or reopening Explorer later from anywhere, resumes here.
 Future<void> openInFreshExplorer(
   BuildContext context,
   WidgetRef ref,
   ExplorerRef target,
 ) async {
-  final notifier = ref.read(explorerTrailProvider.notifier);
-  final previousTrail = ref.read(explorerTrailProvider);
-  notifier
-    ..clear()
-    ..open(target);
+  final trailNotifier = ref.read(explorerTrailProvider.notifier);
+  final insideNotifier = ref.read(insideExplorerProvider.notifier);
+  final wasNested = ref.read(insideExplorerProvider);
+  final previousTrail = wasNested ? ref.read(explorerTrailProvider) : null;
+
+  if (wasNested) {
+    trailNotifier
+      ..clear()
+      ..open(target);
+  } else {
+    trailNotifier.open(target);
+  }
+
+  insideNotifier.set(true);
   await Navigator.of(context).push(
     MaterialPageRoute(builder: (_) => const ExplorerScreen()),
   );
-  notifier.restore(previousTrail);
+  insideNotifier.set(wasNested);
+  if (wasNested && previousTrail != null) {
+    trailNotifier.restore(previousTrail);
+  }
 }
 
 /// Full-page knowledge-web browser over the bundled study datasets: every

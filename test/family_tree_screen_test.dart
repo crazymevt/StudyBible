@@ -247,6 +247,36 @@ void main() {
     });
 
     testWidgets(
+      'popping back out of a fresh Explorer (opened from the Reader, not '
+      "nested inside another) leaves the trail as browsed, so reopening "
+      "Explorer elsewhere resumes it instead of starting over",
+      (tester) async {
+        final container = await pumpWithExplorer(tester, 1);
+
+        await tester.tap(
+          find.descendant(
+            of: find.byType(InteractiveViewer),
+            matching: find.text('Jacob'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(container.read(explorerTrailProvider), [
+          const ExplorerRef.person(1, 'Jacob'),
+        ]);
+
+        final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+        navigator.pop();
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ExplorerScreen), findsNothing);
+        expect(container.read(explorerTrailProvider), [
+          const ExplorerRef.person(1, 'Jacob'),
+        ]);
+        expect(container.read(insideExplorerProvider), isFalse);
+      },
+    );
+
+    testWidgets(
       "the AppBar's \"Open in Explorer\" action does the same",
       (tester) async {
         final container = await pumpWithExplorer(tester, 1);
@@ -289,6 +319,7 @@ void main() {
         container
             .read(explorerTrailProvider.notifier)
             .open(const ExplorerRef.person(1, 'Jacob'));
+        container.read(insideExplorerProvider.notifier).set(true);
 
         await tester.pumpWidget(
           UncontrolledProviderScope(

@@ -218,6 +218,22 @@ final explorerTrailProvider =
   () => ExplorerTrailNotifier(),
 );
 
+/// Whether an [ExplorerScreen] pushed by `openInFreshExplorer` is currently
+/// showing. Lets that function tell a nested open (from inside an
+/// already-open Explorer, e.g. a family tree node) apart from a fresh,
+/// top-level open (from the Reader or a side panel) — only the nested case
+/// needs its trail protected from the detour.
+class InsideExplorerNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
+}
+
+final insideExplorerProvider = NotifierProvider<InsideExplorerNotifier, bool>(
+  () => InsideExplorerNotifier(),
+);
+
 // --- Universal search ---
 
 class ExplorerSearchQueryNotifier extends Notifier<String> {
