@@ -194,7 +194,10 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
         .toList();
         
     if (parts.length >= 2) {
-      final safeParts = parts.map((p) => '"${p.replaceAll('"', '""')}"').join(' ');
+      // Prefix-match the last word of each part, same as the plain-phrase
+      // branch below — FTS5 allows a `*` directly after a quoted phrase to
+      // mean "prefix match on its final term" even inside NEAR().
+      final safeParts = parts.map((p) => '"${p.replaceAll('"', '""')}"*').join(' ');
       searchPattern = 'NEAR($safeParts, $distance)';
     } else {
       final cleanQuery = terms.replaceAll('"', '""');
