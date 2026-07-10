@@ -58,8 +58,9 @@ final explorerTopicLocationsProvider =
             verses[key] = <int>{};
           }
           final existing = verses[key];
-          if (existing == null)
+          if (existing == null) {
             continue; // already widened to the whole chapter
+          }
           if (r.verse == null) {
             verses[key] = null;
           } else {
