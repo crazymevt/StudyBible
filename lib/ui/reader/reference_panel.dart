@@ -9,20 +9,16 @@ import '../../domain/reference/covenant.dart';
 import '../../domain/reference/king_reign.dart';
 import '../../domain/reference/measure.dart';
 import '../../domain/explorer/explorer_ref.dart';
+import '../../domain/scripture/passage_citation.dart';
 import '../common/breakpoints.dart';
 import '../explorer/explorer_screen.dart';
 
-/// A reference citation, e.g. "Micah 5:2", "Isaiah 53:5-6", or a whole
-/// chapter "Leviticus 16". Chapter-only citations default to verse 1,
-/// matching the convention the Feasts/Prophecies/curated-topic passages use.
-final _passageExp = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
-
 void _goToPassage(BuildContext context, WidgetRef ref, String passage) {
-  final match = _passageExp.firstMatch(passage.trim());
-  if (match == null) return;
-  final bookName = match.group(1)!.trim();
-  final chapter = int.parse(match.group(2)!);
-  final verse = int.tryParse(match.group(3) ?? '') ?? 1;
+  final citation = PassageCitation.tryParse(passage);
+  if (citation == null) return;
+  final bookName = citation.book;
+  final chapter = citation.chapter;
+  final verse = citation.verse ?? 1;
 
   ref.read(selectedBookNameProvider.notifier).set(bookName);
   ref.read(selectedChapterProvider.notifier).set(chapter);

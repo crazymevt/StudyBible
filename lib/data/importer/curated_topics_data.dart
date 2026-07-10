@@ -1,4 +1,5 @@
 import '../../domain/feasts/feast_data.dart';
+import '../../domain/scripture/passage_citation.dart';
 
 /// One scripture reference for a [CuratedTopic] entry — same shape as the
 /// bundled Nave's Topical Bible's `topic_references` rows: a whole-chapter
@@ -42,18 +43,8 @@ class CuratedTopic {
 /// [CuratedTopicRef]. The book-name group is lazy so multi-word names ("1
 /// Samuel", "Song of Solomon") aren't swallowed by a greedy match.
 CuratedTopicRef _ref(String passage) {
-  final m = RegExp(
-    r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$',
-  ).firstMatch(passage.trim());
-  if (m == null) {
-    throw ArgumentError('CuratedTopic: cannot parse passage "$passage"');
-  }
-  return CuratedTopicRef(
-    m.group(1)!,
-    int.parse(m.group(2)!),
-    m.group(3) == null ? null : int.parse(m.group(3)!),
-    m.group(4) == null ? null : int.parse(m.group(4)!),
-  );
+  final c = PassageCitation.parse(passage);
+  return CuratedTopicRef(c.book, c.chapter, c.verse, c.endVerse);
 }
 
 /// The nine appointed feasts (Leviticus 23, plus Purim and Dedication),

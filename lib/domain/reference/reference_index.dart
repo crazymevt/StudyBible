@@ -1,3 +1,4 @@
+import '../scripture/passage_citation.dart';
 import 'covenant.dart';
 import 'covenants_data.dart';
 import 'king_reign.dart';
@@ -37,8 +38,6 @@ class ReferenceChapterHit {
 /// Map key for a chapter, e.g. `2 Kings|18`.
 String referenceChapterKey(String book, int chapter) => '$book|$chapter';
 
-final RegExp _passageExp = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
-
 class _MutableHit {
   final ReferenceKind kind;
   final String title;
@@ -69,11 +68,11 @@ Map<String, List<ReferenceChapterHit>> buildReferenceChapterIndex({
     int? explorerPersonId,
     String passage,
   ) {
-    final m = _passageExp.firstMatch(passage.trim());
-    if (m == null) return;
-    final book = m.group(1)!.trim();
-    final chapter = int.parse(m.group(2)!);
-    final verse = int.tryParse(m.group(3) ?? '') ?? 1;
+    final citation = PassageCitation.tryParse(passage);
+    if (citation == null) return;
+    final book = citation.book;
+    final chapter = citation.chapter;
+    final verse = citation.verse ?? 1;
     final hit = byKey
         .putIfAbsent(referenceChapterKey(book, chapter), () => {})
         .putIfAbsent(

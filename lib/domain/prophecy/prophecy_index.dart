@@ -1,3 +1,4 @@
+import '../scripture/passage_citation.dart';
 import 'prophecy.dart';
 import 'prophecy_data.dart';
 
@@ -25,8 +26,6 @@ class ProphecyChapterHit {
 /// Map key for a chapter, e.g. `Micah|5`.
 String prophecyChapterKey(String book, int chapter) => '$book|$chapter';
 
-final RegExp _passageExp = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
-
 class _MutableHit {
   final int index;
   final String title;
@@ -47,11 +46,11 @@ Map<String, List<ProphecyChapterHit>> buildProphecyChapterIndex([
   final byKey = <String, Map<int, _MutableHit>>{};
 
   void record(int idx, String title, String passage, {required bool foretold}) {
-    final m = _passageExp.firstMatch(passage.trim());
-    if (m == null) return;
-    final book = m.group(1)!.trim();
-    final chapter = int.parse(m.group(2)!);
-    final verse = int.tryParse(m.group(3) ?? '') ?? 1;
+    final citation = PassageCitation.tryParse(passage);
+    if (citation == null) return;
+    final book = citation.book;
+    final chapter = citation.chapter;
+    final verse = citation.verse ?? 1;
     final hit = byKey
         .putIfAbsent(prophecyChapterKey(book, chapter), () => {})
         .putIfAbsent(idx, () => _MutableHit(idx, title));

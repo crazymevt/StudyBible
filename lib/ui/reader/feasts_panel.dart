@@ -8,14 +8,10 @@ import '../../app/feast_providers.dart';
 import '../../app/reader_state.dart';
 import '../../domain/feasts/feast.dart';
 import '../../domain/feasts/feast_data.dart';
+import '../../domain/scripture/passage_citation.dart';
 import '../common/breakpoints.dart';
 
 final _dateFormat = DateFormat('MMM d, yyyy');
-
-/// A feast's Torah/Scripture citation, e.g. "Leviticus 23:5" or "John 10:22-23".
-/// Chapter-only citations (e.g. "Leviticus 16") default to verse 1, matching
-/// the convention used elsewhere for whole-chapter references.
-final _passageExp = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
 
 enum _FeastSort { alphabetical, date }
 
@@ -41,11 +37,11 @@ class _FeastsPanelState extends ConsumerState<FeastsPanel> {
   }
 
   void _goToPassage(String passage) {
-    final match = _passageExp.firstMatch(passage.trim());
-    if (match == null) return;
-    final bookName = match.group(1)!.trim();
-    final chapter = int.parse(match.group(2)!);
-    final verse = int.tryParse(match.group(3) ?? '') ?? 1;
+    final citation = PassageCitation.tryParse(passage);
+    if (citation == null) return;
+    final bookName = citation.book;
+    final chapter = citation.chapter;
+    final verse = citation.verse ?? 1;
 
     ref.read(selectedBookNameProvider.notifier).set(bookName);
     ref.read(selectedChapterProvider.notifier).set(chapter);
