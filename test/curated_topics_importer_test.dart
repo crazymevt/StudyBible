@@ -116,7 +116,9 @@ void main() {
     expect(judges.map((t) => t.name), contains('GIDEON'));
     expect(judges, hasLength(13));
     expect(prophets.map((t) => t.name), contains('ISAIAH'));
-    expect(prophets, hasLength(16));
+    expect(prophets.map((t) => t.name), contains('ELIJAH'));
+    // 4 major + 12 minor (writing prophets) + 14 other (no book of their own).
+    expect(prophets, hasLength(30));
   });
 
   test('named-group browse order follows the curated order, not alphabetical',
@@ -135,9 +137,34 @@ void main() {
     expect(await browse('prophet'), prophetOrder);
   });
 
-  test('namedGroupPersonIds values are unique', () {
-    final ids = namedGroupPersonIds.values.toList();
-    expect(ids.toSet().length, ids.length, reason: '$ids');
+  test('namedGroupPersonIds values are unique per category', () {
+    // Deborah and Samuel are intentionally listed under both 'judge' and
+    // 'prophet' (same real person, same id) — uniqueness only needs to hold
+    // within a single category's own keys, not globally across categories.
+    final byCategory = <String, List<int>>{};
+    for (final entry in namedGroupPersonIds.entries) {
+      final category = entry.key.split('|').first;
+      byCategory.putIfAbsent(category, () => []).add(entry.value);
+    }
+    for (final entry in byCategory.entries) {
+      expect(entry.value.toSet().length, entry.value.length,
+          reason: '${entry.key}: ${entry.value}');
+    }
+  });
+
+  test('prophetSections covers every prophet topic exactly once, '
+      'partitioned 4/12/14', () {
+    final prophetNames =
+        curatedTopics.where((t) => t.category == 'prophet').map((t) => t.name);
+    expect(prophetSections.keys.toSet(), prophetNames.toSet());
+
+    final counts = <String, int>{};
+    for (final section in prophetSections.values) {
+      counts[section] = (counts[section] ?? 0) + 1;
+    }
+    expect(counts['Major Prophets'], 4);
+    expect(counts['Minor Prophets'], 12);
+    expect(counts['Other Prophets'], 14);
   });
 
   test('each curated topic is searchable via full-text search', () async {

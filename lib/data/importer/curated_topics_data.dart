@@ -4687,6 +4687,121 @@ final _prophetTopics = <CuratedTopic>[
         'looking ahead to a coming messenger.',
     refs: [_ref('Malachi 1:1')],
   ),
+
+  // --- Other Prophets (chronological — no book bears their name) ---
+  CuratedTopic(
+    name: 'MIRIAM',
+    category: 'prophet',
+    description:
+        "Moses and Aaron's sister. Called \"the prophetess\" after leading "
+        'the Israelite women in song at the Red Sea.',
+    refs: [_ref('Exodus 15:20-21')],
+  ),
+  CuratedTopic(
+    name: 'MOSES',
+    category: 'prophet',
+    description:
+        'Mediated the Law at Sinai. Scripture says no prophet like him '
+        'arose again in Israel.',
+    refs: [_ref('Deuteronomy 34:10-12'), _ref('Deuteronomy 18:15')],
+  ),
+  CuratedTopic(
+    name: 'DEBORAH',
+    category: 'prophet',
+    description:
+        'The only female judge, also a prophetess. Summoned Barak to '
+        "battle Sisera at the LORD's command.",
+    refs: [_ref('Judges 4:4-7')],
+  ),
+  CuratedTopic(
+    name: 'SAMUEL',
+    category: 'prophet',
+    description:
+        "Israel's last judge, also a prophet and priest. Anointed Saul "
+        "and David as king at God's direction.",
+    refs: [_ref('1 Samuel 3:19-20'), _ref('1 Samuel 16:13')],
+  ),
+  CuratedTopic(
+    name: 'NATHAN',
+    category: 'prophet',
+    description:
+        "David's court prophet. Confronted David over Bathsheba with the "
+        'parable of the ewe lamb.',
+    refs: [_ref('2 Samuel 7:2-3'), _ref('2 Samuel 12:1-7')],
+  ),
+  CuratedTopic(
+    name: 'GAD',
+    category: 'prophet',
+    description:
+        "David's seer, with him from his fugitive years. Delivered God's "
+        "choice of three punishments after David's census.",
+    refs: [_ref('1 Samuel 22:5'), _ref('2 Samuel 24:11-13')],
+  ),
+  CuratedTopic(
+    name: 'AHIJAH',
+    category: 'prophet',
+    description:
+        'The Shilonite prophet who tore his cloak into twelve pieces to '
+        "foretell Jeroboam's kingship.",
+    refs: [_ref('1 Kings 11:29-31')],
+  ),
+  CuratedTopic(
+    name: 'ELIJAH',
+    category: 'prophet',
+    description:
+        'The Tishbite. Confronted Ahab and the prophets of Baal at Mount '
+        'Carmel, then was taken to heaven in a whirlwind.',
+    refs: [_ref('1 Kings 18:20-24'), _ref('2 Kings 2:11')],
+  ),
+  CuratedTopic(
+    name: 'MICAIAH',
+    category: 'prophet',
+    description:
+        'Son of Imlah. Alone among 400 court prophets to prophesy truly '
+        'against Ahab, at the cost of imprisonment.',
+    refs: [_ref('1 Kings 22:8'), _ref('1 Kings 22:26-27')],
+  ),
+  CuratedTopic(
+    name: 'ELISHA',
+    category: 'prophet',
+    description:
+        "Elijah's successor, who received a double portion of his "
+        'spirit. Ministered through the reigns of several kings of '
+        'Israel.',
+    refs: [_ref('2 Kings 2:9-14')],
+  ),
+  CuratedTopic(
+    name: 'HULDAH',
+    category: 'prophet',
+    description:
+        'The prophetess Josiah consulted after the Book of the Law was '
+        'rediscovered in the temple.',
+    refs: [_ref('2 Kings 22:14-15')],
+  ),
+  CuratedTopic(
+    name: 'JOHN THE BAPTIST',
+    category: 'prophet',
+    description:
+        'The last of the old-covenant prophets, sent to prepare the way '
+        'for the Messiah.',
+    refs: [_ref('Luke 1:76'), _ref('Matthew 3:1-3')],
+  ),
+  CuratedTopic(
+    name: 'ANNA',
+    category: 'prophet',
+    description:
+        'An aged prophetess who recognized the infant Jesus as the '
+        'redemption of Jerusalem.',
+    refs: [_ref('Luke 2:36-38')],
+  ),
+  CuratedTopic(
+    name: 'AGABUS',
+    category: 'prophet',
+    description:
+        "A New Testament prophet who foretold a coming famine, and "
+        "later Paul's arrest in Jerusalem.",
+    refs: [_ref('Acts 11:27-28'), _ref('Acts 21:10-11')],
+  ),
 ];
 
 final curatedTopics = <CuratedTopic>[
@@ -4759,6 +4874,57 @@ const Map<String, int> namedGroupPersonIds = {
   'prophet|HAGGAI': 1337,
   'prophet|ZECHARIAH': 2970,
   'prophet|MALACHI': 1886,
+  'prophet|MIRIAM': 2074,
+  'prophet|MOSES': 2095,
+  'prophet|DEBORAH': 994,
+  'prophet|SAMUEL': 2454,
+  'prophet|NATHAN': 2140,
+  'prophet|GAD': 1251,
+  'prophet|AHIJAH': 135,
+  'prophet|ELIJAH': 1128,
+  'prophet|MICAIAH': 2041,
+  'prophet|ELISHA': 1150,
+  'prophet|HULDAH': 1554,
+  'prophet|JOHN THE BAPTIST': 1663,
+  'prophet|ANNA': 268,
+  'prophet|AGABUS': 107,
+};
+
+/// Which of the three "kinds" of prophet a Prophets-category topic belongs
+/// to — the browse page groups by this in its curated (Traditional) order.
+/// The 4 "writing" prophets with a Major book, the 12 with a Minor book,
+/// and everyone else scripture calls a prophet without a book to their name.
+const Map<String, String> prophetSections = {
+  'ISAIAH': 'Major Prophets',
+  'JEREMIAH': 'Major Prophets',
+  'EZEKIEL': 'Major Prophets',
+  'DANIEL': 'Major Prophets',
+  'HOSEA': 'Minor Prophets',
+  'JOEL': 'Minor Prophets',
+  'AMOS': 'Minor Prophets',
+  'OBADIAH': 'Minor Prophets',
+  'JONAH': 'Minor Prophets',
+  'MICAH': 'Minor Prophets',
+  'NAHUM': 'Minor Prophets',
+  'HABAKKUK': 'Minor Prophets',
+  'ZEPHANIAH': 'Minor Prophets',
+  'HAGGAI': 'Minor Prophets',
+  'ZECHARIAH': 'Minor Prophets',
+  'MALACHI': 'Minor Prophets',
+  'MIRIAM': 'Other Prophets',
+  'MOSES': 'Other Prophets',
+  'DEBORAH': 'Other Prophets',
+  'SAMUEL': 'Other Prophets',
+  'NATHAN': 'Other Prophets',
+  'GAD': 'Other Prophets',
+  'AHIJAH': 'Other Prophets',
+  'ELIJAH': 'Other Prophets',
+  'MICAIAH': 'Other Prophets',
+  'ELISHA': 'Other Prophets',
+  'HULDAH': 'Other Prophets',
+  'JOHN THE BAPTIST': 'Other Prophets',
+  'ANNA': 'Other Prophets',
+  'AGABUS': 'Other Prophets',
 };
 
 /// Canonical (non-alphabetical) browse order for each of the four named-group

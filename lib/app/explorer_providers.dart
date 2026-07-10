@@ -109,6 +109,12 @@ final explorerStatsProvider = FutureProvider<ExplorerStats>((ref) async {
 final namedGroupPersonIdsProvider =
     Provider<Map<String, int>>((ref) => namedGroupPersonIds);
 
+/// Major/Minor/Other grouping for the Prophets browse category (see
+/// `prophetSections` in `curated_topics_data.dart`), wrapped in a provider
+/// for the same reason as [namedGroupPersonIdsProvider].
+final prophetSectionsProvider =
+    Provider<Map<String, String>>((ref) => prophetSections);
+
 // --- Browsable indexes (the pages behind the home page's dataset chips) ---
 
 /// One row of a browsable index over an entity kind.

@@ -25,11 +25,13 @@ void main() {
     ExplorerEntityType kind = ExplorerEntityType.person,
     String? category,
     List<ExplorerIndexEntry> data = entries,
+    Map<String, String> sections = const {},
   }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           explorerIndexProvider.overrideWith((ref, spec) async => data),
+          prophetSectionsProvider.overrideWithValue(sections),
         ],
         child: MaterialApp(
           home: Scaffold(
@@ -158,5 +160,60 @@ void main() {
       container.read(explorerTrailProvider),
       [const ExplorerRef.person(2, 'Abel')],
     );
+  });
+
+  group('prophet section headers', () {
+    const prophetEntries = [
+      ExplorerIndexEntry(ExplorerRef.topic(1, 'ISAIAH')),
+      ExplorerIndexEntry(ExplorerRef.topic(2, 'DANIEL')),
+      ExplorerIndexEntry(ExplorerRef.topic(3, 'HOSEA')),
+      ExplorerIndexEntry(ExplorerRef.topic(4, 'MALACHI')),
+      ExplorerIndexEntry(ExplorerRef.topic(5, 'ELIJAH')),
+    ];
+    const sections = {
+      'ISAIAH': 'Major Prophets',
+      'DANIEL': 'Major Prophets',
+      'HOSEA': 'Minor Prophets',
+      'MALACHI': 'Minor Prophets',
+      'ELIJAH': 'Other Prophets',
+    };
+
+    testWidgets(
+        'Traditional order shows Major/Minor/Other headers grouping the '
+        'given order, not alphabetical', (tester) async {
+      await pumpIndex(
+        tester,
+        kind: ExplorerEntityType.topic,
+        category: 'prophet',
+        data: prophetEntries,
+        sections: sections,
+      );
+
+      expect(find.text('Traditional order'), findsOneWidget);
+      expect(find.text('Major Prophets'), findsOneWidget);
+      expect(find.text('Minor Prophets'), findsOneWidget);
+      expect(find.text('Other Prophets'), findsOneWidget);
+      expect(visibleTitles(tester),
+          ['ISAIAH', 'DANIEL', 'HOSEA', 'MALACHI', 'ELIJAH']);
+    });
+
+    testWidgets('switching to A-Z hides the section headers', (tester) async {
+      await pumpIndex(
+        tester,
+        kind: ExplorerEntityType.topic,
+        category: 'prophet',
+        data: prophetEntries,
+        sections: sections,
+      );
+
+      await tester.tap(find.text('A–Z'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Major Prophets'), findsNothing);
+      expect(find.text('Minor Prophets'), findsNothing);
+      expect(find.text('Other Prophets'), findsNothing);
+      expect(visibleTitles(tester),
+          ['DANIEL', 'ELIJAH', 'HOSEA', 'ISAIAH', 'MALACHI']);
+    });
   });
 }

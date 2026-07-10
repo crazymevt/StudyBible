@@ -105,6 +105,10 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
   Widget build(BuildContext context) {
     final entriesAsync = ref.watch(explorerIndexProvider(
         (kind: widget.kind, category: widget.category)));
+    // Major/Minor/Other grouping — only the Prophets category has one today.
+    final sections = widget.category == 'prophet'
+        ? ref.watch(prophetSectionsProvider)
+        : null;
     return entriesAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => Center(
@@ -113,11 +117,15 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
           child: Text('Couldn\'t load this index: $e'),
         ),
       ),
-      data: (all) => _buildIndex(context, all),
+      data: (all) => _buildIndex(context, all, sections),
     );
   }
 
-  Widget _buildIndex(BuildContext context, List<ExplorerIndexEntry> all) {
+  Widget _buildIndex(
+    BuildContext context,
+    List<ExplorerIndexEntry> all,
+    Map<String, String>? sections,
+  ) {
     // A-Z always re-sorts with the punctuation-blind key (the provider's
     // SQL ordering puts quoted titles before "A"); rank keeps the given
     // order for naturally-ordered kinds (events, feasts).
@@ -150,9 +158,12 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
               if (_groupLetter(e.ref.label) == _letter) e,
           ];
 
-    // Flattened list rows: a String is a letter header, anything else an
-    // entry — headers only in the unfiltered A-Z view, where they carry the
-    // scan rhythm a single letter's list doesn't need.
+    // Flattened list rows: a String is a group header, anything else an
+    // entry. In A-Z mode that's a letter header (skipped once filtered to
+    // one letter); in rank mode, a category with its own [sections] lookup
+    // (Prophets' Major/Minor/Other) gets the same treatment instead — the
+    // list is already in that curated block order, so a header just marks
+    // where the section value changes as we walk it.
     final rows = <Object>[];
     if (alpha && _letter == null) {
       String? current;
@@ -161,6 +172,16 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
         if (l != current) {
           current = l;
           rows.add(l);
+        }
+        rows.add(e);
+      }
+    } else if (!alpha && sections != null) {
+      String? current;
+      for (final e in visible) {
+        final s = sections[e.ref.label];
+        if (s != current) {
+          current = s;
+          if (s != null) rows.add(s);
         }
         rows.add(e);
       }
@@ -234,7 +255,7 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
                 itemCount: rows.length,
                 itemBuilder: (context, i) {
                   final row = rows[i];
-                  if (row is String) return _LetterHeader(row);
+                  if (row is String) return _GroupHeader(row);
                   final entry = row as ExplorerIndexEntry;
                   return ListTile(
                     dense: true,
@@ -309,17 +330,20 @@ class _LetterButton extends StatelessWidget {
   }
 }
 
-class _LetterHeader extends StatelessWidget {
-  const _LetterHeader(this.letter);
+/// A group header row — a letter in A-Z mode, a Major/Minor/Other section
+/// label in rank mode for categories that have one. Just a styled `Text`;
+/// nothing here is letter-specific.
+class _GroupHeader extends StatelessWidget {
+  const _GroupHeader(this.label);
 
-  final String letter;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 2),
       child: Text(
-        letter,
+        label,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.w700,
