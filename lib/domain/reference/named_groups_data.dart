@@ -125,6 +125,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Denied Jesus three times the night of his arrest, then was restored and commissioned.',
     citations: ['Matthew 10:2', 'John 21:15-17'],
     order: 1,
+    explorerPersonId: 2730,
   ),
   NamedGroupEntry(
     id: 'apostle-andrew',
@@ -134,6 +135,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Originally a disciple of John the Baptist before following Jesus.',
     citations: ['Matthew 10:2', 'John 1:40-42'],
     order: 2,
+    explorerPersonId: 264,
   ),
   NamedGroupEntry(
     id: 'apostle-james-zebedee',
@@ -143,6 +145,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'The first apostle martyred, executed by Herod Agrippa I.',
     citations: ['Matthew 10:2', 'Acts 12:2'],
     order: 3,
+    explorerPersonId: 717,
   ),
   NamedGroupEntry(
     id: 'apostle-john',
@@ -152,6 +155,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Traditionally credited with the Gospel of John, three epistles, and Revelation.',
     citations: ['Matthew 10:2', 'John 21:20'],
     order: 4,
+    explorerPersonId: 1664,
   ),
   NamedGroupEntry(
     id: 'apostle-philip',
@@ -161,6 +165,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'From Bethsaida, the same town as Peter and Andrew.',
     citations: ['Matthew 10:3', 'John 1:45-46'],
     order: 5,
+    explorerPersonId: 2329,
   ),
   NamedGroupEntry(
     id: 'apostle-bartholomew',
@@ -170,6 +175,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Widely identified with the Nathanael of John\'s Gospel.',
     citations: ['Matthew 10:3', 'John 1:47'],
     order: 6,
+    explorerPersonId: 405,
   ),
   NamedGroupEntry(
     id: 'apostle-thomas',
@@ -179,6 +185,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Refused to believe the resurrection without physical proof, then confessed Jesus as Lord and God.',
     citations: ['Matthew 10:3', 'John 20:24-28'],
     order: 7,
+    explorerPersonId: 2809,
   ),
   NamedGroupEntry(
     id: 'apostle-matthew',
@@ -188,6 +195,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Traditionally credited with the Gospel bearing his name.',
     citations: ['Matthew 10:3', 'Matthew 9:9'],
     order: 8,
+    explorerPersonId: 1958,
   ),
   NamedGroupEntry(
     id: 'apostle-james-alphaeus',
@@ -197,6 +205,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Little is recorded of him beyond his name in the apostle lists.',
     citations: ['Matthew 10:3'],
     order: 9,
+    explorerPersonId: 718,
   ),
   NamedGroupEntry(
     id: 'apostle-thaddaeus',
@@ -206,6 +215,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Distinguished by name from Judas Iscariot at the last supper.',
     citations: ['Matthew 10:3', 'John 14:22'],
     order: 10,
+    explorerPersonId: 1802,
   ),
   NamedGroupEntry(
     id: 'apostle-simon-zealot',
@@ -215,6 +225,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'His inclusion alongside Matthew (a tax collector) reflects the Twelve\'s political diversity.',
     citations: ['Matthew 10:4'],
     order: 11,
+    explorerPersonId: 2731,
   ),
   NamedGroupEntry(
     id: 'apostle-judas-iscariot',
@@ -224,6 +235,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Kept the disciples\' money bag; hanged himself after the betrayal.',
     citations: ['Matthew 10:4', 'Matthew 26:14-16'],
     order: 12,
+    explorerPersonId: 1747,
   ),
 
   // --- Judges of Israel (chronological order) ---
@@ -235,6 +247,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Delivered Israel from Cushan-rishathaim, king of Mesopotamia.',
     citations: ['Judges 3:9-11'],
     order: 1,
+    explorerPersonId: 2244,
   ),
   NamedGroupEntry(
     id: 'judge-ehud',
@@ -244,6 +257,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Assassinated Eglon, king of Moab, with a concealed dagger.',
     citations: ['Judges 3:15-30'],
     order: 2,
+    explorerPersonId: 1036,
   ),
   NamedGroupEntry(
     id: 'judge-shamgar',
@@ -253,6 +267,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Gets only a single verse, the briefest account of any judge.',
     citations: ['Judges 3:31'],
     order: 3,
+    explorerPersonId: 2519,
   ),
   NamedGroupEntry(
     id: 'judge-deborah',
@@ -262,6 +277,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Led Israel to victory over Canaanite general Sisera and sang a victory song with Barak.',
     citations: ['Judges 4:4-5', 'Judges 5:1-3'],
     order: 4,
+    explorerPersonId: 994,
   ),
   NamedGroupEntry(
     id: 'judge-gideon',
@@ -271,6 +287,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Tested God with the fleece before leading Israel\'s smallest army to a decisive victory.',
     citations: ['Judges 6:11-14', 'Judges 7:19-21'],
     order: 5,
+    explorerPersonId: 1302,
   ),
   NamedGroupEntry(
     id: 'judge-tola',
@@ -280,6 +297,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Little detail is recorded beyond his lineage and tenure.',
     citations: ['Judges 10:1-2'],
     order: 6,
+    explorerPersonId: 2836,
   ),
   NamedGroupEntry(
     id: 'judge-jair',
@@ -289,6 +307,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'A Gileadite who judged Israel 22 years.',
     citations: ['Judges 10:3-5'],
     order: 7,
+    explorerPersonId: 709,
   ),
   NamedGroupEntry(
     id: 'judge-jephthah',
@@ -298,6 +317,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Defeated the Ammonites, but is remembered for a rash vow with tragic consequences for his daughter.',
     citations: ['Judges 11:1-3', 'Judges 12:7'],
     order: 8,
+    explorerPersonId: 839,
   ),
   NamedGroupEntry(
     id: 'judge-ibzan',
@@ -307,6 +327,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Judged Israel from Bethlehem for seven years.',
     citations: ['Judges 12:8-10'],
     order: 9,
+    explorerPersonId: 1575,
   ),
   NamedGroupEntry(
     id: 'judge-elon',
@@ -316,6 +337,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Judged Israel ten years; little else is recorded.',
     citations: ['Judges 12:11-12'],
     order: 10,
+    explorerPersonId: 1181,
   ),
   NamedGroupEntry(
     id: 'judge-abdon',
@@ -325,6 +347,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'The last of the "minor judges" before Samson.',
     citations: ['Judges 12:13-15'],
     order: 11,
+    explorerPersonId: 10,
   ),
   NamedGroupEntry(
     id: 'judge-samson',
@@ -337,6 +360,7 @@ const List<NamedGroupEntry> namedGroups = [
         'down their temple.',
     citations: ['Judges 13:24', 'Judges 16:28-30'],
     order: 12,
+    explorerPersonId: 2453,
   ),
   NamedGroupEntry(
     id: 'judge-samuel',
@@ -346,6 +370,7 @@ const List<NamedGroupEntry> namedGroups = [
     notes: 'Anointed Israel\'s first two kings, Saul and David, ending the era of the judges.',
     citations: ['1 Samuel 7:15-17'],
     order: 13,
+    explorerPersonId: 2454,
   ),
 
   // --- Major & Minor Prophets (canonical order) ---

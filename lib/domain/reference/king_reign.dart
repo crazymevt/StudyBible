@@ -41,6 +41,13 @@ class KingReign {
 
   final List<String> citations;
 
+  /// The content store's `BiblePeople.id` for this king, hand-verified
+  /// against `assets/data/theographic.json` (name collisions there make
+  /// automatic matching unsafe — see the Reference Phase 5 plan notes) —
+  /// null unless individually confirmed. Powers the "Open in Explorer"
+  /// button and the Explorer passage-page facet.
+  final int? explorerPersonId;
+
   const KingReign({
     required this.id,
     required this.name,
@@ -51,6 +58,7 @@ class KingReign {
     this.verdict,
     required this.notes,
     required this.citations,
+    this.explorerPersonId,
   });
 }
 

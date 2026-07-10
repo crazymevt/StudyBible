@@ -11,6 +11,7 @@ import '../../app/media_providers.dart';
 import '../../app/people_providers.dart';
 import '../../app/place_providers.dart';
 import '../../app/prophecy_providers.dart';
+import '../../app/reference_providers.dart';
 import '../../app/search_providers.dart';
 import '../../app/topic_providers.dart';
 import '../../app/user_providers.dart';
@@ -21,6 +22,7 @@ import '../../domain/explorer/explorer_ref.dart';
 import '../../domain/prophecy/prophecy.dart';
 import '../../domain/prophecy/prophecy_data.dart';
 import '../../domain/prophecy/prophecy_index.dart';
+import '../../domain/reference/reference_index.dart';
 import '../common/skeleton.dart';
 import '../reader/image_viewer_dialog.dart';
 import '../reader/media_video_list.dart';
@@ -42,12 +44,16 @@ class ExplorerEntityPage extends StatelessWidget {
       ExplorerEntityType.place => _PlacePage(placeId: entry.id!),
       ExplorerEntityType.event => _EventPage(eventId: entry.id!),
       ExplorerEntityType.topic => _TopicPage(topicId: entry.id!),
-      ExplorerEntityType.passage =>
-        _PassagePage(book: entry.book!, chapter: entry.chapter!),
+      ExplorerEntityType.passage => _PassagePage(
+        book: entry.book!,
+        chapter: entry.chapter!,
+      ),
       ExplorerEntityType.tag => _TagPage(tagId: entry.tagId!),
       ExplorerEntityType.prophecy => _ProphecyPage(index: entry.id!),
       ExplorerEntityType.browse => ExplorerIndexPage(
-          kind: entry.browseKind!, category: entry.browseCategory),
+        kind: entry.browseKind!,
+        category: entry.browseCategory,
+      ),
     };
   }
 }
@@ -137,8 +143,8 @@ String _prophecyRoleLabel(ProphecyChapterHit h) {
   final role = h.foretold && h.fulfilled
       ? 'foretold & fulfilled'
       : h.foretold
-          ? 'foretold'
-          : 'fulfilled';
+      ? 'foretold'
+      : 'fulfilled';
   final vs = h.verses.length == 1
       ? 'v. ${h.verses.first}'
       : 'vv. ${h.verses.join(', ')}';
@@ -279,12 +285,11 @@ class _PersonPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(personDetailProvider(personId));
     final placesAsync = ref.watch(explorerPersonPlacesProvider(personId));
-    final stories = ref
-            .watch(explorerPersonStoriesProvider(personId))
-            .asData
-            ?.value ??
+    final stories =
+        ref.watch(explorerPersonStoriesProvider(personId)).asData?.value ??
         const <ExplorerTopicHit>[];
-    final tags = ref.watch(explorerPersonTagsProvider(personId)).asData?.value ??
+    final tags =
+        ref.watch(explorerPersonTagsProvider(personId)).asData?.value ??
         const <ExplorerEntityTag>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
@@ -292,15 +297,23 @@ class _PersonPage extends ConsumerWidget {
       data: (d) {
         if (d == null) return const _ErrorBody('Person not found.');
         final p = d.person;
-        final sermons = ref
-                .watch(explorerSermonsProvider(
-                    ExplorerRef.person(p.id, p.displayTitle)))
+        final sermons =
+            ref
+                .watch(
+                  explorerSermonsProvider(
+                    ExplorerRef.person(p.id, p.displayTitle),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
-        final notebookPages = ref
-                .watch(explorerNotebookPagesProvider(
-                    ExplorerRef.person(p.id, p.displayTitle)))
+        final notebookPages =
+            ref
+                .watch(
+                  explorerNotebookPagesProvider(
+                    ExplorerRef.person(p.id, p.displayTitle),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
@@ -343,15 +356,14 @@ class _PersonPage extends ConsumerWidget {
               ExplorerFacetCard(
                 icon: Icons.family_restroom,
                 title: 'Family',
-                trailing: d.father == null &&
-                        d.mother == null &&
-                        d.children.isEmpty
+                trailing:
+                    d.father == null && d.mother == null && d.children.isEmpty
                     ? null
                     : IconButton(
                         icon: const Icon(Icons.account_tree_outlined),
                         tooltip: 'View family tree',
-                        onPressed: () => Navigator.of(context)
-                            .push(familyTreeRoute(p.id)),
+                        onPressed: () =>
+                            Navigator.of(context).push(familyTreeRoute(p.id)),
                       ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,13 +380,11 @@ class _PersonPage extends ConsumerWidget {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   label,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
+                                  style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                       ),
                                 ),
                               ),
@@ -387,7 +397,9 @@ class _PersonPage extends ConsumerWidget {
                                   for (final person in people)
                                     ExplorerRefChip(
                                       ExplorerRef.person(
-                                          person.id, person.displayTitle),
+                                        person.id,
+                                        person.displayTitle,
+                                      ),
                                     ),
                                 ],
                               ),
@@ -462,21 +474,22 @@ class _PersonPage extends ConsumerWidget {
             if (d.verses.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.menu_book_outlined,
-                title: 'Appears in ${d.verses.length} '
+                title:
+                    'Appears in ${d.verses.length} '
                     '${d.verses.length == 1 ? 'verse' : 'verses'}',
-                child: ExplorerVerseGroups(refs: [
-                  for (final v in d.verses)
-                    (book: v.bookName, chapter: v.chapter, verse: v.verse),
-                ]),
+                child: ExplorerVerseGroups(
+                  refs: [
+                    for (final v in d.verses)
+                      (book: v.bookName, chapter: v.chapter, verse: v.verse),
+                  ],
+                ),
               ),
             if (sermons.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.co_present_outlined,
                 title: 'Your sermons (${sermons.length})',
                 child: Column(
-                  children: [
-                    for (final s in sermons) _TaggedItemTile(item: s),
-                  ],
+                  children: [for (final s in sermons) _TaggedItemTile(item: s)],
                 ),
               ),
             if (notebookPages.isNotEmpty)
@@ -507,7 +520,8 @@ class _PlacePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(explorerPlaceDetailProvider(placeId));
-    final tags = ref.watch(explorerPlaceTagsProvider(placeId)).asData?.value ??
+    final tags =
+        ref.watch(explorerPlaceTagsProvider(placeId)).asData?.value ??
         const <ExplorerEntityTag>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
@@ -515,18 +529,28 @@ class _PlacePage extends ConsumerWidget {
       data: (d) {
         if (d == null) return const _ErrorBody('Place not found.');
         final dictionary =
-            ref.watch(explorerEntryDictionaryProvider(d.place.name)).asData
-                    ?.value ??
-                const <DictionaryEntryWithDict>[];
-        final sermons = ref
-                .watch(explorerSermonsProvider(
-                    ExplorerRef.place(d.place.id, d.place.name)))
+            ref
+                .watch(explorerEntryDictionaryProvider(d.place.name))
+                .asData
+                ?.value ??
+            const <DictionaryEntryWithDict>[];
+        final sermons =
+            ref
+                .watch(
+                  explorerSermonsProvider(
+                    ExplorerRef.place(d.place.id, d.place.name),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
-        final notebookPages = ref
-                .watch(explorerNotebookPagesProvider(
-                    ExplorerRef.place(d.place.id, d.place.name)))
+        final notebookPages =
+            ref
+                .watch(
+                  explorerNotebookPagesProvider(
+                    ExplorerRef.place(d.place.id, d.place.name),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
@@ -534,14 +558,21 @@ class _PlacePage extends ConsumerWidget {
           children: [
             _PageTitle(
               title: d.place.name,
-              subtitle: '${d.verses.length} '
+              subtitle:
+                  '${d.verses.length} '
                   '${d.verses.length == 1 ? 'verse mentions' : 'verses mention'} '
                   'this place',
             ),
-            ExplorerMap(places: [
-              ExplorerMapPlace(d.place.id, d.place.name, d.place.lat,
-                  d.place.lng),
-            ]),
+            ExplorerMap(
+              places: [
+                ExplorerMapPlace(
+                  d.place.id,
+                  d.place.name,
+                  d.place.lat,
+                  d.place.lng,
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             if (dictionary.isNotEmpty) _DictionaryCard(entries: dictionary),
             if (d.events.isNotEmpty)
@@ -575,29 +606,29 @@ class _PlacePage extends ConsumerWidget {
                   runSpacing: 6,
                   children: [
                     for (final p in d.people)
-                      ExplorerRefChip(
-                          ExplorerRef.person(p.id, p.displayTitle)),
+                      ExplorerRefChip(ExplorerRef.person(p.id, p.displayTitle)),
                   ],
                 ),
               ),
             if (d.verses.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.menu_book_outlined,
-                title: 'Mentioned in ${d.verses.length} '
+                title:
+                    'Mentioned in ${d.verses.length} '
                     '${d.verses.length == 1 ? 'verse' : 'verses'}',
-                child: ExplorerVerseGroups(refs: [
-                  for (final v in d.verses)
-                    (book: v.bookName, chapter: v.chapter, verse: v.verse),
-                ]),
+                child: ExplorerVerseGroups(
+                  refs: [
+                    for (final v in d.verses)
+                      (book: v.bookName, chapter: v.chapter, verse: v.verse),
+                  ],
+                ),
               ),
             if (sermons.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.co_present_outlined,
                 title: 'Your sermons (${sermons.length})',
                 child: Column(
-                  children: [
-                    for (final s in sermons) _TaggedItemTile(item: s),
-                  ],
+                  children: [for (final s in sermons) _TaggedItemTile(item: s)],
                 ),
               ),
             if (notebookPages.isNotEmpty)
@@ -628,22 +659,31 @@ class _EventPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(explorerEventDetailProvider(eventId));
-    final tags = ref.watch(explorerEventTagsProvider(eventId)).asData?.value ??
+    final tags =
+        ref.watch(explorerEventTagsProvider(eventId)).asData?.value ??
         const <ExplorerEntityTag>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this event: $e'),
       data: (d) {
         if (d == null) return const _ErrorBody('Event not found.');
-        final sermons = ref
-                .watch(explorerSermonsProvider(
-                    ExplorerRef.event(d.event.id, d.event.title)))
+        final sermons =
+            ref
+                .watch(
+                  explorerSermonsProvider(
+                    ExplorerRef.event(d.event.id, d.event.title),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
-        final notebookPages = ref
-                .watch(explorerNotebookPagesProvider(
-                    ExplorerRef.event(d.event.id, d.event.title)))
+        final notebookPages =
+            ref
+                .watch(
+                  explorerNotebookPagesProvider(
+                    ExplorerRef.event(d.event.id, d.event.title),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
@@ -681,8 +721,7 @@ class _EventPage extends ConsumerWidget {
                   runSpacing: 6,
                   children: [
                     for (final p in d.participants)
-                      ExplorerRefChip(
-                          ExplorerRef.person(p.id, p.displayTitle)),
+                      ExplorerRefChip(ExplorerRef.person(p.id, p.displayTitle)),
                   ],
                 ),
               ),
@@ -692,14 +731,16 @@ class _EventPage extends ConsumerWidget {
                 title: d.places.length == d.placesTotalCount
                     ? 'Where it happened'
                     : 'Where it happened (${d.places.length} of '
-                        '${d.placesTotalCount})',
+                          '${d.placesTotalCount})',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ExplorerMap(places: [
-                      for (final p in d.places)
-                        ExplorerMapPlace(p.id, p.name, p.lat, p.lng),
-                    ]),
+                    ExplorerMap(
+                      places: [
+                        for (final p in d.places)
+                          ExplorerMapPlace(p.id, p.name, p.lat, p.lng),
+                      ],
+                    ),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 6,
@@ -717,9 +758,7 @@ class _EventPage extends ConsumerWidget {
                 icon: Icons.co_present_outlined,
                 title: 'Your sermons (${sermons.length})',
                 child: Column(
-                  children: [
-                    for (final s in sermons) _TaggedItemTile(item: s),
-                  ],
+                  children: [for (final s in sermons) _TaggedItemTile(item: s)],
                 ),
               ),
             if (notebookPages.isNotEmpty)
@@ -765,22 +804,33 @@ class _TopicPage extends ConsumerWidget {
       data: (d) {
         if (d == null) return const _ErrorBody('Topic not found.');
         final dictionary =
-            ref.watch(explorerEntryDictionaryProvider(d.topic.name)).asData
-                    ?.value ??
-                const <DictionaryEntryWithDict>[];
-        final sermons = ref
-                .watch(explorerSermonsProvider(
-                    ExplorerRef.topic(d.topic.id, d.topic.name)))
+            ref
+                .watch(explorerEntryDictionaryProvider(d.topic.name))
+                .asData
+                ?.value ??
+            const <DictionaryEntryWithDict>[];
+        final sermons =
+            ref
+                .watch(
+                  explorerSermonsProvider(
+                    ExplorerRef.topic(d.topic.id, d.topic.name),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
-        final notebookPages = ref
-                .watch(explorerNotebookPagesProvider(
-                    ExplorerRef.topic(d.topic.id, d.topic.name)))
+        final notebookPages =
+            ref
+                .watch(
+                  explorerNotebookPagesProvider(
+                    ExplorerRef.topic(d.topic.id, d.topic.name),
+                  ),
+                )
                 .asData
                 ?.value ??
             const <SearchResult>[];
-        final passageFacets = ref
+        final passageFacets =
+            ref
                 .watch(explorerTopicPassageFacetsProvider(topicId))
                 .asData
                 ?.value ??
@@ -820,7 +870,7 @@ class _TopicPage extends ConsumerWidget {
                               label: r.verse == null
                                   ? '${r.bookName} ${r.chapter}'
                                   : '${r.bookName} ${r.chapter}:${r.verse}'
-                                      '${r.verseEnd != null ? '–${r.verseEnd}' : ''}',
+                                        '${r.verseEnd != null ? '–${r.verseEnd}' : ''}',
                             ),
                         ],
                       ),
@@ -852,10 +902,12 @@ class _TopicPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ExplorerMap(places: [
-                      for (final p in places)
-                        ExplorerMapPlace(p.id, p.name, p.lat, p.lng),
-                    ]),
+                    ExplorerMap(
+                      places: [
+                        for (final p in places)
+                          ExplorerMapPlace(p.id, p.name, p.lat, p.lng),
+                      ],
+                    ),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 6,
@@ -904,7 +956,8 @@ class _TopicPage extends ConsumerWidget {
                   children: [
                     for (final f in passageFacets)
                       if (f.commentaries.isNotEmpty) ...[
-                        if (multiLocation) _TopicLocationLabel(f.book, f.chapter),
+                        if (multiLocation)
+                          _TopicLocationLabel(f.book, f.chapter),
                         for (final section in f.commentaries)
                           _CommentarySection(section: section),
                       ],
@@ -914,14 +967,16 @@ class _TopicPage extends ConsumerWidget {
             if (passageFacets.any((f) => f.crossRefGroups.isNotEmpty))
               ExplorerCollapsibleFacetCard(
                 icon: Icons.compare_arrows_outlined,
-                title: 'Cross-references '
+                title:
+                    'Cross-references '
                     '(${passageFacets.fold(0, (n, f) => n + f.crossRefGroups.fold(0, (m, g) => m + g.refs.length))})',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (final f in passageFacets)
                       if (f.crossRefGroups.isNotEmpty) ...[
-                        if (multiLocation) _TopicLocationLabel(f.book, f.chapter),
+                        if (multiLocation)
+                          _TopicLocationLabel(f.book, f.chapter),
                         for (final group in f.crossRefGroups)
                           _CrossRefGroupTile(group: group),
                       ],
@@ -933,9 +988,7 @@ class _TopicPage extends ConsumerWidget {
                 icon: Icons.co_present_outlined,
                 title: 'Your sermons (${sermons.length})',
                 child: Column(
-                  children: [
-                    for (final s in sermons) _TaggedItemTile(item: s),
-                  ],
+                  children: [for (final s in sermons) _TaggedItemTile(item: s)],
                 ),
               ),
             if (notebookPages.isNotEmpty)
@@ -957,7 +1010,11 @@ class _TopicPage extends ConsumerWidget {
                     for (final f in passageFacets)
                       if (f.notes.isNotEmpty)
                         for (final n in f.notes)
-                          _PassageNoteTile(book: f.book, chapter: f.chapter, note: n),
+                          _PassageNoteTile(
+                            book: f.book,
+                            chapter: f.chapter,
+                            note: n,
+                          ),
                   ],
                 ),
               ),
@@ -970,14 +1027,17 @@ class _TopicPage extends ConsumerWidget {
                   children: [
                     for (final f in passageFacets)
                       if (f.tags.isNotEmpty) ...[
-                        if (multiLocation) _TopicLocationLabel(f.book, f.chapter),
+                        if (multiLocation)
+                          _TopicLocationLabel(f.book, f.chapter),
                         Wrap(
                           spacing: 6,
                           runSpacing: 6,
                           children: [
                             for (final t in f.tags)
-                              ExplorerTagChip(t.tag,
-                                  subtitle: 'v. ${t.verses.join(', ')}'),
+                              ExplorerTagChip(
+                                t.tag,
+                                subtitle: 'v. ${t.verses.join(', ')}',
+                              ),
                           ],
                         ),
                       ],
@@ -1001,52 +1061,80 @@ class _PassagePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final overviewAsync = ref
-        .watch(explorerPassageOverviewProvider((book: book, chapter: chapter)));
-    final commentaries = ref
-            .watch(explorerPassageCommentariesProvider(
-                (book: book, chapter: chapter)))
+    final overviewAsync = ref.watch(
+      explorerPassageOverviewProvider((book: book, chapter: chapter)),
+    );
+    final commentaries =
+        ref
+            .watch(
+              explorerPassageCommentariesProvider((
+                book: book,
+                chapter: chapter,
+              )),
+            )
             .asData
             ?.value ??
         const <ExplorerCommentarySection>[];
-    final crossRefGroups = ref
-            .watch(explorerPassageCrossReferencesProvider(
-                (book: book, chapter: chapter)))
+    final crossRefGroups =
+        ref
+            .watch(
+              explorerPassageCrossReferencesProvider((
+                book: book,
+                chapter: chapter,
+              )),
+            )
             .asData
             ?.value ??
         const <ExplorerCrossRefGroup>[];
-    final passageSermons = ref
+    final passageSermons =
+        ref
             .watch(explorerSermonsProvider(ExplorerRef.passage(book, chapter)))
             .asData
             ?.value ??
         const <SearchResult>[];
-    final passageNotebookPages = ref
-            .watch(explorerNotebookPagesProvider(
-                ExplorerRef.passage(book, chapter)))
+    final passageNotebookPages =
+        ref
+            .watch(
+              explorerNotebookPagesProvider(ExplorerRef.passage(book, chapter)),
+            )
             .asData
             ?.value ??
         const <SearchResult>[];
-    final notes = ref
+    final notes =
+        ref
             .watch(
-                chapterNotesFamilyProvider((bookName: book, chapter: chapter)))
+              chapterNotesFamilyProvider((bookName: book, chapter: chapter)),
+            )
             .asData
             ?.value ??
         const <Note>[];
-    final passageTags = ref
+    final passageTags =
+        ref
             .watch(explorerPassageTagsProvider((book: book, chapter: chapter)))
             .asData
             ?.value ??
         const <ExplorerPassageTag>[];
-    final videoGroups =
-        ref.watch(chapterMediaProvider((book: book, chapter: chapter)));
-    final attachments = ref
+    final videoGroups = ref.watch(
+      chapterMediaProvider((book: book, chapter: chapter)),
+    );
+    final attachments =
+        ref
             .watch(chapterAttachmentsProvider((book: book, chapter: chapter)))
             .asData
             ?.value ??
         const <MediaAttachment>[];
-    final prophecyHits = ref.watch(prophecyChapterIndexProvider)[
-            prophecyChapterKey(book, chapter)] ??
+    final prophecyHits =
+        ref.watch(prophecyChapterIndexProvider)[prophecyChapterKey(
+          book,
+          chapter,
+        )] ??
         const <ProphecyChapterHit>[];
+    final referenceHits =
+        ref.watch(referenceChapterIndexProvider)[referenceChapterKey(
+          book,
+          chapter,
+        )] ??
+        const <ReferenceChapterHit>[];
     return overviewAsync.when(
       loading: () => const SkeletonList(),
       error: (e, _) => _ErrorBody('Couldn\'t load this passage: $e'),
@@ -1058,8 +1146,8 @@ class _PassagePage extends ConsumerWidget {
               trailing: FilledButton.tonalIcon(
                 icon: const Icon(Icons.menu_book, size: 18),
                 label: const Text('Open in reader'),
-                onPressed: () => explorerOpenVerseInReader(
-                    context, ref, book, chapter, 1),
+                onPressed: () =>
+                    explorerOpenVerseInReader(context, ref, book, chapter, 1),
               ),
             ),
             if (d.isEmpty &&
@@ -1071,9 +1159,11 @@ class _PassagePage extends ConsumerWidget {
                 passageTags.isEmpty &&
                 videoGroups.isEmpty &&
                 attachments.isEmpty &&
-                prophecyHits.isEmpty)
+                prophecyHits.isEmpty &&
+                referenceHits.isEmpty)
               const _ErrorBody(
-                  'The datasets don\'t tag anything in this chapter yet.'),
+                'The datasets don\'t tag anything in this chapter yet.',
+              ),
             if (d.people.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.person_outline,
@@ -1097,10 +1187,12 @@ class _PassagePage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ExplorerMap(places: [
-                      for (final p in d.places)
-                        ExplorerMapPlace(p.id, p.name, p.lat, p.lng),
-                    ]),
+                    ExplorerMap(
+                      places: [
+                        for (final p in d.places)
+                          ExplorerMapPlace(p.id, p.name, p.lat, p.lng),
+                      ],
+                    ),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 6,
@@ -1167,6 +1259,47 @@ class _PassagePage extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (referenceHits.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.table_chart_outlined,
+                title: 'Reference (${referenceHits.length})',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final h in referenceHits)
+                      h.explorerPersonId != null
+                          ? ExplorerRefChip(
+                              ExplorerRef.person(h.explorerPersonId!, h.title),
+                              subtitle: h.kind.label,
+                            )
+                          : Chip(
+                              visualDensity: VisualDensity.compact,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              avatar: const Icon(Icons.table_chart, size: 16),
+                              label: Text.rich(
+                                TextSpan(
+                                  text: h.title,
+                                  children: [
+                                    TextSpan(
+                                      text: '  ${h.kind.label}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                  ],
+                ),
+              ),
             for (final group in videoGroups)
               ExplorerFacetCard(
                 icon: Icons.play_circle_outline,
@@ -1201,7 +1334,8 @@ class _PassagePage extends ConsumerWidget {
             if (crossRefGroups.isNotEmpty)
               ExplorerCollapsibleFacetCard(
                 icon: Icons.compare_arrows_outlined,
-                title: 'Cross-references '
+                title:
+                    'Cross-references '
                     '(${crossRefGroups.fold(0, (n, g) => n + g.refs.length)})',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1284,11 +1418,12 @@ class _CrossRefGroupTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('v. ${group.verse}',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
+          Text(
+            'v. ${group.verse}',
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 4),
           Wrap(
             spacing: 6,
@@ -1301,8 +1436,10 @@ class _CrossRefGroupTile extends StatelessWidget {
                   verse: xref.targetVerse,
                 ),
               if (remaining > 0)
-                Text('+$remaining more',
-                    style: Theme.of(context).textTheme.labelSmall),
+                Text(
+                  '+$remaining more',
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
             ],
           ),
         ],
@@ -1339,9 +1476,9 @@ class _CommentarySection extends StatelessWidget {
                     child: Text(
                       'Verse ${entry.verse}',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 HtmlWidget(entry.textContent),
@@ -1423,9 +1560,9 @@ class _DictionarySection extends StatelessWidget {
                   child: Text(
                     entry.word,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 HtmlWidget(entry.definition),
@@ -1454,9 +1591,9 @@ class _TopicLocationLabel extends StatelessWidget {
       child: Text(
         '$book $chapter',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w600,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -1468,7 +1605,8 @@ class _TopicLocationLabel extends StatelessWidget {
 /// it appeared in, so it's only meaningful (and only shown) when the topic
 /// has just one location — see the `multiLocation` check where this is used.
 List<PlaceInPassage> _mergeTopicPlaces(
-    List<ExplorerTopicLocationFacets> facets) {
+  List<ExplorerTopicLocationFacets> facets,
+) {
   final byId = <int, PlaceInPassage>{};
   for (final f in facets) {
     for (final p in f.places) {
@@ -1493,7 +1631,8 @@ List<PlaceInPassage> _mergeTopicPlaces(
 /// de-duplicating items a story's overlapping chapters would otherwise list
 /// twice (matched by youtube id/slug, falling back to title).
 List<MediaGroup> _mergeTopicVideoGroups(
-    List<ExplorerTopicLocationFacets> facets) {
+  List<ExplorerTopicLocationFacets> facets,
+) {
   final merged = <String, MediaGroup>{};
   final seenKeys = <String, Set<String>>{};
   for (final f in facets) {
@@ -1518,7 +1657,8 @@ List<MediaGroup> _mergeTopicVideoGroups(
 /// attachment tagged to more than one of a story's chapters would otherwise
 /// appear once per chapter).
 List<MediaAttachment> _mergeTopicAttachments(
-    List<ExplorerTopicLocationFacets> facets) {
+  List<ExplorerTopicLocationFacets> facets,
+) {
   final byId = <String, MediaAttachment>{};
   for (final f in facets) {
     for (final a in f.attachments) {
@@ -1538,10 +1678,15 @@ class _TagPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(explorerTagDetailProvider(tagId));
-    final crossRefs = ref.watch(explorerTagCrossRefsProvider(tagId)).asData?.value;
-    final commentaries = ref.watch(explorerTagCommentariesProvider(tagId)).asData?.value ??
+    final crossRefs = ref
+        .watch(explorerTagCrossRefsProvider(tagId))
+        .asData
+        ?.value;
+    final commentaries =
+        ref.watch(explorerTagCommentariesProvider(tagId)).asData?.value ??
         const <ExplorerCommentarySection>[];
-    final crossRefGroups = ref.watch(explorerTagCrossReferencesProvider(tagId)).asData?.value ??
+    final crossRefGroups =
+        ref.watch(explorerTagCrossReferencesProvider(tagId)).asData?.value ??
         const <ExplorerCrossRefGroup>[];
     return detailAsync.when(
       loading: () => const SkeletonList(),
@@ -1551,15 +1696,13 @@ class _TagPage extends ConsumerWidget {
           // Tags are user data: unlike the bundled entities, one can vanish
           // from under its breadcrumb (deleted here or on a synced device).
           return const _ErrorBody(
-              'This tag no longer exists — it may have been deleted, '
-              'possibly on another device.');
+            'This tag no longer exists — it may have been deleted, '
+            'possibly on another device.',
+          );
         }
         return _PageScroll(
           children: [
-            _PageTitle(
-              title: '#${d.tag.name}',
-              subtitle: 'Your tag',
-            ),
+            _PageTitle(title: '#${d.tag.name}', subtitle: 'Your tag'),
             if (d.isEmpty)
               const _ErrorBody('Nothing is filed under this tag yet.'),
             if (d.verses.isNotEmpty)
@@ -1595,10 +1738,12 @@ class _TagPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ExplorerMap(places: [
-                      for (final p in crossRefs.places)
-                        ExplorerMapPlace(p.id, p.label, p.lat!, p.lng!),
-                    ]),
+                    ExplorerMap(
+                      places: [
+                        for (final p in crossRefs.places)
+                          ExplorerMapPlace(p.id, p.label, p.lat!, p.lng!),
+                      ],
+                    ),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 6,
@@ -1689,7 +1834,8 @@ class _TagPage extends ConsumerWidget {
             if (crossRefGroups.isNotEmpty)
               ExplorerCollapsibleFacetCard(
                 icon: Icons.compare_arrows_outlined,
-                title: 'Cross-references '
+                title:
+                    'Cross-references '
                     '(${crossRefGroups.fold(0, (n, g) => n + g.refs.length)})',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1704,9 +1850,7 @@ class _TagPage extends ConsumerWidget {
                 icon: Icons.edit_note_outlined,
                 title: 'Notes (${d.notes.length})',
                 child: Column(
-                  children: [
-                    for (final n in d.notes) _TaggedItemTile(item: n),
-                  ],
+                  children: [for (final n in d.notes) _TaggedItemTile(item: n)],
                 ),
               ),
             if (d.sermons.isNotEmpty)
@@ -1788,9 +1932,9 @@ class _TaggedItemTile extends ConsumerWidget {
       title: Text(
         item.title,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w600,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       subtitle: item.textContent.trim().isEmpty
           ? null
@@ -1827,10 +1971,11 @@ class _AttachmentTile extends StatelessWidget {
     final file = await _resolveFile();
     if (!await file.exists()) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content:
-              Text('File not found locally. It may still be syncing.'),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('File not found locally. It may still be syncing.'),
+          ),
+        );
       }
       return;
     }
@@ -1935,17 +2080,17 @@ class _PassageNoteTile extends ConsumerWidget {
       title: Text(
         _label,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w600,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       subtitle: Text(
         note.content,
         maxLines: 4,
         overflow: TextOverflow.ellipsis,
       ),
-      onTap: () => explorerOpenVerseInReader(
-          context, ref, book, chapter, _targetVerse),
+      onTap: () =>
+          explorerOpenVerseInReader(context, ref, book, chapter, _targetVerse),
     );
   }
 }

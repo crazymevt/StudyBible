@@ -8,6 +8,7 @@ import '../domain/reference/measure.dart';
 import '../domain/reference/measures_data.dart';
 import '../domain/reference/named_group.dart';
 import '../domain/reference/named_groups_data.dart';
+import '../domain/reference/reference_index.dart';
 
 /// The curated Kings & Reigns dataset, consumed by the reader's Reference
 /// tool.
@@ -22,5 +23,15 @@ final covenantsProvider = Provider<List<Covenant>>((ref) => covenants);
 
 /// The curated Named Groups dataset (tribes/apostles/judges/prophets),
 /// consumed by the reader's Reference tool.
-final namedGroupsProvider =
-    Provider<List<NamedGroupEntry>>((ref) => namedGroups);
+final namedGroupsProvider = Provider<List<NamedGroupEntry>>(
+  (ref) => namedGroups,
+);
+
+/// The chapter → Reference-entry reverse index (see
+/// [buildReferenceChapterIndex]), built once and cached so the Explorer
+/// passage page can look up the entries touching a chapter without
+/// rescanning all four datasets each open.
+final referenceChapterIndexProvider =
+    Provider<Map<String, List<ReferenceChapterHit>>>(
+      (ref) => buildReferenceChapterIndex(),
+    );

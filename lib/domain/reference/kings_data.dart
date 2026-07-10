@@ -26,6 +26,7 @@ const List<KingReign> kingReigns = [
         'king "like all the nations." Began well but disobeyed repeatedly and '
         'was rejected by God; died by his own sword at Gilboa.',
     citations: ['1 Samuel 10:1', '1 Samuel 15:22-23', '1 Samuel 31:1-6', 'Acts 13:21'],
+    explorerPersonId: 2463,
   ),
   KingReign(
     id: 'david',
@@ -40,6 +41,7 @@ const List<KingReign> kingReigns = [
         "God's own heart\" despite his sin with Bathsheba. Given God's "
         'covenant promise of an eternal throne.',
     citations: ['1 Samuel 16:13', '2 Samuel 5:3-4', '2 Samuel 7:12-16', '1 Kings 2:10-11'],
+    explorerPersonId: 991,
   ),
   KingReign(
     id: 'solomon',
@@ -54,6 +56,7 @@ const List<KingReign> kingReigns = [
         'his many foreign wives turned his heart to idolatry in old age, '
         'setting up the kingdom\'s division.',
     citations: ['1 Kings 3:9-12', '1 Kings 6:1', '1 Kings 11:1-8', '1 Kings 11:42-43'],
+    explorerPersonId: 2746,
   ),
 
   // --- Northern Kingdom (Israel) ---

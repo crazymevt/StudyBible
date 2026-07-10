@@ -118,6 +118,26 @@ void main() {
     expect(container.read(targetVerseToScrollProvider), 1);
   });
 
+  testWidgets(
+      'a hand-verified king shows an Open in Explorer button, an unverified one does not',
+      (tester) async {
+    await pumpPanel(tester);
+
+    await tester.enterText(searchFieldWithHint(kingsHint), 'David');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('David — King'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Open in Explorer'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(searchFieldWithHint(kingsHint), 'Hezekiah');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Hezekiah — King'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Open in Explorer'), findsNothing);
+  });
+
   testWidgets('Measures & Money tab lists units grouped by category', (
     tester,
   ) async {
@@ -278,5 +298,25 @@ void main() {
     expect(container.read(selectedBookNameProvider), 'John');
     expect(container.read(selectedChapterProvider), 21);
     expect(container.read(targetVerseToScrollProvider), 15);
+  });
+
+  testWidgets(
+      'a hand-verified apostle shows an Open in Explorer button, an unverified tribe does not',
+      (tester) async {
+    await pumpPanel(tester);
+
+    await tester.tap(find.text('Named Groups'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Reuben'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Open in Explorer'), findsNothing);
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('12 Apostles'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Simon Peter'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Open in Explorer'), findsOneWidget);
   });
 }

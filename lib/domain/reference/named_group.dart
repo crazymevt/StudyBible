@@ -25,6 +25,13 @@ class NamedGroupEntry {
   /// order for apostles, chronological order for judges and prophets.
   final int order;
 
+  /// The content store's `BiblePeople.id` for this person, hand-verified
+  /// against `assets/data/theographic.json` (name collisions there make
+  /// automatic matching unsafe — see the Reference Phase 5 plan notes) —
+  /// null unless individually confirmed. Powers the "Open in Explorer"
+  /// button and the Explorer passage-page facet.
+  final int? explorerPersonId;
+
   const NamedGroupEntry({
     required this.id,
     required this.list,
@@ -33,6 +40,7 @@ class NamedGroupEntry {
     required this.notes,
     required this.citations,
     required this.order,
+    this.explorerPersonId,
   });
 }
 

@@ -8,8 +8,10 @@ import '../../app/reference_providers.dart';
 import '../../domain/reference/covenant.dart';
 import '../../domain/reference/king_reign.dart';
 import '../../domain/reference/measure.dart';
+import '../../domain/explorer/explorer_ref.dart';
 import '../../domain/reference/named_group.dart';
 import '../common/breakpoints.dart';
+import '../explorer/explorer_screen.dart';
 
 /// A reference citation, e.g. "Micah 5:2", "Isaiah 53:5-6", or a whole
 /// chapter "Leviticus 16". Chapter-only citations default to verse 1,
@@ -34,6 +36,19 @@ void _goToPassage(BuildContext context, WidgetRef ref, String passage) {
     ref.read(activeToolProvider.notifier).close();
     if (Navigator.of(context).canPop()) Navigator.of(context).pop();
   }
+}
+
+/// Opens a hand-verified `BiblePeople` row's Explorer page — only called
+/// where [KingReign.explorerPersonId]/[NamedGroupEntry.explorerPersonId] is
+/// non-null, since that id is a curated constant rather than resolved at
+/// runtime (see either field's doc comment for why).
+void _openInExplorer(
+  BuildContext context,
+  WidgetRef ref,
+  int personId,
+  String label,
+) {
+  openInFreshExplorer(context, ref, ExplorerRef.person(personId, label));
 }
 
 /// Browsable reference tables: Kings & Reigns today, more datasets as tabs
@@ -65,9 +80,7 @@ class ReferencePanel extends ConsumerWidget {
                       children: [
                         Text(
                           'Reference',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
+                          style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         IconButton(
@@ -145,7 +158,10 @@ class _TabSearchHeader extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                   onPressed: onBack,
                 ),
-                Text('Back to results', style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  'Back to results',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ],
             )
           : TextField(
@@ -188,8 +204,9 @@ class _KingsReignsTabState extends ConsumerState<_KingsReignsTab> {
   Widget build(BuildContext context) {
     final selectedId = _selectedId;
     final all = ref.watch(kingReignsProvider);
-    final selected =
-        selectedId == null ? null : all.firstWhere((k) => k.id == selectedId);
+    final selected = selectedId == null
+        ? null
+        : all.firstWhere((k) => k.id == selectedId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -207,6 +224,14 @@ class _KingsReignsTabState extends ConsumerState<_KingsReignsTab> {
               ? _KingReignDetailView(
                   king: selected,
                   onPassageTap: (p) => _goToPassage(context, ref, p),
+                  onOpenInExplorer: selected.explorerPersonId == null
+                      ? null
+                      : () => _openInExplorer(
+                          context,
+                          ref,
+                          selected.explorerPersonId!,
+                          selected.name,
+                        ),
                 )
               : _KingReignList(
                   query: _query,
@@ -286,20 +311,25 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         label.toUpperCase(),
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: scheme.primary,
-              letterSpacing: 0.6,
-            ),
+          fontWeight: FontWeight.bold,
+          color: scheme.primary,
+          letterSpacing: 0.6,
+        ),
       ),
     );
   }
 }
 
 class _KingReignDetailView extends StatelessWidget {
-  const _KingReignDetailView({required this.king, required this.onPassageTap});
+  const _KingReignDetailView({
+    required this.king,
+    required this.onPassageTap,
+    this.onOpenInExplorer,
+  });
 
   final KingReign king;
   final void Function(String passage) onPassageTap;
+  final VoidCallback? onOpenInExplorer;
 
   @override
   Widget build(BuildContext context) {
@@ -311,18 +341,31 @@ class _KingReignDetailView extends StatelessWidget {
         Text(
           king.realm.label.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: scheme.primary,
-                letterSpacing: 0.6,
-              ),
+            fontWeight: FontWeight.bold,
+            color: scheme.primary,
+            letterSpacing: 0.6,
+          ),
         ),
         const SizedBox(height: 4),
-        Text(
-          '${king.name} — ${king.title}',
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(fontWeight: FontWeight.bold),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                '${king.name} — ${king.title}',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            if (onOpenInExplorer != null)
+              IconButton(
+                icon: const Icon(Icons.explore_outlined),
+                tooltip: 'Open in Explorer',
+                visualDensity: VisualDensity.compact,
+                onPressed: onOpenInExplorer,
+              ),
+          ],
         ),
         const SizedBox(height: 2),
         Text(king.reignSummary, style: Theme.of(context).textTheme.bodyMedium),
@@ -331,7 +374,11 @@ class _KingReignDetailView extends StatelessWidget {
           _VerdictChip(verdict: king.verdict!),
         ],
         const SizedBox(height: 16),
-        _NotesSection(notes: king.notes, citations: king.citations, onPassageTap: onPassageTap),
+        _NotesSection(
+          notes: king.notes,
+          citations: king.citations,
+          onPassageTap: onPassageTap,
+        ),
       ],
     );
   }
@@ -384,8 +431,9 @@ class _MeasuresMoneyTabState extends ConsumerState<_MeasuresMoneyTab> {
   Widget build(BuildContext context) {
     final selectedId = _selectedId;
     final all = ref.watch(measuresProvider);
-    final selected =
-        selectedId == null ? null : all.firstWhere((m) => m.id == selectedId);
+    final selected = selectedId == null
+        ? null
+        : all.firstWhere((m) => m.id == selectedId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -480,23 +528,29 @@ class _MeasureDetailView extends StatelessWidget {
         Text(
           measure.category.label.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: scheme.primary,
-                letterSpacing: 0.6,
-              ),
+            fontWeight: FontWeight.bold,
+            color: scheme.primary,
+            letterSpacing: 0.6,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           measure.name,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 2),
-        Text(measure.modernEquivalent, style: Theme.of(context).textTheme.bodyMedium),
+        Text(
+          measure.modernEquivalent,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
         const SizedBox(height: 16),
-        _NotesSection(notes: measure.notes, citations: measure.citations, onPassageTap: onPassageTap),
+        _NotesSection(
+          notes: measure.notes,
+          citations: measure.citations,
+          onPassageTap: onPassageTap,
+        ),
       ],
     );
   }
@@ -527,10 +581,10 @@ class _NotesSection extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               'Notes',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold, color: scheme.primary),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: scheme.primary,
+              ),
             ),
           ],
         ),
@@ -543,12 +597,14 @@ class _NotesSection extends StatelessWidget {
               spacing: 6,
               runSpacing: 6,
               children: citations
-                  .map((p) => ActionChip(
-                        visualDensity: VisualDensity.compact,
-                        avatar: const Icon(Icons.menu_book, size: 16),
-                        label: Text(p),
-                        onPressed: () => onPassageTap(p),
-                      ))
+                  .map(
+                    (p) => ActionChip(
+                      visualDensity: VisualDensity.compact,
+                      avatar: const Icon(Icons.menu_book, size: 16),
+                      label: Text(p),
+                      onPressed: () => onPassageTap(p),
+                    ),
+                  )
                   .toList(),
             ),
           ),
@@ -573,8 +629,9 @@ class _CovenantsTabState extends ConsumerState<_CovenantsTab> {
   Widget build(BuildContext context) {
     final selectedId = _selectedId;
     final all = ref.watch(covenantsProvider);
-    final selected =
-        selectedId == null ? null : all.firstWhere((c) => c.id == selectedId);
+    final selected = selectedId == null
+        ? null
+        : all.firstWhere((c) => c.id == selectedId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -593,7 +650,10 @@ class _CovenantsTabState extends ConsumerState<_CovenantsTab> {
                   visualDensity: VisualDensity.compact,
                   onPressed: () => setState(() => _selectedId = null),
                 ),
-                Text('Back to results', style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  'Back to results',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ],
             ),
           ),
@@ -603,7 +663,9 @@ class _CovenantsTabState extends ConsumerState<_CovenantsTab> {
                   covenant: selected,
                   onPassageTap: (p) => _goToPassage(context, ref, p),
                 )
-              : _CovenantList(onSelect: (id) => setState(() => _selectedId = id)),
+              : _CovenantList(
+                  onSelect: (id) => setState(() => _selectedId = id),
+                ),
         ),
       ],
     );
@@ -638,7 +700,10 @@ class _CovenantList extends ConsumerWidget {
 }
 
 class _CovenantDetailView extends StatelessWidget {
-  const _CovenantDetailView({required this.covenant, required this.onPassageTap});
+  const _CovenantDetailView({
+    required this.covenant,
+    required this.onPassageTap,
+  });
 
   final Covenant covenant;
   final void Function(String passage) onPassageTap;
@@ -650,10 +715,9 @@ class _CovenantDetailView extends StatelessWidget {
       children: [
         Text(
           covenant.name,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         _Field(label: 'Parties', value: covenant.parties),
@@ -689,10 +753,10 @@ class _Field extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: scheme.primary,
-                letterSpacing: 0.6,
-              ),
+            fontWeight: FontWeight.bold,
+            color: scheme.primary,
+            letterSpacing: 0.6,
+          ),
         ),
         const SizedBox(height: 2),
         Text(value, style: Theme.of(context).textTheme.bodyMedium),
@@ -718,8 +782,9 @@ class _NamedGroupsTabState extends ConsumerState<_NamedGroupsTab> {
   Widget build(BuildContext context) {
     final selectedId = _selectedId;
     final all = ref.watch(namedGroupsProvider);
-    final selected =
-        selectedId == null ? null : all.firstWhere((e) => e.id == selectedId);
+    final selected = selectedId == null
+        ? null
+        : all.firstWhere((e) => e.id == selectedId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -738,7 +803,10 @@ class _NamedGroupsTabState extends ConsumerState<_NamedGroupsTab> {
                       visualDensity: VisualDensity.compact,
                       onPressed: () => setState(() => _selectedId = null),
                     ),
-                    Text(_selectedList.label, style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      _selectedList.label,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ],
                 )
               : SingleChildScrollView(
@@ -749,7 +817,8 @@ class _NamedGroupsTabState extends ConsumerState<_NamedGroupsTab> {
                         ButtonSegment(value: list, label: Text(list.label)),
                     ],
                     selected: {_selectedList},
-                    onSelectionChanged: (s) => setState(() => _selectedList = s.first),
+                    onSelectionChanged: (s) =>
+                        setState(() => _selectedList = s.first),
                   ),
                 ),
         ),
@@ -759,6 +828,14 @@ class _NamedGroupsTabState extends ConsumerState<_NamedGroupsTab> {
               ? _NamedGroupDetailView(
                   entry: selected,
                   onPassageTap: (p) => _goToPassage(context, ref, p),
+                  onOpenInExplorer: selected.explorerPersonId == null
+                      ? null
+                      : () => _openInExplorer(
+                          context,
+                          ref,
+                          selected.explorerPersonId!,
+                          selected.name,
+                        ),
                 )
               : _NamedGroupList(
                   list: _selectedList,
@@ -789,7 +866,10 @@ class _NamedGroupList extends ConsumerWidget {
             dense: true,
             leading: CircleAvatar(
               radius: 14,
-              child: Text('${e.order}', style: Theme.of(context).textTheme.labelSmall),
+              child: Text(
+                '${e.order}',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
             ),
             title: Text(e.name),
             subtitle: Text(
@@ -807,10 +887,15 @@ class _NamedGroupList extends ConsumerWidget {
 }
 
 class _NamedGroupDetailView extends StatelessWidget {
-  const _NamedGroupDetailView({required this.entry, required this.onPassageTap});
+  const _NamedGroupDetailView({
+    required this.entry,
+    required this.onPassageTap,
+    this.onOpenInExplorer,
+  });
 
   final NamedGroupEntry entry;
   final void Function(String passage) onPassageTap;
+  final VoidCallback? onOpenInExplorer;
 
   @override
   Widget build(BuildContext context) {
@@ -822,18 +907,31 @@ class _NamedGroupDetailView extends StatelessWidget {
         Text(
           entry.list.label.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: scheme.primary,
-                letterSpacing: 0.6,
-              ),
+            fontWeight: FontWeight.bold,
+            color: scheme.primary,
+            letterSpacing: 0.6,
+          ),
         ),
         const SizedBox(height: 4),
-        Text(
-          entry.name,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(fontWeight: FontWeight.bold),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                entry.name,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            if (onOpenInExplorer != null)
+              IconButton(
+                icon: const Icon(Icons.explore_outlined),
+                tooltip: 'Open in Explorer',
+                visualDensity: VisualDensity.compact,
+                onPressed: onOpenInExplorer,
+              ),
+          ],
         ),
         const SizedBox(height: 2),
         Text(entry.subtitle, style: Theme.of(context).textTheme.bodyMedium),

@@ -111,4 +111,20 @@ void main() {
           reason: '${list.name} orders: $orders');
     }
   });
+
+  test('hand-verified explorerPersonId values are unique per dataset', () {
+    final kingIds = kingReigns
+        .map((k) => k.explorerPersonId)
+        .whereType<int>()
+        .toList();
+    expect(kingIds.toSet().length, kingIds.length,
+        reason: 'duplicate explorerPersonId in kingReigns: $kingIds');
+
+    final namedGroupIds = namedGroups
+        .map((e) => e.explorerPersonId)
+        .whereType<int>()
+        .toList();
+    expect(namedGroupIds.toSet().length, namedGroupIds.length,
+        reason: 'duplicate explorerPersonId in namedGroups: $namedGroupIds');
+  });
 }
