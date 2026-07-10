@@ -1,5 +1,53 @@
 [
   {
+    "version": "26.7.10+1",
+    "date": "2026-07-10",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "New Reference reader tool, starting with Kings & Reigns",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Reference: added Measures & Money tab",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Reference: added Covenants tab",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Named Groups moved from Reference into Explorer as a browse category",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Reference entries now link to Explorer, with a new passage-page facet",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Prophets: added 14 non-writing prophets and new section headers",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Prophecy dataset expanded with 41 new entries",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.9+1",
     "date": "2026-07-09",
     "features": [
