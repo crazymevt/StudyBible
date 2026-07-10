@@ -56,6 +56,14 @@ const List<Measure> measures = [
     notes: 'A Greek/Roman distance unit — Emmaus was about seven furlongs from Jerusalem.',
     citations: ['Luke 24:13', 'Revelation 21:16'],
   ),
+  Measure(
+    id: 'mile',
+    name: 'Mile',
+    category: MeasureCategory.length,
+    modernEquivalent: '≈ 1,000 paces (1.48 km)',
+    notes: 'The Roman mile, the unit behind Jesus\' "go with him twain" teaching on compelled service.',
+    citations: ['Matthew 5:41'],
+  ),
 
   // --- Weight ---
   Measure(
@@ -65,6 +73,25 @@ const List<Measure> measures = [
     modernEquivalent: '≈ 0.6 grams — 1/20 of a shekel',
     notes: 'The smallest weight unit, used to define the sanctuary shekel\'s standard.',
     citations: ['Exodus 30:13'],
+  ),
+  Measure(
+    id: 'bekah',
+    name: 'Bekah',
+    category: MeasureCategory.weight,
+    modernEquivalent: '≈ 5.7 grams — half a shekel',
+    notes: 'The half-shekel weight each numbered Israelite man paid toward the tabernacle census offering.',
+    citations: ['Exodus 38:26'],
+  ),
+  Measure(
+    id: 'pim',
+    name: 'Pim',
+    category: MeasureCategory.weight,
+    modernEquivalent: '≈ 7.6 grams — roughly two-thirds of a shekel',
+    notes:
+        'The price the Philistines charged Israel to sharpen plow points and '
+        'other iron tools; the word survived only via archaeology, since KJV '
+        'renders it "a file" rather than as a currency.',
+    citations: ['1 Samuel 13:21'],
   ),
   Measure(
     id: 'shekel-weight',
@@ -93,6 +120,14 @@ const List<Measure> measures = [
 
   // --- Volume ---
   Measure(
+    id: 'cab',
+    name: 'Cab',
+    category: MeasureCategory.volume,
+    modernEquivalent: '≈ 1.2 liters — 1/18 of an ephah',
+    notes: 'The smallest dry measure — a quarter-cab of dove\'s dung sold for five shekels during Samaria\'s siege famine.',
+    citations: ['2 Kings 6:25'],
+  ),
+  Measure(
     id: 'omer',
     name: 'Omer',
     category: MeasureCategory.volume,
@@ -115,6 +150,16 @@ const List<Measure> measures = [
     modernEquivalent: '≈ 22 liters (5 gallons)',
     notes: 'The standard dry-goods measure — Ruth gleaned about an ephah of barley in a day.',
     citations: ['Ruth 2:17', 'Leviticus 5:11'],
+  ),
+  Measure(
+    id: 'letek',
+    name: 'Letek (Half-homer)',
+    category: MeasureCategory.volume,
+    modernEquivalent: '≈ 110 liters — half a homer',
+    notes:
+        'Part of the price Hosea paid to redeem his unfaithful wife Gomer, '
+        'alongside silver and an homer of barley; KJV renders it "half homer".',
+    citations: ['Hosea 3:2'],
   ),
   Measure(
     id: 'homer',
@@ -165,8 +210,19 @@ const List<Measure> measures = [
     name: 'Didrachma (Temple Tax)',
     category: MeasureCategory.money,
     modernEquivalent: '≈ 2 days\' wages — a half-shekel per person',
-    notes: 'The annual temple tax Jesus paid with a coin found in a fish\'s mouth.',
-    citations: ['Matthew 17:24-27'],
+    notes: 'The annual temple tax the collectors asked Peter whether Jesus paid.',
+    citations: ['Matthew 17:24'],
+  ),
+  Measure(
+    id: 'stater',
+    name: 'Stater',
+    category: MeasureCategory.money,
+    modernEquivalent: '≈ 4 days\' wages — a shekel-equivalent silver coin',
+    notes:
+        'The coin (KJV: "a piece of money") Peter found in a fish\'s mouth, '
+        'worth exactly two didrachmas — enough to cover the temple tax for '
+        'both himself and Jesus.',
+    citations: ['Matthew 17:27'],
   ),
   Measure(
     id: 'denarius',
