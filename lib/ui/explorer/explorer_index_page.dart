@@ -34,10 +34,21 @@ class ExplorerIndexPage extends ConsumerStatefulWidget {
 }
 
 class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
+  /// Whether a category has its own curated, non-alphabetical order rather
+  /// than plain A-Z (the feasts calendar, tribes' birth order, etc.).
+  static const _naturallyOrderedCategories = {
+    'feast',
+    'tribe',
+    'apostle',
+    'judge',
+    'prophet',
+  };
+
   /// Whether the provider's given order is itself a meaningful browse order
   /// (the events timeline, the feasts calendar) rather than plain A-Z.
   bool get _natural =>
-      widget.kind == ExplorerEntityType.event || widget.category == 'feast';
+      widget.kind == ExplorerEntityType.event ||
+      _naturallyOrderedCategories.contains(widget.category);
 
   // Naturally-ordered kinds default to that order; everything else to A-Z.
   late _IndexSort _sort = _natural ? _IndexSort.rank : _IndexSort.alpha;
@@ -48,6 +59,10 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
   String get _noun => switch (widget.category) {
         'feast' => 'feasts',
         'story' => 'stories',
+        'tribe' => 'tribes',
+        'apostle' => 'apostles',
+        'judge' => 'judges',
+        'prophet' => 'prophets',
         _ => switch (widget.kind) {
             ExplorerEntityType.person => 'people',
             ExplorerEntityType.place => 'places',
@@ -64,10 +79,13 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
       widget.kind == ExplorerEntityType.person ||
       widget.kind == ExplorerEntityType.place;
 
-  String get _rankLabel => switch (widget.kind) {
-        ExplorerEntityType.event => 'Timeline',
-        ExplorerEntityType.topic => 'Calendar',
-        _ => 'Most verses',
+  String get _rankLabel => switch (widget.category) {
+        'feast' => 'Calendar',
+        'tribe' || 'apostle' || 'judge' || 'prophet' => 'Traditional order',
+        _ => switch (widget.kind) {
+            ExplorerEntityType.event => 'Timeline',
+            _ => 'Most verses',
+          },
       };
 
   /// The first alphabetic character of [label] — story titles like

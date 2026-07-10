@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:study_bible/domain/reference/covenants_data.dart';
 import 'package:study_bible/domain/reference/kings_data.dart';
 import 'package:study_bible/domain/reference/measures_data.dart';
-import 'package:study_bible/domain/reference/named_groups_data.dart';
 import 'package:study_bible/domain/reference/reference_index.dart';
 
 void main() {
@@ -30,7 +29,6 @@ void main() {
     final reachableKingIds = <String>{};
     final reachableMeasureIds = <String>{};
     final reachableCovenantIds = <String>{};
-    final reachableNamedGroupIds = <String>{};
     for (final hits in index.values) {
       for (final h in hits) {
         switch (h.kind) {
@@ -40,15 +38,12 @@ void main() {
             reachableMeasureIds.add(h.title);
           case ReferenceKind.covenant:
             reachableCovenantIds.add(h.title);
-          case ReferenceKind.namedGroup:
-            reachableNamedGroupIds.add(h.title);
         }
       }
     }
     expect(reachableKingIds.length, kingReigns.length);
     expect(reachableMeasureIds.length, measures.length);
     expect(reachableCovenantIds.length, covenants.length);
-    expect(reachableNamedGroupIds.length, namedGroups.length);
   });
 
   test('explorerPersonId only appears where the source data set it', () {

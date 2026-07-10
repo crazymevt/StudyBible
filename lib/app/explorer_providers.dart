@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content_store.dart';
+import '../data/importer/curated_topics_data.dart';
 import '../data/user_store.dart';
 import '../domain/explorer/explorer_ref.dart';
 import '../domain/explorer/fuzzy_suggest.dart';
@@ -32,9 +33,9 @@ final explorerReadyProvider = FutureProvider<bool>((ref) async {
   return true;
 });
 
-/// Dataset sizes shown on the Explorer home page. Curated feasts and stories
-/// are counted apart from the plain (Nave's) topics — each of the three gets
-/// its own browse chip.
+/// Dataset sizes shown on the Explorer home page. Curated feasts, stories,
+/// and named-group categories are counted apart from the plain (Nave's)
+/// topics — each gets its own browse chip.
 class ExplorerStats {
   final int people;
   final int places;
@@ -43,6 +44,10 @@ class ExplorerStats {
   final int feasts;
   final int stories;
   final int prophecies;
+  final int tribes;
+  final int apostles;
+  final int judges;
+  final int prophets;
   const ExplorerStats({
     required this.people,
     required this.places,
@@ -51,6 +56,10 @@ class ExplorerStats {
     required this.feasts,
     required this.stories,
     required this.prophecies,
+    required this.tribes,
+    required this.apostles,
+    required this.judges,
+    required this.prophets,
   });
 }
 
@@ -71,6 +80,10 @@ final explorerStatsProvider = FutureProvider<ExplorerStats>((ref) async {
     count('topics WHERE category IS NULL'),
     count("topics WHERE category = 'feast'"),
     count("topics WHERE category = 'story'"),
+    count("topics WHERE category = 'tribe'"),
+    count("topics WHERE category = 'apostle'"),
+    count("topics WHERE category = 'judge'"),
+    count("topics WHERE category = 'prophet'"),
   ]);
   return ExplorerStats(
     people: counts[0],
@@ -82,8 +95,19 @@ final explorerStatsProvider = FutureProvider<ExplorerStats>((ref) async {
     // Prophecies aren't a content-store table — they're the pure-Dart
     // `prophecies` dataset, so this count is just its length.
     prophecies: prophecies.length,
+    tribes: counts[6],
+    apostles: counts[7],
+    judges: counts[8],
+    prophets: counts[9],
   );
 });
+
+/// Hand-verified tribe/apostle/judge/prophet → `BiblePeople.id` links (see
+/// `namedGroupPersonIds` in `curated_topics_data.dart`), wrapped in a
+/// provider so the Explorer topic page reads it the same way it reads
+/// everything else.
+final namedGroupPersonIdsProvider =
+    Provider<Map<String, int>>((ref) => namedGroupPersonIds);
 
 // --- Browsable indexes (the pages behind the home page's dataset chips) ---
 
@@ -172,6 +196,24 @@ final explorerIndexProvider = FutureProvider.family<List<ExplorerIndexEntry>,
         final order = [for (final f in feasts) f.name.toUpperCase()];
         rows.sort(
             (a, b) => order.indexOf(a.name).compareTo(order.indexOf(b.name)));
+      } else if (spec.category == 'tribe') {
+        // Birth order (Genesis 29-30, 35), not alphabetical.
+        rows.sort((a, b) =>
+            tribeOrder.indexOf(a.name).compareTo(tribeOrder.indexOf(b.name)));
+      } else if (spec.category == 'apostle') {
+        // The Matthew 10:2-4 list order, not alphabetical.
+        rows.sort((a, b) => apostleOrder
+            .indexOf(a.name)
+            .compareTo(apostleOrder.indexOf(b.name)));
+      } else if (spec.category == 'judge') {
+        // Chronological, per the book of Judges (and 1 Samuel for Samuel).
+        rows.sort((a, b) =>
+            judgeOrder.indexOf(a.name).compareTo(judgeOrder.indexOf(b.name)));
+      } else if (spec.category == 'prophet') {
+        // Canonical order (majors, then minors), not alphabetical.
+        rows.sort((a, b) => prophetOrder
+            .indexOf(a.name)
+            .compareTo(prophetOrder.indexOf(b.name)));
       }
       return [
         for (final t in rows)

@@ -357,6 +357,27 @@ class _HomeIntro extends ConsumerWidget {
                 '${stats.prophecies} prophecies',
               ),
               _StatChip(
+                const ExplorerRef.browse(
+                    ExplorerEntityType.topic, 'Tribes of Israel',
+                    category: 'tribe'),
+                '${stats.tribes} tribes',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.topic, 'Apostles',
+                    category: 'apostle'),
+                '${stats.apostles} apostles',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.topic, 'Judges',
+                    category: 'judge'),
+                '${stats.judges} judges',
+              ),
+              _StatChip(
+                const ExplorerRef.browse(ExplorerEntityType.topic, 'Prophets',
+                    category: 'prophet'),
+                '${stats.prophets} prophets',
+              ),
+              _StatChip(
                 const ExplorerRef.browse(ExplorerEntityType.topic, 'Topics'),
                 '${stats.topics} topics',
               ),

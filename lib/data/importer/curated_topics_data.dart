@@ -4232,4 +4232,539 @@ const _storyTopics = <CuratedTopic>[
   ),
 ];
 
-final curatedTopics = <CuratedTopic>[..._feastTopics, ..._storyTopics];
+/// The 12 tribes of Israel, in Jacob's sons' birth order (Genesis 29–30,
+/// 35) — the tribes' own natural, non-alphabetical browse order.
+final _tribeTopics = <CuratedTopic>[
+  CuratedTopic(
+    name: 'REUBEN',
+    category: 'tribe',
+    description:
+        "Jacob's firstborn, by Leah. Lost his birthright privilege for "
+        "defiling his father's bed.",
+    refs: [_ref('Genesis 29:32'), _ref('Genesis 49:3-4')],
+  ),
+  CuratedTopic(
+    name: 'SIMEON',
+    category: 'tribe',
+    description:
+        "Jacob's second son, by Leah. Later absorbed largely into Judah's "
+        'territory.',
+    refs: [_ref('Genesis 29:33')],
+  ),
+  CuratedTopic(
+    name: 'LEVI',
+    category: 'tribe',
+    description:
+        "Jacob's third son, by Leah. Received no territorial inheritance; "
+        "set apart as Israel's priestly tribe instead.",
+    refs: [_ref('Genesis 29:34'), _ref('Numbers 18:20')],
+  ),
+  CuratedTopic(
+    name: 'JUDAH',
+    category: 'tribe',
+    description:
+        "Jacob's fourth son, by Leah. The royal tribe — David's line and, "
+        "ultimately, the Messiah's.",
+    refs: [_ref('Genesis 29:35'), _ref('Genesis 49:10')],
+  ),
+  CuratedTopic(
+    name: 'DAN',
+    category: 'tribe',
+    description:
+        "Son of Bilhah, Rachel's servant. Samson, most famous of the "
+        'judges, was of this tribe.',
+    refs: [_ref('Genesis 30:6')],
+  ),
+  CuratedTopic(
+    name: 'NAPHTALI',
+    category: 'tribe',
+    description:
+        "Son of Bilhah, Rachel's servant. Settled in Galilee's hill "
+        "country, later the setting for much of Jesus' ministry.",
+    refs: [_ref('Genesis 30:8')],
+  ),
+  CuratedTopic(
+    name: 'GAD',
+    category: 'tribe',
+    description:
+        "Son of Zilpah, Leah's servant. Settled east of the Jordan, among "
+        'the first tribes to request that territory.',
+    refs: [_ref('Genesis 30:11')],
+  ),
+  CuratedTopic(
+    name: 'ASHER',
+    category: 'tribe',
+    description:
+        "Son of Zilpah, Leah's servant. Allotted fertile coastal land in "
+        "the far north; blessed with abundance in Jacob's final words.",
+    refs: [_ref('Genesis 30:13'), _ref('Genesis 49:20')],
+  ),
+  CuratedTopic(
+    name: 'ISSACHAR',
+    category: 'tribe',
+    description:
+        "Jacob's ninth son, by Leah. Later described as men who "
+        '"understood the times," advising David.',
+    refs: [_ref('Genesis 30:18'), _ref('1 Chronicles 12:32')],
+  ),
+  CuratedTopic(
+    name: 'ZEBULUN',
+    category: 'tribe',
+    description:
+        "Jacob's tenth son, by Leah. Settled near the Sea of Galilee, "
+        'bordering Naphtali.',
+    refs: [_ref('Genesis 30:20')],
+  ),
+  CuratedTopic(
+    name: 'JOSEPH',
+    category: 'tribe',
+    description:
+        "Jacob's eleventh son, by Rachel. Sold into slavery by his "
+        'brothers, then rose to rule Egypt. His inheritance was later '
+        'split between his two sons, Ephraim and Manasseh, keeping the '
+        'tribal count at twelve without Levi.',
+    refs: [_ref('Genesis 30:24'), _ref('Joshua 14:4')],
+  ),
+  CuratedTopic(
+    name: 'BENJAMIN',
+    category: 'tribe',
+    description:
+        "Jacob's twelfth son, by Rachel — born in Canaan. Rachel died "
+        "giving birth to him; Saul, Israel's first king, was of this "
+        'tribe.',
+    refs: [_ref('Genesis 35:18')],
+  ),
+];
+
+/// The 12 apostles, in the Matthew 10:2-4 list order.
+final _apostleTopics = <CuratedTopic>[
+  CuratedTopic(
+    name: 'SIMON PETER',
+    category: 'apostle',
+    description:
+        '"The Rock" — leader among the Twelve. Denied Jesus three times '
+        'the night of his arrest, then was restored and commissioned.',
+    refs: [_ref('Matthew 10:2'), _ref('John 21:15-17')],
+  ),
+  CuratedTopic(
+    name: 'ANDREW',
+    category: 'apostle',
+    description:
+        "Peter's brother, one of the first two disciples called. "
+        'Originally a disciple of John the Baptist before following '
+        'Jesus.',
+    refs: [_ref('Matthew 10:2'), _ref('John 1:40-42')],
+  ),
+  CuratedTopic(
+    name: 'JAMES (SON OF ZEBEDEE)',
+    category: 'apostle',
+    description:
+        "John's brother, part of Jesus' inner circle. The first apostle "
+        'martyred, executed by Herod Agrippa I.',
+    refs: [_ref('Matthew 10:2'), _ref('Acts 12:2')],
+  ),
+  CuratedTopic(
+    name: 'JOHN',
+    category: 'apostle',
+    description:
+        '"The disciple whom Jesus loved." Traditionally credited with '
+        'the Gospel of John, three epistles, and Revelation.',
+    refs: [_ref('Matthew 10:2'), _ref('John 21:20')],
+  ),
+  CuratedTopic(
+    name: 'PHILIP',
+    category: 'apostle',
+    description:
+        'Brought Nathanael to Jesus. From Bethsaida, the same town as '
+        'Peter and Andrew.',
+    refs: [_ref('Matthew 10:3'), _ref('John 1:45-46')],
+  ),
+  CuratedTopic(
+    name: 'BARTHOLOMEW (NATHANAEL)',
+    category: 'apostle',
+    description:
+        '"An Israelite indeed, in whom is no guile." Widely identified '
+        "with the Nathanael of John's Gospel.",
+    refs: [_ref('Matthew 10:3'), _ref('John 1:47')],
+  ),
+  CuratedTopic(
+    name: 'THOMAS',
+    category: 'apostle',
+    description:
+        '"Doubting Thomas." Refused to believe the resurrection without '
+        'physical proof, then confessed Jesus as Lord and God.',
+    refs: [_ref('Matthew 10:3'), _ref('John 20:24-28')],
+  ),
+  CuratedTopic(
+    name: 'MATTHEW (LEVI)',
+    category: 'apostle',
+    description:
+        'Former tax collector. Traditionally credited with the Gospel '
+        'bearing his name.',
+    refs: [_ref('Matthew 10:3'), _ref('Matthew 9:9')],
+  ),
+  CuratedTopic(
+    name: 'JAMES (SON OF ALPHAEUS)',
+    category: 'apostle',
+    description:
+        'Sometimes called "James the Less." Little is recorded of him '
+        'beyond his name in the apostle lists.',
+    refs: [_ref('Matthew 10:3')],
+  ),
+  CuratedTopic(
+    name: 'THADDAEUS (JUDAS SON OF JAMES)',
+    category: 'apostle',
+    description:
+        'Asked Jesus why he would reveal himself only to the disciples. '
+        'Distinguished by name from Judas Iscariot at the last supper.',
+    refs: [_ref('Matthew 10:3'), _ref('John 14:22')],
+  ),
+  CuratedTopic(
+    name: 'SIMON THE ZEALOT',
+    category: 'apostle',
+    description:
+        'Named for a former political-nationalist allegiance. His '
+        'inclusion alongside Matthew (a tax collector) reflects the '
+        "Twelve's political diversity.",
+    refs: [_ref('Matthew 10:4')],
+  ),
+  CuratedTopic(
+    name: 'JUDAS ISCARIOT',
+    category: 'apostle',
+    description:
+        "Betrayed Jesus for thirty pieces of silver. Kept the disciples' "
+        'money bag; hanged himself after the betrayal.',
+    refs: [_ref('Matthew 10:4'), _ref('Matthew 26:14-16')],
+  ),
+];
+
+/// The judges of Israel, in the chronological order the book of Judges (and
+/// 1 Samuel, for Samuel) narrates them.
+final _judgeTopics = <CuratedTopic>[
+  CuratedTopic(
+    name: 'OTHNIEL',
+    category: 'judge',
+    description:
+        "Israel's first judge. Delivered Israel from Cushan-rishathaim, "
+        'king of Mesopotamia.',
+    refs: [_ref('Judges 3:9-11')],
+  ),
+  CuratedTopic(
+    name: 'EHUD',
+    category: 'judge',
+    description:
+        'A left-handed Benjamite. Assassinated Eglon, king of Moab, with '
+        'a concealed dagger.',
+    refs: [_ref('Judges 3:15-30')],
+  ),
+  CuratedTopic(
+    name: 'SHAMGAR',
+    category: 'judge',
+    description:
+        'Struck down 600 Philistines with an ox goad. Gets only a single '
+        'verse, the briefest account of any judge.',
+    refs: [_ref('Judges 3:31')],
+  ),
+  CuratedTopic(
+    name: 'DEBORAH',
+    category: 'judge',
+    description:
+        'The only female judge, also a prophetess. Led Israel to victory '
+        'over Canaanite general Sisera and sang a victory song with '
+        'Barak.',
+    refs: [_ref('Judges 4:4-5'), _ref('Judges 5:1-3')],
+  ),
+  CuratedTopic(
+    name: 'GIDEON',
+    category: 'judge',
+    description:
+        'Defeated Midian with just 300 men. Tested God with the fleece '
+        "before leading Israel's smallest army to a decisive victory.",
+    refs: [_ref('Judges 6:11-14'), _ref('Judges 7:19-21')],
+  ),
+  CuratedTopic(
+    name: 'TOLA',
+    category: 'judge',
+    description:
+        'Judged Israel 23 years. Little detail is recorded beyond his '
+        'lineage and tenure.',
+    refs: [_ref('Judges 10:1-2')],
+  ),
+  CuratedTopic(
+    name: 'JAIR',
+    category: 'judge',
+    description:
+        'Had thirty sons who rode thirty donkeys. A Gileadite who judged '
+        'Israel 22 years.',
+    refs: [_ref('Judges 10:3-5')],
+  ),
+  CuratedTopic(
+    name: 'JEPHTHAH',
+    category: 'judge',
+    description:
+        'A rejected outcast turned military deliverer. Defeated the '
+        'Ammonites, but is remembered for a rash vow with tragic '
+        'consequences for his daughter.',
+    refs: [_ref('Judges 11:1-3'), _ref('Judges 12:7')],
+  ),
+  CuratedTopic(
+    name: 'IBZAN',
+    category: 'judge',
+    description:
+        'Had thirty sons and thirty daughters. Judged Israel from '
+        'Bethlehem for seven years.',
+    refs: [_ref('Judges 12:8-10')],
+  ),
+  CuratedTopic(
+    name: 'ELON',
+    category: 'judge',
+    description:
+        'A Zebulunite. Judged Israel ten years; little else is recorded.',
+    refs: [_ref('Judges 12:11-12')],
+  ),
+  CuratedTopic(
+    name: 'ABDON',
+    category: 'judge',
+    description:
+        'Had forty sons and thirty grandsons who rode 70 donkeys. The '
+        'last of the "minor judges" before Samson.',
+    refs: [_ref('Judges 12:13-15')],
+  ),
+  CuratedTopic(
+    name: 'SAMSON',
+    category: 'judge',
+    description:
+        'A Nazirite of superhuman strength. Betrayed by Delilah after '
+        'revealing the secret of his strength; killed more Philistines '
+        'in his death than in his life by pulling down their temple.',
+    refs: [_ref('Judges 13:24'), _ref('Judges 16:28-30')],
+  ),
+  CuratedTopic(
+    name: 'SAMUEL',
+    category: 'judge',
+    description:
+        "Israel's last judge, also a prophet and priest. Anointed "
+        "Israel's first two kings, Saul and David, ending the era of "
+        'the judges.',
+    refs: [_ref('1 Samuel 7:15-17')],
+  ),
+];
+
+/// The major and minor prophets, in canonical order (majors first, then
+/// minors in their traditional Book order).
+final _prophetTopics = <CuratedTopic>[
+  CuratedTopic(
+    name: 'ISAIAH',
+    category: 'prophet',
+    description:
+        'Major Prophet, 8th century BC. The most-quoted Old Testament '
+        'prophet in the New Testament, including many Messianic '
+        'prophecies.',
+    refs: [_ref('Isaiah 1:1')],
+  ),
+  CuratedTopic(
+    name: 'JEREMIAH',
+    category: 'prophet',
+    description:
+        'Major Prophet, 7th–6th century BC. "The weeping prophet," who '
+        "ministered through Jerusalem's fall to Babylon.",
+    refs: [_ref('Jeremiah 1:1')],
+  ),
+  CuratedTopic(
+    name: 'EZEKIEL',
+    category: 'prophet',
+    description:
+        'Major Prophet, 6th century BC. Prophesied among the exiles in '
+        'Babylon, known for vivid visions like the valley of dry bones.',
+    refs: [_ref('Ezekiel 1:1')],
+  ),
+  CuratedTopic(
+    name: 'DANIEL',
+    category: 'prophet',
+    description:
+        'Major Prophet, 6th century BC. Exiled to Babylon as a youth; '
+        'served under multiple kings while receiving prophetic visions.',
+    refs: [_ref('Daniel 1:1')],
+  ),
+  CuratedTopic(
+    name: 'HOSEA',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 8th century BC. His troubled marriage to Gomer '
+        "illustrated God's faithfulness to unfaithful Israel.",
+    refs: [_ref('Hosea 1:1')],
+  ),
+  CuratedTopic(
+    name: 'JOEL',
+    category: 'prophet',
+    description:
+        'Minor Prophet, date debated. A locust plague becomes the '
+        'occasion for his call to repentance and promise of the Spirit '
+        'poured out.',
+    refs: [_ref('Joel 1:1')],
+  ),
+  CuratedTopic(
+    name: 'AMOS',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 8th century BC. A shepherd from Judah sent to '
+        "confront the northern kingdom's social injustice.",
+    refs: [_ref('Amos 1:1')],
+  ),
+  CuratedTopic(
+    name: 'OBADIAH',
+    category: 'prophet',
+    description:
+        'Minor Prophet — the shortest Old Testament book. A '
+        'single-chapter oracle of judgment against Edom.',
+    refs: [_ref('Obadiah 1:1')],
+  ),
+  CuratedTopic(
+    name: 'JONAH',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 8th century BC. Fled his call to preach to '
+        'Nineveh and was swallowed by a great fish before finally '
+        'obeying.',
+    refs: [_ref('Jonah 1:1')],
+  ),
+  CuratedTopic(
+    name: 'MICAH',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 8th century BC. Named Bethlehem as the '
+        "Messiah's birthplace centuries in advance.",
+    refs: [_ref('Micah 1:1')],
+  ),
+  CuratedTopic(
+    name: 'NAHUM',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 7th century BC. Prophesied the destruction of '
+        "Nineveh, over a century after Jonah's preaching there.",
+    refs: [_ref('Nahum 1:1')],
+  ),
+  CuratedTopic(
+    name: 'HABAKKUK',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 7th century BC. Structured as a dialogue with '
+        'God over why the wicked prosper; "the just shall live by his '
+        'faith."',
+    refs: [_ref('Habakkuk 1:1')],
+  ),
+  CuratedTopic(
+    name: 'ZEPHANIAH',
+    category: 'prophet',
+    description:
+        "Minor Prophet, 7th century BC. Prophesied during Josiah's "
+        'reign, warning of the coming "day of the LORD."',
+    refs: [_ref('Zephaniah 1:1')],
+  ),
+  CuratedTopic(
+    name: 'HAGGAI',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 6th century BC (post-exile). Urged the returned '
+        'exiles to resume rebuilding the temple.',
+    refs: [_ref('Haggai 1:1')],
+  ),
+  CuratedTopic(
+    name: 'ZECHARIAH',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 6th century BC (post-exile). Ministered '
+        "alongside Haggai, encouraging the temple's completion with "
+        'vivid Messianic visions.',
+    refs: [_ref('Zechariah 1:1')],
+  ),
+  CuratedTopic(
+    name: 'MALACHI',
+    category: 'prophet',
+    description:
+        'Minor Prophet, 5th century BC — the last Old Testament book. '
+        "Closes the Old Testament rebuking Israel's complacency and "
+        'looking ahead to a coming messenger.',
+    refs: [_ref('Malachi 1:1')],
+  ),
+];
+
+final curatedTopics = <CuratedTopic>[
+  ..._feastTopics,
+  ..._storyTopics,
+  ..._tribeTopics,
+  ..._apostleTopics,
+  ..._judgeTopics,
+  ..._prophetTopics,
+];
+
+/// Hand-verified `BiblePeople.id` links for tribe/apostle/judge/prophet
+/// topics — found by reading `assets/data/theographic.json` directly (see
+/// Reference tool Phase 5/6 plan notes: automatic name matching is unsafe,
+/// the raw data has real collisions like duplicate "Ahaziah" rows), keyed
+/// `'category|NAME'` to match against a `Topics` row's `category` + `name`.
+/// Consumed by the Explorer topic page to show an "Open in Explorer as
+/// Person" facet — not a schema change, just a curated constant.
+const Map<String, int> namedGroupPersonIds = {
+  'tribe|REUBEN': 2414,
+  'tribe|SIMEON': 2726,
+  'tribe|LEVI': 1807,
+  'tribe|JUDAH': 1738,
+  'tribe|DAN': 972,
+  'tribe|NAPHTALI': 2136,
+  'tribe|GAD': 1250,
+  'tribe|ASHER': 337,
+  'tribe|ISSACHAR': 645,
+  'tribe|ZEBULUN': 2956,
+  'tribe|JOSEPH': 1697,
+  'tribe|BENJAMIN': 463,
+  'apostle|SIMON PETER': 2730,
+  'apostle|ANDREW': 264,
+  'apostle|JAMES (SON OF ZEBEDEE)': 717,
+  'apostle|JOHN': 1664,
+  'apostle|PHILIP': 2329,
+  'apostle|BARTHOLOMEW (NATHANAEL)': 405,
+  'apostle|THOMAS': 2809,
+  'apostle|MATTHEW (LEVI)': 1958,
+  'apostle|JAMES (SON OF ALPHAEUS)': 718,
+  'apostle|THADDAEUS (JUDAS SON OF JAMES)': 1802,
+  'apostle|SIMON THE ZEALOT': 2731,
+  'apostle|JUDAS ISCARIOT': 1747,
+  'judge|OTHNIEL': 2244,
+  'judge|EHUD': 1036,
+  'judge|SHAMGAR': 2519,
+  'judge|DEBORAH': 994,
+  'judge|GIDEON': 1302,
+  'judge|TOLA': 2836,
+  'judge|JAIR': 709,
+  'judge|JEPHTHAH': 839,
+  'judge|IBZAN': 1575,
+  'judge|ELON': 1181,
+  'judge|ABDON': 10,
+  'judge|SAMSON': 2453,
+  'judge|SAMUEL': 2454,
+  'prophet|ISAIAH': 617,
+  'prophet|JEREMIAH': 853,
+  'prophet|EZEKIEL': 1234,
+  'prophet|DANIEL': 974,
+  'prophet|HOSEA': 1543,
+  'prophet|JOEL': 1647,
+  'prophet|AMOS': 238,
+  'prophet|OBADIAH': 2211,
+  'prophet|JONAH': 1676,
+  'prophet|MICAH': 2040,
+  'prophet|NAHUM': 2132,
+  'prophet|HABAKKUK': 1322,
+  'prophet|ZEPHANIAH': 2994,
+  'prophet|HAGGAI': 1337,
+  'prophet|ZECHARIAH': 2970,
+  'prophet|MALACHI': 1886,
+};
+
+/// Canonical (non-alphabetical) browse order for each of the four named-group
+/// categories, used the same way `explorerIndexProvider` already reorders
+/// 'feast' rows into Leviticus 23 calendar order.
+final List<String> tribeOrder = [for (final t in _tribeTopics) t.name];
+final List<String> apostleOrder = [for (final t in _apostleTopics) t.name];
+final List<String> judgeOrder = [for (final t in _judgeTopics) t.name];
+final List<String> prophetOrder = [for (final t in _prophetTopics) t.name];

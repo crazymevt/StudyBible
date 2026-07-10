@@ -839,6 +839,8 @@ class _TopicPage extends ConsumerWidget {
         final places = _mergeTopicPlaces(passageFacets);
         final videoGroups = _mergeTopicVideoGroups(passageFacets);
         final attachments = _mergeTopicAttachments(passageFacets);
+        final namedGroupPersonId = ref.watch(namedGroupPersonIdsProvider)[
+            '${d.topic.category}|${d.topic.name}'];
         return _PageScroll(
           children: [
             _PageTitle(
@@ -846,9 +848,27 @@ class _TopicPage extends ConsumerWidget {
               subtitle: switch (d.topic.category) {
                 'feast' => 'Bible feast',
                 'story' => 'Bible story',
+                'tribe' => 'One of the 12 Tribes of Israel',
+                'apostle' => 'One of the 12 Apostles',
+                'judge' => 'A Judge of Israel',
+                'prophet' => 'A Major or Minor Prophet',
                 _ => 'Nave\'s Topical Bible',
               },
             ),
+            if (namedGroupPersonId != null)
+              ExplorerFacetCard(
+                icon: Icons.person_outline,
+                title: 'Person',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    ExplorerRefChip(
+                      ExplorerRef.person(namedGroupPersonId, d.topic.name),
+                    ),
+                  ],
+                ),
+              ),
             if (dictionary.isNotEmpty) _DictionaryCard(entries: dictionary),
             for (final ev in d.entries)
               ExplorerFacetCard(

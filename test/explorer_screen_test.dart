@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_bible/app/content_providers.dart';
+import 'package:study_bible/app/explorer_providers.dart';
 import 'package:study_bible/app/notebook_providers.dart';
 import 'package:study_bible/app/people_providers.dart';
 import 'package:study_bible/app/place_providers.dart';
@@ -19,6 +20,7 @@ import 'package:study_bible/app/topic_providers.dart';
 import 'package:study_bible/app/user_providers.dart';
 import 'package:study_bible/data/content_store.dart';
 import 'package:study_bible/data/user_store.dart';
+import 'package:study_bible/domain/explorer/explorer_ref.dart';
 import 'package:study_bible/ui/explorer/explorer_screen.dart';
 
 /// Drives the Explorer screen end to end on seeded data: home renders, a
@@ -116,6 +118,19 @@ void main() {
             bookName: Value('1 Samuel'),
             chapter: Value(24),
             verse: Value(3),
+          ),
+        );
+    // A named-group-style curated topic, standing in for the real
+    // CuratedTopicsImporter output this test's `curatedTopicsReadyProvider`
+    // override skips — just enough to exercise the person-link facet.
+    await store
+        .into(store.topics)
+        .insert(
+          const TopicsCompanion(
+            id: Value(2),
+            name: Value('REUBEN'),
+            section: Value('R'),
+            category: Value('tribe'),
           ),
         );
     await store
@@ -466,6 +481,9 @@ void main() {
         curatedTopicsReadyProvider.overrideWith((ref) async => true),
         // recordHistory reads this; the real one touches the filesystem.
         deviceIdProvider.overrideWith((ref) async => 'test-device'),
+        // Points the seeded 'REUBEN' tribe topic at the seeded Saul person
+        // (id 1) rather than a real production BiblePeople id.
+        namedGroupPersonIdsProvider.overrideWith((ref) => {'tribe|REUBEN': 1}),
       ],
     );
     addTearDown(container.dispose);
@@ -825,5 +843,31 @@ void main() {
     // Back on home with the previous query still in the box.
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('TOPICS'), findsOneWidget);
+  });
+
+  testWidgets(
+      'a named-group topic with a hand-verified person link shows a '
+      'tappable Person facet', (tester) async {
+    final container = await pump(tester);
+
+    container
+        .read(explorerTrailProvider.notifier)
+        .open(const ExplorerRef.topic(2, 'REUBEN'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('One of the 12 Tribes of Israel'), findsOneWidget);
+    expect(find.text('Person'), findsOneWidget);
+    // The chip's label mirrors the topic's own name (REUBEN); the seeded
+    // link points it at the seeded person (id 1, "Saul") to avoid needing a
+    // second person fixture — tapping through proves it's a real id lookup,
+    // not just an inert label.
+    expect(find.textContaining('REUBEN', findRichText: true), findsWidgets);
+
+    await tester.tap(find.textContaining('REUBEN', findRichText: true).last);
+    await tester.pumpAndSettle();
+
+    // Landed on Saul's own person page, not just a chip with his name.
+    expect(find.text('Saul'), findsOneWidget);
+    expect(find.text('Your tags'), findsOneWidget);
   });
 }

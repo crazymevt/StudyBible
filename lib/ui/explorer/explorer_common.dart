@@ -40,6 +40,10 @@ IconData explorerBrowseIcon(ExplorerEntityType kind, String? category) =>
     switch (category) {
       'feast' => Icons.celebration_outlined,
       'story' => Icons.auto_stories_outlined,
+      'tribe' => Icons.groups_outlined,
+      'apostle' => Icons.diversity_3_outlined,
+      'judge' => Icons.gavel_outlined,
+      'prophet' => Icons.record_voice_over_outlined,
       _ => explorerEntityIcon(kind),
     };
 

@@ -6,10 +6,12 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:study_bible/app/content_providers.dart';
+import 'package:study_bible/app/explorer_providers.dart';
 import 'package:study_bible/app/topic_providers.dart';
 import 'package:study_bible/data/content_store.dart';
 import 'package:study_bible/data/importer/curated_topics_data.dart';
 import 'package:study_bible/data/importer/curated_topics_importer.dart';
+import 'package:study_bible/domain/explorer/explorer_ref.dart';
 
 /// Runs the real curated importer against the real bundled Nave's Topical
 /// Bible data, then exercises the real Explorer topic providers end to end —
@@ -92,6 +94,50 @@ void main() {
           ..where((t) => t.name.equals('AARON')))
         .getSingleOrNull();
     expect(aaron?.category, isNull);
+  });
+
+  test('tribes/apostles/judges/prophets land in their own categories',
+      () async {
+    await container.read(curatedTopicsReadyProvider.future);
+    final tribes =
+        await container.read(curatedTopicsByCategoryProvider('tribe').future);
+    final apostles = await container.read(
+      curatedTopicsByCategoryProvider('apostle').future,
+    );
+    final judges =
+        await container.read(curatedTopicsByCategoryProvider('judge').future);
+    final prophets = await container.read(
+      curatedTopicsByCategoryProvider('prophet').future,
+    );
+    expect(tribes.map((t) => t.name), contains('REUBEN'));
+    expect(tribes, hasLength(12));
+    expect(apostles.map((t) => t.name), contains('SIMON PETER'));
+    expect(apostles, hasLength(12));
+    expect(judges.map((t) => t.name), contains('GIDEON'));
+    expect(judges, hasLength(13));
+    expect(prophets.map((t) => t.name), contains('ISAIAH'));
+    expect(prophets, hasLength(16));
+  });
+
+  test('named-group browse order follows the curated order, not alphabetical',
+      () async {
+    await container.read(curatedTopicsReadyProvider.future);
+    Future<List<String>> browse(String category) async {
+      final entries = await container.read(explorerIndexProvider(
+              (kind: ExplorerEntityType.topic, category: category))
+          .future);
+      return entries.map((e) => e.ref.label).toList();
+    }
+
+    expect(await browse('tribe'), tribeOrder);
+    expect(await browse('apostle'), apostleOrder);
+    expect(await browse('judge'), judgeOrder);
+    expect(await browse('prophet'), prophetOrder);
+  });
+
+  test('namedGroupPersonIds values are unique', () {
+    final ids = namedGroupPersonIds.values.toList();
+    expect(ids.toSet().length, ids.length, reason: '$ids');
   });
 
   test('each curated topic is searchable via full-text search', () async {

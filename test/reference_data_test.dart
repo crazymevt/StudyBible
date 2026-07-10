@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:study_bible/domain/reference/covenants_data.dart';
 import 'package:study_bible/domain/reference/kings_data.dart';
 import 'package:study_bible/domain/reference/measures_data.dart';
-import 'package:study_bible/domain/reference/named_group.dart';
-import 'package:study_bible/domain/reference/named_groups_data.dart';
 import 'package:study_bible/data/importer/sword/sword_versification.dart';
 
 /// Same reference grammar the Feasts/Prophecies/curated-topic data and the
@@ -84,47 +82,12 @@ void main() {
     expect(ids.toSet().length, ids.length);
   });
 
-  test('every named group citation resolves against the KJV versification', () {
-    final failures = <String>[];
-    for (final e in namedGroups) {
-      for (final ref in e.citations) {
-        final issue = problem(ref);
-        if (issue != null) failures.add('${e.id}: "$ref" — $issue');
-      }
-    }
-    expect(failures, isEmpty, reason: failures.join('\n'));
-  });
-
-  test('named group ids are unique', () {
-    final ids = namedGroups.map((e) => e.id).toList();
-    expect(ids.toSet().length, ids.length);
-  });
-
-  test('each named-group list has contiguous order starting at 1', () {
-    for (final list in NamedGroupList.values) {
-      final orders = namedGroups
-          .where((e) => e.list == list)
-          .map((e) => e.order)
-          .toList()
-        ..sort();
-      expect(orders, equals(List.generate(orders.length, (i) => i + 1)),
-          reason: '${list.name} orders: $orders');
-    }
-  });
-
-  test('hand-verified explorerPersonId values are unique per dataset', () {
+  test('hand-verified explorerPersonId values are unique', () {
     final kingIds = kingReigns
         .map((k) => k.explorerPersonId)
         .whereType<int>()
         .toList();
     expect(kingIds.toSet().length, kingIds.length,
         reason: 'duplicate explorerPersonId in kingReigns: $kingIds');
-
-    final namedGroupIds = namedGroups
-        .map((e) => e.explorerPersonId)
-        .whereType<int>()
-        .toList();
-    expect(namedGroupIds.toSet().length, namedGroupIds.length,
-        reason: 'duplicate explorerPersonId in namedGroups: $namedGroupIds');
   });
 }

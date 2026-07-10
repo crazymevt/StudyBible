@@ -4,15 +4,12 @@ import 'king_reign.dart';
 import 'kings_data.dart';
 import 'measure.dart';
 import 'measures_data.dart';
-import 'named_group.dart';
-import 'named_groups_data.dart';
 
-/// Which of the four Reference tabs a [ReferenceChapterHit] came from.
+/// Which of the three Reference tabs a [ReferenceChapterHit] came from.
 enum ReferenceKind {
   kingReign('Kings & Reigns'),
   measure('Measures & Money'),
-  covenant('Covenants'),
-  namedGroup('Named Groups');
+  covenant('Covenants');
 
   const ReferenceKind(this.label);
 
@@ -21,8 +18,8 @@ enum ReferenceKind {
 
 /// One Reference entry that cites a particular chapter. [explorerPersonId]
 /// is only non-null for the small hand-verified subset (see
-/// [KingReign.explorerPersonId]/[NamedGroupEntry.explorerPersonId]) — the
-/// Explorer passage page uses it to decide whether the hit is tappable.
+/// [KingReign.explorerPersonId]) — the Explorer passage page uses it to
+/// decide whether the hit is tappable.
 class ReferenceChapterHit {
   final ReferenceKind kind;
   final String title;
@@ -50,7 +47,7 @@ class _MutableHit {
   _MutableHit(this.kind, this.title, this.explorerPersonId);
 }
 
-/// Builds the chapter → Reference-entry reverse index once from the four
+/// Builds the chapter → Reference-entry reverse index once from the three
 /// curated datasets, so the Explorer passage page can show which Reference
 /// entries touch a chapter with an O(1) lookup instead of scanning every
 /// dataset on each page open. Keyed by [referenceChapterKey]. Mirrors
@@ -62,7 +59,6 @@ Map<String, List<ReferenceChapterHit>> buildReferenceChapterIndex({
   List<KingReign> kings = kingReigns,
   List<Measure> measureList = measures,
   List<Covenant> covenantList = covenants,
-  List<NamedGroupEntry> namedGroupList = namedGroups,
 }) {
   final byKey = <String, Map<String, _MutableHit>>{};
 
@@ -106,17 +102,6 @@ Map<String, List<ReferenceChapterHit>> buildReferenceChapterIndex({
   for (final c in covenantList) {
     for (final r in c.citations) {
       record('covenant|${c.id}', ReferenceKind.covenant, c.name, null, r);
-    }
-  }
-  for (final e in namedGroupList) {
-    for (final r in e.citations) {
-      record(
-        'namedGroup|${e.id}',
-        ReferenceKind.namedGroup,
-        e.name,
-        e.explorerPersonId,
-        r,
-      );
     }
   }
 

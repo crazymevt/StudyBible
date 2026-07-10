@@ -9,7 +9,6 @@ import '../../domain/reference/covenant.dart';
 import '../../domain/reference/king_reign.dart';
 import '../../domain/reference/measure.dart';
 import '../../domain/explorer/explorer_ref.dart';
-import '../../domain/reference/named_group.dart';
 import '../common/breakpoints.dart';
 import '../explorer/explorer_screen.dart';
 
@@ -39,9 +38,9 @@ void _goToPassage(BuildContext context, WidgetRef ref, String passage) {
 }
 
 /// Opens a hand-verified `BiblePeople` row's Explorer page — only called
-/// where [KingReign.explorerPersonId]/[NamedGroupEntry.explorerPersonId] is
-/// non-null, since that id is a curated constant rather than resolved at
-/// runtime (see either field's doc comment for why).
+/// where [KingReign.explorerPersonId] is non-null, since that id is a
+/// curated constant rather than resolved at runtime (see the field's doc
+/// comment for why).
 void _openInExplorer(
   BuildContext context,
   WidgetRef ref,
@@ -62,7 +61,7 @@ class ReferencePanel extends ConsumerWidget {
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: DefaultTabController(
-        length: 4,
+        length: 3,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -103,7 +102,6 @@ class ReferencePanel extends ConsumerWidget {
                       Tab(text: 'Kings & Reigns'),
                       Tab(text: 'Measures & Money'),
                       Tab(text: 'Covenants'),
-                      Tab(text: 'Named Groups'),
                     ],
                   ),
                 ],
@@ -115,7 +113,6 @@ class ReferencePanel extends ConsumerWidget {
                   _KingsReignsTab(),
                   _MeasuresMoneyTab(),
                   _CovenantsTab(),
-                  _NamedGroupsTab(),
                 ],
               ),
             ),
@@ -760,187 +757,6 @@ class _Field extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(value, style: Theme.of(context).textTheme.bodyMedium),
-      ],
-    );
-  }
-}
-
-/// Bundles four small curated lists (tribes/apostles/judges/prophets) behind
-/// a sub-list selector rather than four more top-level tabs.
-class _NamedGroupsTab extends ConsumerStatefulWidget {
-  const _NamedGroupsTab();
-
-  @override
-  ConsumerState<_NamedGroupsTab> createState() => _NamedGroupsTabState();
-}
-
-class _NamedGroupsTabState extends ConsumerState<_NamedGroupsTab> {
-  NamedGroupList _selectedList = NamedGroupList.tribes;
-  String? _selectedId;
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedId = _selectedId;
-    final all = ref.watch(namedGroupsProvider);
-    final selected = selectedId == null
-        ? null
-        : all.firstWhere((e) => e.id == selectedId);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          ),
-          child: selected != null
-              ? Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      tooltip: 'Back to results',
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () => setState(() => _selectedId = null),
-                    ),
-                    Text(
-                      _selectedList.label,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                )
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SegmentedButton<NamedGroupList>(
-                    segments: [
-                      for (final list in NamedGroupList.values)
-                        ButtonSegment(value: list, label: Text(list.label)),
-                    ],
-                    selected: {_selectedList},
-                    onSelectionChanged: (s) =>
-                        setState(() => _selectedList = s.first),
-                  ),
-                ),
-        ),
-        const Divider(height: 1),
-        Expanded(
-          child: selected != null
-              ? _NamedGroupDetailView(
-                  entry: selected,
-                  onPassageTap: (p) => _goToPassage(context, ref, p),
-                  onOpenInExplorer: selected.explorerPersonId == null
-                      ? null
-                      : () => _openInExplorer(
-                          context,
-                          ref,
-                          selected.explorerPersonId!,
-                          selected.name,
-                        ),
-                )
-              : _NamedGroupList(
-                  list: _selectedList,
-                  onSelect: (id) => setState(() => _selectedId = id),
-                ),
-        ),
-      ],
-    );
-  }
-}
-
-class _NamedGroupList extends ConsumerWidget {
-  const _NamedGroupList({required this.list, required this.onSelect});
-
-  final NamedGroupList list;
-  final void Function(String id) onSelect;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final all = ref.watch(namedGroupsProvider);
-    final items = all.where((e) => e.list == list).toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
-
-    return ListView(
-      children: [
-        for (final e in items)
-          ListTile(
-            dense: true,
-            leading: CircleAvatar(
-              radius: 14,
-              child: Text(
-                '${e.order}',
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-            ),
-            title: Text(e.name),
-            subtitle: Text(
-              e.subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            trailing: const Icon(Icons.chevron_right, size: 18),
-            onTap: () => onSelect(e.id),
-          ),
-      ],
-    );
-  }
-}
-
-class _NamedGroupDetailView extends StatelessWidget {
-  const _NamedGroupDetailView({
-    required this.entry,
-    required this.onPassageTap,
-    this.onOpenInExplorer,
-  });
-
-  final NamedGroupEntry entry;
-  final void Function(String passage) onPassageTap;
-  final VoidCallback? onOpenInExplorer;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      children: [
-        Text(
-          entry.list.label.toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: scheme.primary,
-            letterSpacing: 0.6,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Text(
-                entry.name,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ),
-            if (onOpenInExplorer != null)
-              IconButton(
-                icon: const Icon(Icons.explore_outlined),
-                tooltip: 'Open in Explorer',
-                visualDensity: VisualDensity.compact,
-                onPressed: onOpenInExplorer,
-              ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        Text(entry.subtitle, style: Theme.of(context).textTheme.bodyMedium),
-        const SizedBox(height: 16),
-        _NotesSection(
-          notes: entry.notes,
-          citations: entry.citations,
-          onPassageTap: onPassageTap,
-        ),
       ],
     );
   }
