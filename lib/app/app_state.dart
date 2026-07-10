@@ -1015,3 +1015,23 @@ final presentationClockSizeProvider =
     NotifierProvider<PresentationClockSizeNotifier, String>(
       () => PresentationClockSizeNotifier(),
     );
+
+/// When true (the default), sermon presentation mode shows an elapsed-time
+/// timer (hh:mm:ss since presenting started) centered in the top bar.
+class ShowPresentationTimerNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool('showPresentationTimer') ?? true;
+  }
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool('showPresentationTimer', value);
+  }
+}
+
+final showPresentationTimerProvider =
+    NotifierProvider<ShowPresentationTimerNotifier, bool>(
+      () => ShowPresentationTimerNotifier(),
+    );

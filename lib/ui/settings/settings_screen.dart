@@ -999,9 +999,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ref.read(showPresentationClockProvider.notifier).set(value);
             },
           ),
-          if (ref.watch(showPresentationClockProvider)) ...[
+          SwitchListTile(
+            title: const Text('Show Elapsed Timer'),
+            subtitle: const Text(
+              'Display how long presentation mode has been active (hh:mm:ss), centered in the top bar',
+            ),
+            value: ref.watch(showPresentationTimerProvider),
+            onChanged: (bool value) {
+              ref.read(showPresentationTimerProvider.notifier).set(value);
+            },
+          ),
+          if (ref.watch(showPresentationClockProvider) ||
+              ref.watch(showPresentationTimerProvider)) ...[
             ListTile(
-              title: const Text('Clock Size'),
+              title: const Text('Clock / Timer Size'),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),

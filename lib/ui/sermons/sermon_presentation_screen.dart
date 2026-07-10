@@ -77,6 +77,14 @@ class _SermonPresentationScreenState extends ConsumerState<SermonPresentationScr
         title: Text(widget.sermon.title),
         elevation: 0,
         backgroundColor: Colors.transparent,
+        flexibleSpace: ref.watch(showPresentationTimerProvider)
+            ? Align(
+                alignment: Alignment.center,
+                child: _PresentationTimer(
+                  size: ref.watch(presentationClockSizeProvider),
+                ),
+              )
+            : null,
         actions: [
           if (ref.watch(showPresentationClockProvider))
             Padding(
@@ -121,6 +129,18 @@ class _SermonPresentationScreenState extends ConsumerState<SermonPresentationScr
   }
 }
 
+/// Text style for presentation-mode overlays (clock, elapsed timer) per the
+/// user's configured size: 'small', 'medium' (default), or 'large'.
+TextStyle? _presentationOverlayStyle(BuildContext context, String size) {
+  final textTheme = Theme.of(context).textTheme;
+  final style = switch (size) {
+    'small' => textTheme.titleMedium,
+    'large' => textTheme.headlineMedium,
+    _ => textTheme.headlineSmall,
+  };
+  return style?.copyWith(fontWeight: FontWeight.w600);
+}
+
 class _PresentationClock extends StatefulWidget {
   final String size;
 
@@ -148,24 +168,53 @@ class _PresentationClockState extends State<_PresentationClock> {
     super.dispose();
   }
 
-  TextStyle? _textStyle(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    switch (widget.size) {
-      case 'small':
-        return textTheme.titleMedium;
-      case 'large':
-        return textTheme.headlineMedium;
-      case 'medium':
-      default:
-        return textTheme.headlineSmall;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      DateFormat.jm().format(_now),
+      style: _presentationOverlayStyle(context, widget.size),
+    );
+  }
+}
+
+class _PresentationTimer extends StatefulWidget {
+  final String size;
+
+  const _PresentationTimer({required this.size});
+
+  @override
+  State<_PresentationTimer> createState() => _PresentationTimerState();
+}
+
+class _PresentationTimerState extends State<_PresentationTimer> {
+  final DateTime _startedAt = DateTime.now();
+  late Timer _timer;
+  Duration _elapsed = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      setState(() => _elapsed = DateTime.now().difference(_startedAt));
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  String _format(Duration d) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(d.inHours)}:${two(d.inMinutes.remainder(60))}:${two(d.inSeconds.remainder(60))}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      DateFormat.jm().format(_now),
-      style: _textStyle(context)?.copyWith(fontWeight: FontWeight.w600),
+      _format(_elapsed),
+      style: _presentationOverlayStyle(context, widget.size),
     );
   }
 }
