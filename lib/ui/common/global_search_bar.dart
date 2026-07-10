@@ -7,6 +7,9 @@ import '../../app/content_providers.dart';
 import '../../app/user_providers.dart';
 import '../../domain/search/reference_parser.dart';
 import '../../app/reader_state.dart';
+import '../reader/mobile_tools_drawer.dart';
+import '../reader/search_panel.dart';
+import 'breakpoints.dart';
 
 class GlobalSearchBar extends ConsumerStatefulWidget {
   const GlobalSearchBar({super.key});
@@ -32,15 +35,23 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
       ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
       
       final currentModule = ref.read(appModuleProvider);
+      final isCompact = MediaQuery.sizeOf(context).width <= Breakpoints.compact;
       if (currentModule != AppModule.reader) {
-        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-      } else {
-        // We are already in the reader. 
-        // If there's an endDrawer (i.e. on mobile), open it so the user can see results.
-        final scaffold = Scaffold.maybeOf(context);
-        if (scaffold != null && scaffold.hasEndDrawer) {
-          scaffold.openEndDrawer();
+        // On compact layouts the reader shows tool results as a bottom
+        // sheet it pushes itself, rather than a docked panel that reacts to
+        // activeToolProvider — that panel doesn't exist yet until the
+        // reader actually mounts. Queue a one-shot launch so ReaderScreen
+        // opens it once it's up, instead of leaving the user to search
+        // again after arriving there.
+        if (isCompact) {
+          ref.read(pendingMobileSearchLaunchProvider.notifier).set(true);
         }
+        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+      } else if (isCompact) {
+        // Already in the reader: push the sheet directly rather than
+        // opening the tools drawer, which would just show the generic
+        // tool-selection menu, not the results.
+        showMobileToolPanel(context, const SearchPanel());
       }
     }
   }

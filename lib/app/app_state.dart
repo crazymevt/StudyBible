@@ -55,6 +55,24 @@ final activeToolProvider = NotifierProvider<ActiveToolNotifier, ActiveTool>(
   () => ActiveToolNotifier(),
 );
 
+/// One-shot signal for compact/mobile layouts: set when a search is
+/// submitted from outside the reader module, so the reader can't show its
+/// bottom-sheet results panel until after the module switch finishes.
+/// ReaderScreen consumes this once it mounts (opening the panel) and resets
+/// it to false; wide layouts never need it since their docked panel already
+/// reacts to [activeToolProvider] directly.
+class PendingMobileSearchLaunchNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
+}
+
+final pendingMobileSearchLaunchProvider =
+    NotifierProvider<PendingMobileSearchLaunchNotifier, bool>(
+  () => PendingMobileSearchLaunchNotifier(),
+);
+
 const kDefaultPinnedTools = [
   ActiveTool.notes,
   ActiveTool.highlights,

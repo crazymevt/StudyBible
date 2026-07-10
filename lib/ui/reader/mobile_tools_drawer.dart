@@ -25,23 +25,30 @@ import '../common/tool_groups.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
 
+/// Shows [panel] in the same bottom-sheet chrome used by the mobile tools
+/// drawer, so a tool can be opened directly (e.g. from the global search
+/// bar) without going through the drawer's tool-selection menu first.
+void showMobileToolPanel(BuildContext context, Widget panel) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (context) => DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 1.0,
+      expand: false,
+      builder: (_, scrollController) => panel,
+    ),
+  );
+}
+
 class MobileToolsDrawer extends ConsumerWidget {
   const MobileToolsDrawer({super.key});
 
   void _openTool(BuildContext context, Widget panel) {
     Navigator.of(context).pop(); // Close the drawer
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.5,
-        maxChildSize: 1.0,
-        expand: false,
-        builder: (_, scrollController) => panel,
-      ),
-    );
+    showMobileToolPanel(context, panel);
   }
 
   Widget _panelFor(ActiveTool tool, WidgetRef ref) {

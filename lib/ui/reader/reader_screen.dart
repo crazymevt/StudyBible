@@ -27,6 +27,7 @@ import '../../app/tts_providers.dart';
 import '../../data/tts_service.dart';
 import 'commentary_panel.dart';
 import 'dictionary_panel.dart';
+import 'search_panel.dart';
 import 'return_to_sermon_chip.dart';
 import '../common/search_title_bar.dart';
 import '../onboarding/tutorial_keys.dart';
@@ -114,6 +115,20 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       onStateChange: _handleLifecycleState,
     );
     HardwareKeyboard.instance.addHandler(_handleGlobalKey);
+
+    // A cross-module search on a compact layout sets this before the reader
+    // (and this State) even exists, so a ref.listen registered in build()
+    // would never see the flip to true — it only fires on later
+    // transitions. Check the already-set value directly on mount instead.
+    if (ref.read(pendingMobileSearchLaunchProvider)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(pendingMobileSearchLaunchProvider.notifier).set(false);
+        if (MediaQuery.sizeOf(context).width <= Breakpoints.compact) {
+          showMobileToolPanel(context, const SearchPanel());
+        }
+      });
+    }
   }
 
   bool _handleGlobalKey(KeyEvent event) {
