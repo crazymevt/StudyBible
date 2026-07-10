@@ -975,3 +975,43 @@ class ReminderTimeNotifier extends Notifier<TimeOfDay> {
 final reminderTimeProvider = NotifierProvider<ReminderTimeNotifier, TimeOfDay>(
   () => ReminderTimeNotifier(),
 );
+
+/// When true (the default), sermon presentation mode shows a live clock in
+/// the top-right corner.
+class ShowPresentationClockNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool('showPresentationClock') ?? true;
+  }
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool('showPresentationClock', value);
+  }
+}
+
+final showPresentationClockProvider =
+    NotifierProvider<ShowPresentationClockNotifier, bool>(
+      () => ShowPresentationClockNotifier(),
+    );
+
+/// Text size for the presentation-mode clock: 'small', 'medium' (default), or
+/// 'large'.
+class PresentationClockSizeNotifier extends Notifier<String> {
+  @override
+  String build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('presentationClockSize') ?? 'medium';
+  }
+
+  void set(String value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setString('presentationClockSize', value);
+  }
+}
+
+final presentationClockSizeProvider =
+    NotifierProvider<PresentationClockSizeNotifier, String>(
+      () => PresentationClockSizeNotifier(),
+    );

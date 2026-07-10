@@ -981,6 +981,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const Divider(),
 
+          // ── Presentation Mode ──
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Presentation Mode',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+            ),
+          ),
+          SwitchListTile(
+            title: const Text('Show Clock'),
+            subtitle: const Text(
+              'Display the current time in the top-right corner while presenting',
+            ),
+            value: ref.watch(showPresentationClockProvider),
+            onChanged: (bool value) {
+              ref.read(showPresentationClockProvider.notifier).set(value);
+            },
+          ),
+          if (ref.watch(showPresentationClockProvider)) ...[
+            ListTile(
+              title: const Text('Clock Size'),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: 'small', label: Text('Small')),
+                  ButtonSegment(value: 'medium', label: Text('Medium')),
+                  ButtonSegment(value: 'large', label: Text('Large')),
+                ],
+                selected: {ref.watch(presentationClockSizeProvider)},
+                onSelectionChanged: (Set<String> newSelection) {
+                  ref
+                      .read(presentationClockSizeProvider.notifier)
+                      .set(newSelection.first);
+                },
+              ),
+            ),
+          ],
+          const Divider(),
+
           // ── Copy & Share ──
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),

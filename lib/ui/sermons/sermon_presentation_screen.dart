@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import '../../app/app_state.dart';
 import '../../app/scripture_nav_providers.dart';
 import '../../data/user_store.dart';
 import '../../data/logging.dart';
@@ -75,6 +78,15 @@ class _SermonPresentationScreenState extends ConsumerState<SermonPresentationScr
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
+          if (ref.watch(showPresentationClockProvider))
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Center(
+                child: _PresentationClock(
+                  size: ref.watch(presentationClockSizeProvider),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.route_outlined),
             tooltip: 'Navigate Scriptures',
@@ -105,6 +117,55 @@ class _SermonPresentationScreenState extends ConsumerState<SermonPresentationScr
           ),
         ),
       ),
+    );
+  }
+}
+
+class _PresentationClock extends StatefulWidget {
+  final String size;
+
+  const _PresentationClock({required this.size});
+
+  @override
+  State<_PresentationClock> createState() => _PresentationClockState();
+}
+
+class _PresentationClockState extends State<_PresentationClock> {
+  late Timer _timer;
+  DateTime _now = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      setState(() => _now = DateTime.now());
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  TextStyle? _textStyle(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    switch (widget.size) {
+      case 'small':
+        return textTheme.titleMedium;
+      case 'large':
+        return textTheme.headlineMedium;
+      case 'medium':
+      default:
+        return textTheme.headlineSmall;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      DateFormat.jm().format(_now),
+      style: _textStyle(context)?.copyWith(fontWeight: FontWeight.w600),
     );
   }
 }
