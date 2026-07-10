@@ -1,5 +1,41 @@
 [
   {
+    "version": "26.7.10+2",
+    "date": "2026-07-10",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "prefix-match each NEAR search term, not just plain phrase queries",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "show global search results on compact layouts instead of the tools drawer/nothing",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add missing biblical measures and currency to Measures & Money",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add elapsed-time timer to sermon presentation mode",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add configurable clock to sermon presentation mode",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.10+1",
     "date": "2026-07-10",
     "features": [
