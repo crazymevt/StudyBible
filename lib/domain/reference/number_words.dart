@@ -20,6 +20,18 @@ const Map<String, int> _multiplierWords = {'hundred': 100, 'thousand': 1000};
 
 const Set<String> _connectorWords = {'a', 'an', 'and'};
 
+/// Whether [word] is a token that can appear inside a written-out cardinal
+/// number phrase ("six", "hundred", "and", "12") — used to tell a quantity
+/// word tapped on its own from an ordinary word, so a tap anywhere in "six
+/// hundred and fifty cubits" can be traced forward to the unit it modifies.
+bool isNumberWord(String word) {
+  final w = word.toLowerCase();
+  return _numberWords.containsKey(w) ||
+      _multiplierWords.containsKey(w) ||
+      _connectorWords.contains(w) ||
+      int.tryParse(w) != null;
+}
+
 /// Scans backward through [precedingWords] (oldest-to-newest, i.e. the word
 /// immediately before the tapped measure word is last) collecting a
 /// contiguous run of recognized number/connector tokens, then sums it into a

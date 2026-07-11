@@ -78,6 +78,59 @@ void main() {
     });
   });
 
+  group('isNumberWord', () {
+    test('recognizes cardinal, multiplier, connector, and digit tokens', () {
+      expect(isNumberWord('six'), isTrue);
+      expect(isNumberWord('hundred'), isTrue);
+      expect(isNumberWord('and'), isTrue);
+      expect(isNumberWord('3'), isTrue);
+      expect(isNumberWord('CUBITS'), isFalse);
+    });
+  });
+
+  group('resolveMeasureNearWord', () {
+    test('tap directly on the unit word behaves as before', () {
+      final resolved = resolveMeasureNearWord('cubits', ['six'], []);
+      expect(resolved!.measure.id, 'cubit');
+      expect(resolved.quantity, 6);
+      expect(resolved.unitWord, 'cubits');
+    });
+
+    test('tap on the quantity word finds the unit ahead of it', () {
+      final resolved = resolveMeasureNearWord('six', [], ['cubits', 'long']);
+      expect(resolved!.measure.id, 'cubit');
+      expect(resolved.quantity, 6);
+      expect(resolved.unitWord, 'cubits');
+    });
+
+    test('tap in the middle of a compound number still finds the unit', () {
+      // "six hundred and fifty cubits" — tap on "and".
+      final resolved = resolveMeasureNearWord(
+        'and',
+        ['six', 'hundred'],
+        ['fifty', 'cubits', 'long'],
+      );
+      expect(resolved!.measure.id, 'cubit');
+      expect(resolved.quantity, 650);
+      expect(resolved.unitWord, 'cubits');
+    });
+
+    test('tap on a bare article resolves quantity 1', () {
+      final resolved = resolveMeasureNearWord('a', [], ['cubit']);
+      expect(resolved!.measure.id, 'cubit');
+      expect(resolved.quantity, 1);
+    });
+
+    test('a number not followed by a unit word resolves to nothing', () {
+      // "forty days and forty nights" — tap on "forty".
+      expect(resolveMeasureNearWord('forty', [], ['days', 'and', 'forty', 'nights']), isNull);
+    });
+
+    test('a plain word that is neither a unit nor a number resolves to nothing', () {
+      expect(resolveMeasureNearWord('mountain', ['the', 'great'], ['stood', 'firm']), isNull);
+    });
+  });
+
   group('ambiguityNoteFor', () {
     test('flags the shekel/talent money-vs-weight ambiguity', () {
       expect(ambiguityNoteFor(_byId('shekel-money')), isNotNull);

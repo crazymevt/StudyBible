@@ -105,7 +105,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
     });
   }
 
-  void _openDictionary(String word, Offset position, List<String> precedingWords) async {
+  void _openDictionary(String word, Offset position, List<String> precedingWords, List<String> followingWords) async {
     // The long-press timer that triggers this can fire after the widget is
     // gone (e.g. a rebuild mid-press), so bail before touching context.
     if (!mounted) return;
@@ -115,6 +115,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
       word: word,
       position: position,
       precedingWords: precedingWords,
+      followingWords: followingWords,
     );
   }
 
@@ -334,7 +335,7 @@ class _ParallelVerseRow extends StatefulWidget {
   final Function(int) onVerseTap;
   final ValueChanged<int>? onFootnoteTap;
   final ValueChanged<String>? onStrongTap;
-  final Function(String, Offset, List<String>) onWordRightClick;
+  final Function(String, Offset, List<String>, List<String>) onWordRightClick;
 
   const _ParallelVerseRow({
     super.key,

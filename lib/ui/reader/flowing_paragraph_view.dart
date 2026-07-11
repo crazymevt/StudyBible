@@ -125,7 +125,7 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
     _spanRecognizers.clear();
   }
 
-  void _openDictionary(String word, Offset position, List<String> precedingWords) async {
+  void _openDictionary(String word, Offset position, List<String> precedingWords, List<String> followingWords) async {
     // The long-press timer that triggers this can fire after the widget is
     // gone (e.g. a rebuild mid-press), so bail before touching context.
     if (!mounted) return;
@@ -135,6 +135,7 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
       word: word,
       position: position,
       precedingWords: precedingWords,
+      followingWords: followingWords,
     );
   }
 

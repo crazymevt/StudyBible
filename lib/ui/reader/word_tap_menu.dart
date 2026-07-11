@@ -5,7 +5,6 @@ import '../../app/content_providers.dart';
 import '../../domain/reference/measure.dart';
 import '../../domain/reference/measure_conversion.dart';
 import '../../domain/reference/measure_matcher.dart';
-import '../../domain/reference/number_words.dart';
 import '../common/breakpoints.dart';
 import 'dictionary_panel.dart';
 
@@ -13,18 +12,19 @@ import 'dictionary_panel.dart';
 /// verse-rendering view (list, flowing paragraph, parallel) so the dictionary
 /// lookup and measure-conversion behavior can't drift between copies.
 ///
-/// [precedingWords] are the lowercased word tokens already seen earlier in
-/// the same verse, oldest-to-newest, used to find a quantity written just
-/// before a unit-of-measure word (e.g. the "six" in "six cubits").
+/// [precedingWords] and [followingWords] are the lowercased word tokens
+/// already seen earlier/later in the same verse (oldest-to-newest), used to
+/// find a quantity phrase next to a unit-of-measure word (e.g. the "six" in
+/// "six cubits") regardless of which of those words was actually tapped.
 Future<void> showWordTapMenu({
   required BuildContext context,
   required WidgetRef ref,
   required String word,
   required Offset position,
   required List<String> precedingWords,
+  required List<String> followingWords,
 }) async {
-  final measure = matchMeasureWord(word);
-  final quantity = measure == null ? null : parseQuantityBeforeMeasure(precedingWords);
+  final resolved = resolveMeasureNearWord(word, precedingWords, followingWords);
 
   final result = await showMenu<String>(
     context: context,
@@ -39,11 +39,11 @@ Future<void> showWordTapMenu({
         value: 'dictionary',
         child: Text('Look up "$word" in Dictionary'),
       ),
-      if (measure != null)
+      if (resolved != null)
         PopupMenuItem(
           value: 'measure',
           child: Text(
-            'Convert "${_quantityPhrase(quantity, word)}" to US units',
+            'Convert "${_quantityPhrase(resolved.quantity, resolved.unitWord)}" to US units',
           ),
         ),
     ],
@@ -71,10 +71,10 @@ Future<void> showWordTapMenu({
         ),
       );
     }
-  } else if (result == 'measure' && measure != null) {
+  } else if (result == 'measure' && resolved != null) {
     showDialog<void>(
       context: context,
-      builder: (_) => _MeasureConversionDialog(measure: measure, quantity: quantity ?? 1),
+      builder: (_) => _MeasureConversionDialog(measure: resolved.measure, quantity: resolved.quantity ?? 1),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'measure.dart';
 import 'measures_data.dart';
+import 'number_words.dart';
 
 /// Maps a lowercased word as it might appear in verse text to the
 /// [Measure.id] it names — the app's default KJV text spells several of
@@ -70,3 +71,39 @@ Measure? matchMeasureWord(String word) {
 /// A caveat for words that ambiguously name more than one biblical unit
 /// (e.g. "shekel", "talent"), or null if [measure] isn't ambiguous.
 String? ambiguityNoteFor(Measure measure) => _ambiguityNotes[measure.id];
+
+/// A [Measure] resolved from a tapped word, the quantity that applies to it,
+/// and the literal word that names the unit (e.g. "cubits") — which may
+/// differ from the tapped word itself, see [resolveMeasureNearWord].
+typedef ResolvedMeasure = ({Measure measure, num? quantity, String unitWord});
+
+/// Resolves the unit of measure a tapped [word] implies, whether the tap
+/// landed on the unit word itself ("cubits" in "six cubits") or on a word in
+/// the quantity phrase that precedes it ("six"). In the latter case, scans
+/// forward through [followingWords] past any remaining number/connector
+/// words to find the unit they modify; returns null if none is found.
+ResolvedMeasure? resolveMeasureNearWord(
+  String word,
+  List<String> precedingWords,
+  List<String> followingWords,
+) {
+  final direct = matchMeasureWord(word);
+  if (direct != null) {
+    return (measure: direct, quantity: parseQuantityBeforeMeasure(precedingWords), unitWord: word);
+  }
+
+  if (!isNumberWord(word)) return null;
+
+  var i = 0;
+  while (i < followingWords.length && isNumberWord(followingWords[i])) {
+    i++;
+  }
+  if (i >= followingWords.length) return null;
+
+  final unitWord = followingWords[i];
+  final measure = matchMeasureWord(unitWord);
+  if (measure == null) return null;
+
+  final quantity = parseQuantityBeforeMeasure([...precedingWords, word, ...followingWords.sublist(0, i)]);
+  return (measure: measure, quantity: quantity, unitWord: unitWord);
+}

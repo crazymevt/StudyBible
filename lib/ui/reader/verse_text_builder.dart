@@ -11,12 +11,21 @@ import '../../data/mybible_book_map.dart';
 import '../../theme/app_themes.dart';
 import '../../data/models/verse_segment.dart';
 
+/// Matches a single word token the same way [_buildWordSpans] tokenizes
+/// verse text, so [buildVerseSpans] can pre-scan an entire verse's words up
+/// front — needed to look *forward* from a tapped word (e.g. from "six" to
+/// the "cubits" it quantifies), which isn't available yet mid-build.
+final RegExp _wordTokenRegex = RegExp(r'[\p{L}\p{N}\p{M}]+', unicode: true);
+
+List<String> _tokenizeWords(String text) =>
+    _wordTokenRegex.allMatches(text).map((m) => m.group(0)!.toLowerCase()).toList();
+
 List<InlineSpan> buildVerseSpans({
   required BuildContext context,
   required Verse verse,
   required Color? bgColor,
   required Function(int) onVerseTap,
-  required Function(String, Offset, List<String>) onWordRightClick,
+  required Function(String, Offset, List<String>, List<String>) onWordRightClick,
   Function(int)? onFootnoteTap,
   Function(String)? onStrongTap,
   bool showStrongNumbers = false,
@@ -50,6 +59,7 @@ List<InlineSpan> buildVerseSpans({
       context: context,
       recognizers: recognizers,
       precedingWords: precedingWords,
+      allWords: _tokenizeWords(text),
     ));
     return spans;
   }
@@ -57,6 +67,13 @@ List<InlineSpan> buildVerseSpans({
   try {
     final List<dynamic> jsonList = jsonDecode(verse.segments);
     final segments = jsonList.map((e) => VerseSegment.fromJson(e)).toList();
+    // Pre-scanned once up front (rather than accumulated during the loop
+    // below, like precedingWords is) because a tap needs to look *forward*
+    // to words that haven't been visited by the build loop yet.
+    final allWords = <String>[
+      for (final seg in segments)
+        if (seg.text.isNotEmpty) ..._tokenizeWords(seg.text),
+    ];
 
     bool hasText = false;
     int footnoteCount = 0;
@@ -158,6 +175,7 @@ List<InlineSpan> buildVerseSpans({
             context: context,
             recognizers: recognizers,
             precedingWords: precedingWords,
+            allWords: allWords,
           ));
         }
 
@@ -222,6 +240,7 @@ List<InlineSpan> buildVerseSpans({
       context: context,
       recognizers: recognizers,
       precedingWords: precedingWords,
+      allWords: _tokenizeWords(text),
     ));
     return spans;
   }
@@ -368,14 +387,15 @@ List<InlineSpan> _buildHighlightedSpans(
   String text,
   TextStyle? style, {
   required VoidCallback onVerseTap,
-  required Function(String, Offset, List<String>) onWordRightClick,
+  required Function(String, Offset, List<String>, List<String>) onWordRightClick,
   required String? searchQuery,
   required BuildContext context,
   List<GestureRecognizer>? recognizers,
   required List<String> precedingWords,
+  required List<String> allWords,
 }) {
   if (searchQuery == null || searchQuery.isEmpty) {
-    return _buildWordSpans(text, style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords);
+    return _buildWordSpans(text, style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords);
   }
 
   final spans = <InlineSpan>[];
@@ -385,7 +405,7 @@ List<InlineSpan> _buildHighlightedSpans(
   int lastMatchEnd = 0;
   for (final match in matches) {
     if (match.start > lastMatchEnd) {
-      spans.addAll(_buildWordSpans(text.substring(lastMatchEnd, match.start), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords));
+      spans.addAll(_buildWordSpans(text.substring(lastMatchEnd, match.start), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords));
     }
 
     final highlightStyle = style?.copyWith(
@@ -394,12 +414,12 @@ List<InlineSpan> _buildHighlightedSpans(
         ) ??
         TextStyle(backgroundColor: Colors.yellow.withValues(alpha: 0.5), color: Colors.black);
 
-    spans.addAll(_buildWordSpans(text.substring(match.start, match.end), highlightStyle, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords));
+    spans.addAll(_buildWordSpans(text.substring(match.start, match.end), highlightStyle, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords));
     lastMatchEnd = match.end;
   }
 
   if (lastMatchEnd < text.length) {
-    spans.addAll(_buildWordSpans(text.substring(lastMatchEnd), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords));
+    spans.addAll(_buildWordSpans(text.substring(lastMatchEnd), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords));
   }
 
   return spans;
@@ -409,9 +429,10 @@ List<InlineSpan> _buildWordSpans(
   String text,
   TextStyle? style, {
   required VoidCallback onVerseTap,
-  required Function(String, Offset, List<String>) onWordRightClick,
+  required Function(String, Offset, List<String>, List<String>) onWordRightClick,
   List<GestureRecognizer>? recognizers,
   required List<String> precedingWords,
+  required List<String> allWords,
 }) {
   final spans = <InlineSpan>[];
   // Match unicode letters/numbers or non-letters/numbers
@@ -436,8 +457,14 @@ List<InlineSpan> _buildWordSpans(
       bool isLongPress = false;
       // Snapshot the words seen so far in this verse — precedingWords keeps
       // accumulating after this closure is created, so a tap that fires
-      // later must not see words that came after it.
+      // later must not see words that came after it. precedingWords.length
+      // at this point is also this word's index into allWords (both grow by
+      // exactly one word per token, in the same order), so it doubles as the
+      // cursor for slicing out the words that come *after* this one.
       final wordsBefore = List<String>.of(precedingWords);
+      final wordsAfter = precedingWords.length + 1 <= allWords.length
+          ? allWords.sublist(precedingWords.length + 1)
+          : const <String>[];
 
       final recognizer = TapGestureRecognizer()
             ..onTapDown = (details) {
@@ -446,7 +473,7 @@ List<InlineSpan> _buildWordSpans(
                 isLongPress = true;
                 final cleanWord = segment.toLowerCase();
                 if (cleanWord.isNotEmpty) {
-                  onWordRightClick(cleanWord, details.globalPosition, wordsBefore);
+                  onWordRightClick(cleanWord, details.globalPosition, wordsBefore, wordsAfter);
                 }
               });
             }
@@ -463,7 +490,7 @@ List<InlineSpan> _buildWordSpans(
             ..onSecondaryTapUp = (details) {
                final cleanWord = segment.toLowerCase();
                if (cleanWord.isNotEmpty) {
-                 onWordRightClick(cleanWord, details.globalPosition, wordsBefore);
+                 onWordRightClick(cleanWord, details.globalPosition, wordsBefore, wordsAfter);
                }
             };
       recognizers?.add(recognizer);
