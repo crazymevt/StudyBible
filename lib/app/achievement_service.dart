@@ -226,7 +226,8 @@ class AchievementService {
 
   Future<void> _unlockAchievement(String id, UserStore store, String deviceId, int now) async {
     final existing = await (store.select(store.achievements)..where((a) => a.id.equals(id))).getSingleOrNull();
-    
+
+    bool unlocked;
     if (existing == null) {
       final achievement = Achievement(
         id: id,
@@ -235,13 +236,28 @@ class AchievementService {
         deleted: false,
         unlockedAt: now,
       );
-      await store.into(store.achievements).insert(achievement);
+      // insertOrIgnore guards against a race: evaluateAchievements() is
+      // called fire-and-forget from several places (e.g. once per verse in a
+      // multi-select highlight batch), so two overlapping runs can both see
+      // this achievement as not-yet-unlocked and both reach this insert. The
+      // second write is silently dropped (id is the primary key) instead of
+      // throwing a unique-constraint error; insertReturningOrNull tells us
+      // whether *this* call actually won, so we only notify once.
+      final inserted = await store
+          .into(store.achievements)
+          .insertReturningOrNull(achievement, mode: InsertMode.insertOrIgnore);
+      unlocked = inserted != null;
     } else if (existing.deleted) {
       await store.into(store.achievements).insert(
         existing.copyWith(deleted: false, updatedAt: now),
         mode: InsertMode.replace,
       );
+      unlocked = true;
+    } else {
+      unlocked = false;
     }
+
+    if (!unlocked) return;
 
     final def = allAchievements.where((a) => a.id == id).firstOrNull;
     if (def != null && scaffoldMessengerKey.currentState != null) {
