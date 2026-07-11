@@ -57,6 +57,11 @@ void main() {
           }),
           bibleVersionsProvider.overrideWith(MockBibleVersionsNotifier.new),
           ph4CatalogProvider.overrideWith((ref) async => []),
+          // Same reasoning as contentStoreProvider above — these would
+          // otherwise reach the real bundled-KJV/Easton's import (rootBundle
+          // + path_provider), which the headless test VM can't serve.
+          bundledKjvReadyProvider.overrideWith((ref) async => true),
+          bundledEastonReadyProvider.overrideWith((ref) async => true),
         ],
       );
 
@@ -66,6 +71,11 @@ void main() {
           child: const StudyBibleApp(),
         ),
       );
+      // Two async gates resolve in sequence before onboarding renders now —
+      // bundledKjvReadyProvider/bundledEastonReadyProvider first (the shell
+      // shows a bare loading spinner while those are pending), then
+      // bibleVersionsProvider — each needs its own pump to settle.
+      await tester.pump();
       await tester.pump();
 
       expect(find.byType(MaterialApp), findsOneWidget);

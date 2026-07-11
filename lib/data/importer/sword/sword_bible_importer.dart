@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import 'package:path/path.dart' as p;
 
 import '../../content_store.dart';
+import '../../models/verse_segment.dart';
 import 'sword_config.dart';
 import 'sword_rawtext_reader.dart';
 import 'sword_source_parser.dart';
@@ -33,10 +34,16 @@ class SwordBibleImporter {
   /// Import the module described by [config], reading data from the module's
   /// directory tree rooted at [moduleRoot] (the conf's `DataPath` is resolved
   /// against it). Throws if the testament data files are missing.
+  ///
+  /// [paragraphBreaksAt], if given, is a set of `"BookName|chapter|verse"`
+  /// keys marking verses that begin a new paragraph — for modules (like
+  /// CrossWire's KJV) whose own source markup has no paragraph data at all.
+  /// See [importBible].
   Future<void> importFromDirectory(
     Directory moduleRoot,
-    SwordConfig config,
-  ) async {
+    SwordConfig config, {
+    Set<String> paragraphBreaksAt = const {},
+  }) async {
     final rel = (config.dataPath ?? '').replaceFirst(RegExp(r'^\./'), '');
     final dataDir = Directory(p.normalize(p.join(moduleRoot.path, rel)));
 
@@ -54,16 +61,20 @@ class SwordBibleImporter {
         'No SWORD testament data files found under "${dataDir.path}".',
       );
     }
-    await importBible(config, ot: ot, nt: nt);
+    await importBible(config, ot: ot, nt: nt, paragraphBreaksAt: paragraphBreaksAt);
   }
 
   /// Core import: walk the versification and write the module backed by the
   /// supplied testament [ot]/[nt] readers (either may be null). Separated from
   /// file resolution so it can be driven from in-memory readers in tests.
+  ///
+  /// [paragraphBreaksAt] backfills paragraph breaks for source markup that
+  /// has none of its own — see [importFromDirectory].
   Future<void> importBible(
     SwordConfig config, {
     SwordVerseReader? ot,
     SwordVerseReader? nt,
+    Set<String> paragraphBreaksAt = const {},
   }) async {
     if (!config.modDrv.isBible) {
       throw UnsupportedError(
@@ -127,13 +138,20 @@ class SwordBibleImporter {
             final parsed = parseSwordSource(raw, sourceType);
             if (parsed.text.isEmpty) continue;
 
+            var segments = parsed.segments;
+            if (paragraphBreaksAt.contains('${book.name}|$chapter|$verse')) {
+              segments = [
+                const VerseSegment(isParagraphBreak: true),
+                ...segments,
+              ];
+            }
+
             rows.add(VersesCompanion.insert(
               bookId: 0, // patched once the book id is known
               chapter: chapter,
               verse: verse,
               textContent: parsed.text,
-              segments:
-                  jsonEncode(parsed.segments.map((s) => s.toJson()).toList()),
+              segments: jsonEncode(segments.map((s) => s.toJson()).toList()),
             ));
           }
         }

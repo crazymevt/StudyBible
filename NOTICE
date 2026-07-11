@@ -63,6 +63,40 @@ itself licensed CC BY 4.0; the application code remains under the Apache
 License 2.0.
 
 ------------------------------------------------------------------------------
+This application bundles Easton's Bible Dictionary (assets/data/easton_sword.zip)
+as distributed by the CrossWire Bible Society, https://www.crosswire.org/sword/,
+under CrossWire's "Public Domain" module distribution license. The underlying
+text (M.G. Easton, "Illustrated Bible Dictionary", Third Edition, Thomas
+Nelson, 1897) is itself public domain — the author died in 1894 and the work
+was first published in 1897. Bundled unmodified.
+
+------------------------------------------------------------------------------
+This application bundles the King James Version (assets/data/kjv_sword.zip) as
+distributed by the CrossWire Bible Society, https://www.crosswire.org/sword/ —
+the "KJV" module (the KJV2003 Project text, with Strong's numbers and
+morphology tagging), whose own module distribution license is GPL (©
+CrossWire Bible Society 2003-2023; CrossWire's conf file states: "CrossWire
+Bible Society hereby grants a general public license to use this text for any
+purpose"). The base 1611/1769 text itself is public domain outside the United
+Kingdom; within the UK, Crown Letters Patent restrict commercial printing and
+publishing of the KJV to the Queen's/King's Printer, a restriction that does
+not apply to this application's free digital distribution. Bundled unmodified
+except for the paragraph-break markers described below.
+
+CrossWire's KJV module carries no paragraph markup (its own conf declares
+`Feature=NoParagraphs`, true of every KJV edition CrossWire distributes).
+Paragraph break positions are derived instead from ph4.org's "AV" MyBible
+module (King James Version with cross-references, 1914, from A. J. Holman
+Company's "Holman Home Bible" — public domain) by
+scripts/build_kjv_paragraphs.dart, and applied to CrossWire's text by verse
+coordinate at import time. No text from ph4.org's module is bundled or
+distributed — only a list of (book, chapter, verse) positions
+(assets/data/kjv_paragraph_breaks.json) marking where a new paragraph begins.
+As two independently-digitized editions, the two sources' verse divisions
+disagree in one book (Esther); that book is excluded from the paragraph-break
+data rather than guessed at, so it renders with no paragraph breaks.
+
+------------------------------------------------------------------------------
 lib/data/importer/curated_journeys_data.dart contains hand-authored Atlas
 journey waypoints (people and places the bundled datasets above don't
 otherwise link with enough detail to plot a real route). It cross-references

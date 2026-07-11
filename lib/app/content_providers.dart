@@ -11,6 +11,8 @@ import 'sync_service.dart';
 import 'dart:async';
 import 'package:collection/collection.dart';
 
+import '../data/importer/bundled_easton_importer.dart';
+import '../data/importer/bundled_kjv_importer.dart';
 import '../data/importer/cross_reference_importer.dart';
 import '../data/importer/mybible_verse_parser.dart';
 import '../data/mybible_book_map.dart';
@@ -45,6 +47,41 @@ final contentStoreProvider = Provider<ContentStore>((ref) {
   }
 
   return store;
+});
+
+final bundledKjvImporterProvider = Provider<BundledKjvImporter>(
+  (ref) => BundledKjvImporter(ref.watch(contentStoreProvider)),
+);
+
+/// Loads the bundled KJV into the DB on first access, then resolves.
+///
+/// Deliberately NOT awaited inside [VersionsNotifier]/[BibleVersionsNotifier]
+/// etc. — those are shared, widely-read providers, and any consumer's
+/// `ProviderContainer` that overrides only [contentStoreProvider] (the norm
+/// across this test suite) would otherwise hit real rootBundle/path_provider
+/// I/O it never set up. Nor is it invalidated from inside
+/// [contentStoreProvider]'s own postFrameCallback — a provider calling back
+/// into something that depends on it, through its own `ref`, throws
+/// Riverpod's CircularDependencyError even when deferred to a later
+/// microtask. Instead this is watched once, directly, at the app's root
+/// widget (`main_shell.dart`) before anything reads installed Bible
+/// versions — the one real entry point every actual app launch goes
+/// through, which no test's isolated provider container does.
+final bundledKjvReadyProvider = FutureProvider<bool>((ref) async {
+  await ref.watch(bundledKjvImporterProvider).ensureLoaded();
+  return true;
+});
+
+final bundledEastonImporterProvider = Provider<BundledEastonImporter>(
+  (ref) => BundledEastonImporter(ref.watch(contentStoreProvider)),
+);
+
+/// Loads the bundled Easton's Bible Dictionary into the DB on first access,
+/// then resolves. See [bundledKjvReadyProvider] for why this is watched at
+/// the app root rather than gating the shared dictionary provider directly.
+final bundledEastonReadyProvider = FutureProvider<bool>((ref) async {
+  await ref.watch(bundledEastonImporterProvider).ensureLoaded();
+  return true;
 });
 
 class VersionsNotifier extends AsyncNotifier<List<Version>> {

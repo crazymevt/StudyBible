@@ -211,6 +211,37 @@ About=A test module.
     expect(await store.select(store.versions).get(), isEmpty);
   });
 
+  test(
+    'paragraphBreaksAt backfills a paragraph break for source markup with none',
+    () async {
+      await SwordBibleImporter(store).importBible(
+        config,
+        ot: otReader(),
+        nt: ntReader(),
+        paragraphBreaksAt: {'Genesis|1|2', 'Matthew|1|1'},
+      );
+
+      final gen = await versesFor('Genesis');
+      List<VerseSegment> segsFor(Verse v) =>
+          (jsonDecode(v.segments) as List)
+              .map((e) => VerseSegment.fromJson(e as Map<String, dynamic>))
+              .toList();
+
+      // Genesis 1:1 isn't in the break set — untouched.
+      expect(segsFor(gen[0]).first.isParagraphBreak, isFalse);
+      // Genesis 1:2 is — a leading zero-width paragraph-break segment,
+      // ahead of its real text, the same shape MyBible's literal <pb/> tag
+      // produces.
+      final v2Segs = segsFor(gen[1]);
+      expect(v2Segs.first.isParagraphBreak, isTrue);
+      expect(v2Segs.first.text, isEmpty);
+      expect(v2Segs.skip(1).map((s) => s.text).join(), gen[1].textContent);
+
+      final matt = await versesFor('Matthew');
+      expect(segsFor(matt.first).first.isParagraphBreak, isTrue);
+    },
+  );
+
   test('re-importing replaces prior rows', () async {
     final importer = SwordBibleImporter(store);
     await importer.importBible(config, ot: otReader(), nt: ntReader());

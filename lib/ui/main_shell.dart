@@ -94,6 +94,19 @@ class _MainShellState extends ConsumerState<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Load the bundled KJV/Easton's before anything below reads installed
+    // Bible versions or dictionaries — otherwise a genuinely first launch
+    // would flash the "no Bible installed" onboarding screen while the
+    // import is still running (see bundledKjvReadyProvider's doc comment for
+    // why this can't just gate VersionsNotifier/DictionariesNotifier
+    // directly). Resolves near-instantly on every launch after the first,
+    // once both are already installed.
+    final kjvReady = ref.watch(bundledKjvReadyProvider);
+    final eastonReady = ref.watch(bundledEastonReadyProvider);
+    if (kjvReady.isLoading || eastonReady.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     final currentModule = ref.watch(appModuleProvider);
     final versionsAsync = ref.watch(bibleVersionsProvider);
 
