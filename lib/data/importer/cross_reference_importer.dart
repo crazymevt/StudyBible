@@ -32,36 +32,42 @@ class CrossReferenceImporter {
     await tempFile.writeAsBytes(byteData.buffer.asUint8List());
 
     final db = sqlite.sqlite3.open(tempFile.path);
-    final results = db.select('SELECT * FROM cross_references');
-
-    await store.batch((batch) {
-      // Clear first so the import is idempotent: the count check above is not
-      // atomic, so two overlapping first-run imports could both pass it. The
-      // batch runs in one transaction and writers are serialized, so whichever
-      // runs second clears the other's rows and re-inserts — the table always
-      // ends with exactly one copy instead of duplicates.
-      batch.deleteAll(store.crossReferences);
-      for (final row in results) {
-        batch.insert(
-          store.crossReferences,
-          CrossReferencesCompanion.insert(
-            sourceBookName: row['sourceBookName'] as String,
-            sourceChapter: int.tryParse(row['sourceChapter'].toString()) ?? 0,
-            sourceVerse: int.tryParse(row['sourceVerse'].toString()) ?? 0,
-            targetBookName: row['targetBookName'] as String,
-            targetChapter: int.tryParse(row['targetChapter'].toString()) ?? 0,
-            targetVerse: int.tryParse(row['targetVerse'].toString()) ?? 0,
-            votes: drift.Value(int.tryParse(row['votes']?.toString() ?? '')),
-          ),
-        );
-      }
-    });
-
-    db.close();
     try {
-      await tempFile.delete();
-    } catch (_) {
-      // Ignore if it couldn't be deleted
+      final results = db.select('SELECT * FROM cross_references');
+
+      await store.batch((batch) {
+        // Clear first so the import is idempotent: the count check above is not
+        // atomic, so two overlapping first-run imports could both pass it. The
+        // batch runs in one transaction and writers are serialized, so whichever
+        // runs second clears the other's rows and re-inserts — the table always
+        // ends with exactly one copy instead of duplicates.
+        batch.deleteAll(store.crossReferences);
+        for (final row in results) {
+          batch.insert(
+            store.crossReferences,
+            CrossReferencesCompanion.insert(
+              sourceBookName: row['sourceBookName'] as String,
+              sourceChapter: int.tryParse(row['sourceChapter'].toString()) ?? 0,
+              sourceVerse: int.tryParse(row['sourceVerse'].toString()) ?? 0,
+              targetBookName: row['targetBookName'] as String,
+              targetChapter: int.tryParse(row['targetChapter'].toString()) ?? 0,
+              targetVerse: int.tryParse(row['targetVerse'].toString()) ?? 0,
+              votes: drift.Value(int.tryParse(row['votes']?.toString() ?? '')),
+            ),
+          );
+        }
+      });
+    } finally {
+      // Always close the native handle and remove the temp file, even if the
+      // batch throws (e.g. a malformed row) — otherwise both leak, and since
+      // every run uses a fresh UUID filename, a failing import leaks a new
+      // temp file on every retry instead of ever cleaning up.
+      db.close();
+      try {
+        await tempFile.delete();
+      } catch (_) {
+        // Ignore if it couldn't be deleted
+      }
     }
   }
 }
