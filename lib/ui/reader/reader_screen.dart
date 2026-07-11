@@ -8,6 +8,7 @@ import '../../app/user_providers.dart';
 import '../../domain/scripture/scripture_route.dart';
 import '../../app/tag_providers.dart';
 import '../../app/audio_providers.dart';
+import '../../data/importer/mybible_verse_parser.dart';
 import 'verse_list_view.dart';
 import 'flowing_paragraph_view.dart';
 import 'parallel_view.dart';
@@ -85,7 +86,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final matches = <int>{};
     for (final verses in versesMap.values) {
       for (final v in verses) {
-        if (v.textContent.toLowerCase().contains(lowerQuery)) {
+        // Match against the rendered plain text, not the raw stored
+        // textContent — that still carries inline footnote bodies (see
+        // mybibleVersePlainText), which verse_text_builder never highlights.
+        // Matching the raw markup let this report a "found" verse whose
+        // visible text had no highlight anywhere.
+        final plain = mybibleVersePlainText(v.textContent as String);
+        if (plain.toLowerCase().contains(lowerQuery)) {
           matches.add(v.verse as int);
         }
       }
