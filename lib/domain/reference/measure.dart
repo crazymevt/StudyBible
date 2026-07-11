@@ -21,6 +21,15 @@ class Measure {
 
   final List<String> citations;
 
+  /// Multiplier from one unit of this measure to the category's US base
+  /// unit — length: feet, weight: ounces, volume: US quarts, money:
+  /// laborer day-wages (a denarius/drachma = 1 day). Lets the tap-to-convert
+  /// feature compute an actual total for a quantity found in the verse text
+  /// (e.g. "six cubits" → 9 feet), on top of the fixed per-unit
+  /// [modernEquivalent] string. Approximate for the same reasons
+  /// [modernEquivalent] is.
+  final double usUnitFactor;
+
   const Measure({
     required this.id,
     required this.name,
@@ -28,6 +37,7 @@ class Measure {
     required this.modernEquivalent,
     required this.notes,
     required this.citations,
+    required this.usUnitFactor,
   });
 }
 

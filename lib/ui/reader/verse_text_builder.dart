@@ -16,7 +16,7 @@ List<InlineSpan> buildVerseSpans({
   required Verse verse,
   required Color? bgColor,
   required Function(int) onVerseTap,
-  required Function(String, Offset) onWordRightClick,
+  required Function(String, Offset, List<String>) onWordRightClick,
   Function(int)? onFootnoteTap,
   Function(String)? onStrongTap,
   bool showStrongNumbers = false,
@@ -26,6 +26,10 @@ List<InlineSpan> buildVerseSpans({
   List<GestureRecognizer>? recognizers,
 }) {
   final spans = <InlineSpan>[];
+  // Accumulates word tokens across this whole verse (including across
+  // segment/markup boundaries) so a tap on a unit-of-measure word can look
+  // back for a preceding quantity ("six cubits") — see number_words.dart.
+  final precedingWords = <String>[];
   final isDark = Theme.of(context).brightness == Brightness.dark;
   final customColors = Theme.of(context).extension<CustomAppColors>();
   final jesusWordsColor = customColors?.jesusWordsColor ?? (isDark ? Colors.red.shade300 : Colors.red.shade700);
@@ -45,6 +49,7 @@ List<InlineSpan> buildVerseSpans({
       searchQuery: searchQuery,
       context: context,
       recognizers: recognizers,
+      precedingWords: precedingWords,
     ));
     return spans;
   }
@@ -152,6 +157,7 @@ List<InlineSpan> buildVerseSpans({
             searchQuery: searchQuery,
             context: context,
             recognizers: recognizers,
+            precedingWords: precedingWords,
           ));
         }
 
@@ -215,6 +221,7 @@ List<InlineSpan> buildVerseSpans({
       searchQuery: searchQuery,
       context: context,
       recognizers: recognizers,
+      precedingWords: precedingWords,
     ));
     return spans;
   }
@@ -361,13 +368,14 @@ List<InlineSpan> _buildHighlightedSpans(
   String text,
   TextStyle? style, {
   required VoidCallback onVerseTap,
-  required Function(String, Offset) onWordRightClick,
+  required Function(String, Offset, List<String>) onWordRightClick,
   required String? searchQuery,
   required BuildContext context,
   List<GestureRecognizer>? recognizers,
+  required List<String> precedingWords,
 }) {
   if (searchQuery == null || searchQuery.isEmpty) {
-    return _buildWordSpans(text, style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers);
+    return _buildWordSpans(text, style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords);
   }
 
   final spans = <InlineSpan>[];
@@ -377,7 +385,7 @@ List<InlineSpan> _buildHighlightedSpans(
   int lastMatchEnd = 0;
   for (final match in matches) {
     if (match.start > lastMatchEnd) {
-      spans.addAll(_buildWordSpans(text.substring(lastMatchEnd, match.start), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers));
+      spans.addAll(_buildWordSpans(text.substring(lastMatchEnd, match.start), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords));
     }
 
     final highlightStyle = style?.copyWith(
@@ -386,12 +394,12 @@ List<InlineSpan> _buildHighlightedSpans(
         ) ??
         TextStyle(backgroundColor: Colors.yellow.withValues(alpha: 0.5), color: Colors.black);
 
-    spans.addAll(_buildWordSpans(text.substring(match.start, match.end), highlightStyle, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers));
+    spans.addAll(_buildWordSpans(text.substring(match.start, match.end), highlightStyle, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords));
     lastMatchEnd = match.end;
   }
 
   if (lastMatchEnd < text.length) {
-    spans.addAll(_buildWordSpans(text.substring(lastMatchEnd), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers));
+    spans.addAll(_buildWordSpans(text.substring(lastMatchEnd), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords));
   }
 
   return spans;
@@ -401,17 +409,18 @@ List<InlineSpan> _buildWordSpans(
   String text,
   TextStyle? style, {
   required VoidCallback onVerseTap,
-  required Function(String, Offset) onWordRightClick,
+  required Function(String, Offset, List<String>) onWordRightClick,
   List<GestureRecognizer>? recognizers,
+  required List<String> precedingWords,
 }) {
   final spans = <InlineSpan>[];
   // Match unicode letters/numbers or non-letters/numbers
   final RegExp regex = RegExp(r'([\p{L}\p{N}\p{M}]+)|([^\p{L}\p{N}\p{M}]+)', unicode: true);
-  
+
   for (final match in regex.allMatches(text)) {
     final segment = match.group(0)!;
     final isWord = match.group(1) != null;
-    
+
     if (!isWord) {
       final recognizer = TapGestureRecognizer()..onTap = onVerseTap;
       recognizers?.add(recognizer);
@@ -425,6 +434,10 @@ List<InlineSpan> _buildWordSpans(
     } else {
       Timer? longPressTimer;
       bool isLongPress = false;
+      // Snapshot the words seen so far in this verse — precedingWords keeps
+      // accumulating after this closure is created, so a tap that fires
+      // later must not see words that came after it.
+      final wordsBefore = List<String>.of(precedingWords);
 
       final recognizer = TapGestureRecognizer()
             ..onTapDown = (details) {
@@ -433,7 +446,7 @@ List<InlineSpan> _buildWordSpans(
                 isLongPress = true;
                 final cleanWord = segment.toLowerCase();
                 if (cleanWord.isNotEmpty) {
-                  onWordRightClick(cleanWord, details.globalPosition);
+                  onWordRightClick(cleanWord, details.globalPosition, wordsBefore);
                 }
               });
             }
@@ -450,10 +463,11 @@ List<InlineSpan> _buildWordSpans(
             ..onSecondaryTapUp = (details) {
                final cleanWord = segment.toLowerCase();
                if (cleanWord.isNotEmpty) {
-                 onWordRightClick(cleanWord, details.globalPosition);
+                 onWordRightClick(cleanWord, details.globalPosition, wordsBefore);
                }
             };
       recognizers?.add(recognizer);
+      precedingWords.add(segment.toLowerCase());
       spans.add(
         TextSpan(
           text: segment,

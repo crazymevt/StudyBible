@@ -8,10 +8,8 @@ import '../../app/app_state.dart';
 import 'flowing_paragraph_view.dart';
 import 'chapter_navigation_footer.dart';
 import 'verse_text_builder.dart';
-import 'dictionary_panel.dart';
+import 'word_tap_menu.dart';
 import '../../theme/app_themes.dart';
-import '../../app/content_providers.dart';
-import '../common/breakpoints.dart';
 import '../../app/verse_selection.dart';
 
 class ParallelView extends ConsumerStatefulWidget {
@@ -107,48 +105,17 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
     });
   }
 
-  void _openDictionary(String word, Offset position) async {
+  void _openDictionary(String word, Offset position, List<String> precedingWords) async {
     // The long-press timer that triggers this can fire after the widget is
     // gone (e.g. a rebuild mid-press), so bail before touching context.
     if (!mounted) return;
-    final result = await showMenu<String>(
+    await showWordTapMenu(
       context: context,
-      position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy,
-        position.dx,
-        position.dy,
-      ),
-      items: [
-        PopupMenuItem(
-          value: 'dictionary',
-          child: Text('Look up "$word" in Dictionary'),
-        ),
-      ],
+      ref: ref,
+      word: word,
+      position: position,
+      precedingWords: precedingWords,
     );
-
-    if (result == 'dictionary') {
-      if (!mounted) return;
-      ref.read(dictionarySearchQueryProvider.notifier).setQuery(word, exact: true);
-      if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
-        ref.read(activeToolProvider.notifier).openTool(ActiveTool.dictionary);
-      } else {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => Container(
-            height: MediaQuery.sizeOf(context).height * 0.8,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            child: const DictionaryPanel(),
-          ),
-        );
-      }
-    }
   }
 
   Widget _buildHeader(BuildContext context, String versionId) {
@@ -367,7 +334,7 @@ class _ParallelVerseRow extends StatefulWidget {
   final Function(int) onVerseTap;
   final ValueChanged<int>? onFootnoteTap;
   final ValueChanged<String>? onStrongTap;
-  final Function(String, Offset) onWordRightClick;
+  final Function(String, Offset, List<String>) onWordRightClick;
 
   const _ParallelVerseRow({
     super.key,
