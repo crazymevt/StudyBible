@@ -473,7 +473,10 @@ class _AccountCard extends ConsumerWidget {
                 }
                 return SelectableText.rich(
                   TextSpan(children: spans),
-                  style: const TextStyle(fontSize: 15, height: 1.5),
+                  // bodyLarge (not a literal fontSize) so this respects the
+                  // user's reader font-size setting, same as the main verse
+                  // list.
+                  style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
                 );
               },
             ),

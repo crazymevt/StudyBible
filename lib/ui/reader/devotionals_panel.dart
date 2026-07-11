@@ -162,7 +162,9 @@ class DevotionalsPanel extends ConsumerWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: HtmlWidget(
                         entry.textContent,
-                        textStyle: const TextStyle(fontSize: 16),
+                        // bodyLarge (not a literal fontSize) so this respects
+                        // the user's reader font-size setting.
+                        textStyle: Theme.of(context).textTheme.bodyLarge,
                       ),
                     );
                   },

@@ -253,7 +253,9 @@ class _CompareResultCard extends ConsumerWidget {
           const SizedBox(height: 8),
           SelectableText.rich(
             TextSpan(children: spans),
-            style: const TextStyle(fontSize: 16, height: 1.5),
+            // bodyLarge (not a literal fontSize) so this respects the user's
+            // reader font-size setting, same as the main verse list.
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.5),
           ),
         ],
       ),
