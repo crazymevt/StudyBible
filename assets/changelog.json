@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.11+2",
+    "date": "2026-07-11",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "allow tapping any word in a measurement phrase to convert units",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.11+1",
     "date": "2026-07-11",
     "features": [
