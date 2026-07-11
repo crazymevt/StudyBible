@@ -406,7 +406,20 @@ class _FamilyTreeEdgePainter extends CustomPainter {
     }
 
     final childXs = childCenters.map((c) => c.dx).toList()..sort();
-    final railY = childCenters.first.dy - _nodeHeight / 2 - _railRise;
+    // Anchor the rail above the *topmost* child row, not just the first
+    // child in unit.childIds — a FamilyUnit's children aren't always level
+    // (e.g. a full sibling pair where one of them is also the root's own
+    // cross-generation spouse, so their generation was overridden to match
+    // the root's row instead of their sibling's). Using an arbitrary
+    // (non-topmost) child's row would place the rail below another child's
+    // card and give that child a stub a full row longer than it should be.
+    // A child below the topmost row simply gets a longer stub down to its
+    // own row, mirroring how off-row parents already get long stubs up to
+    // the join above.
+    final topChildY = childCenters
+        .map((c) => c.dy)
+        .reduce((a, b) => a < b ? a : b);
+    final railY = topChildY - _nodeHeight / 2 - _railRise;
     final dropX = (stubXs.reduce((a, b) => a + b) / stubXs.length)
         .clamp(childXs.first, childXs.last);
 
