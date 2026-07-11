@@ -635,6 +635,21 @@ class _PersonBarRow extends StatelessWidget {
   final bool banded;
   final VoidCallback onTap;
 
+  /// Horizontal padding inside the bar (matches the Container's padding).
+  static const double _hPad = 12;
+  /// Minimum breathing room to leave around a label before it's worth
+  /// showing at all.
+  static const double _labelGap = 8;
+
+  double _measure(String text, TextStyle style, BuildContext context) {
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    return tp.width;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -646,7 +661,24 @@ class _PersonBarRow extends StatelessWidget {
         : person.birthYear;
     final left = edgePad + (lo - minYear) * px;
     final width = ((hi - lo) * px).clamp(3.0, double.infinity);
-    final showEndLabels = width > 96;
+    final age = hi - lo;
+    final ageLabel = '$age ${age == 1 ? 'yr' : 'yrs'}';
+    final birthText = formatIsoYear(person.birthYear);
+    final deathText = formatIsoYear(person.deathYear);
+
+    const labelStyle = TextStyle(fontSize: 10);
+    final birthW = _measure(birthText, labelStyle, context);
+    final deathW = _measure(deathText, labelStyle, context);
+    final ageW = _measure(ageLabel, labelStyle, context);
+    final innerWidth = width - _hPad;
+
+    // Only show labels the bar can actually fit, measured from real text
+    // metrics (font, locale, accessibility text scale) rather than a guess —
+    // a fixed pixel threshold under- or over-estimates depending on how wide
+    // the formatted years happen to be.
+    final showEndLabels = innerWidth >= birthW + deathW + _labelGap;
+    final showAgeLabel =
+        showEndLabels && innerWidth >= birthW + deathW + ageW + _labelGap * 2;
 
     return Stack(
       children: [
@@ -657,39 +689,71 @@ class _PersonBarRow extends StatelessWidget {
           top: 6,
           bottom: 6,
           width: width,
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              decoration: BoxDecoration(
-                color: scheme.primaryContainer,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: scheme.primary.withValues(alpha: 0.5),
+          child: Tooltip(
+            message:
+                '${person.displayTitle}\n'
+                '${formatIsoYear(person.birthYear)} – '
+                '${formatIsoYear(person.deathYear)} ($ageLabel)',
+            child: GestureDetector(
+              onTap: onTap,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: scheme.primary.withValues(alpha: 0.5),
+                  ),
                 ),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                alignment: Alignment.center,
+                child: showEndLabels
+                    ? Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              birthText,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: scheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          if (showAgeLabel)
+                            Flexible(
+                              child: Text(
+                                ageLabel,
+                                maxLines: 1,
+                                softWrap: false,
+                                overflow: TextOverflow.clip,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: scheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                          const Spacer(),
+                          Flexible(
+                            child: Text(
+                              deathText,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.clip,
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: scheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : null,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              alignment: Alignment.center,
-              child: showEndLabels
-                  ? Row(
-                      children: [
-                        Text(
-                          formatIsoYear(person.birthYear),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: scheme.onPrimaryContainer,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          formatIsoYear(person.deathYear),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: scheme.onPrimaryContainer,
-                          ),
-                        ),
-                      ],
-                    )
-                  : null,
             ),
           ),
         ),

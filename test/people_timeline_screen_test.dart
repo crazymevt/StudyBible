@@ -103,6 +103,41 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    'bars never overflow while zooming through narrow-to-wide widths',
+    (tester) async {
+      await pump(tester);
+
+      // Step through every zoom level one tap at a time: this sweeps bars
+      // through the narrow (labels hidden), medium (years only), and wide
+      // (years + age) width bands, which is where a fixed pixel threshold
+      // previously mismatched the actual label width and overflowed the row.
+      for (var i = 0; i < 14; i++) {
+        await tester.tap(find.byTooltip('Zoom in'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
+      for (var i = 0; i < 14; i++) {
+        await tester.tap(find.byTooltip('Zoom out'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+
+  testWidgets('zooming in reveals each bar\'s age in years', (tester) async {
+    await pump(tester);
+
+    // Zoom in enough that Adam's bar (930-year lifespan) widens past the
+    // threshold for showing start/end years and the age label between them.
+    for (var i = 0; i < 10; i++) {
+      await tester.tap(find.byTooltip('Zoom in'));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('930 yrs'), findsOneWidget);
+  });
+
   testWidgets('tapping a name opens that person', (tester) async {
     await pump(tester);
 
