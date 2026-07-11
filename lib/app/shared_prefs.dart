@@ -41,3 +41,31 @@ class HasSeenTutorialNotifier extends Notifier<bool> {
 final hasSeenTutorialProvider = NotifierProvider<HasSeenTutorialNotifier, bool>(() {
   return HasSeenTutorialNotifier();
 });
+
+/// Whether the Content Manager's "Get more study resources" banner has been
+/// dismissed or fulfilled. KJV and Easton's now ship bundled with the app, so
+/// [main_shell.dart]'s onboarding screen — the only other place offering the
+/// curated [recommendedPh4Modules] set — no longer appears for most installs;
+/// this banner is the replacement entry point. Set on manual dismiss and on a
+/// fully-successful [ContentManagerController.downloadRecommended] run, so it
+/// doesn't linger after the set is installed.
+const String kHasDismissedRecommendedBannerKey = 'hasDismissedRecommendedBanner';
+
+class HasDismissedRecommendedBannerNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool(kHasDismissedRecommendedBannerKey) ?? false;
+  }
+
+  Future<void> setDismissed(bool dismissed) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool(kHasDismissedRecommendedBannerKey, dismissed);
+    state = dismissed;
+  }
+}
+
+final hasDismissedRecommendedBannerProvider =
+    NotifierProvider<HasDismissedRecommendedBannerNotifier, bool>(() {
+  return HasDismissedRecommendedBannerNotifier();
+});

@@ -9,7 +9,6 @@ void main() {
       expect(
         abbrs,
         containsAll(<String>[
-          'AV',
           'ESVGSB',
           'MHWBC.commentaries',
           'Pool-c.commentaries',
@@ -35,7 +34,11 @@ void main() {
 
     test('the Bible is installed before its study resources', () {
       // Commentaries/dictionaries anchor to a translation, so a Bible must lead.
-      expect(abbrs.first, 'AV');
+      expect(abbrs.first, 'BSB\u{2019}22');
+    });
+
+    test('excludes AV — the KJV now ships bundled with the app', () {
+      expect(abbrs, isNot(contains('AV')));
     });
 
     test('includes the King James subheadings the reader defaults to', () {

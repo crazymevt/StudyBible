@@ -117,7 +117,7 @@ class OnboardingScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Includes the KJV, Berean Standard & ESV Global Study Bibles, '
+                      'Includes the Berean Standard & ESV Global Study Bibles, '
                       'Matthew Henry & Poole commentaries, and Vine\'s, Webster\'s, '
                       'and King James dictionaries.',
                       style: theme.textTheme.bodySmall?.copyWith(

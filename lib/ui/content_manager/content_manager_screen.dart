@@ -13,6 +13,7 @@ import '../../app/app_state.dart';
 import '../../app/content_manager_providers.dart';
 import '../../app/content_providers.dart';
 import '../../app/search_providers.dart';
+import '../../app/shared_prefs.dart';
 import '../../data/importer/sword/sword_versification.dart';
 import '../app_drawer.dart';
 import '../common/empty_state.dart';
@@ -228,6 +229,96 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
     return Text(sizeText == null ? label : '$label • $sizeText');
   }
 
+  /// Offers the curated [recommendedPh4Modules] set. KJV and Easton's now ship
+  /// bundled, so onboarding — the only other place this was offered — no
+  /// longer appears for most installs; this banner is the replacement entry
+  /// point. Dismisses itself on a fully-successful download (see
+  /// [ContentManagerController.downloadRecommended]); a partial failure leaves
+  /// it up, showing the error, so the user can retry.
+  Widget _buildRecommendedBanner() {
+    final theme = Theme.of(context);
+    final recProgress =
+        ref.watch(contentManagerControllerProvider)[recommendedDownloadKey];
+    final isDownloading = recProgress != null &&
+        recProgress.status != 'Done' &&
+        !recProgress.status.startsWith('Error') &&
+        !recProgress.status.startsWith('Finished');
+    final isError = recProgress != null && recProgress.status.startsWith('Error');
+
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.auto_awesome, color: theme.colorScheme.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Get more study resources',
+                    style: theme.textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Download the curated study set — the Berean Standard & '
+                    'ESV Global Study Bibles, Matthew Henry & Poole '
+                    "commentaries, and Vine's, Webster's, and King James "
+                    'dictionaries.',
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 12),
+                  if (isDownloading) ...[
+                    Text(recProgress.status, style: theme.textTheme.bodySmall),
+                    const SizedBox(height: 4),
+                    LinearProgressIndicator(
+                      value: recProgress.percent,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ] else ...[
+                    if (isError) ...[
+                      Text(
+                        recProgress.status,
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: theme.colorScheme.error),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    FilledButton.icon(
+                      icon: const Icon(Icons.download, size: 18),
+                      label: Text(isError ? 'Retry' : 'Download'),
+                      onPressed: () {
+                        ref
+                            .read(contentManagerControllerProvider.notifier)
+                            .downloadRecommended();
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (!isDownloading)
+              IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                tooltip: 'Dismiss',
+                onPressed: () {
+                  ref
+                      .read(hasDismissedRecommendedBannerProvider.notifier)
+                      .setDismissed(true);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInstalledTab() {
     final versionsAsync = ref.watch(versionsProvider);
     final commentariesAsync = ref.watch(commentariesProvider);
@@ -415,8 +506,12 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
       );
     }
 
+    final showRecommendedBanner =
+        q.isEmpty && !ref.watch(hasDismissedRecommendedBannerProvider);
+
     return ListView(
       children: [
+        if (showRecommendedBanner) _buildRecommendedBanner(),
         if (bibles.isNotEmpty) ...[
           const Padding(
             padding: EdgeInsets.all(16.0),

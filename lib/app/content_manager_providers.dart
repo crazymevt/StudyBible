@@ -15,6 +15,7 @@ import '../data/importer/sword/sword_dictionary_importer.dart';
 import '../data/logging.dart';
 import 'app_state.dart'; // To get subheadingsSourceProvider
 import 'content_providers.dart'; // To get contentStoreProvider
+import 'shared_prefs.dart'; // To get hasDismissedRecommendedBannerProvider
 
 final contentManagerApiProvider = Provider((ref) => ContentManagerApi());
 
@@ -72,7 +73,6 @@ class DownloadProgress {
 /// to). Resolved against the live ph4.org catalog at download time by [abbr];
 /// any entry no longer in the catalog is skipped rather than failing the run.
 const recommendedPh4Modules = <({String abbr, String label})>[
-  (abbr: 'AV', label: 'King James Version (with cross references)'),
   // ph4 spells the Berean abbr with a curly apostrophe (U+2019); match it
   // exactly so the catalog lookup resolves.
   (abbr: 'BSB\u{2019}22', label: 'Berean Standard Bible (2022)'),
@@ -320,6 +320,15 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
           : DownloadProgress(
               1.0, 'Finished — ${failed.length} of $total could not be installed'),
     };
+
+    // Fully successful: the banner/onboarding prompt that triggered this has
+    // nothing left to offer, so stop showing it. A partial failure leaves it
+    // up so the user can retry.
+    if (failed.isEmpty) {
+      await ref
+          .read(hasDismissedRecommendedBannerProvider.notifier)
+          .setDismissed(true);
+    }
   }
 
   Future<void> downloadAndImportOsis(
