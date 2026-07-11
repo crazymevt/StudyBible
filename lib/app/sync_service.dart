@@ -51,6 +51,7 @@ class SyncService {
   FileSyncEngine? _engine;
   FileSystemEntity? _resolvedBookmarkEntity;
   http.Client? _driveClient;
+  Future<void>? _inFlightSync;
 
   SyncService(this._store, this._ref);
 
@@ -114,7 +115,23 @@ class SyncService {
     _engine = FileSyncEngine(storage: storage, localDeviceId: deviceId);
   }
 
-  Future<void> sync() async {
+  /// Runs a sync, or — if one is already in progress — awaits that one
+  /// instead of starting a second. `_engine`/`_driveClient` are mutable
+  /// instance state and `sync()` does a read-everything-then-write-everything
+  /// pass with no locking of its own, so two overlapping calls (e.g. the
+  /// auto-sync timer firing while the user taps "Sync Now") would each merge
+  /// from a stale local snapshot and clobber each other's writes, and could
+  /// each create a same-named Google Drive state file (Drive doesn't enforce
+  /// filename uniqueness). Single-flighting here — rather than relying on
+  /// each caller's own local "am I syncing" flag — covers every call site at
+  /// once.
+  Future<void> sync() {
+    return _inFlightSync ??= _syncLocked().whenComplete(() {
+      _inFlightSync = null;
+    });
+  }
+
+  Future<void> _syncLocked() async {
     await _ensureInit();
 
     if (_resolvedBookmarkEntity != null) {
@@ -669,8 +686,8 @@ class SyncService {
                             t.deleted.equals(false) &
                             t.content.equals(localJournal.content),
                       ))
-                      .getSingleOrNull();
-              if (already == null) {
+                      .get();
+              if (already.isEmpty) {
                 await _store
                     .into(_store.journalRevisions)
                     .insert(
@@ -726,8 +743,8 @@ class SyncService {
                             t.deleted.equals(false) &
                             t.content.equals(localSermon.content),
                       ))
-                      .getSingleOrNull();
-              if (already == null) {
+                      .get();
+              if (already.isEmpty) {
                 await _store
                     .into(_store.sermonRevisions)
                     .insert(
@@ -816,8 +833,8 @@ class SyncService {
                             t.deleted.equals(false) &
                             t.content.equals(localPage.content),
                       ))
-                      .getSingleOrNull();
-              if (already == null) {
+                      .get();
+              if (already.isEmpty) {
                 await _store
                     .into(_store.notebookPageRevisions)
                     .insert(
