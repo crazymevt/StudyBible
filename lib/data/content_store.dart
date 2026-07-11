@@ -42,7 +42,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 19;
 
   @override
   MigrationStrategy get migration {
@@ -279,6 +279,58 @@ class ContentStore extends _$ContentStore {
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_topics_name_category '
             'ON topics (name, category)',
+          );
+        }
+        if (from < 17) {
+          // Installs that already imported people before the upstream fix
+          // (scripts/build_theographic.dart's _knownBadDeathYears) are stuck
+          // with Seth's old deathYear forever — TheographicImporter only
+          // seeds bible_people once, on an empty table, so a corrected asset
+          // never reaches an existing install on its own. Patch the one bad
+          // row directly; a no-op for installs that never imported people or
+          // that already have the corrected value.
+          await customStatement(
+            "UPDATE bible_people SET death_year = -2962 "
+            "WHERE slug = 'seth_2504' AND death_year = -2692",
+          );
+        }
+        if (from < 18) {
+          // Same problem as v17, for three more people whose upstream
+          // birthYear/deathYear contradict each other outright (death before
+          // birth) with no clear correct value to substitute — see
+          // scripts/build_theographic.dart's _unreliableLifespans. Null
+          // both out rather than guess, so the People Timeline stops
+          // rendering an impossible negative lifespan for them.
+          await customStatement(
+            "UPDATE bible_people SET birth_year = NULL, death_year = NULL "
+            "WHERE slug IN ('samson_2468', 'ahaziah_121', 'jehoram_803') "
+            "AND birth_year > death_year",
+          );
+        }
+        if (from < 19) {
+          // Same problem again, for four more people — see
+          // scripts/build_theographic.dart's _knownBadDeathYears,
+          // _unreliableBirthYears, and _unreliableLifespans for the sourcing
+          // behind each value. Guarded on the exact known-bad value so a
+          // device that already has the corrected (or nulled) data is a
+          // no-op.
+          await customStatement(
+            "UPDATE bible_people SET death_year = -1411 "
+            "WHERE slug = 'joshua_1727' AND death_year = -1424",
+          );
+          await customStatement(
+            "UPDATE bible_people SET birth_year = NULL "
+            "WHERE slug = 'rachel_2386' AND birth_year = -1755",
+          );
+          await customStatement(
+            "UPDATE bible_people SET birth_year = NULL, death_year = NULL "
+            "WHERE slug = 'manasseh_1930' AND birth_year = -677 "
+            "AND death_year = -642",
+          );
+          await customStatement(
+            "UPDATE bible_people SET birth_year = NULL, death_year = NULL "
+            "WHERE slug = 'ahaz_118' AND birth_year = -763 "
+            "AND death_year = -716",
           );
         }
       },

@@ -69,6 +69,67 @@ const Set<(String, int, int, int)> _knownBadVerseLinks = {
   ('Death of Moses', 0, 34, 1),
 };
 
+/// Known-bad birth/death years in the upstream dataset, corrected here so
+/// re-running this script doesn't silently reintroduce them. Keyed by
+/// personLookup slug (stable across re-imports, unlike record ids).
+///
+/// - Seth's deathYear is -2692 upstream, 1182 years after his -3874
+///   birthYear — but Genesis 5:8 states Seth lived 912 years, and his
+///   birthYear checks out (Adam's -4004 + the 130 years of Gen. 5:3). The
+///   correct deathYear is -3874 + 912 = -2962.
+/// - Joshua's deathYear is -1424 upstream, 97 years after his -1521
+///   birthYear — but Josh. 24:29 states he lived 110 years. His birthYear
+///   checks out against Moses's (Moses born -1571, Exodus at Moses's age 80
+///   puts it at -1491, when Joshua — a "young man" per Ex. 33:11 — would be
+///   30, matching the traditional Exodus dating this dataset uses
+///   elsewhere). The correct deathYear is -1521 + 110 = -1411.
+const Map<String, int> _knownBadDeathYears = {
+  'seth_2504': -2962,
+  'joshua_1727': -1411,
+};
+
+/// Upstream birthYears with no reliable value, dropped (leaving deathYear
+/// standing) rather than guessed at. Keyed by personLookup slug.
+///
+/// - Rachel's birthYear is -1755 upstream, only 16 years before her -1739
+///   deathYear — implausible on its face for a woman Jacob married as an
+///   adult (after 7 years' service, Gen. 29) and who bore two sons years
+///   apart before dying in Benjamin's birth (Gen. 35:16-19). Her deathYear
+///   checks out — it exactly matches Benjamin's birthYear elsewhere in this
+///   dataset — so it's the birthYear that's wrong, and Genesis gives no
+///   figure to correct it with.
+const Set<String> _unreliableBirthYears = {'rachel_2386'};
+
+/// Upstream birth/death year pairs with no reliable values at all, dropped
+/// entirely rather than guessed at, so the People Timeline doesn't render an
+/// impossible or contradicted lifespan. Keyed by personLookup slug.
+///
+/// - Samson (samson_2468): -1090/-1101, deathYear before birthYear. Judges
+///   never states his age, so there's no anchor for a correction the way
+///   Genesis gives one for Seth — and 11 years is implausible on its face
+///   for a Nazarite who married, avenged his wife's death, and judged Israel
+///   for 20 years (Judg. 13-16).
+/// - Ahaziah of Judah (ahaziah_121) and his father Jehoram (jehoram_803):
+///   -822/-844 and -802/-844, both deathYear before birthYear. 2 Kings 8:26
+///   says Ahaziah was 22 when he began his one-year reign, and his successor
+///   Joash's birthYear (-844, matching Ahaziah's dy here) hints the
+///   deathYear may be right and the birthYear wrong — but that's a lead, not
+///   a citable figure, so both are dropped.
+/// - Manasseh, son of Hezekiah (manasseh_1930): -677/-642, a 35-year span.
+///   2 Kings 21:1 says he began reigning at 12 and reigned 55 years, so he
+///   lived at least 67 years — the data is missing over half his life.
+/// - Ahaz (ahaz_118): -763/-716, a 47-year span. 2 Kings 16:2 gives 20 + 16
+///   = 36 (this rests on a well-known textual crux in Kings — Ahaz's stated
+///   age there would make him father Hezekiah at 11 — so the true figure is
+///   disputed among scholars, but 47 doesn't match any standard reading).
+const Set<String> _unreliableLifespans = {
+  'samson_2468',
+  'ahaziah_121',
+  'jehoram_803',
+  'manasseh_1930',
+  'ahaz_118',
+};
+
 Future<void> main(List<String> args) async {
   String? srcDir;
   var outputPath = 'assets/data/theographic.json';
@@ -169,14 +230,22 @@ Future<void> main(List<String> args) async {
         .where((s) => s.isNotEmpty)
         .join(', ');
     final bio = _cleanBio(f['dictText']);
+    final slug = f['personLookup'] as String? ?? recId;
+    final isUnreliable = _unreliableLifespans.contains(slug);
+    final birthYear = (isUnreliable || _unreliableBirthYears.contains(slug))
+        ? null
+        : _year(f['birthYear']);
+    final deathYear = isUnreliable
+        ? null
+        : (_knownBadDeathYears[slug] ?? _year(f['deathYear']));
     final person = <String, dynamic>{
-      's': f['personLookup'] ?? recId,
+      's': slug,
       'n': name,
       if (displayTitle != name) 'dt': displayTitle,
       if (f['gender'] case final String gender) 'g': gender,
       if (alsoCalled != null && alsoCalled.isNotEmpty) 'a': alsoCalled,
-      'by': ?_year(f['birthYear']),
-      'dy': ?_year(f['deathYear']),
+      'by': ?birthYear,
+      'dy': ?deathYear,
       'mn': ?_year(f['minYear']),
       'mx': ?_year(f['maxYear']),
       'f': ?indexOfLink(f['father']),
