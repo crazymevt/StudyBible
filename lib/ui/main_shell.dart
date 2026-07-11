@@ -175,15 +175,14 @@ class _MainShellState extends ConsumerState<MainShell> {
     final hasSeenTutorial = ref.watch(hasSeenTutorialProvider);
     final showTutorial = !hasSeenTutorial && hasBibles;
 
-    final readerLayout = LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > Breakpoints.compact) {
-          return const _DesktopLayout();
-        } else {
-          return const ReaderScreen();
-        }
-      },
-    );
+    // A LayoutBuilder here (instead of the isWideLayout computed above) would
+    // decide this during Flutter's layout phase rather than its build phase —
+    // and mounting ReaderScreen's provider chain for the first time inside a
+    // layout-phase rebuild can throw "setState()/markNeedsBuild() called
+    // during build" when a newly-created provider notifies ProviderScope, an
+    // ancestor Flutter doesn't consider "currently building" at that point.
+    final readerLayout =
+        isWideLayout ? const _DesktopLayout() : const ReaderScreen();
 
     final Widget shell;
     if (showTutorial) {
