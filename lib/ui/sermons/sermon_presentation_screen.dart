@@ -22,6 +22,14 @@ class SermonPresentationScreen extends ConsumerStatefulWidget {
 class _SermonPresentationScreenState extends ConsumerState<SermonPresentationScreen> {
   late QuillController _controller;
 
+  /// Passed explicitly to QuillEditor.basic below. Without it, the factory
+  /// mints a brand-new default FocusNode on every call — i.e. every rebuild.
+  /// This screen rebuilds whenever the presentation timer/clock toggles are
+  /// watched providers change, so an implicit FocusNode churns on every such
+  /// toggle. See the identical fix (and crash history) in
+  /// sermon_editor_screen.dart.
+  final _editorFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +51,7 @@ class _SermonPresentationScreenState extends ConsumerState<SermonPresentationScr
   @override
   void dispose() {
     _controller.dispose();
+    _editorFocusNode.dispose();
     super.dispose();
   }
 
@@ -113,6 +122,7 @@ class _SermonPresentationScreenState extends ConsumerState<SermonPresentationScr
               ),
               child: QuillEditor.basic(
                 controller: _controller,
+                focusNode: _editorFocusNode,
                 config: QuillEditorConfig(
                   customLinkPrefixes: referenceLinkPrefixes,
                   customRecognizerBuilder:
