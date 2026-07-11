@@ -1,5 +1,95 @@
 [
   {
+    "version": "26.7.11+1",
+    "date": "2026-07-11",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "surface recommended-resources download in Content Manager",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "bundle KJV and Easton's Bible Dictionary with the app",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "decide reader mobile/desktop layout during build, not layout phase",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "show a tooltip and age label on People Timeline bars",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct upstream birth/death-year errors for Seth, Joshua, and five others",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "tap a measure or currency word to convert it to US units",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "anchor family tree sibling rail to the topmost child row",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "close sqlite handle and temp file on cross-reference import failure",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "respect reader font-size setting in compare/harmony/devotionals panels",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "match rendered text, not raw markup, for reader in-page find",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "give sermon presentation editor an explicit FocusNode",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "dedupe concurrent achievement unlocks",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "prevent sync crashes and races in SyncService",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "guard content/user store migrations against duplicate-column crashes",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.10+2",
     "date": "2026-07-10",
     "features": [
