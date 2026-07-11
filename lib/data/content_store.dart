@@ -112,8 +112,14 @@ class ContentStore extends _$ContentStore {
           await m.addColumn(versions, versions.about);
           await m.addColumn(commentaries, commentaries.about);
           await m.addColumn(dictionaries, dictionaries.about);
-          await m.addColumn(subheadings, subheadings.about);
-          await m.addColumn(devotionals, devotionals.about);
+          // subheadings/devotionals are guarded (not a bare addColumn): a
+          // device upgrading from schema 1 hits `from < 2`'s
+          // createTable(subheadings) and `from < 4`'s createTable(devotionals)
+          // first, and createTable always reflects the *current* Dart column
+          // list — which already includes `about` — so a bare addColumn here
+          // would throw "duplicate column name" and wedge the content DB open.
+          await _ensureSubheadingsAboutColumn(m);
+          await _ensureDevotionalsAboutColumn(m);
         }
         if (from < 9) {
           await _createIfNotExists(m, topics);
@@ -289,6 +295,32 @@ class ContentStore extends _$ContentStore {
     ).get();
     if (hasColumn.isEmpty) {
       await m.addColumn(topics, topics.category);
+    }
+  }
+
+  /// Idempotently adds the subheadings.about column. Guarded because a device
+  /// upgrading from schema 1 creates `subheadings` fresh (with `about`
+  /// already present, since createTable reflects the current Dart schema)
+  /// before reaching this v8 step, so a bare addColumn would throw
+  /// "duplicate column name" and wedge the upgrade.
+  Future<void> _ensureSubheadingsAboutColumn(Migrator m) async {
+    final hasColumn = await customSelect(
+      "SELECT 1 FROM pragma_table_info('subheadings') WHERE name = 'about'",
+    ).get();
+    if (hasColumn.isEmpty) {
+      await m.addColumn(subheadings, subheadings.about);
+    }
+  }
+
+  /// Idempotently adds the devotionals.about column. Guarded for the same
+  /// reason as [_ensureSubheadingsAboutColumn]: schema 1-3 devices create
+  /// `devotionals` fresh (with `about` already present) at the v4 step.
+  Future<void> _ensureDevotionalsAboutColumn(Migrator m) async {
+    final hasColumn = await customSelect(
+      "SELECT 1 FROM pragma_table_info('devotionals') WHERE name = 'about'",
+    ).get();
+    if (hasColumn.isEmpty) {
+      await m.addColumn(devotionals, devotionals.about);
     }
   }
 

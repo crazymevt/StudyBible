@@ -207,7 +207,13 @@ class UserStore extends _$UserStore {
           // Sermons are rich text (Quill Delta JSON). Index a plain-text
           // projection instead of the raw JSON so the search index/snippets
           // aren't polluted with markup.
-          await m.addColumn(sermons, sermons.contentPlain);
+          //
+          // Guarded (not a bare addColumn): a device upgrading from schema
+          // 2-8 creates `sermons` fresh at the v9 step above, and createTable
+          // reflects the current Dart schema — which already includes
+          // content_plain — so a bare addColumn here would throw "duplicate
+          // column name" and wedge the upgrade.
+          await _ensureSermonContentPlainColumn(m);
 
           // Drop the sermon triggers so the backfill below doesn't fire them,
           // then recreate them to index content_plain.
@@ -795,6 +801,17 @@ class UserStore extends _$UserStore {
   /// COALESCE) yet only added in the v21 block, and because SQLite's ALTER
   /// TABLE ADD COLUMN would otherwise throw "duplicate column name" on a
   /// re-run after a rolled-back migration attempt.
+  /// Idempotently adds the sermons.content_plain column. See the call site
+  /// in the v13 migration step for why this must be guarded.
+  Future<void> _ensureSermonContentPlainColumn(Migrator m) async {
+    final hasColumn = await customSelect(
+      "SELECT 1 FROM pragma_table_info('sermons') WHERE name = 'content_plain'",
+    ).get();
+    if (hasColumn.isEmpty) {
+      await m.addColumn(sermons, sermons.contentPlain);
+    }
+  }
+
   Future<void> _ensureJournalContentPlainColumn(Migrator m) async {
     final hasColumn = await customSelect(
       "SELECT 1 FROM pragma_table_info('journals') "
