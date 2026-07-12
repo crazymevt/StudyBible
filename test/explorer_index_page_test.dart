@@ -150,6 +150,32 @@ void main() {
     ]);
   });
 
+  testWidgets(
+      'typing in the filter field narrows the list and hides the letter '
+      'strip', (tester) async {
+    await pumpIndex(tester);
+    expect(find.byKey(const Key('explorerIndexLetterStrip')), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'aa');
+    await tester.pumpAndSettle();
+    expect(visibleTitles(tester), ['Aaron']);
+    expect(find.text('1 of 4 people'), findsOneWidget);
+    // Filtering hides the jump strip and its group headers.
+    expect(find.byKey(const Key('explorerIndexLetterStrip')), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.clear));
+    await tester.pumpAndSettle();
+    expect(visibleTitles(tester), ['Aaron', 'Abel', 'Barak', 'Caleb']);
+    expect(find.text('4 people'), findsOneWidget);
+  });
+
+  testWidgets('filter matching is case-insensitive', (tester) async {
+    await pumpIndex(tester);
+    await tester.enterText(find.byType(TextField), 'BARAK');
+    await tester.pumpAndSettle();
+    expect(visibleTitles(tester), ['Barak']);
+  });
+
   testWidgets('tapping a tile opens the entity on the trail', (tester) async {
     await pumpIndex(tester);
     await tester.tap(find.text('Abel'));

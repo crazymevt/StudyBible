@@ -44,10 +44,6 @@ ordered by value-for-effort within each group.
   already exist for notebooks (`entity_link.dart`, `handleEntityLinkLaunch`).
   Exposing "Copy link" in `_PageTitle` would let users paste live entity
   links into their own sermons and notebook pages.
-- [ ] **Explorer — search-within-index.** The People index is ~3,000 entries;
-  the letter strip helps, but a filter field on `explorer_index_page.dart`
-  (filtering the already-loaded list, no new provider needed) beats tapping
-  "J" and scrolling hundreds of J-names.
 - [ ] **Explorer — disambiguating subtitles on search results.** Result tiles
   show a subtitle, but for people/places it could show the strongest hook
   ("father of David · 22 verses") to disambiguate the many duplicate biblical
@@ -78,6 +74,16 @@ ordered by value-for-effort within each group.
 ## Issues
 
 ## Archive
+
+- [x] **Explorer — search-within-index.** Added a filter `TextField` to
+  `explorer_index_page.dart`'s header row (case-insensitive substring match
+  on the label, against the already-loaded list — no new provider). While a
+  filter is active, the letter strip and its group headers (and the
+  Prophets Major/Minor/Other sections) are hidden and the count reads
+  "N of M" instead of just "M"; clearing the field restores the normal
+  A-Z/rank view untouched. Tests in `explorer_index_page_test.dart`:
+  narrowing + letter-strip hiding + count text, and case-insensitive
+  matching.
 
 - [x] **Explorer — verse preview sheet + Person-page dictionary card.** The
   top two picks from the 2026-07-12 Explorer walkthrough, done together:

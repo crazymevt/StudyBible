@@ -56,6 +56,17 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
   /// Initial letter the alphabetical view is filtered to; null shows all.
   String? _letter;
 
+  final _searchController = TextEditingController();
+
+  /// Lower-cased filter text; empty means no filter is active.
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   String get _noun => switch (widget.category) {
         'feast' => 'feasts',
         'story' => 'stories',
@@ -144,6 +155,7 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
     }
 
     final alpha = _sort == _IndexSort.alpha;
+    final searching = _query.isNotEmpty;
     final letters = <String>[];
     if (alpha) {
       for (final e in entries) {
@@ -151,7 +163,12 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
         if (letters.isEmpty || letters.last != l) letters.add(l);
       }
     }
-    final visible = !alpha || _letter == null
+    final visible = searching
+        ? [
+            for (final e in entries)
+              if (e.ref.label.toLowerCase().contains(_query)) e,
+          ]
+        : !alpha || _letter == null
         ? entries
         : [
             for (final e in entries)
@@ -160,12 +177,14 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
 
     // Flattened list rows: a String is a group header, anything else an
     // entry. In A-Z mode that's a letter header (skipped once filtered to
-    // one letter); in rank mode, a category with its own [sections] lookup
-    // (Prophets' Major/Minor/Other) gets the same treatment instead — the
-    // list is already in that curated block order, so a header just marks
-    // where the section value changes as we walk it.
+    // one letter, or while searching); in rank mode, a category with its own
+    // [sections] lookup (Prophets' Major/Minor/Other) gets the same
+    // treatment instead — the list is already in that curated block order,
+    // so a header just marks where the section value changes as we walk it.
     final rows = <Object>[];
-    if (alpha && _letter == null) {
+    if (searching) {
+      rows.addAll(visible);
+    } else if (alpha && _letter == null) {
       String? current;
       for (final e in visible) {
         final l = _groupLetter(e.ref.label);
@@ -202,7 +221,9 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      '${all.length} $_noun',
+                      searching
+                          ? '${visible.length} of ${all.length} $_noun'
+                          : '${all.length} $_noun',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -231,8 +252,39 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
                 ],
               ),
             ),
-            if (alpha && letters.length > 1)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  isDense: true,
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  suffixIcon: searching
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          tooltip: 'Clear filter',
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _query = '');
+                          },
+                        )
+                      : null,
+                  hintText: 'Filter $_noun',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                ),
+                onChanged: (v) =>
+                    setState(() => _query = v.trim().toLowerCase()),
+              ),
+            ),
+            if (alpha && letters.length > 1 && !searching)
               Padding(
+                key: const Key('explorerIndexLetterStrip'),
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
                 child: Wrap(
                   alignment: WrapAlignment.center,
