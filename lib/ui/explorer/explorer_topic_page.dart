@@ -63,6 +63,10 @@ class _TopicPage extends ConsumerWidget {
         final namedGroupPersonId = ref.watch(
           namedGroupPersonIdsProvider,
         )['${d.topic.category}|${d.topic.name}'];
+        final allRefs = d.entries.expand((e) => e.refs);
+        final firstRef = d.topic.category == 'story' && allRefs.isNotEmpty
+            ? allRefs.first
+            : null;
         return _PageScroll(
           children: [
             _PageTitle(
@@ -76,6 +80,19 @@ class _TopicPage extends ConsumerWidget {
                 'prophet' => 'A Major or Minor Prophet',
                 _ => 'Nave\'s Topical Bible',
               },
+              trailing: firstRef == null
+                  ? null
+                  : FilledButton.tonalIcon(
+                      icon: const Icon(Icons.menu_book, size: 18),
+                      label: const Text('Read the account'),
+                      onPressed: () => explorerOpenVerseInReader(
+                        context,
+                        ref,
+                        firstRef.bookName,
+                        firstRef.chapter,
+                        firstRef.verse ?? 1,
+                      ),
+                    ),
             ),
             if (namedGroupPersonId != null)
               ExplorerFacetCard(
