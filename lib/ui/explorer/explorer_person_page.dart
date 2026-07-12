@@ -69,6 +69,21 @@ class _PersonPage extends ConsumerWidget {
 
         final places = placesAsync.asData?.value ?? const <Place>[];
 
+        // The biography card already carries the Easton entry (baked into
+        // the Theographic data), so when there is one, drop the installed
+        // Easton module's matching entry rather than showing it twice.
+        final dictionary = [
+          for (final e
+              in ref
+                      .watch(explorerEntryDictionaryProvider(p.displayTitle))
+                      .asData
+                      ?.value ??
+                  const <DictionaryEntryWithDict>[])
+            if (p.bio == null ||
+                e.dictionary.abbreviation.toUpperCase() != 'EASTON')
+              e,
+        ];
+
         return _PageScroll(
           children: [
             _PageTitle(title: p.displayTitle, subtitle: subtitle),
@@ -78,6 +93,7 @@ class _PersonPage extends ConsumerWidget {
                 title: 'Biography — Easton\'s Bible Dictionary',
                 child: _ExpandableText(p.bio!),
               ),
+            if (dictionary.isNotEmpty) _DictionaryCard(entries: dictionary),
             if (family.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.family_restroom,

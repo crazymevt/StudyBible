@@ -325,19 +325,27 @@ class ExplorerTagChip extends ConsumerWidget {
   }
 }
 
-/// A chip that opens a verse in the reader (leaving the Explorer).
+/// A chip that previews a verse in a bottom sheet, so an entity's mentions
+/// can be skimmed without leaving the Explorer; the sheet's "Open in reader"
+/// keeps the old jump one tap away.
 class ExplorerVerseChip extends ConsumerWidget {
   const ExplorerVerseChip({
     super.key,
     required this.book,
     required this.chapter,
     required this.verse,
+    this.verseEnd,
     this.label,
   });
 
   final String book;
   final int chapter;
   final int verse;
+
+  /// Last verse of an inclusive range starting at [verse]; null for a single
+  /// verse. Only widens the preview — opening in the reader still lands on
+  /// [verse].
+  final int? verseEnd;
 
   /// Chip text; defaults to the full "Book chapter:verse" reference.
   final String? label;
@@ -348,8 +356,157 @@ class ExplorerVerseChip extends ConsumerWidget {
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       label: Text(label ?? '$book $chapter:$verse'),
-      onPressed: () =>
-          explorerOpenVerseInReader(context, ref, book, chapter, verse),
+      // No label forwarded: chip labels can be shorthand ("24:2"); the sheet
+      // titles itself with the canonical full reference instead.
+      onPressed: () => showExplorerVersePreview(
+        context,
+        book: book,
+        chapter: chapter,
+        verse: verse,
+        verseEnd: verseEnd,
+      ),
+    );
+  }
+}
+
+/// Bottom-sheet preview of a verse (or an inclusive range within a chapter)
+/// in the primary version — see [ExplorerVerseChip]. [label] overrides the
+/// default full-reference title.
+Future<void> showExplorerVersePreview(
+  BuildContext context, {
+  required String book,
+  required int chapter,
+  required int verse,
+  int? verseEnd,
+  String? label,
+}) {
+  final end = verseEnd == null || verseEnd <= verse ? verse : verseEnd;
+  return showModalBottomSheet(
+    context: context,
+    showDragHandle: true,
+    builder: (_) => _ExplorerVersePreviewSheet(
+      book: book,
+      chapter: chapter,
+      verse: verse,
+      verseEnd: end,
+      label:
+          label ??
+          (end == verse
+              ? '$book $chapter:$verse'
+              : '$book $chapter:$verse–$end'),
+    ),
+  );
+}
+
+class _ExplorerVersePreviewSheet extends ConsumerWidget {
+  const _ExplorerVersePreviewSheet({
+    required this.book,
+    required this.chapter,
+    required this.verse,
+    required this.verseEnd,
+    required this.label,
+  });
+
+  final String book;
+  final int chapter;
+  final int verse;
+  final int verseEnd;
+  final String label;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
+    final previewAsync = ref.watch(
+      explorerVersePreviewProvider((
+        book: book,
+        chapter: chapter,
+        verse: verse,
+        verseEnd: verseEnd,
+      )),
+    );
+    final preview = previewAsync.asData?.value;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+                if (preview != null)
+                  Text(
+                    preview.versionAbbreviation,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Flexible(
+              child: SingleChildScrollView(
+                child: previewAsync.isLoading
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    : preview == null
+                        ? Text(
+                            'This passage isn\'t available in your primary '
+                            'Bible.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: scheme.onSurfaceVariant),
+                          )
+                        : Text.rich(
+                            TextSpan(
+                              children: [
+                                for (final v in preview.verses) ...[
+                                  TextSpan(
+                                    text: '${v.verse} ',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: scheme.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                  TextSpan(text: '${v.text} '),
+                                ],
+                              ],
+                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(height: 1.6),
+                          ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.tonalIcon(
+                icon: const Icon(Icons.menu_book, size: 18),
+                label: const Text('Open in reader'),
+                // Unwinds to the shell, which also dismisses this sheet.
+                onPressed: () =>
+                    explorerOpenVerseInReader(context, ref, book, chapter, verse),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

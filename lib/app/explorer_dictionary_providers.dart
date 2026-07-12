@@ -1,16 +1,17 @@
 part of 'explorer_providers.dart';
 
-// --- Dictionary lookup (place & topic pages) ---
+// --- Dictionary lookup (person, place & topic pages) ---
 
 /// Dictionary entries whose headword matches an Explorer entity's name, across
 /// every installed dictionary (Easton's, or any user-imported lexicon). Powers
-/// the "Dictionary" facet card on place and topic pages, so a place like
-/// "Jerusalem" or a topic like "AARON" surfaces its dictionary definition.
-/// Empty when no dictionary is installed or nothing matches.
+/// the "Dictionary" facet card on person, place, and topic pages, so a place
+/// like "Jerusalem" or a topic like "AARON" surfaces its dictionary
+/// definition. Empty when no dictionary is installed or nothing matches.
 ///
-/// Person pages deliberately don't use this — their biography card already
-/// shows the Easton entry (baked into the Theographic data), so a dictionary
-/// card would duplicate it.
+/// Person pages filter the result rather than taking it as-is: when the
+/// person has a bio, their biography card already shows the Easton entry
+/// (baked into the Theographic data), so the installed Easton module's
+/// matching entry is dropped there to avoid duplication.
 final explorerEntryDictionaryProvider =
     FutureProvider.family<List<DictionaryEntryWithDict>, String>((
       ref,

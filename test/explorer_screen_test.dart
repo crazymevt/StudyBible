@@ -44,6 +44,49 @@ void main() {
             name: Value('Saul'),
             displayTitle: Value('Saul'),
             verseCount: Value(1),
+            bio: Value('The first king of Israel, son of Kish.'),
+          ),
+        );
+
+    // Two installed dictionaries with a matching headword: the person page's
+    // Dictionary card must drop the Easton entry (his bio card already shows
+    // Easton's text) but keep every other module's.
+    await store
+        .into(store.dictionaries)
+        .insert(
+          const DictionariesCompanion(
+            id: Value(1),
+            abbreviation: Value('EASTON'),
+            name: Value('Easton\'s Bible Dictionary'),
+          ),
+        );
+    await store
+        .into(store.dictionaryEntries)
+        .insert(
+          const DictionaryEntriesCompanion(
+            id: Value(1),
+            dictionaryId: Value(1),
+            word: Value('Saul'),
+            definition: Value('<p>Easton entry for Saul.</p>'),
+          ),
+        );
+    await store
+        .into(store.dictionaries)
+        .insert(
+          const DictionariesCompanion(
+            id: Value(2),
+            abbreviation: Value('SMITH'),
+            name: Value('Smith\'s Bible Dictionary'),
+          ),
+        );
+    await store
+        .into(store.dictionaryEntries)
+        .insert(
+          const DictionaryEntriesCompanion(
+            id: Value(2),
+            dictionaryId: Value(2),
+            word: Value('Saul'),
+            definition: Value('<p>Smith entry for Saul.</p>'),
           ),
         );
     await store
@@ -523,12 +566,92 @@ void main() {
     await tester.tap(find.widgetWithText(ListTile, 'Saul'));
     await tester.pumpAndSettle();
 
-    // Page title plus the breadcrumb crumb.
-    expect(find.text('Saul'), findsNWidgets(2));
+    // Page title plus the breadcrumb crumb (and possibly the Dictionary
+    // card's headword, viewport permitting).
+    expect(find.text('Saul'), findsAtLeastNWidgets(2));
     expect(find.text('Events (1)'), findsOneWidget);
     expect(find.text('David spares Saul'), findsOneWidget);
     expect(find.text('Appears in 1 verse'), findsOneWidget);
   });
+
+  testWidgets(
+    'person page shows a Dictionary card, deduping the Easton bio',
+    (tester) async {
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final container = await pump(tester);
+
+      container
+          .read(explorerTrailProvider.notifier)
+          .open(const ExplorerRef.person(1, 'Saul'));
+      await tester.pumpAndSettle();
+
+      // The baked-in Theographic bio keeps its own card…
+      expect(
+        find.text('Biography — Easton\'s Bible Dictionary'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('The first king of Israel, son of Kish.'),
+        findsOneWidget,
+      );
+      // …and the Dictionary card carries the other installed modules: the
+      // installed Easton duplicate is dropped, Smith's survives and is
+      // auto-expanded as the only visible module.
+      expect(find.text('Dictionary'), findsOneWidget);
+      expect(find.text('Smith\'s Bible Dictionary'), findsOneWidget);
+      expect(find.text('Easton\'s Bible Dictionary'), findsNothing);
+      expect(
+        find.textContaining('Smith entry for Saul', findRichText: true),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Easton entry for Saul', findRichText: true),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'a verse chip previews the verse text in a sheet before the reader jump',
+    (tester) async {
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final container = await pump(tester);
+
+      container
+          .read(explorerTrailProvider.notifier)
+          .open(const ExplorerRef.person(1, 'Saul'));
+      await tester.pumpAndSettle();
+
+      // "Appears in 1 verse" groups chips per book — expand, open 24:2.
+      await tester.tap(find.text('1 Samuel (1)'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('24:2'));
+      await tester.pumpAndSettle();
+
+      // The sheet titles itself with the full reference (the chip label is
+      // shorthand), names the version, and shows the cleaned verse text.
+      expect(find.text('1 Samuel 24:2'), findsOneWidget);
+      expect(find.text('KJV'), findsOneWidget);
+      expect(
+        find.textContaining(
+          'Then Saul took three thousand',
+          findRichText: true,
+        ),
+        findsOneWidget,
+      );
+
+      // "Open in reader" jumps to the verse and unwinds the Explorer.
+      await tester.tap(find.text('Open in reader'));
+      await tester.pumpAndSettle();
+      expect(container.read(selectedBookNameProvider), '1 Samuel');
+      expect(container.read(selectedChapterProvider), 24);
+      expect(container.read(selectedVersesProvider), {2});
+    },
+  );
 
   testWidgets('passage page shows commentary and user-note cards', (
     tester,
@@ -583,10 +706,19 @@ void main() {
       expect(find.text('Your sermons (1)'), findsOneWidget);
       expect(find.text('Sparing an Enemy'), findsOneWidget);
 
-      // Tapping a cross-reference chip jumps the reader to its target (this
-      // pops the Explorer route back to the shell, per explorerOpenVerseInReader,
-      // so it runs last).
+      // Tapping a cross-reference chip opens the preview sheet. Genesis has
+      // no seeded text, so the sheet shows the not-available fallback but
+      // still offers the reader jump, which pops the Explorer route back to
+      // the shell (per explorerOpenVerseInReader, so it runs last). The
+      // passage page has its own "Open in reader" button behind the sheet —
+      // .last is the sheet's.
       await tester.tap(find.text('Genesis 1:1'));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('isn\'t available in your primary'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Open in reader').last);
       await tester.pumpAndSettle();
       expect(container.read(selectedBookNameProvider), 'Genesis');
       expect(container.read(selectedChapterProvider), 1);
@@ -866,8 +998,13 @@ void main() {
     await tester.tap(find.textContaining('REUBEN', findRichText: true).last);
     await tester.pumpAndSettle();
 
-    // Landed on Saul's own person page, not just a chip with his name.
-    expect(find.text('Saul'), findsOneWidget);
+    // Landed on Saul's own person page, not just a chip with his name (his
+    // bio card only renders there; 'Saul' alone also matches the Dictionary
+    // card's headword).
+    expect(
+      find.text('The first king of Israel, son of Kish.'),
+      findsOneWidget,
+    );
     expect(find.text('Your tags'), findsOneWidget);
   });
 }

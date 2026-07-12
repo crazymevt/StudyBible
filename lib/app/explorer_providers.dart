@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content_store.dart';
 import '../data/importer/curated_topics_data.dart';
+import '../data/importer/mybible_verse_parser.dart';
 import '../data/user_store.dart';
 import '../domain/explorer/explorer_ref.dart';
 import '../domain/explorer/fuzzy_suggest.dart';
@@ -29,6 +30,7 @@ part 'explorer_event_detail_providers.dart';
 part 'explorer_place_detail_providers.dart';
 part 'explorer_person_detail_providers.dart';
 part 'explorer_dictionary_providers.dart';
+part 'explorer_verse_preview_providers.dart';
 part 'explorer_passage_hit_providers.dart';
 part 'explorer_topic_facet_providers.dart';
 part 'explorer_tag_providers.dart';

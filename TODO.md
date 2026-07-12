@@ -6,6 +6,53 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
+Explorer-page improvements scoped from a code walkthrough (2026-07-12), roughly
+ordered by value-for-effort within each group.
+
+*Consistency gaps (cheap wins — the pattern already exists on a sibling page):*
+
+- [ ] **Explorer — user-content facets on the Prophecy page.** Every other
+  entity page shows "Your sermons" / "Your notebooks" / tags cards;
+  `explorer_prophecy_page.dart` has none, so a prophecy the user has preached
+  on looks unconnected to their own work. `ExplorerRef.prophecy` already
+  exists, so `explorerSermonsProvider` / `explorerNotebookPagesProvider`
+  should slot in.
+- [ ] **Explorer — "Read the account" button on the Event page.** The Passage
+  page has a prominent "Open in reader" `FilledButton.tonalIcon` in its title
+  row; the Event page makes you pick an individual verse chip. Add the same
+  button jumping to the first verse of the account.
+
+*Navigation & discovery:*
+
+- [ ] **Explorer — "Recently visited" on the home page.** Home is search +
+  browse chips with no memory of past explorations beyond the single
+  persistent trail. A small recents row (last ~10 entities visited, deduped)
+  would make re-finding an entity faster than re-searching.
+- [ ] **Explorer — "Often appears with" on the Person page.** Events-with-
+  participants and shared-verse data already exist; a facet of the people who
+  co-occur most with this person (co-participants in events, or same-verse
+  mentions) would add sideways person→person links — currently the only ones
+  are family.
+- [ ] **Explorer — timeline neighbors on the Event page.** Events have
+  `startYear` and a timeline order (the index page uses it). "What happened
+  before / after" chips would let users walk the timeline without returning
+  to the index.
+
+*Bigger-ticket:*
+
+- [ ] **Explorer — share / copy-link on entity pages.** `sbent:` entity links
+  already exist for notebooks (`entity_link.dart`, `handleEntityLinkLaunch`).
+  Exposing "Copy link" in `_PageTitle` would let users paste live entity
+  links into their own sermons and notebook pages.
+- [ ] **Explorer — search-within-index.** The People index is ~3,000 entries;
+  the letter strip helps, but a filter field on `explorer_index_page.dart`
+  (filtering the already-loaded list, no new provider needed) beats tapping
+  "J" and scrolling hundreds of J-names.
+- [ ] **Explorer — disambiguating subtitles on search results.** Result tiles
+  show a subtitle, but for people/places it could show the strongest hook
+  ("father of David · 22 verses") to disambiguate the many duplicate biblical
+  names (~7 Marys, ~30 Zechariahs).
+
 ## Research
 
 - [ ] **Import SWORD modules** (CrossWire format — translations, commentaries,
@@ -31,6 +78,32 @@ Running list of known issues and follow-ups.
 ## Issues
 
 ## Archive
+
+- [x] **Explorer — verse preview sheet + Person-page dictionary card.** The
+  top two picks from the 2026-07-12 Explorer walkthrough, done together:
+  - *Verse preview:* every `ExplorerVerseChip` tap now opens a bottom-sheet
+    preview (full canonical reference, primary-version abbreviation, cleaned
+    verse text via the same footnote-stripping `MyBibleVerseParser` pass the
+    cross-reference panel uses) instead of immediately tearing the user out
+    of the Explorer; "Open in reader" inside the sheet keeps the old jump one
+    tap away. Backed by `explorerVersePreviewProvider`
+    (`explorer_verse_preview_providers.dart`), which resolves the reference
+    against the primary active version and returns null (→ a "not available"
+    fallback in the sheet, reader jump still offered) when the book/verse
+    doesn't exist there. Chips gained an optional `verseEnd` so ranged
+    references preview the whole range — threaded through from the topic
+    page's `r.verseEnd` and the prophecy page's parsed `V-V` passages.
+  - *Person dictionary card:* the Person page now renders the same
+    `_DictionaryCard` as place/topic pages (`explorerEntryDictionaryProvider`
+    on `displayTitle`), revisiting the original deliberate exclusion: when
+    the person has a Theographic bio (which *is* the Easton text), entries
+    from the installed Easton module (`abbreviation == 'EASTON'`,
+    case-insensitive) are dropped so only genuinely new modules (Smith's,
+    user-imported lexicons) appear; bio-less people keep Easton entries.
+  - Tests in `explorer_screen_test.dart`: preview sheet shows seeded verse
+    text + version and jumps on "Open in reader"; unavailable-verse fallback
+    (cross-ref chip test, updated for the two-step flow); dictionary card
+    dedupes Easton but keeps Smith's.
 
 - [x] **Explorer — richer content on entity/passage pages.** Three enrichments
   scoped from a data-source audit (2026-07-02). All three now resolved:

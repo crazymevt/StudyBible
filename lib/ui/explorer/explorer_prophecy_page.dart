@@ -69,6 +69,7 @@ class _ProphecySection extends StatelessWidget {
                       book: m.group(1)!.trim(),
                       chapter: int.parse(m.group(2)!),
                       verse: int.tryParse(m.group(3) ?? '') ?? 1,
+                      verseEnd: int.tryParse(m.group(4) ?? ''),
                       label: passage,
                     ),
               ],

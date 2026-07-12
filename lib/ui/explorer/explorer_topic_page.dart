@@ -109,6 +109,7 @@ class _TopicPage extends ConsumerWidget {
                               book: r.bookName,
                               chapter: r.chapter,
                               verse: r.verse ?? 1,
+                              verseEnd: r.verseEnd,
                               label: r.verse == null
                                   ? '${r.bookName} ${r.chapter}'
                                   : '${r.bookName} ${r.chapter}:${r.verse}'
