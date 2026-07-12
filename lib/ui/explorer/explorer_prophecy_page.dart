@@ -24,6 +24,9 @@ class _ProphecyPage extends ConsumerWidget {
     final notebookPages =
         ref.watch(explorerNotebookPagesProvider(entityRef)).asData?.value ??
         const <SearchResult>[];
+    final tags =
+        ref.watch(explorerProphecyTagsProvider(index)).asData?.value ??
+        const <ExplorerEntityTag>[];
     return _PageScroll(
       children: [
         _PageTitle(title: prophecy.title, subtitle: prophecy.category.label),
@@ -61,6 +64,7 @@ class _ProphecyPage extends ConsumerWidget {
               ],
             ),
           ),
+        if (tags.isNotEmpty) _EntityTagsCard(tags: tags),
       ],
     );
   }

@@ -8,6 +8,7 @@ import '../data/user_store.dart';
 import '../domain/explorer/explorer_ref.dart';
 import '../domain/explorer/fuzzy_suggest.dart';
 import '../domain/feasts/feast_data.dart' show feasts;
+import '../domain/prophecy/prophecy.dart' show Prophecy;
 import '../domain/prophecy/prophecy_data.dart' show prophecies;
 import '../domain/prophecy/prophecy_index.dart' show searchProphecies;
 import '../domain/search/reference_parser.dart';

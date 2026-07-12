@@ -651,3 +651,43 @@ final explorerEventTagsProvider =
         ]);
       });
     });
+
+/// A prophecy's own passage references ("Book C", "Book C:V", "Book C:V-V")
+/// expanded into individual verse refs, prophecy references first then
+/// fulfillment — the same shorthand [_ProphecySection] parses for its chips.
+/// Whole-chapter refs contribute nothing (there's no single verse to
+/// intersect a tag against).
+final _prophecyTagRefExp = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
+
+List<({String book, int chapter, int verse})> _prophecyVerseRefs(
+  Prophecy prophecy,
+) {
+  final refs = <({String book, int chapter, int verse})>[];
+  for (final passage in [...prophecy.prophecy, ...prophecy.fulfillment]) {
+    final m = _prophecyTagRefExp.firstMatch(passage.trim());
+    if (m == null) continue;
+    final start = int.tryParse(m.group(3) ?? '');
+    if (start == null) continue;
+    final book = m.group(1)!.trim();
+    final chapter = int.parse(m.group(2)!);
+    final end = int.tryParse(m.group(4) ?? '') ?? start;
+    for (var v = start; v <= end; v++) {
+      refs.add((book: book, chapter: chapter, verse: v));
+    }
+  }
+  return refs;
+}
+
+/// Your tags on verses cited by a prophecy's foretelling or fulfillment. See
+/// [explorerPersonTagsProvider] — the only difference is the prophecy
+/// dataset is pure Dart, not backed by a per-entity SQL verse list.
+final explorerProphecyTagsProvider =
+    StreamProvider.family<List<ExplorerEntityTag>, int>((ref, index) {
+      final db = ref.watch(userStoreProvider);
+      return _taggedVerseStream(db).asyncMap((tagged) async {
+        if (tagged.isEmpty || index < 0 || index >= prophecies.length) {
+          return const <ExplorerEntityTag>[];
+        }
+        return _tagsOnVerses(tagged, _prophecyVerseRefs(prophecies[index]));
+      });
+    });

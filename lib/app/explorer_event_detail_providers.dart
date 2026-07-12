@@ -200,3 +200,36 @@ final explorerEventDetailProvider =
         placesTotalCount: placeIds.length,
       );
     });
+
+/// The curated feasts/stories (see curated_topics_data.dart) whose cited
+/// verses include one of an event's account verses — the event-page
+/// equivalent of [explorerPersonStoriesProvider]. Nave's own subject
+/// headings are excluded the same way — only feast/story-category topics
+/// qualify.
+final explorerEventStoriesProvider =
+    FutureProvider.family<List<ExplorerTopicHit>, int>((ref, eventId) async {
+      await ref.watch(explorerReadyProvider.future);
+      final store = ref.watch(contentStoreProvider);
+      final rows = await store
+          .customSelect(
+            '''
+    SELECT DISTINCT t.id AS id, t.name AS name
+    FROM event_verses ev
+    JOIN topic_references tr ON tr.book_name = ev.book_name AND tr.chapter = ev.chapter
+      AND (
+        tr.verse IS NULL
+        OR (tr.verse_end IS NULL AND tr.verse = ev.verse)
+        OR (tr.verse_end IS NOT NULL AND ev.verse BETWEEN tr.verse AND tr.verse_end)
+      )
+    JOIN topics t ON t.id = tr.topic_id AND t.category IS NOT NULL
+    WHERE ev.event_id = ?
+    ORDER BY t.name
+    ''',
+            variables: [Variable.withInt(eventId)],
+          )
+          .get();
+      return [
+        for (final r in rows)
+          ExplorerTopicHit(r.read<int>('id'), r.read<String>('name')),
+      ];
+    });

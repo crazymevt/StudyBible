@@ -38,6 +38,15 @@ class _EventPage extends ConsumerWidget {
                 .asData
                 ?.value ??
             const <SearchResult>[];
+        final dictionary =
+            ref
+                .watch(explorerEntryDictionaryProvider(d.event.title))
+                .asData
+                ?.value ??
+            const <DictionaryEntryWithDict>[];
+        final stories =
+            ref.watch(explorerEventStoriesProvider(eventId)).asData?.value ??
+            const <ExplorerTopicHit>[];
         return _PageScroll(
           children: [
             _PageTitle(
@@ -59,6 +68,20 @@ class _EventPage extends ConsumerWidget {
                       ),
                     ),
             ),
+            if (dictionary.isNotEmpty) _DictionaryCard(entries: dictionary),
+            if (stories.isNotEmpty)
+              ExplorerFacetCard(
+                icon: Icons.topic_outlined,
+                title: 'Related stories',
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final s in stories)
+                      ExplorerRefChip(ExplorerRef.topic(s.id, s.name)),
+                  ],
+                ),
+              ),
             if (d.verses.isNotEmpty)
               ExplorerFacetCard(
                 icon: Icons.menu_book_outlined,

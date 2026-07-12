@@ -12,9 +12,20 @@ class _PageScroll extends StatelessWidget {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 840),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
+          // Secondary facets (sermons, tags, media…) resolve independently
+          // and pop their cards in as each provider finishes; AnimatedSize
+          // eases that into a smooth grow instead of an abrupt jump under
+          // whatever the user is currently reading. A finite animation —
+          // unlike SkeletonList's shimmer, it settles, so it doesn't fight
+          // widget tests' pumpAndSettle.
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            alignment: Alignment.topCenter,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            ),
           ),
         ),
       ),
