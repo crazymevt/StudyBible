@@ -17,10 +17,6 @@ ordered by value-for-effort within each group.
   on looks unconnected to their own work. `ExplorerRef.prophecy` already
   exists, so `explorerSermonsProvider` / `explorerNotebookPagesProvider`
   should slot in.
-- [ ] **Explorer — "Read the account" button on the Event page.** The Passage
-  page has a prominent "Open in reader" `FilledButton.tonalIcon` in its title
-  row; the Event page makes you pick an individual verse chip. Add the same
-  button jumping to the first verse of the account.
 
 *Navigation & discovery:*
 
@@ -74,6 +70,15 @@ ordered by value-for-effort within each group.
 ## Issues
 
 ## Archive
+
+- [x] **Explorer — "Read the account" button on the Event page.** Added a
+  `FilledButton.tonalIcon` ("Read the account") to `_PageTitle`'s trailing
+  slot on `explorer_event_page.dart`, matching the Passage page's "Open in
+  reader" button — jumps straight to the account's first verse
+  (`d.verses.first`, already canonical-order per `ExplorerEventDetail`)
+  via the shared `explorerOpenVerseInReader`, instead of requiring a chip
+  pick. Hidden when an event has no tagged verses. Test in
+  `explorer_screen_test.dart` on the seeded "David spares Saul" event.
 
 - [x] **Explorer — search-within-index.** Added a filter `TextField` to
   `explorer_index_page.dart`'s header row (case-insensitive substring match

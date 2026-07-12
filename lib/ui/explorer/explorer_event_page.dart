@@ -45,6 +45,19 @@ class _EventPage extends ConsumerWidget {
               subtitle: d.event.startYear == null
                   ? null
                   : explorerYearLabel(d.event.startYear!),
+              trailing: d.verses.isEmpty
+                  ? null
+                  : FilledButton.tonalIcon(
+                      icon: const Icon(Icons.menu_book, size: 18),
+                      label: const Text('Read the account'),
+                      onPressed: () => explorerOpenVerseInReader(
+                        context,
+                        ref,
+                        d.verses.first.bookName,
+                        d.verses.first.chapter,
+                        d.verses.first.verse,
+                      ),
+                    ),
             ),
             if (d.verses.isNotEmpty)
               ExplorerFacetCard(

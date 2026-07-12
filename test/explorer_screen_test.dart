@@ -575,6 +575,25 @@ void main() {
   });
 
   testWidgets(
+    'event page "Read the account" button jumps to the account\'s first '
+    'verse without picking a chip',
+    (tester) async {
+      final container = await pump(tester);
+
+      container
+          .read(explorerTrailProvider.notifier)
+          .open(const ExplorerRef.event(1, 'David spares Saul'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Read the account'));
+      await tester.pumpAndSettle();
+      expect(container.read(selectedBookNameProvider), '1 Samuel');
+      expect(container.read(selectedChapterProvider), 24);
+      expect(container.read(selectedVersesProvider), {1});
+    },
+  );
+
+  testWidgets(
     'person page shows a Dictionary card, deduping the Easton bio',
     (tester) async {
       tester.view.physicalSize = const Size(1000, 2400);
