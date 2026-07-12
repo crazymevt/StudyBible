@@ -8,7 +8,6 @@ import 'chapter_navigation_footer.dart';
 import 'verse_text_builder.dart';
 import 'word_tap_menu.dart';
 import '../../app/reader_state.dart';
-import '../../app/verse_selection.dart';
 
 class FlowingParagraphView extends ConsumerStatefulWidget {
   final List<Verse> verses;
@@ -251,29 +250,12 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
       );
     }).toList();
 
-        Widget content = Text.rich(TextSpan(children: spans));
-        if (widget.selectedVerses.isNotEmpty) {
-          content = LongPressDraggable<String>(
-            data: () {
-              final sel = collectSelection(ref);
-              if (sel == null) return '';
-              return formatSelection(ref, sel);
-            }(),
-            feedback: Material(
-              elevation: 8.0,
-              borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text(
-                  'Dragging ${widget.selectedVerses.length} verse(s)',
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              ),
-            ),
-            child: content,
-          );
-        }
+        // Unlike the list/parallel views, the whole chapter is one Text.rich
+        // here, so a LongPressDraggable around it would cover *every* verse —
+        // any selection used to disable long-press word lookup chapter-wide.
+        // In this view, dragging a selection is done from the verse action
+        // bar's drag handle instead.
+        final Widget content = Text.rich(TextSpan(children: spans));
 
         return SingleChildScrollView(
           child: Column(

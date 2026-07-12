@@ -9,6 +9,7 @@ import 'flowing_paragraph_view.dart';
 import 'chapter_navigation_footer.dart';
 import 'verse_text_builder.dart';
 import 'word_tap_menu.dart';
+import 'verse_drag_feedback.dart';
 import '../../theme/app_themes.dart';
 import '../../app/verse_selection.dart';
 
@@ -286,29 +287,18 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                 onFootnoteTap: widget.onFootnoteTap,
                 onStrongTap: widget.onStrongTap,
                 onWordRightClick: _openDictionary,
+                isSelected: isSelected,
               );
 
               if (isSelected) {
-                tile = LongPressDraggable<String>(
-                  data: () {
-                    final sel = collectSelection(ref);
-                    if (sel == null) return '';
-                    return formatSelection(ref, sel);
-                  }(),
-                  feedback: Material(
-                    elevation: 8.0,
-                    borderRadius: BorderRadius.circular(8),
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      child: Text(
-                        'Dragging ${widget.selectedVerses.length} verse(s)',
-                        style: Theme.of(context).textTheme.labelLarge,
-                      ),
-                    ),
-                  ),
-                  child: tile,
-                );
+                final sel = collectSelection(ref);
+                if (sel != null) {
+                  tile = LongPressDraggable<String>(
+                    data: formatSelection(ref, sel),
+                    feedback: VerseDragFeedback.fromSelection(sel),
+                    child: tile,
+                  );
+                }
               }
 
               return tile;
@@ -337,6 +327,11 @@ class _ParallelVerseRow extends StatefulWidget {
   final ValueChanged<String>? onStrongTap;
   final Function(String, Offset, List<String>, List<String>) onWordRightClick;
 
+  /// True when this row is part of the selection and therefore wrapped in a
+  /// [LongPressDraggable]. Long-press then means "drag", so the word-lookup
+  /// long-press is suppressed to keep the two gestures from racing.
+  final bool isSelected;
+
   const _ParallelVerseRow({
     super.key,
     required this.verseNum,
@@ -350,6 +345,7 @@ class _ParallelVerseRow extends StatefulWidget {
     required this.onFootnoteTap,
     required this.onStrongTap,
     required this.onWordRightClick,
+    required this.isSelected,
   });
 
   @override
@@ -446,6 +442,7 @@ class _ParallelVerseRowState extends State<_ParallelVerseRow> {
                                       searchQuery: widget.searchQuery,
                                       ignoreLeadingBreaks: true,
                                       recognizers: _recognizers,
+                                      suppressWordLongPress: widget.isSelected,
                                     ),
                                   ],
                                 ),

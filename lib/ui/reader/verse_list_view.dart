@@ -10,6 +10,7 @@ import '../../app/tts_providers.dart';
 import 'chapter_navigation_footer.dart';
 import 'verse_text_builder.dart';
 import 'word_tap_menu.dart';
+import 'verse_drag_feedback.dart';
 import '../../app/verse_selection.dart';
 
 class VerseListView extends ConsumerStatefulWidget {
@@ -244,29 +245,18 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
           onFootnoteTap: widget.onFootnoteTap,
           onStrongTap: widget.onStrongTap,
           onWordRightClick: _openDictionary,
+          isSelected: isSelected,
         );
 
         if (isSelected) {
-          tile = LongPressDraggable<String>(
-            data: () {
-              final sel = collectSelection(ref);
-              if (sel == null) return '';
-              return formatSelection(ref, sel);
-            }(),
-            feedback: Material(
-              elevation: 8.0,
-              borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text(
-                  'Dragging ${widget.selectedVerses.length} verse(s)',
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              ),
-            ),
-            child: tile,
-          );
+          final sel = collectSelection(ref);
+          if (sel != null) {
+            tile = LongPressDraggable<String>(
+              data: formatSelection(ref, sel),
+              feedback: VerseDragFeedback.fromSelection(sel),
+              child: tile,
+            );
+          }
         }
 
         return tile;
@@ -294,6 +284,11 @@ class _VerseTile extends StatefulWidget {
   final ValueChanged<String>? onStrongTap;
   final Function(String, Offset, List<String>, List<String>) onWordRightClick;
 
+  /// True when this verse is part of the selection and therefore wrapped in a
+  /// [LongPressDraggable]. Long-press then means "drag", so the word-lookup
+  /// long-press is suppressed to keep the two gestures from racing.
+  final bool isSelected;
+
   const _VerseTile({
     super.key,
     required this.verse,
@@ -309,6 +304,7 @@ class _VerseTile extends StatefulWidget {
     required this.onFootnoteTap,
     required this.onStrongTap,
     required this.onWordRightClick,
+    required this.isSelected,
   });
 
   @override
@@ -411,6 +407,7 @@ class _VerseTileState extends State<_VerseTile> {
                     ignoreLeadingBreaks: true,
                     searchQuery: widget.searchQuery,
                     recognizers: _recognizers,
+                    suppressWordLongPress: widget.isSelected,
                   ),
                 ],
               ),

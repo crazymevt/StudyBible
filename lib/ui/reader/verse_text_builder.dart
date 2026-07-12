@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
@@ -33,6 +34,7 @@ List<InlineSpan> buildVerseSpans({
   bool ignoreLeadingBreaks = false,
   String? searchQuery,
   List<GestureRecognizer>? recognizers,
+  bool suppressWordLongPress = false,
 }) {
   final spans = <InlineSpan>[];
   // Accumulates word tokens across this whole verse (including across
@@ -60,6 +62,7 @@ List<InlineSpan> buildVerseSpans({
       recognizers: recognizers,
       precedingWords: precedingWords,
       allWords: _tokenizeWords(text),
+      suppressWordLongPress: suppressWordLongPress,
     ));
     return spans;
   }
@@ -176,6 +179,7 @@ List<InlineSpan> buildVerseSpans({
             recognizers: recognizers,
             precedingWords: precedingWords,
             allWords: allWords,
+            suppressWordLongPress: suppressWordLongPress,
           ));
         }
 
@@ -241,6 +245,7 @@ List<InlineSpan> buildVerseSpans({
       recognizers: recognizers,
       precedingWords: precedingWords,
       allWords: _tokenizeWords(text),
+      suppressWordLongPress: suppressWordLongPress,
     ));
     return spans;
   }
@@ -393,9 +398,10 @@ List<InlineSpan> _buildHighlightedSpans(
   List<GestureRecognizer>? recognizers,
   required List<String> precedingWords,
   required List<String> allWords,
+  bool suppressWordLongPress = false,
 }) {
   if (searchQuery == null || searchQuery.isEmpty) {
-    return _buildWordSpans(text, style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords);
+    return _buildWordSpans(text, style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords, suppressWordLongPress: suppressWordLongPress);
   }
 
   final spans = <InlineSpan>[];
@@ -405,7 +411,7 @@ List<InlineSpan> _buildHighlightedSpans(
   int lastMatchEnd = 0;
   for (final match in matches) {
     if (match.start > lastMatchEnd) {
-      spans.addAll(_buildWordSpans(text.substring(lastMatchEnd, match.start), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords));
+      spans.addAll(_buildWordSpans(text.substring(lastMatchEnd, match.start), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords, suppressWordLongPress: suppressWordLongPress));
     }
 
     final highlightStyle = style?.copyWith(
@@ -414,12 +420,12 @@ List<InlineSpan> _buildHighlightedSpans(
         ) ??
         TextStyle(backgroundColor: Colors.yellow.withValues(alpha: 0.5), color: Colors.black);
 
-    spans.addAll(_buildWordSpans(text.substring(match.start, match.end), highlightStyle, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords));
+    spans.addAll(_buildWordSpans(text.substring(match.start, match.end), highlightStyle, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords, suppressWordLongPress: suppressWordLongPress));
     lastMatchEnd = match.end;
   }
 
   if (lastMatchEnd < text.length) {
-    spans.addAll(_buildWordSpans(text.substring(lastMatchEnd), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords));
+    spans.addAll(_buildWordSpans(text.substring(lastMatchEnd), style, onVerseTap: onVerseTap, onWordRightClick: onWordRightClick, recognizers: recognizers, precedingWords: precedingWords, allWords: allWords, suppressWordLongPress: suppressWordLongPress));
   }
 
   return spans;
@@ -433,6 +439,7 @@ List<InlineSpan> _buildWordSpans(
   List<GestureRecognizer>? recognizers,
   required List<String> precedingWords,
   required List<String> allWords,
+  bool suppressWordLongPress = false,
 }) {
   final spans = <InlineSpan>[];
   // Match unicode letters/numbers or non-letters/numbers
@@ -469,10 +476,20 @@ List<InlineSpan> _buildWordSpans(
       final recognizer = TapGestureRecognizer()
             ..onTapDown = (details) {
               isLongPress = false;
+              // When this verse is armed for drag-and-drop (i.e. selected, and
+              // wrapped in a LongPressDraggable), long-press must mean "drag"
+              // alone. The lookup timer would race the drag recognizer's own
+              // ~500ms delay — both firing at once opened the dictionary popup
+              // mid-drag — so it doesn't run at all here.
+              if (suppressWordLongPress) return;
               longPressTimer = Timer(const Duration(milliseconds: 500), () {
                 isLongPress = true;
                 final cleanWord = segment.toLowerCase();
                 if (cleanWord.isNotEmpty) {
+                  // Confirm the hold "took" — mirrors LongPressDraggable's
+                  // haptic on drag start, so both long-press outcomes announce
+                  // themselves the same way.
+                  HapticFeedback.selectionClick();
                   onWordRightClick(cleanWord, details.globalPosition, wordsBefore, wordsAfter);
                 }
               });

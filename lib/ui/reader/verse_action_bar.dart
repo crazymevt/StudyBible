@@ -14,6 +14,7 @@ import 'note_editor.dart';
 import 'compare_panel.dart';
 import 'topics_panel.dart';
 import 'harmony_panel.dart';
+import 'verse_drag_feedback.dart';
 import 'verse_image_card.dart';
 import '../tags/tag_editor_dialog.dart';
 import '../common/breakpoints.dart';
@@ -57,6 +58,15 @@ class VerseActionBar extends ConsumerWidget {
 
     final actions = _buildActions(context, ref, onBarColor, showLabels: !compact);
 
+    // Explicit drag source for the selection. Verse tiles also start a drag on
+    // long-press, but the flowing paragraph view can't (its whole chapter is a
+    // single Text.rich where long-press means word lookup), so the handle is
+    // the one drag affordance that works in every view mode.
+    final dragHandle = _SelectionDragHandle(
+      color: onBarColor,
+      showLabel: !compact,
+    );
+
     // On phones the swatches + actions don't fit comfortably on one line, so
     // FittedBox would shrink them below a usable size. Stack the highlight
     // swatches and the actions onto two centered rows instead. Tablets and
@@ -75,6 +85,8 @@ class VerseActionBar extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  dragHandle,
+                  const SizedBox(width: 4),
                   for (final a in actions) ...[a, const SizedBox(width: 4)],
                 ],
               ),
@@ -83,6 +95,10 @@ class VerseActionBar extends ConsumerWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              dragHandle,
+              const SizedBox(width: 8),
+              Container(width: 1, height: 24, color: onBarColor.withValues(alpha: 0.24)),
+              const SizedBox(width: 8),
               ...swatches,
               const SizedBox(width: 8),
               Container(width: 1, height: 24, color: onBarColor.withValues(alpha: 0.24)),
@@ -409,6 +425,65 @@ class VerseActionBar extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (_) => VerseImageShareDialog(reference: reference, verseText: body),
+    );
+  }
+}
+
+/// Grab-and-drag chip for the current selection. An immediate [Draggable]
+/// (no long-press delay) because the handle is explicit — unlike the verse
+/// text, there's no competing gesture to disambiguate from. Drop it on the
+/// scratch pad, a sermon, or a notebook page to insert the formatted verses.
+class _SelectionDragHandle extends ConsumerWidget {
+  final Color color;
+  final bool showLabel;
+
+  const _SelectionDragHandle({required this.color, this.showLabel = true});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Rebuilt whenever the selection changes (the bar watches
+    // selectedVersesProvider), so the payload snapshot stays current.
+    final sel = collectSelection(ref);
+    if (sel == null) return const SizedBox.shrink();
+
+    final visual = showLabel
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.drag_indicator, color: color, size: 20),
+                const SizedBox(height: 4),
+                Text(
+                  'Drag',
+                  style: TextStyle(
+                      color: color.withValues(alpha: 0.7), fontSize: 10),
+                ),
+              ],
+            ),
+          )
+        : SizedBox(
+            width: 40,
+            height: 40,
+            child: Center(
+                child: Icon(Icons.drag_indicator, color: color, size: 22)),
+          );
+
+    final label = sel.numbers.length == 1
+        ? 'Drag this verse into a note, sermon, or the scratch pad'
+        : 'Drag these ${sel.numbers.length} verses into a note, sermon, or the scratch pad';
+
+    return Tooltip(
+      message: label,
+      child: Semantics(
+        label: label,
+        child: Draggable<String>(
+          data: formatSelection(ref, sel),
+          feedback: VerseDragFeedback.fromSelection(sel),
+          childWhenDragging: Opacity(opacity: 0.35, child: visual),
+          child: MouseRegion(cursor: SystemMouseCursors.grab, child: visual),
+        ),
+      ),
     );
   }
 }
