@@ -1,5 +1,41 @@
 [
   {
+    "version": "26.7.12+1",
+    "date": "2026-07-12",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add user-content facets to the Explorer Prophecy page",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add \"Read the account\" button to the Explorer Event page",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add a filter field to the Explorer index page",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "verse preview sheet and Person-page dictionary card in Explorer",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "separate word-lookup and drag long-press gestures on selected verses",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.7.11+2",
     "date": "2026-07-11",
     "features": [
