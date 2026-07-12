@@ -57,6 +57,22 @@ Future<void> openInFreshExplorer(
   }
 }
 
+/// Opens the Explorer with no particular destination — home, or wherever the
+/// persistent trail left off. This is the top-level entry point used by the
+/// app drawer and the reader toolbar. Tracks [insideExplorerProvider] just
+/// like [openInFreshExplorer], so entity detours launched from inside this
+/// screen (e.g. a family tree node) know an Explorer is already showing and
+/// protect its trail.
+Future<void> openExplorer(BuildContext context, WidgetRef ref) async {
+  final insideNotifier = ref.read(insideExplorerProvider.notifier);
+  final wasInside = ref.read(insideExplorerProvider);
+  insideNotifier.set(true);
+  await Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => const ExplorerScreen()),
+  );
+  insideNotifier.set(wasInside);
+}
+
 /// Full-page knowledge-web browser over the bundled study datasets: every
 /// person, place, event, topic, and passage is a page, and the pages
 /// cross-link so one search can be explored in any direction. Navigation

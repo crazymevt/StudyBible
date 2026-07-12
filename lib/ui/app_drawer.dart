@@ -87,9 +87,7 @@ class AppDrawer extends ConsumerWidget {
             title: const Text('Explorer'),
             onTap: () {
               Navigator.of(context).pop(); // close drawer
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ExplorerScreen()),
-              );
+              openExplorer(context, ref);
             },
           ),
           ListTile(

@@ -34,6 +34,7 @@ import '../common/search_title_bar.dart';
 import '../onboarding/tutorial_keys.dart';
 import '../common/sync_button.dart';
 import '../app_drawer.dart';
+import '../explorer/explorer_screen.dart';
 import '../../app/dashboard_providers.dart';
 import '../../app/app_state.dart';
 import 'dart:async';
@@ -41,7 +42,15 @@ import 'package:flutter/services.dart';
 
 /// Actions collapsed into the phone app bar's overflow menu; wider layouts
 /// show each as its own icon button.
-enum _ReaderAction { audio, readAloud, sync, ribbons, versions, toggleView }
+enum _ReaderAction {
+  explorer,
+  audio,
+  readAloud,
+  sync,
+  ribbons,
+  versions,
+  toggleView,
+}
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({super.key});
@@ -395,6 +404,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
   void _handleReaderAction(_ReaderAction action) {
     switch (action) {
+      case _ReaderAction.explorer:
+        openExplorer(context, ref);
       case _ReaderAction.audio:
         _showAudioPlayer();
       case _ReaderAction.readAloud:
@@ -599,6 +610,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 tooltip: 'More',
                 onSelected: _handleReaderAction,
                 itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: _ReaderAction.explorer,
+                    child: ListTile(
+                      leading: Icon(Icons.travel_explore),
+                      title: Text('Explorer'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
                   if (audioData != null)
                     const PopupMenuItem(
                       value: _ReaderAction.audio,
@@ -666,6 +685,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.travel_explore),
+                      tooltip: 'Explorer',
+                      onPressed: () => openExplorer(context, ref),
+                    ),
                     IconButton(
                       icon: const Icon(Icons.history),
                       tooltip: 'History',

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as drift;
@@ -5,8 +7,11 @@ import '../../app/search_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/user_providers.dart';
+import '../../app/explorer_providers.dart';
+import '../../domain/explorer/explorer_ref.dart';
 import '../../domain/search/reference_parser.dart';
 import '../../app/reader_state.dart';
+import '../explorer/explorer_screen.dart';
 import '../reader/mobile_tools_drawer.dart';
 import '../reader/search_panel.dart';
 import 'breakpoints.dart';
@@ -21,6 +26,14 @@ class GlobalSearchBar extends ConsumerStatefulWidget {
 class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+
+  /// Explorer destinations behind the "Explore:" suggestions, keyed by the
+  /// exact option string shown in the dropdown. RawAutocomplete only hands
+  /// back the selected string, so this is how a tap finds its entity again.
+  /// Entries accumulate rather than being cleared per keystroke — overlapping
+  /// async optionsBuilder runs could otherwise wipe the map a visible option
+  /// still needs.
+  final Map<String, ExplorerRef> _explorerHits = {};
 
   @override
   void dispose() {
@@ -108,6 +121,55 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
           debugPrint('Failed to build "go to reference" suggestion: $e');
         }
 
+        // Explorer entities (people, places, topics, events) matching the
+        // query, as "Explore:" jump-ins. The fan-out awaits the study
+        // datasets' import internally, which right after first launch can
+        // take a while — cap the wait so the other suggestions don't stall
+        // behind it (the next keystroke simply tries again).
+        try {
+          final entityResults = await ref
+              .read(explorerSearchResultsForProvider(text.trim()).future)
+              .timeout(const Duration(milliseconds: 500));
+          // Round-robin across the kinds so one exact name match (e.g.
+          // "David" the person) doesn't crowd out the same name as a
+          // place or topic.
+          final kinds = [
+            (entityResults.people, 'Person'),
+            (entityResults.places, 'Place'),
+            (entityResults.topics, 'Topic'),
+            (entityResults.events, 'Event'),
+          ];
+          const maxEntityHits = 4;
+          final options = <String>[];
+          for (var i = 0; options.length < maxEntityHits; i++) {
+            final row = [
+              for (final (hits, label) in kinds)
+                if (i < hits.length) (hits[i], label),
+            ];
+            if (row.isEmpty) break;
+            for (final (hit, label) in row) {
+              if (options.length >= maxEntityHits) break;
+              // People (~15% of the bundled dataset) collide on bare name —
+              // multiple Bible figures are both called "Elijah", "Zechariah",
+              // etc. — so the subtitle the full Explorer search already
+              // shows (verse count, or a place's/event's own qualifier) is
+              // folded in here too rather than just the kind, which alone
+              // can't tell two same-named "Person" hits apart.
+              final qualifier = hit.subtitle == null
+                  ? label
+                  : '$label · ${hit.subtitle}';
+              final option = 'Explore: ${hit.ref.label} · $qualifier';
+              _explorerHits[option] = hit.ref;
+              options.add(option);
+            }
+          }
+          results.addAll(options);
+        } on TimeoutException {
+          // Datasets still importing; entity suggestions sit this one out.
+        } catch (e) {
+          debugPrint('Failed to build Explorer suggestions: $e');
+        }
+
         final words = text.split(RegExp(r'\s+'));
         final lastWord = words.last.toLowerCase();
         
@@ -133,6 +195,14 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
         return results;
       },
       onSelected: (String selection) async {
+        final explorerTarget = _explorerHits[selection];
+        if (explorerTarget != null) {
+          _focusNode.unfocus();
+          _controller.clear();
+          openInFreshExplorer(context, ref, explorerTarget);
+          return;
+        }
+
         if (selection.startsWith('Find on page: ')) {
           final query = selection.replaceFirst('Find on page: ', '');
           ref.read(findInPageQueryProvider.notifier).set(query);
@@ -252,6 +322,7 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
                   final isGoto = option.startsWith('Go to: ');
                   final isFind = option.startsWith('Find on page: ');
                   final isTag = option.startsWith('#');
+                  final isExplore = option.startsWith('Explore: ');
                   return ListTile(
                     dense: true,
                     leading: Icon(
@@ -259,12 +330,16 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
                           ? Icons.menu_book
                           : (isFind
                               ? Icons.find_in_page
-                              : (isTag ? Icons.label : Icons.search)),
+                              : (isExplore
+                                  ? Icons.travel_explore
+                                  : (isTag ? Icons.label : Icons.search))),
                       size: 16,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     title: Text(
                       option,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontWeight: (isGoto || isFind) ? FontWeight.bold : FontWeight.normal,
                       ),
