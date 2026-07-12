@@ -1,5 +1,35 @@
 [
   {
+    "version": "26.7.12+2",
+    "date": "2026-07-12",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "resolve weight-standard shekel mentions instead of defaulting to money",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add \"Read the account\" button to the Explorer Stories page",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "surface Explorer in the reader toolbar and global search suggestions",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "round out Explorer entity pages with dictionary/stories, tags, and smoother facet loading",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.12+1",
     "date": "2026-07-12",
     "features": [
