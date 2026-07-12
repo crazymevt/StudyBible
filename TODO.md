@@ -9,15 +9,6 @@ Running list of known issues and follow-ups.
 Explorer-page improvements scoped from a code walkthrough (2026-07-12), roughly
 ordered by value-for-effort within each group.
 
-*Consistency gaps (cheap wins — the pattern already exists on a sibling page):*
-
-- [ ] **Explorer — user-content facets on the Prophecy page.** Every other
-  entity page shows "Your sermons" / "Your notebooks" / tags cards;
-  `explorer_prophecy_page.dart` has none, so a prophecy the user has preached
-  on looks unconnected to their own work. `ExplorerRef.prophecy` already
-  exists, so `explorerSermonsProvider` / `explorerNotebookPagesProvider`
-  should slot in.
-
 *Navigation & discovery:*
 
 - [ ] **Explorer — "Recently visited" on the home page.** Home is search +
@@ -70,6 +61,17 @@ ordered by value-for-effort within each group.
 ## Issues
 
 ## Archive
+
+- [x] **Explorer — user-content facets on the Prophecy page.** Converted
+  `_ProphecyPage` (`explorer_prophecy_page.dart`) from a `StatelessWidget` to
+  a `ConsumerWidget` and added "Your sermons" / "Your notebooks" facet cards,
+  matching person/place/event/topic/passage pages — `ExplorerRef.prophecy`
+  already existed, so `explorerSermonsProvider` /
+  `explorerNotebookPagesProvider` slotted straight in against the same
+  `document_references` self-healing index (matches on an explicit
+  `sbent:prophecy|<index>` link, same as every other entity type; prose
+  mentions don't count). Test in `explorer_screen_test.dart` on a sermon and
+  notebook page both linked to prophecy index 0 ("The seed of the woman").
 
 - [x] **Explorer — "Read the account" button on the Event page.** Added a
   `FilledButton.tonalIcon` ("Read the account") to `_PageTitle`'s trailing

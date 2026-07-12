@@ -2,19 +2,28 @@ part of 'explorer_pages.dart';
 
 /// A single prophecy from the pure-Dart `prophecies` dataset: the Old
 /// Testament foretelling and its New Testament fulfillment, each with tappable
-/// passages that open in the reader. No async — the data is a const list.
-class _ProphecyPage extends StatelessWidget {
+/// passages that open in the reader. The prophecy/fulfillment text itself is
+/// no async — the data is a const list — but the user-content facets
+/// (sermons/notebooks referencing this prophecy via an `sbent:` link) are.
+class _ProphecyPage extends ConsumerWidget {
   const _ProphecyPage({required this.index});
 
   final int index;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (index < 0 || index >= prophecies.length) {
       return const _ErrorBody('Prophecy not found.');
     }
     final prophecy = prophecies[index];
     final otFulfillment = prophecy.category == ProphecyCategory.oldTestament;
+    final entityRef = ExplorerRef.prophecy(index, prophecy.title);
+    final sermons =
+        ref.watch(explorerSermonsProvider(entityRef)).asData?.value ??
+        const <SearchResult>[];
+    final notebookPages =
+        ref.watch(explorerNotebookPagesProvider(entityRef)).asData?.value ??
+        const <SearchResult>[];
     return _PageScroll(
       children: [
         _PageTitle(title: prophecy.title, subtitle: prophecy.category.label),
@@ -34,6 +43,24 @@ class _ProphecyPage extends StatelessWidget {
             passages: prophecy.fulfillment,
           ),
         ),
+        if (sermons.isNotEmpty)
+          ExplorerFacetCard(
+            icon: Icons.co_present_outlined,
+            title: 'Your sermons (${sermons.length})',
+            child: Column(
+              children: [for (final s in sermons) _TaggedItemTile(item: s)],
+            ),
+          ),
+        if (notebookPages.isNotEmpty)
+          ExplorerFacetCard(
+            icon: Icons.library_books_outlined,
+            title: 'Your notebooks (${notebookPages.length})',
+            child: Column(
+              children: [
+                for (final n in notebookPages) _TaggedItemTile(item: n),
+              ],
+            ),
+          ),
       ],
     );
   }

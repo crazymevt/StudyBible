@@ -492,6 +492,51 @@ void main() {
             contentPlain: Value('Reflections on 1 Samuel 24 today.'),
           ),
         );
+
+    // A sermon and a notebook page explicitly linked to the first prophecy
+    // ("The seed of the woman", index 0), for the Prophecy page's
+    // Your-sermons/Your-notebooks cards.
+    await userStore
+        .into(userStore.sermons)
+        .insert(
+          SermonsCompanion(
+            id: const Value('sermon-3'),
+            createdAt: const Value(0),
+            updatedAt: const Value(0),
+            deviceId: const Value('test-device'),
+            title: const Value('The Seed That Crushes'),
+            content: Value(
+              jsonEncode([
+                {
+                  'insert': 'the seed of the woman',
+                  'attributes': {'link': 'sbent:prophecy|0'},
+                },
+                {'insert': ' points to Christ.\n'},
+              ]),
+            ),
+          ),
+        );
+    await userStore
+        .into(userStore.notebookPages)
+        .insert(
+          NotebookPagesCompanion(
+            id: const Value('page-3'),
+            createdAt: const Value(0),
+            updatedAt: const Value(0),
+            deviceId: const Value('test-device'),
+            notebookId: const Value('notebook-1'),
+            title: const Value('Prophecy Notes'),
+            content: Value(
+              jsonEncode([
+                {
+                  'insert': 'the seed of the woman',
+                  'attributes': {'link': 'sbent:prophecy|0'},
+                },
+                {'insert': ', first hinted at in Genesis.\n'},
+              ]),
+            ),
+          ),
+        );
   });
 
   tearDown(() async {
@@ -841,6 +886,34 @@ void main() {
     expect(container.read(activeToolProvider), ActiveTool.sermons);
     expect(container.read(selectedSermonIdProvider), 'sermon-2');
   });
+
+  testWidgets(
+    'prophecy page shows Your-sermons and Your-notebooks cards, linked '
+    'via an explicit Link-to-Explorer, not prose',
+    (tester) async {
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final container = await pump(tester);
+
+      container
+          .read(explorerTrailProvider.notifier)
+          .open(const ExplorerRef.prophecy(0, 'The seed of the woman'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Your sermons (1)'), findsOneWidget);
+      expect(find.text('The Seed That Crushes'), findsOneWidget);
+      expect(find.text('Your notebooks (1)'), findsOneWidget);
+      expect(find.text('Prophecy Notes'), findsOneWidget);
+
+      // Tapping the sermon opens it in the reader's sermon tool.
+      await tester.tap(find.text('The Seed That Crushes'));
+      await tester.pumpAndSettle();
+      expect(container.read(appModuleProvider), AppModule.reader);
+      expect(container.read(activeToolProvider), ActiveTool.sermons);
+      expect(container.read(selectedSermonIdProvider), 'sermon-3');
+    },
+  );
 
   testWidgets(
     'tapping a notebook page from Explorer keeps the notebooks panel open '
