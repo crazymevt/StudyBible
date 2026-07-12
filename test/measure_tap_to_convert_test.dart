@@ -129,6 +129,176 @@ void main() {
     test('a plain word that is neither a unit nor a number resolves to nothing', () {
       expect(resolveMeasureNearWord('mountain', ['the', 'great'], ['stood', 'firm']), isNull);
     });
+
+    test('"shekels of brass" resolves to the weight sense, not money', () {
+      // 1 Samuel 17:5 — Goliath's coat of mail, tap on "shekels".
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        ['the', 'weight', 'of', 'the', 'coat', 'was', 'five', 'thousand'],
+        ['of', 'brass'],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 5000);
+    });
+
+    test('"shekels of iron" also resolves to the weight sense', () {
+      // 1 Samuel 17:7 — Goliath's spear head.
+      final resolved = resolveMeasureNearWord('shekels', ['six', 'hundred'], ['of', 'iron']);
+      expect(resolved!.measure.id, 'shekel-weight');
+    });
+
+    test('tap on the quantity number before "shekels of brass" still disambiguates', () {
+      final resolved = resolveMeasureNearWord(
+        'five',
+        [],
+        ['thousand', 'shekels', 'of', 'brass'],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 5000);
+    });
+
+    test('"shekels of silver" stays the money sense', () {
+      final resolved = resolveMeasureNearWord('shekels', ['thirty'], ['of', 'silver']);
+      expect(resolved!.measure.id, 'shekel-money');
+    });
+
+    test('bare "shekels" with no following material stays the money default', () {
+      final resolved = resolveMeasureNearWord('shekels', ['thirty'], []);
+      expect(resolved!.measure.id, 'shekel-money');
+    });
+
+    test('"shekel weight" resolves to the weight sense standing alone', () {
+      // Genesis 24:22 — "an earring ... of half a shekel weight".
+      final resolved = resolveMeasureNearWord('shekel', ['half', 'a'], ['weight']);
+      expect(resolved!.measure.id, 'shekel-weight');
+    });
+
+    test('"shekels weight of gold" resolves to the weight sense', () {
+      // Genesis 24:22 — "two bracelets ... of ten shekels weight of gold".
+      final resolved = resolveMeasureNearWord('shekels', ['ten'], ['weight', 'of', 'gold']);
+      expect(resolved!.measure.id, 'shekel-weight');
+    });
+
+    test('tap on the quantity number before "shekels weight" still disambiguates', () {
+      final resolved = resolveMeasureNearWord('ten', [], ['shekels', 'weight', 'of', 'gold']);
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 10);
+    });
+
+    test('"of pure myrrh five hundred shekels" resolves to weight (Exodus 30:23)', () {
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        ['take', 'thou', 'also', 'unto', 'thee', 'principal', 'spices', 'of', 'pure', 'myrrh', 'five', 'hundred'],
+        [],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 500);
+    });
+
+    test('a restated quantity still resolves to weight once the ingredient was named earlier', () {
+      // "...and of sweet cinnamon half so much, even two hundred and fifty
+      // shekels..." — the ingredient sits well before the actual number,
+      // separated by a comparison clause.
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        [
+          'of', 'pure', 'myrrh', 'five', 'hundred', 'shekels', 'and',
+          'of', 'sweet', 'cinnamon', 'half', 'so', 'much', 'even',
+          'two', 'hundred', 'and', 'fifty',
+        ],
+        [],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 250);
+    });
+
+    test('tap on the quantity number before the ingredient-list "shekels" also resolves to weight', () {
+      final resolved = resolveMeasureNearWord(
+        'five',
+        ['of', 'pure', 'myrrh'],
+        ['hundred', 'shekels'],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 500);
+    });
+
+    test('an unrelated "of <name>" before a money amount does not false-positive', () {
+      // Genesis 23:16 — "...in the audience of the sons of Heth, four
+      // hundred shekels of silver..." must stay the money sense.
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        ['in', 'the', 'audience', 'of', 'the', 'sons', 'of', 'heth', 'four', 'hundred'],
+        ['of', 'silver'],
+      );
+      expect(resolved!.measure.id, 'shekel-money');
+    });
+
+    test('"the weight whereof was ... shekels" resolves to weight (Numbers 7:19)', () {
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        [
+          'he', 'offered', 'for', 'his', 'offering', 'one', 'silver', 'charger',
+          'the', 'weight', 'whereof', 'was', 'an', 'hundred', 'and', 'thirty',
+        ],
+        ['one', 'silver', 'bowl', 'of', 'seventy', 'shekels'],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 130);
+    });
+
+    test('"golden spoon of ten shekels" resolves to weight (Numbers 7:32)', () {
+      // The metal describes the object, not the shekels directly, and it's
+      // the adjective form "golden" rather than the noun "gold".
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        ['one', 'golden', 'spoon', 'of', 'ten'],
+        ['full', 'of', 'incense'],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 10);
+    });
+
+    test('"and a" separates a distinct item — silver stays money (Joshua 7:21)', () {
+      // "...and two hundred shekels of silver, and a wedge of gold of fifty
+      // shekels weight..." — the gold wedge's "weight"/"gold" markers must
+      // not leak backward onto the unrelated silver amount.
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        ['when', 'i', 'saw', 'among', 'the', 'spoils', 'a', 'goodly', 'babylonish', 'garment', 'and', 'two', 'hundred'],
+        ['of', 'silver', 'and', 'a', 'wedge', 'of', 'gold', 'of', 'fifty', 'shekels', 'weight'],
+      );
+      expect(resolved!.measure.id, 'shekel-money');
+      expect(resolved.quantity, 200);
+    });
+
+    test('the gold wedge past that same "and a" still resolves to weight (Joshua 7:21)', () {
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        [
+          'when', 'i', 'saw', 'among', 'the', 'spoils', 'a', 'goodly', 'babylonish', 'garment', 'and', 'two',
+          'hundred', 'shekels', 'of', 'silver', 'and', 'a', 'wedge', 'of', 'gold', 'of', 'fifty',
+        ],
+        ['weight', 'then', 'i', 'coveted', 'them'],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 50);
+    });
+
+    test('a later bare shekel figure inherits the verse\'s weight framing (Numbers 7:19)', () {
+      // "...one silver bowl of seventy shekels..." has no marker of its own
+      // — it reads as weight only because "the weight whereof was" already
+      // set that context earlier in the same verse.
+      final resolved = resolveMeasureNearWord(
+        'shekels',
+        [
+          'the', 'weight', 'whereof', 'was', 'an', 'hundred', 'and', 'thirty', 'shekels',
+          'one', 'silver', 'bowl', 'of', 'seventy',
+        ],
+        ['after', 'the', 'shekel', 'of', 'the', 'sanctuary'],
+      );
+      expect(resolved!.measure.id, 'shekel-weight');
+      expect(resolved.quantity, 70);
+    });
   });
 
   group('ambiguityNoteFor', () {
