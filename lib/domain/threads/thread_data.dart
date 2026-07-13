@@ -269,6 +269,261 @@ const List<Thread> threads = [
       ),
     ],
   ),
+  Thread(
+    id: 'the_shepherd',
+    title: 'The Shepherd',
+    category: ThreadCategory.motif,
+    description:
+        'Before it is ever a title, "shepherd" is a memory — Jacob blesses '
+        'by "the God which fed me all my life long." The image gathers force '
+        'through Psalm 23 and the prophets, turns to grief over shepherdless '
+        'sheep, and is finally claimed at full strength: "I am the good '
+        'shepherd: the good shepherd giveth his life for the sheep."',
+    stops: [
+      ThreadStop(
+        title: 'The God which fed me',
+        passage: 'Genesis 48:15',
+        note:
+            'The Bible\'s first "shepherd" for God is spoken by a dying '
+            'herdsman about his whole life: Jacob blesses by "the God which '
+            'fed me" — in Hebrew, shepherded me — "all my life long."',
+      ),
+      ThreadStop(
+        title: 'Sheep which have no shepherd',
+        passage: 'Numbers 27:16-17',
+        note:
+            'Moses\' last request is a shepherd for Israel, "that the '
+            'congregation of the LORD be not as sheep which have no '
+            'shepherd." Hold the phrase; Matthew will pick it up.',
+      ),
+      ThreadStop(
+        title: 'The LORD is my shepherd',
+        passage: 'Psalms 23:1-4',
+        note:
+            'David turns his own trade into the Bible\'s best-loved '
+            'confession: provision, guidance, and — in the valley of the '
+            'shadow of death — presence. "Thou art with me."',
+      ),
+      ThreadStop(
+        title: 'He shall feed his flock',
+        passage: 'Isaiah 40:11',
+        note:
+            'The God whose coming levels mountains earlier in this chapter '
+            '(v. 4) arrives carrying lambs "in his bosom" — the thread\'s '
+            'power and its gentleness in a single verse.',
+      ),
+      ThreadStop(
+        title: 'I will seek that which was lost',
+        passage: 'Ezekiel 34:11-16',
+        note:
+            'After indicting Israel\'s shepherds for feeding themselves '
+            '(vv. 2-10), God announces the turning point: "I, even I, will '
+            'both search my sheep, and seek them out" — and later in the '
+            'chapter (v. 23) promises one shepherd, "my servant David."',
+      ),
+      ThreadStop(
+        title: 'Moved with compassion',
+        passage: 'Matthew 9:36',
+        note:
+            'Jesus looks at the crowds and Matthew reaches for Moses\' '
+            'phrase: "as sheep having no shepherd." Numbers 27\'s request is '
+            'about to be answered in person.',
+      ),
+      ThreadStop(
+        title: 'I am the good shepherd',
+        passage: 'John 10:11-16',
+        note:
+            'Jesus claims Ezekiel 34 for himself and goes beyond it: this '
+            'shepherd does not only seek the lost, he "giveth his life for '
+            'the sheep" — and other sheep, outside the fold, will hear his '
+            'voice.',
+      ),
+      ThreadStop(
+        title: 'The chief Shepherd',
+        passage: '1 Peter 5:2-4',
+        note:
+            'Peter — once told "feed my sheep" — passes the charge to every '
+            'elder: flocks tended willingly, under "the chief Shepherd" '
+            'whose appearing crowns the work.',
+      ),
+      ThreadStop(
+        title: 'The Lamb shall feed them',
+        passage: 'Revelation 7:17',
+        note:
+            'The thread ends in a glorious inversion: the Lamb in the midst '
+            'of the throne "shall feed them" — shall shepherd them — "unto '
+            'living fountains of waters," and God wipes away every tear.',
+      ),
+    ],
+  ),
+  Thread(
+    id: 'bread_from_heaven',
+    title: 'Bread from Heaven',
+    category: ThreadCategory.motif,
+    description:
+        'Manna is the Bible\'s strangest staple: bread that falls with the '
+        'dew, spoils if hoarded, and comes with a lesson attached — man does '
+        'not live by bread alone. This walk follows bread from the '
+        'wilderness floor to "I am the bread of life," and ends with the '
+        'promise of hidden manna.',
+    stops: [
+      ThreadStop(
+        title: 'I will rain bread from heaven',
+        passage: 'Exodus 16:4',
+        note:
+            'A hungry people, and a strange promise: bread from heaven, '
+            'gathered "a certain rate every day" — a ration deliberately '
+            'designed to teach dependence one morning at a time.',
+      ),
+      ThreadStop(
+        title: 'Man doth not live by bread only',
+        passage: 'Deuteronomy 8:2-3',
+        note:
+            'Forty years later Moses explains the menu: God let them hunger '
+            'and fed them with manna "that he might make thee know that man '
+            'doth not live by bread only."',
+      ),
+      ThreadStop(
+        title: 'Angels\' food',
+        passage: 'Psalms 78:23-25',
+        note:
+            'The psalmist retells the story with wonder — God "opened the '
+            'doors of heaven... man did eat angels\' food" — and with grief, '
+            'for the generation that ate it and still did not trust.',
+      ),
+      ThreadStop(
+        title: 'It is written',
+        passage: 'Matthew 4:4',
+        note:
+            'Hungry in the wilderness where Israel was hungry, Jesus answers '
+            'the tempter with Deuteronomy 8:3 — and passes the test the '
+            'manna generation failed.',
+      ),
+      ThreadStop(
+        title: 'Our daily bread',
+        passage: 'Matthew 6:11',
+        note:
+            'The Lord\'s Prayer builds manna\'s rhythm into everyday '
+            'discipleship: bread asked for one day at a time, from the same '
+            'Father who once rained it.',
+      ),
+      ThreadStop(
+        title: 'I am the bread of life',
+        passage: 'John 6:32-35',
+        note:
+            'A crowd fed on loaves asks for manna as proof (v. 31); Jesus '
+            'answers that the manna was the shadow and he is the substance — '
+            'and later in the discourse (v. 51) the living bread is his '
+            'flesh, given for the life of the world.',
+      ),
+      ThreadStop(
+        title: 'One bread, one body',
+        passage: '1 Corinthians 10:16-17',
+        note:
+            'At the Lord\'s table the motif becomes communion: "we being '
+            'many are one bread, and one body: for we are all partakers of '
+            'that one bread."',
+      ),
+      ThreadStop(
+        title: 'The hidden manna',
+        passage: 'Revelation 2:17',
+        note:
+            'The golden pot of manna once kept in the ark reappears as a '
+            'promise: "to him that overcometh will I give to eat of the '
+            'hidden manna" — wilderness bread, kept for the world to come.',
+      ),
+    ],
+  ),
+  Thread(
+    id: 'light_in_darkness',
+    title: 'Light in the Darkness',
+    category: ThreadCategory.motif,
+    description:
+        'The Bible\'s first recorded words are "Let there be light." This '
+        'walk follows light out of that first darkness — a pillar of fire, '
+        'a promise to a people in gloom, a great light rising over Galilee — '
+        'to the city where there is no night, "for the Lord God giveth them '
+        'light."',
+    stops: [
+      ThreadStop(
+        title: 'Let there be light',
+        passage: 'Genesis 1:3-4',
+        note:
+            'Creation begins with light spoken into darkness and divided '
+            'from it — the separation the whole thread turns on.',
+      ),
+      ThreadStop(
+        title: 'A pillar of fire by night',
+        passage: 'Exodus 13:21-22',
+        note:
+            'For Israel in the wilderness, light is not an idea but a '
+            'presence: God himself goes before them, fire against the dark, '
+            'and the pillar never departs.',
+      ),
+      ThreadStop(
+        title: 'The LORD is my light',
+        passage: 'Psalms 27:1',
+        note:
+            'David makes the motif personal and fearless: "The LORD is my '
+            'light and my salvation; whom shall I fear?"',
+      ),
+      ThreadStop(
+        title: 'The people that walked in darkness',
+        passage: 'Isaiah 9:2',
+        note:
+            'Isaiah promises light precisely where the dark was thickest — '
+            'the humiliated north country of verse 1 — "upon them hath the '
+            'light shined." Matthew is watching this verse.',
+      ),
+      ThreadStop(
+        title: 'Arise, shine',
+        passage: 'Isaiah 60:1-3',
+        note:
+            'The promise widens to the world: Zion\'s light rises, "and the '
+            'Gentiles shall come to thy light, and kings to the brightness '
+            'of thy rising."',
+      ),
+      ThreadStop(
+        title: 'Light springs up in Galilee',
+        passage: 'Matthew 4:14-16',
+        note:
+            'Jesus settles in Capernaum and Matthew quotes Isaiah 9 in '
+            'full: the great light has dawned exactly where it was promised.',
+      ),
+      ThreadStop(
+        title: 'Ye are the light of the world',
+        passage: 'Matthew 5:14-16',
+        note:
+            'Astonishingly, Jesus gives the title away — a city on a hill, '
+            'a candle on a candlestick — so that men "glorify your Father '
+            'which is in heaven."',
+      ),
+      ThreadStop(
+        title: 'I am the light of the world',
+        passage: 'John 8:12',
+        note:
+            'Teaching in the temple treasury (v. 20), Jesus claims the '
+            'motif whole: "he that followeth me shall not walk in darkness, '
+            'but shall have the light of life."',
+      ),
+      ThreadStop(
+        title: 'Light shined in our hearts',
+        passage: '2 Corinthians 4:6',
+        note:
+            'Paul closes the loop with Genesis 1: the God who commanded '
+            'light out of darkness "hath shined in our hearts" — creation\'s '
+            'first word repeated in every conversion.',
+      ),
+      ThreadStop(
+        title: 'No night there',
+        passage: 'Revelation 22:5',
+        note:
+            'The thread\'s destination: no candle, no sun, no night — "for '
+            'the Lord God giveth them light: and they shall reign for ever '
+            'and ever."',
+      ),
+    ],
+  ),
   // ---------------------------------------------------------------------------
   // Covenants & Promises
   // ---------------------------------------------------------------------------
@@ -349,6 +604,94 @@ const List<Thread> threads = [
       ),
     ],
   ),
+  Thread(
+    id: 'seed_of_the_woman',
+    title: 'The Seed of the Woman',
+    category: ThreadCategory.covenant,
+    description:
+        'The Bible\'s first promise is spoken to the serpent: the seed of '
+        'the woman will bruise thy head. This walk traces that seed as it '
+        'narrows — through Abraham, Judah, and David — to a virgin\'s son, '
+        'is named by Paul ("to thy seed, which is Christ"), and faces the '
+        'dragon one last time in Revelation 12.',
+    stops: [
+      ThreadStop(
+        title: 'It shall bruise thy head',
+        passage: 'Genesis 3:15',
+        note:
+            'Before any sentence falls on the man and woman, God promises '
+            'the serpent its destroyer: the seed of the woman, wounded in '
+            'the striking, crushing in the wound. Every later promise in '
+            'this walk refines this one.',
+      ),
+      ThreadStop(
+        title: 'In thy seed, all nations',
+        passage: 'Genesis 22:17-18',
+        note:
+            'On Moriah the seed-line is fixed to Abraham, and its scope is '
+            'fixed too: "in thy seed shall all the nations of the earth be '
+            'blessed."',
+      ),
+      ThreadStop(
+        title: 'Until Shiloh come',
+        passage: 'Genesis 49:10',
+        note:
+            'Jacob\'s deathbed blessing narrows the line again — to Judah, '
+            'whose sceptre will not depart "until Shiloh come; and unto him '
+            'shall the gathering of the people be."',
+      ),
+      ThreadStop(
+        title: 'Thy seed will I establish for ever',
+        passage: 'Psalms 89:3-4',
+        note:
+            'The promise to David is sung as covenant: "Thy seed will I '
+            'establish for ever, and build up thy throne to all '
+            'generations." One family now carries the whole thread.',
+      ),
+      ThreadStop(
+        title: 'A virgin shall conceive',
+        passage: 'Isaiah 7:14',
+        note:
+            'To a faithless king of David\'s house, Isaiah gives a sign '
+            'that answers Genesis 3\'s odd phrase — the seed of the woman: '
+            '"a virgin shall conceive, and bear a son, and shall call his '
+            'name Immanuel."',
+      ),
+      ThreadStop(
+        title: 'The book of the generation',
+        passage: 'Matthew 1:1',
+        note:
+            'The New Testament opens with a receipt: "Jesus Christ, the son '
+            'of David, the son of Abraham" — the seed-line\'s ledger, '
+            'closed and complete.',
+      ),
+      ThreadStop(
+        title: 'Bruised under your feet',
+        passage: 'Romans 16:20',
+        note:
+            'Paul turns Eden\'s promise toward the church: "the God of '
+            'peace shall bruise Satan under your feet shortly." The seed\'s '
+            'victory is shared with the seed\'s people.',
+      ),
+      ThreadStop(
+        title: 'To thy seed, which is Christ',
+        passage: 'Galatians 3:16',
+        note:
+            'Paul reads Genesis with a jeweller\'s eye: "He saith not, And '
+            'to seeds, as of many; but as of one... which is Christ." The '
+            'singular seed has a name.',
+      ),
+      ThreadStop(
+        title: 'The dragon stood before the woman',
+        passage: 'Revelation 12:1-5',
+        note:
+            'The whole thread replayed as apocalypse: the woman, the child, '
+            'and the dragon waiting to devour him — "and her child was '
+            'caught up unto God, and to his throne." Genesis 3:15\'s enmity '
+            'ends at the throne.',
+      ),
+    ],
+  ),
   // ---------------------------------------------------------------------------
   // Types & Shadows
   // ---------------------------------------------------------------------------
@@ -425,6 +768,92 @@ const List<Thread> threads = [
             'The thread ends with the Lamb not on an altar but on the '
             'throne: the city needs no temple and no sun, "for the glory of '
             'God did lighten it, and the Lamb is the light thereof."',
+      ),
+    ],
+  ),
+  Thread(
+    id: 'greater_exodus',
+    title: 'The Greater Exodus',
+    category: ThreadCategory.typology,
+    description:
+        'The exodus is the Bible\'s master pattern of rescue, and the Bible '
+        'itself keeps saying so: the prophets promise a new exodus, Matthew '
+        'walks the child Jesus through Israel\'s steps, and at the '
+        'transfiguration Moses discusses with Jesus "his decease" — in '
+        'Luke\'s Greek, his exodus — "which he should accomplish at '
+        'Jerusalem."',
+    stops: [
+      ThreadStop(
+        title: 'Promised to Abram',
+        passage: 'Genesis 15:13-14',
+        note:
+            'The exodus is announced four hundred years before it happens, '
+            'inside the covenant ceremony itself: enslavement, judgment on '
+            'the enslaver, and a departure "with great substance."',
+      ),
+      ThreadStop(
+        title: 'I will redeem you',
+        passage: 'Exodus 6:6-7',
+        note:
+            'God sets out the rescue as a cascade of "I will"s — bring out, '
+            'rid, redeem, take — and welds it to the covenant formula: "I '
+            'will take you to me for a people."',
+      ),
+      ThreadStop(
+        title: 'Through the midst of the sea',
+        passage: 'Exodus 14:29-31',
+        note:
+            'The pattern\'s signature scene: walls of water, dry ground, '
+            'and a people who on the far shore "believed the LORD."',
+      ),
+      ThreadStop(
+        title: 'Behold, I will do a new thing',
+        passage: 'Isaiah 43:16-19',
+        note:
+            'The prophet invokes the sea-parting God by title, then says '
+            'the unthinkable — "remember ye not the former things" — '
+            'because a new exodus is coming that will outshine the first.',
+      ),
+      ThreadStop(
+        title: 'Out of Egypt have I called my son',
+        passage: 'Hosea 11:1',
+        note:
+            'Hosea compresses the exodus into a father\'s memory: "when '
+            'Israel was a child, then I loved him, and called my son out of '
+            'Egypt." Matthew will read this line forward.',
+      ),
+      ThreadStop(
+        title: 'That it might be fulfilled',
+        passage: 'Matthew 2:14-15',
+        note:
+            'The child Jesus goes down to Egypt and comes up again, and '
+            'Matthew cites Hosea: Israel\'s story is being rewalked, step '
+            'for step, by the Son who will get it right.',
+      ),
+      ThreadStop(
+        title: 'His decease at Jerusalem',
+        passage: 'Luke 9:30-31',
+        note:
+            'At the transfiguration Moses himself appears, talking with '
+            'Jesus about "his decease" — Luke\'s word is exodus — "which he '
+            'should accomplish at Jerusalem." The cross is the greater '
+            'exodus\'s Red Sea.',
+      ),
+      ThreadStop(
+        title: 'Christ our passover',
+        passage: '1 Corinthians 5:7',
+        note:
+            'Paul makes the type explicit in four words: "Christ our '
+            'passover is sacrificed for us" — so the church\'s whole life '
+            'is the feast that follows.',
+      ),
+      ThreadStop(
+        title: 'The song of Moses, and of the Lamb',
+        passage: 'Revelation 15:2-3',
+        note:
+            'The redeemed stand on the far shore of a sea of glass and sing '
+            'the exodus anthem with its final verse added at last: "the '
+            'song of Moses... and the song of the Lamb."',
       ),
     ],
   ),
