@@ -10,6 +10,7 @@ enum ExplorerEntityType {
   tag,
   browse,
   prophecy,
+  thread,
 }
 
 /// An addressable Explorer destination — one entry in the exploration trail.
@@ -88,6 +89,16 @@ class ExplorerRef {
         browseKind = null,
         browseCategory = null;
 
+  /// A single thematic thread, addressed by its 0-based index in the
+  /// pure-Dart `threads` list — same convention as [ExplorerRef.prophecy].
+  const ExplorerRef.thread(int this.id, this.label)
+      : type = ExplorerEntityType.thread,
+        book = null,
+        chapter = null,
+        tagId = null,
+        browseKind = null,
+        browseCategory = null;
+
   ExplorerRef.passage(String this.book, int this.chapter)
       : type = ExplorerEntityType.passage,
         id = null,
@@ -117,7 +128,8 @@ class ExplorerRef {
             kind == ExplorerEntityType.place ||
             kind == ExplorerEntityType.event ||
             kind == ExplorerEntityType.topic ||
-            kind == ExplorerEntityType.prophecy),
+            kind == ExplorerEntityType.prophecy ||
+            kind == ExplorerEntityType.thread),
         assert(category == null || kind == ExplorerEntityType.topic),
         type = ExplorerEntityType.browse,
         browseKind = kind,

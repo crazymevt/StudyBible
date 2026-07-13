@@ -139,6 +139,18 @@ final explorerIndexProvider =
                 subtitle: prophecies[i].category.label,
               ),
           ];
+        case ExplorerEntityType.thread:
+          // Pure-Dart dataset like prophecies; file order groups by category,
+          // which doubles as the natural browse order.
+          return [
+            for (var i = 0; i < threads.length; i++)
+              ExplorerIndexEntry(
+                ExplorerRef.thread(i, threads[i].title),
+                subtitle:
+                    '${threads[i].stops.length} stops · '
+                    '${threads[i].category.label}',
+              ),
+          ];
         case ExplorerEntityType.passage:
         case ExplorerEntityType.tag:
         case ExplorerEntityType.browse:

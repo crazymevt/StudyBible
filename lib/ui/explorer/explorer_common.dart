@@ -32,6 +32,7 @@ IconData explorerEntityIcon(ExplorerEntityType type) => switch (type) {
       ExplorerEntityType.tag => Icons.label_outline,
       ExplorerEntityType.browse => Icons.list_alt_outlined,
       ExplorerEntityType.prophecy => Icons.auto_awesome_outlined,
+      ExplorerEntityType.thread => Icons.route_outlined,
     };
 
 /// Icon for a browse index: curated topic categories get their own icons;

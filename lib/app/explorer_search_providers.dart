@@ -35,6 +35,7 @@ class ExplorerSearchResults {
   final List<ExplorerSearchItem> events;
   final List<ExplorerSearchItem> topics;
   final List<ExplorerSearchItem> prophecies;
+  final List<ExplorerSearchItem> threads;
   final List<ExplorerTagHit> tags;
 
   /// "Did you mean …?" entities near the query by edit distance. Only
@@ -48,6 +49,7 @@ class ExplorerSearchResults {
     this.events = const [],
     this.topics = const [],
     this.prophecies = const [],
+    this.threads = const [],
     this.tags = const [],
     this.suggestions = const [],
   });
@@ -59,6 +61,7 @@ class ExplorerSearchResults {
       events.isEmpty &&
       topics.isEmpty &&
       prophecies.isEmpty &&
+      threads.isEmpty &&
       tags.isEmpty;
 }
 
@@ -355,8 +358,10 @@ final explorerSearchResultsForProvider =
         _rankByPrefix(tagHits, tagQuery, (t) => t.tag.name, (t) => t.itemCount);
       }
 
-      // Prophecies: matched over the pure-Dart dataset (see searchProphecies).
+      // Prophecies and threads: matched over the pure-Dart datasets (see
+      // searchProphecies / searchThreads).
       final prophecyHits = searchProphecies(query, limit: _kSearchLimitPerKind);
+      final threadHits = searchThreads(query, limit: _kSearchLimitPerKind);
 
       final results = ExplorerSearchResults(
         passage: passage,
@@ -397,6 +402,10 @@ final explorerSearchResultsForProvider =
               ExplorerRef.prophecy(h.index, h.title),
               h.subtitle,
             ),
+        ],
+        threads: [
+          for (final h in threadHits)
+            ExplorerSearchItem(ExplorerRef.thread(h.index, h.title), h.subtitle),
         ],
         tags: tagHits,
       );

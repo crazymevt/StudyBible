@@ -652,19 +652,19 @@ final explorerEventTagsProvider =
       });
     });
 
-/// A prophecy's own passage references ("Book C", "Book C:V", "Book C:V-V")
-/// expanded into individual verse refs, prophecy references first then
-/// fulfillment — the same shorthand [_ProphecySection] parses for its chips.
-/// Whole-chapter refs contribute nothing (there's no single verse to
-/// intersect a tag against).
-final _prophecyTagRefExp = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
+/// Passage references ("Book C", "Book C:V", "Book C:V-V") expanded into
+/// individual verse refs — the same shorthand [_ProphecySection] parses for
+/// its chips. Whole-chapter refs contribute nothing (there's no single verse
+/// to intersect a tag against). Shared by the prophecy and thread tag
+/// facets, whose pure-Dart datasets both cite passages in this form.
+final _citedPassageRefExp = RegExp(r'^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$');
 
-List<({String book, int chapter, int verse})> _prophecyVerseRefs(
-  Prophecy prophecy,
+List<({String book, int chapter, int verse})> _citedVerseRefs(
+  Iterable<String> passages,
 ) {
   final refs = <({String book, int chapter, int verse})>[];
-  for (final passage in [...prophecy.prophecy, ...prophecy.fulfillment]) {
-    final m = _prophecyTagRefExp.firstMatch(passage.trim());
+  for (final passage in passages) {
+    final m = _citedPassageRefExp.firstMatch(passage.trim());
     if (m == null) continue;
     final start = int.tryParse(m.group(3) ?? '');
     if (start == null) continue;
@@ -688,6 +688,26 @@ final explorerProphecyTagsProvider =
         if (tagged.isEmpty || index < 0 || index >= prophecies.length) {
           return const <ExplorerEntityTag>[];
         }
-        return _tagsOnVerses(tagged, _prophecyVerseRefs(prophecies[index]));
+        final p = prophecies[index];
+        return _tagsOnVerses(
+          tagged,
+          _citedVerseRefs([...p.prophecy, ...p.fulfillment]),
+        );
+      });
+    });
+
+/// Your tags on verses cited by a thread's stops. Same shape as
+/// [explorerProphecyTagsProvider].
+final explorerThreadTagsProvider =
+    StreamProvider.family<List<ExplorerEntityTag>, int>((ref, index) {
+      final db = ref.watch(userStoreProvider);
+      return _taggedVerseStream(db).asyncMap((tagged) async {
+        if (tagged.isEmpty || index < 0 || index >= threads.length) {
+          return const <ExplorerEntityTag>[];
+        }
+        return _tagsOnVerses(
+          tagged,
+          _citedVerseRefs([for (final s in threads[index].stops) s.passage]),
+        );
       });
     });

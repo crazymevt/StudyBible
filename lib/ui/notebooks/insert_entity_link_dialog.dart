@@ -13,6 +13,7 @@ IconData _iconFor(ExplorerEntityType type) => switch (type) {
       ExplorerEntityType.tag => Icons.label_outline,
       ExplorerEntityType.browse => Icons.list_alt_outlined,
       ExplorerEntityType.prophecy => Icons.auto_awesome_outlined,
+      ExplorerEntityType.thread => Icons.route_outlined,
     };
 
 /// Picks a person, place, event, or topic from the bundled Explorer datasets

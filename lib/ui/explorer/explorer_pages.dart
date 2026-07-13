@@ -13,6 +13,7 @@ import '../../app/place_providers.dart';
 import '../../app/prophecy_providers.dart';
 import '../../app/reference_providers.dart';
 import '../../app/search_providers.dart';
+import '../../app/thread_walk_providers.dart';
 import '../../app/topic_providers.dart';
 import '../../app/user_providers.dart';
 import '../../data/app_paths.dart';
@@ -23,6 +24,9 @@ import '../../domain/prophecy/prophecy.dart';
 import '../../domain/prophecy/prophecy_data.dart';
 import '../../domain/prophecy/prophecy_index.dart';
 import '../../domain/reference/reference_index.dart';
+import '../../domain/scripture/passage_citation.dart';
+import '../../domain/threads/thread.dart';
+import '../../domain/threads/thread_data.dart';
 import '../common/skeleton.dart';
 import '../reader/image_viewer_dialog.dart';
 import '../reader/media_video_list.dart';
@@ -32,6 +36,7 @@ import 'explorer_index_page.dart';
 import 'family_tree_screen.dart';
 
 part 'explorer_prophecy_page.dart';
+part 'explorer_thread_page.dart';
 part 'explorer_page_widgets.dart';
 part 'explorer_person_page.dart';
 part 'explorer_place_page.dart';
@@ -59,6 +64,7 @@ class ExplorerEntityPage extends StatelessWidget {
       ),
       ExplorerEntityType.tag => _TagPage(tagId: entry.tagId!),
       ExplorerEntityType.prophecy => _ProphecyPage(index: entry.id!),
+      ExplorerEntityType.thread => _ThreadPage(index: entry.id!),
       ExplorerEntityType.browse => ExplorerIndexPage(
         kind: entry.browseKind!,
         category: entry.browseCategory,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 import '../../app/scripture_nav_providers.dart';
+import '../../app/thread_walk_providers.dart';
 import '../../app/reading_position_providers.dart';
 import '../../app/user_providers.dart';
 import '../../domain/scripture/scripture_route.dart';
@@ -30,6 +31,7 @@ import 'commentary_panel.dart';
 import 'dictionary_panel.dart';
 import 'search_panel.dart';
 import 'return_to_sermon_chip.dart';
+import 'thread_walk_chip.dart';
 import '../common/search_title_bar.dart';
 import '../onboarding/tutorial_keys.dart';
 import '../common/sync_button.dart';
@@ -884,6 +886,15 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     bottom: 16 + MediaQuery.viewPaddingOf(context).bottom,
                     child: const ReturnToSermonChip(),
                   ),
+                // Thread-walk cockpit (prev/next through the active thread's
+                // stops). All widths — walking happens in the reader itself —
+                // but yielded to the verse action bar like the sermon chip.
+                if (selectedVerses.isEmpty)
+                  Positioned(
+                    left: 12,
+                    bottom: 16 + MediaQuery.viewPaddingOf(context).bottom,
+                    child: const ThreadWalkChip(),
+                  ),
               ],
             ),
           ),
@@ -1065,10 +1076,12 @@ class _ChapterPage extends ConsumerWidget {
         ref.watch(chapterVersesWithRibbonsFamilyProvider(key)).value ?? <int>{};
     final subheadings = ref.watch(chapterSubheadingsProvider(key)).value ??
         <int, List<String>>{};
-    // The current scripture-navigation stop (if the mode is active). Its verse
-    // range in this chapter gets a temporary, non-persisted highlight.
+    // The current scripture-navigation stop (if the mode is active), else the
+    // active thread walk's stop. Its verse range in this chapter gets a
+    // temporary, non-persisted highlight.
     final navStop =
-        ref.watch(scriptureNavProvider.select((nav) => nav?.current));
+        ref.watch(scriptureNavProvider.select((nav) => nav?.current)) ??
+            ref.watch(threadWalkProvider.select((walk) => walk?.routeStop));
 
     return versesAsync.when(
       loading: () => const SkeletonList(rows: 8),

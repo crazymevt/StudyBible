@@ -23,6 +23,7 @@ class ExplorerStats {
   final int feasts;
   final int stories;
   final int prophecies;
+  final int threads;
   final int tribes;
   final int apostles;
   final int judges;
@@ -35,6 +36,7 @@ class ExplorerStats {
     required this.feasts,
     required this.stories,
     required this.prophecies,
+    required this.threads,
     required this.tribes,
     required this.apostles,
     required this.judges,
@@ -71,9 +73,11 @@ final explorerStatsProvider = FutureProvider<ExplorerStats>((ref) async {
     topics: counts[3],
     feasts: counts[4],
     stories: counts[5],
-    // Prophecies aren't a content-store table — they're the pure-Dart
-    // `prophecies` dataset, so this count is just its length.
+    // Prophecies and threads aren't content-store tables — they're the
+    // pure-Dart `prophecies`/`threads` datasets, so these counts are just
+    // their lengths.
     prophecies: prophecies.length,
+    threads: threads.length,
     tribes: counts[6],
     apostles: counts[7],
     judges: counts[8],

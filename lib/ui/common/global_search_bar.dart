@@ -138,6 +138,7 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
             (entityResults.places, 'Place'),
             (entityResults.topics, 'Topic'),
             (entityResults.events, 'Event'),
+            (entityResults.threads, 'Thread'),
           ];
           const maxEntityHits = 4;
           final options = <String>[];
