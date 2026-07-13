@@ -137,8 +137,9 @@ const List<Thread> threads = [
         passage: '1 Kings 8:10-13',
         note:
             'Solomon\'s temple repeats Exodus 40 in stone: the cloud fills '
-            'the house, and the priests cannot stand to minister. Yet Solomon '
-            'already wonders aloud whether any house can hold God.',
+            'the house, and the priests cannot stand to minister. Later in '
+            'this same dedication (v. 27) Solomon already wonders aloud '
+            'whether any house can hold God.',
       ),
       ThreadStop(
         title: 'The glory departs',
