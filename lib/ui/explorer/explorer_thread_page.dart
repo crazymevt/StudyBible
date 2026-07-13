@@ -6,10 +6,28 @@ part of 'explorer_pages.dart';
 /// hands the thread to the reader's walk chip — see `thread_walk_chip.dart`.
 /// The user-content facets (sermons/notebooks/tags) are async, same as the
 /// prophecy page.
-class _ThreadPage extends ConsumerWidget {
+class _ThreadPage extends ConsumerStatefulWidget {
   const _ThreadPage({required this.index});
 
   final int index;
+
+  @override
+  ConsumerState<_ThreadPage> createState() => _ThreadPageState();
+}
+
+class _ThreadPageState extends ConsumerState<_ThreadPage> {
+  int get index => widget.index;
+
+  @override
+  void initState() {
+    super.initState();
+    // Opening the page clears the index's "New" badge. Deferred a frame:
+    // provider writes during initState/build always throw.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || index < 0 || index >= threads.length) return;
+      ref.read(seenThreadsProvider.notifier).markSeen(threads[index].id);
+    });
+  }
 
   void _walkFrom(BuildContext context, WidgetRef ref, int stop) {
     // start() sends the reader to the stop (module + location + nav
@@ -20,13 +38,15 @@ class _ThreadPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     if (index < 0 || index >= threads.length) {
       return const _ErrorBody('Thread not found.');
     }
     final thread = threads[index];
     final walk = ref.watch(threadWalkProvider);
     final walkingThis = walk?.threadIndex == index;
+    final completed =
+        ref.watch(completedThreadWalksProvider).contains(thread.id);
     final entityRef = ExplorerRef.thread(index, thread.title);
     final sermons =
         ref.watch(explorerSermonsProvider(entityRef)).asData?.value ??
@@ -42,7 +62,8 @@ class _ThreadPage extends ConsumerWidget {
       children: [
         _PageTitle(
           title: thread.title,
-          subtitle: '${thread.category.label} · ${thread.stops.length} stops',
+          subtitle: '${thread.category.label} · ${thread.stops.length} stops'
+              '${completed ? ' · walked' : ''}',
         ),
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -62,7 +83,9 @@ class _ThreadPage extends ConsumerWidget {
               walkingThis
                   ? 'Continue the walk · stop ${walk!.stop + 1} of '
                       '${thread.stops.length}'
-                  : 'Walk this thread',
+                  : completed
+                      ? 'Walk it again'
+                      : 'Walk this thread',
             ),
             onPressed: () =>
                 _walkFrom(context, ref, walkingThis ? walk!.stop : 0),

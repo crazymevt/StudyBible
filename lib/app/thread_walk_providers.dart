@@ -130,3 +130,75 @@ class ThreadWalkNotifier extends Notifier<ThreadWalk?> {
 final threadWalkProvider = NotifierProvider<ThreadWalkNotifier, ThreadWalk?>(
   ThreadWalkNotifier.new,
 );
+
+/// Prefs key for the thread ids the user has opened in the Explorer, stored
+/// as a string list. Ids not in the set wear a "New" badge on the threads
+/// index — the badge means "added since you last looked", not "recently
+/// written", so it needs per-user state rather than a date on the dataset.
+const String kSeenThreadsKey = 'seenThreads';
+
+/// Prefs key for the ids of threads whose walk was finished (the walk chip's
+/// flag action on the last stop), stored as a string list.
+const String kCompletedThreadWalksKey = 'completedThreadWalks';
+
+/// The threads that existed before the seen/completed tracking shipped.
+/// They seed [SeenThreadsNotifier] when no set is stored yet, so a user
+/// updating (or installing) today is only badged on threads added after
+/// these — everything is "new" on day one, which would make the badge noise.
+const List<String> _preTrackingThreadIds = [
+  'living_water',
+  'god_with_us',
+  'tree_of_life',
+  'the_covenants',
+  'the_lamb',
+  'i_am',
+];
+
+/// Thread ids the user has opened; the threads index badges the rest as new.
+class SeenThreadsNotifier extends Notifier<Set<String>> {
+  @override
+  Set<String> build() {
+    final stored =
+        ref.watch(sharedPreferencesProvider).getStringList(kSeenThreadsKey);
+    // No stored set (pre-tracking install or first run): only threads added
+    // after tracking shipped count as unseen. markSeen persists the seed
+    // along with its first id, so nothing needs writing here.
+    return (stored ?? _preTrackingThreadIds).toSet();
+  }
+
+  /// Records that the thread's Explorer page was opened, clearing its badge.
+  void markSeen(String id) {
+    if (state.contains(id)) return;
+    state = {...state, id};
+    ref
+        .read(sharedPreferencesProvider)
+        .setStringList(kSeenThreadsKey, state.toList());
+  }
+}
+
+final seenThreadsProvider = NotifierProvider<SeenThreadsNotifier, Set<String>>(
+  SeenThreadsNotifier.new,
+);
+
+/// Thread ids walked to the end — the "which have I already read" half of
+/// the index's status marks (the seen set only answers "which are new").
+class CompletedThreadWalksNotifier extends Notifier<Set<String>> {
+  @override
+  Set<String> build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return (prefs.getStringList(kCompletedThreadWalksKey) ?? const []).toSet();
+  }
+
+  void markCompleted(String id) {
+    if (state.contains(id)) return;
+    state = {...state, id};
+    ref
+        .read(sharedPreferencesProvider)
+        .setStringList(kCompletedThreadWalksKey, state.toList());
+  }
+}
+
+final completedThreadWalksProvider =
+    NotifierProvider<CompletedThreadWalksNotifier, Set<String>>(
+  CompletedThreadWalksNotifier.new,
+);

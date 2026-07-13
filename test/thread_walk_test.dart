@@ -130,4 +130,60 @@ void main() {
     // Same event-queue drain as above: start() kicked off a history write.
     await pumpEventQueue();
   });
+
+  test(
+      'with no stored seen set, only pre-tracking threads count as seen — '
+      'threads added later badge as new until opened', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = await containerWithPrefs();
+
+    final seen = container.read(seenThreadsProvider);
+    // Phase-1 threads predate the badge and must never wear it…
+    expect(seen, contains('living_water'));
+    expect(seen, contains('i_am'));
+    // …while a thread added alongside/after the tracking starts out new.
+    expect(seen, isNot(contains('the_shepherd')));
+
+    container.read(seenThreadsProvider.notifier).markSeen('the_shepherd');
+    expect(
+      container.read(seenThreadsProvider),
+      contains('the_shepherd'),
+    );
+    // The write persisted the seed set along with the new id.
+    final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getStringList(kSeenThreadsKey)!;
+    expect(stored, contains('the_shepherd'));
+    expect(stored, contains('living_water'));
+  });
+
+  test('a stored seen set wins over the pre-tracking seed', () async {
+    SharedPreferences.setMockInitialValues({
+      kSeenThreadsKey: ['the_shepherd'],
+    });
+    final container = await containerWithPrefs();
+    final seen = container.read(seenThreadsProvider);
+    expect(seen, contains('the_shepherd'));
+    expect(seen, isNot(contains('living_water')));
+  });
+
+  test('completed walks persist and restore across containers', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = await containerWithPrefs();
+    expect(container.read(completedThreadWalksProvider), isEmpty);
+
+    container
+        .read(completedThreadWalksProvider.notifier)
+        .markCompleted('living_water');
+    expect(
+      container.read(completedThreadWalksProvider),
+      contains('living_water'),
+    );
+
+    // A fresh container (an app restart) reads it back from prefs.
+    final restarted = await containerWithPrefs();
+    expect(
+      restarted.read(completedThreadWalksProvider),
+      contains('living_water'),
+    );
+  });
 }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_bible/app/explorer_providers.dart';
+import 'package:study_bible/app/shared_prefs.dart';
+import 'package:study_bible/app/thread_walk_providers.dart';
 import 'package:study_bible/domain/explorer/explorer_ref.dart';
+import 'package:study_bible/domain/threads/thread_data.dart';
 import 'package:study_bible/ui/explorer/explorer_index_page.dart';
 
 /// Exercises the browsable index page's three interactions: the A-Z letter
@@ -240,6 +244,85 @@ void main() {
       expect(find.text('Other Prophets'), findsNothing);
       expect(visibleTitles(tester),
           ['DANIEL', 'ELIJAH', 'HOSEA', 'ISAIAH', 'MALACHI']);
+    });
+  });
+
+  group('thread status badges', () {
+    // Real dataset entries: one pre-tracking thread (seeded as seen) and one
+    // added after tracking shipped, so the badge logic is exercised against
+    // the actual seed list.
+    final livingWater = threads.indexWhere((t) => t.id == 'living_water');
+    final shepherd = threads.indexWhere((t) => t.id == 'the_shepherd');
+
+    Future<void> pumpThreads(
+      WidgetTester tester, {
+      Map<String, Object> prefs = const {},
+    }) async {
+      SharedPreferences.setMockInitialValues(prefs);
+      final sharedPrefs = await SharedPreferences.getInstance();
+      final data = [
+        ExplorerIndexEntry(
+          ExplorerRef.thread(livingWater, threads[livingWater].title),
+        ),
+        ExplorerIndexEntry(
+          ExplorerRef.thread(shepherd, threads[shepherd].title),
+        ),
+      ];
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            explorerIndexProvider.overrideWith((ref, spec) async => data),
+            prophetSectionsProvider.overrideWithValue(const {}),
+            sharedPreferencesProvider.overrideWithValue(sharedPrefs),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: ExplorerIndexPage(kind: ExplorerEntityType.thread),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets(
+        'a thread added after tracking wears a New pill; pre-tracking '
+        'threads never do', (tester) async {
+      await pumpThreads(tester);
+      expect(find.text('New'), findsOneWidget);
+      final badged = find.ancestor(
+        of: find.text('New'),
+        matching: find.byType(ListTile),
+      );
+      expect(
+        find.descendant(
+          of: badged,
+          matching: find.text(threads[shepherd].title),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        'a seen thread loses the pill and a completed walk shows a check',
+        (tester) async {
+      await pumpThreads(tester, prefs: {
+        kSeenThreadsKey: <String>['the_shepherd', 'living_water'],
+        kCompletedThreadWalksKey: <String>['living_water'],
+      });
+      expect(find.text('New'), findsNothing);
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    });
+
+    testWidgets('the active walk shows its progress fraction',
+        (tester) async {
+      await pumpThreads(tester, prefs: {
+        kActiveThreadWalkKey: 'living_water|2',
+      });
+      expect(
+        find.text('3/${threads[livingWater].stops.length}'),
+        findsOneWidget,
+      );
     });
   });
 }

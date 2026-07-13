@@ -20,6 +20,9 @@ class ThreadWalkChip extends ConsumerWidget {
   const ThreadWalkChip({super.key});
 
   void _finish(BuildContext context, WidgetRef ref, ThreadWalk walk) {
+    ref
+        .read(completedThreadWalksProvider.notifier)
+        .markCompleted(walk.thread.id);
     ref.read(threadWalkProvider.notifier).clear();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

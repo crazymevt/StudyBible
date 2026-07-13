@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/explorer_providers.dart';
+import '../../app/thread_walk_providers.dart';
 import '../../domain/explorer/explorer_ref.dart';
+import '../../domain/threads/thread_data.dart';
 import '../common/skeleton.dart';
 import 'explorer_common.dart';
 
@@ -325,7 +327,9 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                    trailing: const Icon(Icons.chevron_right, size: 18),
+                    trailing: widget.kind == ExplorerEntityType.thread
+                        ? _ThreadStatusTrailing(index: entry.ref.id!)
+                        : const Icon(Icons.chevron_right, size: 18),
                     onTap: () => ref
                         .read(explorerTrailProvider.notifier)
                         .open(entry.ref),
@@ -336,6 +340,66 @@ class _ExplorerIndexPageState extends ConsumerState<ExplorerIndexPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Trailing status for one row of the threads index, answering "have I read
+/// this one?" at a glance: a progress fraction while its walk is active, a
+/// check once a walk was finished, or a "New" pill for a thread added since
+/// the user last opened it (see [seenThreadsProvider]) — then the chevron
+/// every index row gets.
+class _ThreadStatusTrailing extends ConsumerWidget {
+  const _ThreadStatusTrailing({required this.index});
+
+  /// The thread's position in the pure-Dart `threads` list ([ExplorerRef]'s
+  /// id for threads).
+  final int index;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final id = threads[index].id;
+    final walk = ref.watch(threadWalkProvider);
+
+    Widget? status;
+    if (walk?.threadIndex == index) {
+      status = Text(
+        '${walk!.stop + 1}/${walk.thread.stops.length}',
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: scheme.primary,
+          fontWeight: FontWeight.w700,
+        ),
+      );
+    } else if (ref.watch(completedThreadWalksProvider).contains(id)) {
+      status = Tooltip(
+        message: 'Walked to the end',
+        child: Icon(Icons.check_circle, size: 16, color: scheme.primary),
+      );
+    } else if (!ref.watch(seenThreadsProvider).contains(id)) {
+      status = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+        decoration: BoxDecoration(
+          color: scheme.primaryContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          'New',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: scheme.onPrimaryContainer,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (status != null) ...[status, const SizedBox(width: 6)],
+        const Icon(Icons.chevron_right, size: 18),
+      ],
     );
   }
 }
