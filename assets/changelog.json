@@ -1,5 +1,35 @@
 [
   {
+    "version": "26.7.13+1",
+    "date": "2026-07-13",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "badge new and completed Threads on the Explorer index",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add five more Threads — Shepherd, Bread, Light, Seed, Exodus",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "correct scope of the \"any house can hold God\" note in The Dwelling Place",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add thematic Threads — guided motif walks from Genesis to Revelation",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.12+2",
     "date": "2026-07-12",
     "features": [
