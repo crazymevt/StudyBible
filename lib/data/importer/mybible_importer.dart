@@ -673,6 +673,30 @@ String? footnoteLabelFromMarker(String marker) {
 String renderMyBibleCrossRef(String rawHtml) {
   if (rawHtml.isEmpty) return '';
 
+  // ESV Global Study Bible (and likely other ph4 study-note modules) appends
+  // a swipe-nav block and a <script> to every paragraph-level note — both are
+  // boilerplate from ph4's own web reader. `body.text` below walks all text
+  // node descendants like DOM textContent, so a <script>'s source would
+  // otherwise be included verbatim in the footnote shown to the reader.
+  rawHtml = rawHtml
+      .replaceAll(
+        RegExp(r'<script\b[^>]*>.*?</script>', caseSensitive: false, dotAll: true),
+        '',
+      )
+      .replaceAll(
+        RegExp(r'<style\b[^>]*>.*?</style>', caseSensitive: false, dotAll: true),
+        '',
+      )
+      .replaceAll(
+        RegExp(
+          r'<center\s+class=["\x27]TOC["\x27][^>]*>.*?</center>',
+          caseSensitive: false,
+          dotAll: true,
+        ),
+        '',
+      );
+  if (rawHtml.isEmpty) return '';
+
   String plain(String fragment) =>
       html_parser.parse(fragment).body?.text ?? fragment;
 

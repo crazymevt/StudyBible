@@ -46,6 +46,40 @@ void main() {
         'see also Genesis 1',
       );
     });
+
+    test('a trailing <script> block is dropped, not read as text', () {
+      // Shape of ESV Global Study Bible notes (e.g. 1 Kings 8:1): a real note
+      // paragraph followed by a swipe-nav block and a <script>.
+      expect(
+        renderMyBibleCrossRef(
+          "<pp>The ark of the covenant <a href='B:20 25:10'>Ex. 25:10</a>.</pp>"
+          '<center class="TOC"><span style="display:none;">'
+          "<a href='C:@1000 0:0'>&lArr;</a></span></center>"
+          '<script>'
+          'document.addEventListener("touchstart", handleTouchStart, false);'
+          '</script>',
+        ),
+        'The ark of the covenant {20:25:10|Ex. 25:10}.',
+      );
+    });
+
+    test('a <style> block is dropped, not read as text', () {
+      expect(
+        renderMyBibleCrossRef(
+          '<style>.verse { color: red; }</style>see also Genesis 1',
+        ),
+        'see also Genesis 1',
+      );
+    });
+
+    test('an all-boilerplate note (no real text) yields empty output', () {
+      expect(
+        renderMyBibleCrossRef(
+          '<script>var x = 1;</script>',
+        ),
+        '',
+      );
+    });
   });
 
   group('footnoteLabelFromMarker', () {
