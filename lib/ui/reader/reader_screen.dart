@@ -903,44 +903,19 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     ));
   }
 
-  /// Builds the scrollable reading area. On touch devices showing a single
-  /// version it pages through every chapter via a [PageView] (smooth swipe
-  /// navigation, with adjacent chapters pre-built). Parallel view, desktop, and
-  /// the pre-index window fall back to rendering just the current chapter.
+  /// Builds the scrollable reading area: every chapter paged through a
+  /// [PageView] (smooth swipe navigation, with adjacent chapters pre-built),
+  /// in both single-version and parallel view. Swiping works on every
+  /// platform — the global AppScrollBehavior enables touch, trackpad, and
+  /// mouse drag. Vertical list scrolling is unaffected: the gesture arena
+  /// routes vertical drags to the verse list and only horizontal drags flip
+  /// chapters. Each _ChapterPage loads its own verses (with its own
+  /// loading/empty/error states) and picks single-column vs parallel from its
+  /// fetched verse map, so the PageView itself never depends on any one
+  /// chapter's load state — watching verses here would tear the pager down to
+  /// a spinner on every swipe and snap it back to its initial page. Only the
+  /// pre-index window falls back to rendering just the current chapter.
   Widget _buildReaderBody(BuildContext context, String bookName, int chapter) {
-    // Decide single-version-swipe vs parallel from the version COUNT, not from
-    // the current chapter's fetched verses. Watching the verse map here meant
-    // every swipe (which changes the selected chapter) sent this subtree to a
-    // loading spinner and rebuilt the whole PageView — on remount the
-    // PageController reattached at its initial page, so a swipe flashed the
-    // first chapter before _syncPageController jumped to the target. Each
-    // _ChapterPage loads its own verses (with its own loading/empty/error
-    // states), so the PageView itself no longer depends on any one chapter.
-    final isSingleVersion = ref.watch(displayedVersionCountProvider) <= 1;
-
-    // Parallel view renders only the current chapter — no swipe paging
-    // (arrow keys / footer still navigate). Single-version pages through
-    // chapters via the PageView on every platform: the global
-    // AppScrollBehavior enables touch, trackpad, and mouse drag, so
-    // desktop touchscreens (and trackpad swipes) work too. Vertical list
-    // scrolling is unaffected — the gesture arena routes vertical drags to
-    // the verse list and only horizontal drags flip chapters.
-    if (!isSingleVersion) {
-      return _ChapterPage(
-        bookName: bookName,
-        chapter: chapter,
-        isFlowing: _isFlowing,
-        searchQuery: _searchQuery,
-        onVerseTap: _onVerseTap,
-        onFootnoteTap: (_) => _openCommentaryPanel(),
-        onStrongTap: _openStrongDictionary,
-        onChooseVersion: _showVersionPicker,
-        onRetry: () => ref.invalidate(
-          chapterVersesProvider((bookName: bookName, chapter: chapter)),
-        ),
-      );
-    }
-
     final chapterIndex = ref.watch(chapterIndexProvider).value;
     if (chapterIndex == null || chapterIndex.isEmpty) {
       return _ChapterPage(
