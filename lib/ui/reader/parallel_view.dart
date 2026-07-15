@@ -12,6 +12,7 @@ import 'word_tap_menu.dart';
 import 'verse_drag_feedback.dart';
 import '../../theme/app_themes.dart';
 import '../../app/verse_selection.dart';
+import '../common/breakpoints.dart';
 
 class ParallelView extends ConsumerStatefulWidget {
   final Map<String, List<Verse>> versesMap;
@@ -215,11 +216,15 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
 
     return Column(
       children: [
-        Row(
-          children: keys.map((versionId) {
-            return Expanded(child: _buildHeader(context, versionId));
-          }).toList(),
-        ),
+        // On phones each verse stacks its translations vertically with an
+        // inline version label instead of squeezing them into columns, so
+        // the column headers here would be redundant (and misleading).
+        if (!context.isPhone)
+          Row(
+            children: keys.map((versionId) {
+              return Expanded(child: _buildHeader(context, versionId));
+            }).toList(),
+          ),
         Expanded(
           child: ScrollablePositionedList.builder(
             itemScrollController: widget.externalScrollController ?? itemScrollController,
@@ -280,6 +285,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
               Widget tile = _ParallelVerseRow(
                 key: ValueKey(verseNum),
                 verseNum: verseNum,
+                versionIds: keys,
                 verses: rowVerses,
                 bgColor: bgColor,
                 subheadings: verseSubheadings,
@@ -322,6 +328,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
 /// row rebuilds — no accumulation across scrolling.
 class _ParallelVerseRow extends StatefulWidget {
   final int verseNum;
+  final List<String> versionIds;
   final List<Verse> verses;
   final Color? bgColor;
   final List<String> subheadings;
@@ -347,6 +354,7 @@ class _ParallelVerseRow extends StatefulWidget {
   const _ParallelVerseRow({
     super.key,
     required this.verseNum,
+    required this.versionIds,
     required this.verses,
     required this.bgColor,
     required this.subheadings,
@@ -413,69 +421,153 @@ class _ParallelVerseRowState extends State<_ParallelVerseRow> {
             ),
           Container(
             color: widget.bgColor,
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: widget.verses.map((verse) {
-                  return Expanded(
-                    child: InkWell(
-                      onTap: () => widget.onVerseTap(widget.verseNum),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8.0,
-                        ),
-                        child: verse.id == -1
-                            ? const SizedBox.shrink() // empty cell if verse is missing in this translation
-                            : Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: '${verse.verse} ',
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                            color: theme.colorScheme.primary,
-                                            fontWeight: FontWeight.bold,
-                                            // Bump relative to the
-                                            // (delta-applied) label size so
-                                            // verse numbers track the user's
-                                            // font setting.
-                                            fontSize: (theme.textTheme.labelSmall
-                                                        ?.fontSize ??
-                                                    11) +
-                                                2,
-                                          ),
-                                    ),
-                                    ...buildVerseMarkerSpans(
-                                      context,
-                                      hasNote: widget.hasNote,
-                                      hasTag: widget.hasTag,
-                                      hasRibbon: widget.hasRibbon,
-                                    ),
-                                    ...buildVerseSpans(
-                                      context: context,
-                                      verse: verse,
-                                      bgColor: null,
-                                      onVerseTap: widget.onVerseTap,
-                                      onFootnoteTap: widget.onFootnoteTap,
-                                      onStrongTap: widget.onStrongTap,
-                                      showStrongNumbers: widget.showStrongNumbers,
-                                      onWordRightClick: widget.onWordRightClick,
-                                      searchQuery: widget.searchQuery,
-                                      ignoreLeadingBreaks: true,
-                                      recognizers: _recognizers,
-                                      suppressWordLongPress: widget.isSelected,
-                                    ),
-                                  ],
-                                ),
+            child: context.isPhone
+                ? _buildStacked(context, theme)
+                : IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: widget.verses.map((verse) {
+                        return Expanded(
+                          child: InkWell(
+                            onTap: () => widget.onVerseTap(widget.verseNum),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 8.0,
                               ),
-                      ),
+                              child: verse.id == -1
+                                  ? const SizedBox.shrink() // empty cell if verse is missing in this translation
+                                  : Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '${verse.verse} ',
+                                            style: theme.textTheme.labelSmall
+                                                ?.copyWith(
+                                                  color: theme
+                                                      .colorScheme.primary,
+                                                  fontWeight: FontWeight.bold,
+                                                  // Bump relative to the
+                                                  // (delta-applied) label size
+                                                  // so verse numbers track the
+                                                  // user's font setting.
+                                                  fontSize:
+                                                      (theme.textTheme
+                                                                  .labelSmall
+                                                                  ?.fontSize ??
+                                                              11) +
+                                                          2,
+                                                ),
+                                          ),
+                                          ...buildVerseMarkerSpans(
+                                            context,
+                                            hasNote: widget.hasNote,
+                                            hasTag: widget.hasTag,
+                                            hasRibbon: widget.hasRibbon,
+                                          ),
+                                          ...buildVerseSpans(
+                                            context: context,
+                                            verse: verse,
+                                            bgColor: null,
+                                            onVerseTap: widget.onVerseTap,
+                                            onFootnoteTap:
+                                                widget.onFootnoteTap,
+                                            onStrongTap: widget.onStrongTap,
+                                            showStrongNumbers:
+                                                widget.showStrongNumbers,
+                                            onWordRightClick:
+                                                widget.onWordRightClick,
+                                            searchQuery: widget.searchQuery,
+                                            ignoreLeadingBreaks: true,
+                                            recognizers: _recognizers,
+                                            suppressWordLongPress:
+                                                widget.isSelected,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                  );
-                }).toList(),
-              ),
-            ),
+                  ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Phone-width layout: instead of squeezing every translation into its own
+  /// column (illegible once 2-3 versions share a ~360px screen), each
+  /// verse's translations stack vertically under a shared verse number, each
+  /// tagged with its version id.
+  Widget _buildStacked(BuildContext context, ThemeData theme) {
+    return InkWell(
+      onTap: () => widget.onVerseTap(widget.verseNum),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${widget.verseNum} ',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize:
+                              (theme.textTheme.labelSmall?.fontSize ?? 11) + 2,
+                        ),
+                  ),
+                  ...buildVerseMarkerSpans(
+                    context,
+                    hasNote: widget.hasNote,
+                    hasTag: widget.hasTag,
+                    hasRibbon: widget.hasRibbon,
+                  ),
+                ],
+              ),
+            ),
+            for (var i = 0; i < widget.verses.length; i++)
+              if (widget.verses[i].id != -1)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.versionIds[i],
+                        style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      Text.rich(
+                        TextSpan(
+                          children: buildVerseSpans(
+                            context: context,
+                            verse: widget.verses[i],
+                            bgColor: null,
+                            onVerseTap: widget.onVerseTap,
+                            onFootnoteTap: widget.onFootnoteTap,
+                            onStrongTap: widget.onStrongTap,
+                            showStrongNumbers: widget.showStrongNumbers,
+                            onWordRightClick: widget.onWordRightClick,
+                            searchQuery: widget.searchQuery,
+                            ignoreLeadingBreaks: true,
+                            recognizers: _recognizers,
+                            suppressWordLongPress: widget.isSelected,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          ],
+        ),
       ),
     );
   }

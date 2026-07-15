@@ -3,8 +3,8 @@
 The Reader is the core of the StudyBible app, allowing you to study God's Word without distractions.
 
 ## Layout Options
-- **Parallel Mode:** View multiple Bible versions side-by-side in vertical columns. Use the version selector at the top to add or remove versions. This is excellent for desktop or tablet screens.
-- **Interleaved Mode:** See multiple translations stacked verse-by-verse instead of in columns. This is perfect for mobile devices when you want to compare texts without horizontal scrolling!
+- **Paragraph View:** Each version flows as continuous paragraphs, side-by-side in columns. Use the version selector at the top to add or remove versions. Best on wider screens where columns have room to breathe.
+- **Verse-by-verse View:** Versions stay aligned verse-by-verse as you scroll, so every translation shows the same verse together—handy for close comparison. On wider screens they sit side-by-side in columns; on phones they stack vertically under a shared verse number instead, so no version gets squeezed.
 
 ## Interaction
 - **Select a Verse:** Tap any verse to select it and open the verse action bar, where you can highlight, add a note, tag, compare, copy, or share it. Tap more verses to extend the selection. See the **Notes, Highlights & Sharing** topic for the full rundown.
