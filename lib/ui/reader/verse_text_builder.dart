@@ -21,6 +21,30 @@ final RegExp _wordTokenRegex = RegExp(r'[\p{L}\p{N}\p{M}]+', unicode: true);
 List<String> _tokenizeWords(String text) =>
     _wordTokenRegex.allMatches(text).map((m) => m.group(0)!.toLowerCase()).toList();
 
+/// Inline note/tag/ribbon indicator icons shown after a verse number for
+/// verses the user has annotated. Shared by the list, flowing, and parallel
+/// reader views so the markers look identical everywhere.
+List<InlineSpan> buildVerseMarkerSpans(
+  BuildContext context, {
+  required bool hasNote,
+  required bool hasTag,
+  required bool hasRibbon,
+}) {
+  final color = Theme.of(context).colorScheme.primary.withValues(alpha: 0.8);
+  InlineSpan marker(IconData icon, double size) => WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 4.0),
+          child: Icon(icon, size: size, color: color),
+        ),
+      );
+  return [
+    if (hasNote) marker(Icons.edit_note, 14),
+    if (hasTag) marker(Icons.label, 12),
+    if (hasRibbon) marker(Icons.bookmark, 12),
+  ];
+}
+
 List<InlineSpan> buildVerseSpans({
   required BuildContext context,
   required Verse verse,

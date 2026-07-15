@@ -224,6 +224,12 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
             ),
             recognizer: recognizer,
           ),
+          ...buildVerseMarkerSpans(
+            context,
+            hasNote: widget.versesWithNotes.contains(verse.verse),
+            hasTag: widget.versesWithTags.contains(verse.verse),
+            hasRibbon: widget.versesWithRibbons.contains(verse.verse),
+          ),
         ],
       );
 

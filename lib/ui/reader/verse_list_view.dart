@@ -371,30 +371,12 @@ class _VerseTileState extends State<_VerseTile> {
                       fontSize: (theme.textTheme.labelSmall?.fontSize ?? 11) + 2,
                     ),
                   ),
-                  if (widget.hasNote)
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 4.0),
-                        child: Icon(Icons.edit_note, size: 14, color: theme.colorScheme.primary.withValues(alpha: 0.8)),
-                      ),
-                    ),
-                  if (widget.hasTag)
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 4.0),
-                        child: Icon(Icons.label, size: 12, color: theme.colorScheme.primary.withValues(alpha: 0.8)),
-                      ),
-                    ),
-                  if (widget.hasRibbon)
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 4.0),
-                        child: Icon(Icons.bookmark, size: 12, color: theme.colorScheme.primary.withValues(alpha: 0.8)),
-                      ),
-                    ),
+                  ...buildVerseMarkerSpans(
+                    context,
+                    hasNote: widget.hasNote,
+                    hasTag: widget.hasTag,
+                    hasRibbon: widget.hasRibbon,
+                  ),
                   ...buildVerseSpans(
                     context: context,
                     verse: widget.verse,

@@ -186,6 +186,9 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                     selectedVerses: widget.selectedVerses,
                     savedHighlights: widget.savedHighlights,
                     navHighlights: widget.navHighlights,
+                    versesWithNotes: widget.versesWithNotes,
+                    versesWithTags: widget.versesWithTags,
+                    versesWithRibbons: widget.versesWithRibbons,
                     subheadings: widget.subheadings,
                     onVerseTap: widget.onVerseTap,
                     onFootnoteTap: widget.onFootnoteTap,
@@ -288,6 +291,9 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                 onStrongTap: widget.onStrongTap,
                 onWordRightClick: _openDictionary,
                 isSelected: isSelected,
+                hasNote: widget.versesWithNotes.contains(verseNum),
+                hasTag: widget.versesWithTags.contains(verseNum),
+                hasRibbon: widget.versesWithRibbons.contains(verseNum),
               );
 
               if (isSelected) {
@@ -332,6 +338,12 @@ class _ParallelVerseRow extends StatefulWidget {
   /// long-press is suppressed to keep the two gestures from racing.
   final bool isSelected;
 
+  // Note/tag/ribbon indicators for this verse, shown after the verse number
+  // in every translation column.
+  final bool hasNote;
+  final bool hasTag;
+  final bool hasRibbon;
+
   const _ParallelVerseRow({
     super.key,
     required this.verseNum,
@@ -346,6 +358,9 @@ class _ParallelVerseRow extends StatefulWidget {
     required this.onStrongTap,
     required this.onWordRightClick,
     required this.isSelected,
+    required this.hasNote,
+    required this.hasTag,
+    required this.hasRibbon,
   });
 
   @override
@@ -429,6 +444,12 @@ class _ParallelVerseRowState extends State<_ParallelVerseRow> {
                                                     11) +
                                                 2,
                                           ),
+                                    ),
+                                    ...buildVerseMarkerSpans(
+                                      context,
+                                      hasNote: widget.hasNote,
+                                      hasTag: widget.hasTag,
+                                      hasRibbon: widget.hasRibbon,
                                     ),
                                     ...buildVerseSpans(
                                       context: context,
