@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.7.16+1",
+    "date": "2026-07-16",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "stack verse-by-verse translations vertically on phone widths",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "show note/tag/ribbon verse indicators in parallel and flowing views",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "swipe chapter navigation in parallel view",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.15+1",
     "date": "2026-07-15",
     "features": [
