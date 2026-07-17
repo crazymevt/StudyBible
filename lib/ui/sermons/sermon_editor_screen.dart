@@ -17,6 +17,7 @@ import '../../domain/explorer/entity_link.dart';
 import '../common/entity_autolink.dart';
 import 'export_dialog.dart';
 import '../notebooks/insert_entity_link_dialog.dart';
+import 'series_autocomplete_field.dart';
 import 'sermon_presentation_screen.dart';
 import 'sermon_revisions_dialog.dart';
 import '../common/breakpoints.dart';
@@ -33,7 +34,11 @@ class SermonEditorScreen extends ConsumerStatefulWidget {
   final String sermonId;
   final bool isFullScreen;
 
-  const SermonEditorScreen({super.key, required this.sermonId, this.isFullScreen = true});
+  const SermonEditorScreen({
+    super.key,
+    required this.sermonId,
+    this.isFullScreen = true,
+  });
 
   @override
   ConsumerState<SermonEditorScreen> createState() => _SermonEditorScreenState();
@@ -44,6 +49,10 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   bool _isInitialized = false;
   final _titleController = TextEditingController();
   final _seriesController = TextEditingController();
+
+  /// Owned here (not left to RawAutocomplete) so it can be disposed with the
+  /// rest of the fields.
+  final _seriesFocusNode = FocusNode();
 
   /// Passed explicitly to QuillEditor.basic below. Without it, the factory
   /// mints a brand-new default FocusNode on every call — i.e. every rebuild
@@ -109,7 +118,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
 
   Future<void> _loadSermon() async {
     final store = ref.read(userStoreProvider);
-    final sermon = await (store.select(store.sermons)..where((t) => t.id.equals(widget.sermonId))).getSingleOrNull();
+    final sermon = await (store.select(
+      store.sermons,
+    )..where((t) => t.id.equals(widget.sermonId))).getSingleOrNull();
     if (sermon != null) {
       // Remember this as the sermon to quick-return to from the reader. Every
       // way of opening a sermon mounts this editor, so setting it here is the
@@ -124,7 +135,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         jsonData = jsonDecode(sermon.content);
       } catch (e, stack) {
         logError(e, stack, context: 'SermonEditor: parse content');
-        jsonData = [{'insert': '\\n'}];
+        jsonData = [
+          {'insert': '\\n'},
+        ];
       }
 
       _controller = QuillController(
@@ -185,10 +198,14 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
 
   Future<void> _saveSermonMetadata() async {
     if (_conflictDetected || _internalWrite) return;
-    final ts = await ref.read(sermonActionProvider).updateSermon(
+    final ts = await ref
+        .read(sermonActionProvider)
+        .updateSermon(
           widget.sermonId,
           title: _titleController.text,
-          series: _seriesController.text.isNotEmpty ? _seriesController.text : null,
+          series: _seriesController.text.isNotEmpty
+              ? _seriesController.text
+              : null,
         );
     _loadedUpdatedAt = ts;
   }
@@ -206,7 +223,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       jsonData = jsonDecode(sermon.content);
     } catch (e, stack) {
       logError(e, stack, context: 'SermonEditor: parse content');
-      jsonData = [{'insert': '\\n'}];
+      jsonData = [
+        {'insert': '\\n'},
+      ];
     }
     _controller = QuillController(
       document: Document.fromJson(jsonData),
@@ -230,7 +249,8 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       return;
     }
     if (sermon.deleted || sermon.updatedAt <= _loadedUpdatedAt) return;
-    final changed = sermon.content != _currentContentJson() ||
+    final changed =
+        sermon.content != _currentContentJson() ||
         sermon.title != _titleController.text ||
         (sermon.series ?? '') != _seriesController.text;
     if (changed) {
@@ -250,7 +270,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     final remote = _incomingRemote;
     if (remote == null) return;
     _internalWrite = true;
-    await ref.read(sermonRevisionActionProvider).saveRevision(
+    await ref
+        .read(sermonRevisionActionProvider)
+        .saveRevision(
           sermonId: widget.sermonId,
           title: remote.title,
           series: remote.series,
@@ -258,11 +280,14 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
           label: 'Version from another device',
           kind: RevisionKind.conflict,
         );
-    final ts = await ref.read(sermonActionProvider).updateSermon(
+    final ts = await ref
+        .read(sermonActionProvider)
+        .updateSermon(
           widget.sermonId,
           title: _titleController.text,
-          series:
-              _seriesController.text.isNotEmpty ? _seriesController.text : null,
+          series: _seriesController.text.isNotEmpty
+              ? _seriesController.text
+              : null,
           content: _currentContentJson(),
         );
     _loadedUpdatedAt = ts;
@@ -281,11 +306,14 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     final remote = _incomingRemote;
     if (remote == null) return;
     _internalWrite = true;
-    await ref.read(sermonRevisionActionProvider).saveRevision(
+    await ref
+        .read(sermonRevisionActionProvider)
+        .saveRevision(
           sermonId: widget.sermonId,
           title: _titleController.text,
-          series:
-              _seriesController.text.isNotEmpty ? _seriesController.text : null,
+          series: _seriesController.text.isNotEmpty
+              ? _seriesController.text
+              : null,
           content: _currentContentJson(),
           label: 'Your version before reload',
           kind: RevisionKind.restore,
@@ -307,18 +335,20 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   /// panel's remote-conflict watcher — we mute it for the round trip.
   Future<void> _openFullScreen() async {
     _fullScreenChildOpen = true;
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) =>
-          SermonEditorScreen(sermonId: widget.sermonId, isFullScreen: true),
-    ));
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            SermonEditorScreen(sermonId: widget.sermonId, isFullScreen: true),
+      ),
+    );
     if (!mounted) {
       _fullScreenChildOpen = false;
       return;
     }
     final store = ref.read(userStoreProvider);
-    final sermon = await (store.select(store.sermons)
-          ..where((t) => t.id.equals(widget.sermonId)))
-        .getSingleOrNull();
+    final sermon = await (store.select(
+      store.sermons,
+    )..where((t) => t.id.equals(widget.sermonId))).getSingleOrNull();
     if (!mounted) {
       _fullScreenChildOpen = false;
       return;
@@ -342,8 +372,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       context,
       sermonId: widget.sermonId,
       currentTitle: _titleController.text,
-      currentSeries:
-          _seriesController.text.isNotEmpty ? _seriesController.text : null,
+      currentSeries: _seriesController.text.isNotEmpty
+          ? _seriesController.text
+          : null,
       currentContent: _currentContentJson(),
     );
     if (restored == null || !mounted) return;
@@ -351,18 +382,18 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     _internalWrite = true;
     await ref.read(sermonRevisionActionProvider).restoreRevision(restored.id);
     final store = ref.read(userStoreProvider);
-    final sermon = await (store.select(store.sermons)
-          ..where((t) => t.id.equals(widget.sermonId)))
-        .getSingleOrNull();
+    final sermon = await (store.select(
+      store.sermons,
+    )..where((t) => t.id.equals(widget.sermonId))).getSingleOrNull();
     if (sermon != null && mounted) {
       setState(() => _applySermonToEditor(sermon));
       unawaited(_recalculateReadingTime());
     }
     _internalWrite = false;
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Revision restored')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Revision restored')));
     }
   }
 
@@ -382,8 +413,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       );
       return;
     }
-    final title =
-        _titleController.text.isEmpty ? 'Untitled Sermon' : _titleController.text;
+    final title = _titleController.text.isEmpty
+        ? 'Untitled Sermon'
+        : _titleController.text;
     ref
         .read(scriptureNavProvider.notifier)
         .start(sermonTitle: title, stops: stops);
@@ -397,12 +429,14 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     (store.select(store.sermons)..where((t) => t.id.equals(widget.sermonId)))
         .getSingleOrNull()
         .then((sermon) {
-      if (sermon != null && context.mounted) {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => SermonPresentationScreen(sermon: sermon),
-        ));
-      }
-    });
+          if (sermon != null && context.mounted) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => SermonPresentationScreen(sermon: sermon),
+              ),
+            );
+          }
+        });
   }
 
   void _exportSermon(BuildContext context) {
@@ -410,18 +444,17 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
     (store.select(store.sermons)..where((t) => t.id.equals(widget.sermonId)))
         .getSingleOrNull()
         .then((sermon) {
-      if (sermon != null && context.mounted) {
-        ExportDialog.show(context, [sermon]);
-      }
-    });
+          if (sermon != null && context.mounted) {
+            ExportDialog.show(context, [sermon]);
+          }
+        });
   }
 
   Future<void> _linkEntity(BuildContext context) async {
     final chosen = await InsertEntityLinkDialog.show(context);
     if (chosen == null || !mounted) return;
     final offset = _controller.selection.baseOffset;
-    final insertOffset =
-        offset >= 0 ? offset : _controller.document.length - 1;
+    final insertOffset = offset >= 0 ? offset : _controller.document.length - 1;
     final label = chosen.label;
     _controller.document.insert(insertOffset, label);
     _controller.updateSelection(
@@ -438,10 +471,8 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   void _manageTags(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => TagEditorDialog(
-        entityId: widget.sermonId,
-        entityType: 'sermon',
-      ),
+      builder: (_) =>
+          TagEditorDialog(entityId: widget.sermonId, entityType: 'sermon'),
     );
   }
 
@@ -528,6 +559,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   void dispose() {
     _autolinkDebounce?.cancel();
     _editorFocusNode.dispose();
+    _seriesFocusNode.dispose();
     if (_isInitialized) {
       _controller.removeListener(_saveSermonContent);
       _controller.removeListener(_scheduleAutolink);
@@ -569,10 +601,12 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         const minEditorHeight = 140.0;
         final bannerHeight = _conflictDetected ? 88.0 : 0.0;
         final estimateRowHeight =
-            _estimatedReadingTime != null && _estimatedReadingTime != Duration.zero
-                ? 24.0
-                : 0.0;
-        final multiRowToolbar = constraints.maxHeight >=
+            _estimatedReadingTime != null &&
+                _estimatedReadingTime != Duration.zero
+            ? 24.0
+            : 0.0;
+        final multiRowToolbar =
+            constraints.maxHeight >=
             bannerHeight +
                 titleFieldsHeight +
                 twoRowToolbarHeight +
@@ -595,10 +629,11 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: TextField(
+                    child: SeriesAutocompleteField(
                       controller: _seriesController,
+                      focusNode: _seriesFocusNode,
+                      options: ref.watch(sermonSeriesNamesProvider),
                       readOnly: _viewOnly,
-                      decoration: const InputDecoration(labelText: 'Series'),
                     ),
                   ),
                 ],
@@ -625,7 +660,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
             // only its child swaps between the label and nothing.
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: _estimatedReadingTime != null && _estimatedReadingTime != Duration.zero
+              child:
+                  _estimatedReadingTime != null &&
+                      _estimatedReadingTime != Duration.zero
                   ? Text(
                       'Est. reading time: ${_formatReadingTime(_estimatedReadingTime!)}',
                       style: Theme.of(context).textTheme.bodySmall,
@@ -645,17 +682,22 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                     onAcceptWithDetails: (details) {
                       final text = details.data;
                       final offset = _controller.selection.baseOffset;
-                      final insertOffset = offset >= 0 ? offset : _controller.document.length - 1;
+                      final insertOffset = offset >= 0
+                          ? offset
+                          : _controller.document.length - 1;
                       _controller.document.insert(insertOffset, text);
                       _controller.updateSelection(
-                        TextSelection.collapsed(offset: insertOffset + text.length),
+                        TextSelection.collapsed(
+                          offset: insertOffset + text.length,
+                        ),
                         ChangeSource.local,
                       );
                     },
                     builder: (context, candidateData, rejectedData) {
                       return Container(
                         color: candidateData.isNotEmpty
-                            ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2)
+                            ? Theme.of(context).colorScheme.primaryContainer
+                                  .withValues(alpha: 0.2)
                             : null,
                         child: QuillEditor.basic(
                           controller: _controller,
@@ -676,8 +718,8 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                                 ),
                             onLaunchUrl: (url) =>
                                 parseEntityLinkUrl(url) != null
-                                    ? handleEntityLinkLaunch(ref, context, url)
-                                    : handleReferenceLaunch(ref, context, url),
+                                ? handleEntityLinkLaunch(ref, context, url)
+                                : handleReferenceLaunch(ref, context, url),
                           ),
                         ),
                       );
@@ -792,7 +834,9 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(_viewOnly ? Icons.edit : Icons.visibility_outlined),
+                  icon: Icon(
+                    _viewOnly ? Icons.edit : Icons.visibility_outlined,
+                  ),
                   tooltip: _viewOnly ? 'Exit view only' : 'View only',
                   onPressed: _toggleViewOnly,
                 ),
@@ -838,10 +882,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
           onPressed: _useTheirs,
           child: const Text('Use their version'),
         ),
-        TextButton(
-          onPressed: _keepMine,
-          child: const Text('Keep mine'),
-        ),
+        TextButton(onPressed: _keepMine, child: const Text('Keep mine')),
       ],
     );
   }
@@ -875,14 +916,14 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   void _generateOutline(int numPoints) {
     final currentLength = _controller.document.length;
     int index = currentLength > 1 ? currentLength - 1 : 0;
-    
+
     final delta = Delta()
       ..retain(index)
       ..insert('\n')
       ..insert('Introduction')
       ..insert('\n', {'header': 2})
       ..insert('\n');
-      
+
     for (int i = 1; i <= numPoints; i++) {
       delta
         ..insert('Point $i: ', {'bold': true})
@@ -893,7 +934,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         ..insert('\n', {'list': 'bullet'})
         ..insert('\n');
     }
-    
+
     delta
       ..insert('Conclusion')
       ..insert('\n', {'header': 2})
@@ -955,10 +996,7 @@ class _OutlinePointsDialogState extends State<_OutlinePointsDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        ElevatedButton(
-          onPressed: _submit,
-          child: const Text('Generate'),
-        ),
+        ElevatedButton(onPressed: _submit, child: const Text('Generate')),
       ],
     );
   }

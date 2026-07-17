@@ -6,6 +6,7 @@ import '../../app/tag_providers.dart';
 import '../../data/user_store.dart';
 import '../tags/tag_palette.dart';
 import 'export_dialog.dart';
+import 'series_autocomplete_field.dart';
 import 'sermon_editor_screen.dart';
 import '../common/breakpoints.dart';
 import '../common/empty_state.dart';
@@ -21,6 +22,39 @@ const Map<_SermonSort, String> _sortLabels = {
   _SermonSort.createdAsc: 'Oldest first',
 };
 
+/// Sentinel for the "Group by series" toggle in the sort popup menu, which is
+/// otherwise populated with [_SermonSort] values.
+const _groupBySeriesMenuValue = 'groupBySeries';
+
+/// One section of the grouped sermon list: the display name of the series and
+/// its sermons in list order.
+typedef SeriesGroup = ({String name, List<Sermon> sermons});
+
+/// Label for the section holding sermons without a series.
+const String kNoSeriesLabel = 'No Series';
+
+/// Groups an already filtered+sorted sermon list into series sections.
+///
+/// Series names are matched case-insensitively (display name is the first
+/// spelling seen). Groups appear in the order of their best-ranked sermon, so
+/// the active sort — and pinning — also orders the sections; sermons without
+/// a series are collected under [kNoSeriesLabel] at the end.
+@visibleForTesting
+List<SeriesGroup> groupSermonsBySeries(List<Sermon> sorted) {
+  final groups = <String, SeriesGroup>{};
+  for (final sermon in sorted) {
+    final display = (sermon.series ?? '').trim();
+    final key = display.toLowerCase();
+    final group = groups.putIfAbsent(
+      key,
+      () => (name: display.isEmpty ? kNoSeriesLabel : display, sermons: []),
+    );
+    group.sermons.add(sermon);
+  }
+  final noSeries = groups.remove('');
+  return [...groups.values, ?noSeries];
+}
+
 class SermonsPanel extends ConsumerStatefulWidget {
   const SermonsPanel({super.key});
 
@@ -32,6 +66,7 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
   final _searchController = TextEditingController();
   String _query = '';
   _SermonSort _sort = _SermonSort.createdDesc;
+  bool _groupBySeries = false;
   String? _activeTagId;
   String? _activeTagName;
 
@@ -132,18 +167,30 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        PopupMenuButton<_SermonSort>(
+                        PopupMenuButton<Object>(
                           icon: const Icon(Icons.sort),
                           tooltip: 'Sort',
                           initialValue: _sort,
-                          onSelected: (v) => setState(() => _sort = v),
+                          onSelected: (v) => setState(() {
+                            if (v is _SermonSort) {
+                              _sort = v;
+                            } else {
+                              _groupBySeries = !_groupBySeries;
+                            }
+                          }),
                           itemBuilder: (context) => [
                             for (final entry in _sortLabels.entries)
-                              CheckedPopupMenuItem(
+                              CheckedPopupMenuItem<Object>(
                                 value: entry.key,
                                 checked: _sort == entry.key,
                                 child: Text(entry.value),
                               ),
+                            const PopupMenuDivider(),
+                            CheckedPopupMenuItem<Object>(
+                              value: _groupBySeriesMenuValue,
+                              checked: _groupBySeries,
+                              child: const Text('Group by series'),
+                            ),
                           ],
                         ),
                         IconButton(
@@ -208,89 +255,40 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
                           'Try a different search or clear the tag filter.',
                     );
                   }
+                  if (!_groupBySeries) {
+                    return ListView.separated(
+                      itemCount: visible.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (context, index) => _buildSermonTile(
+                        context,
+                        visible[index],
+                        tagsBySermon[visible[index].id] ?? const <TagData>[],
+                      ),
+                    );
+                  }
+                  // Grouped view: flatten the sections into one row list so a
+                  // single ListView keeps scrolling (and lazy building) cheap.
+                  final rows = <Object>[
+                    for (final group in groupSermonsBySeries(visible)) ...[
+                      group,
+                      ...group.sermons,
+                    ],
+                  ];
                   return ListView.separated(
-                    itemCount: visible.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemCount: rows.length,
+                    separatorBuilder: (_, index) => rows[index + 1] is Sermon
+                        ? const Divider(height: 1)
+                        : const SizedBox.shrink(),
                     itemBuilder: (context, index) {
-                      final sermon = visible[index];
-                      final tags = tagsBySermon[sermon.id] ?? const <TagData>[];
-                      return ListTile(
-                        title: Text(
-                          sermon.title.isEmpty
-                              ? 'Untitled Sermon'
-                              : sermon.title,
-                        ),
-                        subtitle: _buildSubtitle(context, sermon, tags),
-                        isThreeLine: tags.isNotEmpty,
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                sermon.pinned
-                                    ? Icons.push_pin
-                                    : Icons.push_pin_outlined,
-                                size: 20,
-                              ),
-                              color: sermon.pinned
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                              tooltip: sermon.pinned ? 'Unpin' : 'Pin to top',
-                              onPressed: () => ref
-                                  .read(sermonActionProvider)
-                                  .setPinned(sermon.id, !sermon.pinned),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline, size: 20),
-                              tooltip: 'Delete Sermon',
-                              onPressed: () async {
-                                final confirm = await showDialog<bool>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Delete Sermon'),
-                                    content: const Text(
-                                      'Are you sure you want to delete this sermon?',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        child: const Text('Delete'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                                if (confirm == true) {
-                                  ref
-                                      .read(sermonActionProvider)
-                                      .deleteSermon(sermon.id);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          if (MediaQuery.sizeOf(context).width >
-                              Breakpoints.compact) {
-                            ref
-                                .read(selectedSermonIdProvider.notifier)
-                                .set(sermon.id);
-                          } else {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => SermonEditorScreen(
-                                  sermonId: sermon.id,
-                                  isFullScreen: true,
-                                ),
-                              ),
-                            );
-                          }
-                        },
+                      final row = rows[index];
+                      if (row is SeriesGroup) {
+                        return _buildSeriesHeader(context, row);
+                      }
+                      final sermon = row as Sermon;
+                      return _buildSermonTile(
+                        context,
+                        sermon,
+                        tagsBySermon[sermon.id] ?? const <TagData>[],
                       );
                     },
                   );
@@ -305,6 +303,90 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSeriesHeader(BuildContext context, SeriesGroup group) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      color: theme.colorScheme.surfaceContainerHighest,
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+      child: Text(
+        '${group.name} (${group.sermons.length})',
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSermonTile(
+    BuildContext context,
+    Sermon sermon,
+    List<TagData> tags,
+  ) {
+    return ListTile(
+      title: Text(sermon.title.isEmpty ? 'Untitled Sermon' : sermon.title),
+      subtitle: _buildSubtitle(context, sermon, tags),
+      isThreeLine: tags.isNotEmpty && !_groupBySeries,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              sermon.pinned ? Icons.push_pin : Icons.push_pin_outlined,
+              size: 20,
+            ),
+            color: sermon.pinned ? Theme.of(context).colorScheme.primary : null,
+            tooltip: sermon.pinned ? 'Unpin' : 'Pin to top',
+            onPressed: () => ref
+                .read(sermonActionProvider)
+                .setPinned(sermon.id, !sermon.pinned),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 20),
+            tooltip: 'Delete Sermon',
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete Sermon'),
+                  content: const Text(
+                    'Are you sure you want to delete this sermon?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Delete'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                ref.read(sermonActionProvider).deleteSermon(sermon.id);
+              }
+            },
+          ),
+        ],
+      ),
+      onTap: () {
+        if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
+          ref.read(selectedSermonIdProvider.notifier).set(sermon.id);
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  SermonEditorScreen(sermonId: sermon.id, isFullScreen: true),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -356,15 +438,17 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
     );
   }
 
-  Widget _buildSubtitle(
+  /// The tile subtitle: the series name (omitted when the list is grouped by
+  /// series — the section header already shows it) plus any tag chips.
+  Widget? _buildSubtitle(
     BuildContext context,
     Sermon sermon,
     List<TagData> tags,
   ) {
     final series = (sermon.series?.isNotEmpty ?? false)
         ? sermon.series!
-        : 'No Series';
-    if (tags.isEmpty) return Text(series);
+        : kNoSeriesLabel;
+    if (tags.isEmpty) return _groupBySeries ? null : Text(series);
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Wrap(
@@ -372,7 +456,7 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
         runSpacing: 4,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Text(series),
+          if (!_groupBySeries) Text(series),
           for (final tag in tags) _TagChip(tag: tag, onTap: () => _pinTag(tag)),
         ],
       ),
@@ -452,21 +536,23 @@ class _TagChip extends StatelessWidget {
 /// instant `showDialog` returns, which raced the dismiss animation and threw
 /// "TextEditingController used after disposed". Returns the entered
 /// (title, series) via [Navigator.pop], or null on cancel.
-class _NewSermonDialog extends StatefulWidget {
+class _NewSermonDialog extends ConsumerStatefulWidget {
   const _NewSermonDialog();
 
   @override
-  State<_NewSermonDialog> createState() => _NewSermonDialogState();
+  ConsumerState<_NewSermonDialog> createState() => _NewSermonDialogState();
 }
 
-class _NewSermonDialogState extends State<_NewSermonDialog> {
+class _NewSermonDialogState extends ConsumerState<_NewSermonDialog> {
   final _titleController = TextEditingController();
   final _seriesController = TextEditingController();
+  final _seriesFocusNode = FocusNode();
 
   @override
   void dispose() {
     _titleController.dispose();
     _seriesController.dispose();
+    _seriesFocusNode.dispose();
     super.dispose();
   }
 
@@ -482,8 +568,10 @@ class _NewSermonDialogState extends State<_NewSermonDialog> {
             autofocus: true,
             decoration: const InputDecoration(labelText: 'Title'),
           ),
-          TextField(
+          SeriesAutocompleteField(
             controller: _seriesController,
+            focusNode: _seriesFocusNode,
+            options: ref.watch(sermonSeriesNamesProvider),
             decoration: const InputDecoration(labelText: 'Series (Optional)'),
           ),
         ],

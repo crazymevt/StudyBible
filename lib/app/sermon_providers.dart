@@ -17,6 +17,22 @@ final allSermonsProvider = StreamProvider<List<Sermon>>((ref) {
       .watch();
 });
 
+/// Distinct series names across all sermons, for autocomplete suggestions.
+/// Names are deduplicated case-insensitively (keeping the first spelling seen)
+/// and sorted alphabetically.
+final sermonSeriesNamesProvider = Provider<List<String>>((ref) {
+  final sermons =
+      ref.watch(allSermonsProvider).asData?.value ?? const <Sermon>[];
+  final byKey = <String, String>{};
+  for (final sermon in sermons) {
+    final name = (sermon.series ?? '').trim();
+    if (name.isEmpty) continue;
+    byKey.putIfAbsent(name.toLowerCase(), () => name);
+  }
+  return byKey.values.toList()
+    ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+});
+
 /// Tags for every sermon at once, as `sermonId -> tags` (each list sorted by
 /// name). The sermons panel uses this to show tag chips per row and to filter
 /// the list by tag without opening an N-per-row subscription via
