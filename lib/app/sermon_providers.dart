@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' as drift;
 import '../data/user_store.dart';
 import '../data/fts_text.dart';
+import '../domain/natural_compare.dart';
 import 'tag_providers.dart';
 import 'user_providers.dart';
 import 'sync_service.dart'; // for deviceIdProvider
@@ -17,9 +18,17 @@ final allSermonsProvider = StreamProvider<List<Sermon>>((ref) {
       .watch();
 });
 
+/// Canonical stored form of a series name: trimmed, with blank collapsing to
+/// null ("no series"). Applied on every create/update write so grouping and
+/// autocomplete never meet stray-whitespace variants of one series.
+String? normalizeSeriesName(String? raw) {
+  final name = raw?.trim() ?? '';
+  return name.isEmpty ? null : name;
+}
+
 /// Distinct series names across all sermons, for autocomplete suggestions.
 /// Names are deduplicated case-insensitively (keeping the first spelling seen)
-/// and sorted alphabetically.
+/// and sorted naturally ("Week 2" before "Week 10").
 final sermonSeriesNamesProvider = Provider<List<String>>((ref) {
   final sermons =
       ref.watch(allSermonsProvider).asData?.value ?? const <Sermon>[];
@@ -29,8 +38,7 @@ final sermonSeriesNamesProvider = Provider<List<String>>((ref) {
     if (name.isEmpty) continue;
     byKey.putIfAbsent(name.toLowerCase(), () => name);
   }
-  return byKey.values.toList()
-    ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  return byKey.values.toList()..sort(naturalCompare);
 });
 
 /// Tags for every sermon at once, as `sermonId -> tags` (each list sorted by
@@ -161,7 +169,7 @@ class SermonActionNotifier {
       updatedAt: now,
       deviceId: deviceId,
       title: title,
-      series: drift.Value(series),
+      series: drift.Value(normalizeSeriesName(series)),
       content: effectiveContent,
       contentPlain: drift.Value(deltaToPlainText(effectiveContent)),
     );
@@ -175,6 +183,11 @@ class SermonActionNotifier {
   /// Writes the supplied fields and returns the `updatedAt` timestamp stamped on
   /// the row. The editor tracks this value so it can tell its own saves apart
   /// from a remote edit that landed underneath an open document.
+  ///
+  /// [series] is normalized via [normalizeSeriesName] before writing: null
+  /// leaves the stored series untouched, while a blank/whitespace-only value
+  /// clears it — so callers saving the series field must always pass its
+  /// current text, even when empty.
   Future<int> updateSermon(
     String id, {
     String? title,
@@ -187,7 +200,7 @@ class SermonActionNotifier {
         updatedAt: drift.Value(now),
         title: title != null ? drift.Value(title) : const drift.Value.absent(),
         series: series != null
-            ? drift.Value(series)
+            ? drift.Value(normalizeSeriesName(series))
             : const drift.Value.absent(),
         content: content != null
             ? drift.Value(content)
@@ -198,6 +211,40 @@ class SermonActionNotifier {
       ),
     );
     return now;
+  }
+
+  /// Renames every non-deleted sermon in series [from] to [to], returning how
+  /// many sermons changed. [from] is matched with the same trim +
+  /// case-insensitive normalization the grouped sermon list uses, so a rename
+  /// heals any stray spellings of one series; renaming onto another existing
+  /// series' name merges the two. Bumps each row's [updatedAt] so the rename
+  /// syncs (Last-Writer-Wins).
+  Future<int> renameSeries(String from, String to) async {
+    final key = from.trim().toLowerCase();
+    final newName = normalizeSeriesName(to);
+    if (key.isEmpty || newName == null) return 0;
+    final all = await (_store.select(
+      _store.sermons,
+    )..where((t) => t.deleted.equals(false))).get();
+    final targets = [
+      for (final s in all)
+        if ((s.series ?? '').trim().toLowerCase() == key) s.id,
+    ];
+    if (targets.isEmpty) return 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _store.batch((batch) {
+      for (final id in targets) {
+        batch.update(
+          _store.sermons,
+          SermonsCompanion(
+            series: drift.Value(newName),
+            updatedAt: drift.Value(now),
+          ),
+          where: (t) => t.id.equals(id),
+        );
+      }
+    });
+    return targets.length;
   }
 
   /// Pins or unpins a sermon so it sits at the top of the list regardless of

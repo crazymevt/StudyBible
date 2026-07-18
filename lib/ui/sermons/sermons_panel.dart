@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
 import '../../app/sermon_providers.dart';
+import '../../app/shared_prefs.dart';
 import '../../app/tag_providers.dart';
 import '../../data/user_store.dart';
+import '../../domain/natural_compare.dart';
 import '../tags/tag_palette.dart';
 import 'export_dialog.dart';
 import 'series_autocomplete_field.dart';
@@ -26,9 +30,18 @@ const Map<_SermonSort, String> _sortLabels = {
 /// otherwise populated with [_SermonSort] values.
 const _groupBySeriesMenuValue = 'groupBySeries';
 
-/// One section of the grouped sermon list: the display name of the series and
-/// its sermons in list order.
-typedef SeriesGroup = ({String name, List<Sermon> sermons});
+/// Actions in a series section header's overflow menu.
+enum _SeriesAction { rename, export }
+
+/// Persisted list preferences, so the chosen sort and grouping survive
+/// closing the panel (and the app).
+const _kSortPrefKey = 'sermonListSort';
+const _kGroupBySeriesPrefKey = 'sermonListGroupBySeries';
+
+/// One section of the grouped sermon list: the case-insensitive match key
+/// ('' for the no-series group), the display name of the series, and its
+/// sermons in list order.
+typedef SeriesGroup = ({String key, String name, List<Sermon> sermons});
 
 /// Label for the section holding sermons without a series.
 const String kNoSeriesLabel = 'No Series';
@@ -47,12 +60,36 @@ List<SeriesGroup> groupSermonsBySeries(List<Sermon> sorted) {
     final key = display.toLowerCase();
     final group = groups.putIfAbsent(
       key,
-      () => (name: display.isEmpty ? kNoSeriesLabel : display, sermons: []),
+      () => (
+        key: key,
+        name: display.isEmpty ? kNoSeriesLabel : display,
+        sermons: [],
+      ),
     );
     group.sermons.add(sermon);
   }
   final noSeries = groups.remove('');
   return [...groups.values, ?noSeries];
+}
+
+/// Reorders [groups] by series name (naturally, so "Week 2" precedes
+/// "Week 10"), keeping the no-series group last. Used when a title sort is
+/// active: there the best-ranked-sermon order from [groupSermonsBySeries]
+/// would scatter the sections (a series is placed by its first sermon's
+/// title, not its own name) instead of listing them A–Z.
+@visibleForTesting
+List<SeriesGroup> sortSeriesGroupsByName(
+  List<SeriesGroup> groups, {
+  bool descending = false,
+}) {
+  final named = [
+    for (final group in groups)
+      if (group.key.isNotEmpty) group,
+  ]..sort(
+      (a, b) =>
+          descending ? naturalCompare(b.name, a.name) : naturalCompare(a.name, b.name),
+    );
+  return [...named, ...groups.where((g) => g.key.isEmpty)];
 }
 
 class SermonsPanel extends ConsumerStatefulWidget {
@@ -69,6 +106,21 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
   bool _groupBySeries = false;
   String? _activeTagId;
   String? _activeTagName;
+
+  /// Series keys ([SeriesGroup.key]) whose sections are collapsed. Session
+  /// state only; ignored while a search or tag filter is active so matches
+  /// inside a collapsed series still show up.
+  final _collapsedSeries = <String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    final prefs = ref.read(sharedPreferencesProvider);
+    _sort =
+        _SermonSort.values.asNameMap()[prefs.getString(_kSortPrefKey)] ??
+        _SermonSort.createdDesc;
+    _groupBySeries = prefs.getBool(_kGroupBySeriesPrefKey) ?? false;
+  }
 
   @override
   void dispose() {
@@ -106,9 +158,9 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
       if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
       switch (_sort) {
         case _SermonSort.titleAsc:
-          return _titleKey(a).compareTo(_titleKey(b));
+          return naturalCompare(_titleKey(a), _titleKey(b));
         case _SermonSort.titleDesc:
-          return _titleKey(b).compareTo(_titleKey(a));
+          return naturalCompare(_titleKey(b), _titleKey(a));
         case _SermonSort.createdDesc:
           return b.createdAt.compareTo(a.createdAt);
         case _SermonSort.createdAsc:
@@ -171,13 +223,25 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
                           icon: const Icon(Icons.sort),
                           tooltip: 'Sort',
                           initialValue: _sort,
-                          onSelected: (v) => setState(() {
-                            if (v is _SermonSort) {
-                              _sort = v;
-                            } else {
-                              _groupBySeries = !_groupBySeries;
-                            }
-                          }),
+                          onSelected: (v) {
+                            final prefs = ref.read(sharedPreferencesProvider);
+                            setState(() {
+                              if (v is _SermonSort) {
+                                _sort = v;
+                                unawaited(
+                                  prefs.setString(_kSortPrefKey, v.name),
+                                );
+                              } else {
+                                _groupBySeries = !_groupBySeries;
+                                unawaited(
+                                  prefs.setBool(
+                                    _kGroupBySeriesPrefKey,
+                                    _groupBySeries,
+                                  ),
+                                );
+                              }
+                            });
+                          },
                           itemBuilder: (context) => [
                             for (final entry in _sortLabels.entries)
                               CheckedPopupMenuItem<Object>(
@@ -268,12 +332,25 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
                   }
                   // Grouped view: flatten the sections into one row list so a
                   // single ListView keeps scrolling (and lazy building) cheap.
-                  final rows = <Object>[
-                    for (final group in groupSermonsBySeries(visible)) ...[
-                      group,
-                      ...group.sermons,
-                    ],
-                  ];
+                  // While filtering, collapse is suspended (all sections
+                  // expanded, headers not tappable) so no match stays hidden.
+                  final filtering =
+                      _query.trim().isNotEmpty || _activeTagId != null;
+                  var groups = groupSermonsBySeries(visible);
+                  if (_sort == _SermonSort.titleAsc ||
+                      _sort == _SermonSort.titleDesc) {
+                    groups = sortSeriesGroupsByName(
+                      groups,
+                      descending: _sort == _SermonSort.titleDesc,
+                    );
+                  }
+                  final rows = <Object>[];
+                  for (final group in groups) {
+                    rows.add(group);
+                    if (filtering || !_collapsedSeries.contains(group.key)) {
+                      rows.addAll(group.sermons);
+                    }
+                  }
                   return ListView.separated(
                     itemCount: rows.length,
                     separatorBuilder: (_, index) => rows[index + 1] is Sermon
@@ -282,7 +359,14 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
                     itemBuilder: (context, index) {
                       final row = rows[index];
                       if (row is SeriesGroup) {
-                        return _buildSeriesHeader(context, row);
+                        return _buildSeriesHeader(
+                          context,
+                          row,
+                          collapsible: !filtering,
+                          collapsed:
+                              !filtering &&
+                              _collapsedSeries.contains(row.key),
+                        );
                       }
                       final sermon = row as Sermon;
                       return _buildSermonTile(
@@ -306,17 +390,101 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
     );
   }
 
-  Widget _buildSeriesHeader(BuildContext context, SeriesGroup group) {
+  Widget _buildSeriesHeader(
+    BuildContext context,
+    SeriesGroup group, {
+    required bool collapsible,
+    required bool collapsed,
+  }) {
     final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
+    return Material(
       color: theme.colorScheme.surfaceContainerHighest,
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
-      child: Text(
-        '${group.name} (${group.sermons.length})',
-        style: theme.textTheme.titleSmall?.copyWith(
-          color: theme.colorScheme.primary,
-          fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: collapsible
+            ? () => setState(() {
+                if (!_collapsedSeries.remove(group.key)) {
+                  _collapsedSeries.add(group.key);
+                }
+              })
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 2, 4, 2),
+          child: Row(
+            children: [
+              if (collapsible)
+                Icon(
+                  collapsed ? Icons.chevron_right : Icons.expand_more,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                )
+              else
+                const SizedBox(width: 20),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  '${group.name} (${group.sermons.length})',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              PopupMenuButton<_SeriesAction>(
+                iconSize: 18,
+                padding: EdgeInsets.zero,
+                tooltip: 'Series options',
+                onSelected: (action) => switch (action) {
+                  _SeriesAction.rename => _renameSeries(group),
+                  _SeriesAction.export =>
+                    ExportDialog.show(context, group.sermons),
+                },
+                itemBuilder: (context) => [
+                  // The no-series section isn't a series, so there's nothing
+                  // to rename.
+                  if (group.key.isNotEmpty)
+                    const PopupMenuItem(
+                      value: _SeriesAction.rename,
+                      child: ListTile(
+                        leading: Icon(Icons.drive_file_rename_outline),
+                        title: Text('Rename Series'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  const PopupMenuItem(
+                    value: _SeriesAction.export,
+                    child: ListTile(
+                      leading: Icon(Icons.file_upload),
+                      title: Text('Export Series'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _renameSeries(SeriesGroup group) async {
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) => _RenameSeriesDialog(currentName: group.name),
+    );
+    if (newName == null || newName.trim() == group.name || !mounted) return;
+
+    final count = await ref
+        .read(sermonActionProvider)
+        .renameSeries(group.name, newName);
+    if (!mounted) return;
+    // The old key's collapse entry is stale either way (the group now lives
+    // under the new name, or merged into an existing one).
+    setState(() => _collapsedSeries.remove(group.key));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Renamed series for $count ${count == 1 ? 'sermon' : 'sermons'}.',
         ),
       ),
     );
@@ -330,7 +498,10 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
     return ListTile(
       title: Text(sermon.title.isEmpty ? 'Untitled Sermon' : sermon.title),
       subtitle: _buildSubtitle(context, sermon, tags),
-      isThreeLine: tags.isNotEmpty && !_groupBySeries,
+      // Also when grouped (where the subtitle is only tag chips): the chips
+      // can still wrap to a second line, and a two-line subtitle in a
+      // single-line-height tile gets clipped.
+      isThreeLine: tags.isNotEmpty,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -582,14 +753,79 @@ class _NewSermonDialogState extends ConsumerState<_NewSermonDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
+          // The raw text is fine here: createSermon normalizes it (trims,
+          // blank → null).
           onPressed: () => Navigator.pop(context, (
             title: _titleController.text,
-            series: _seriesController.text.isNotEmpty
-                ? _seriesController.text
-                : null,
+            series: _seriesController.text,
           )),
           child: const Text('Create'),
         ),
+      ],
+    );
+  }
+}
+
+/// Prompts for a series' new name, suggesting existing series while typing —
+/// picking one merges the two series. A [StatefulWidget] for the same
+/// dispose-after-route-teardown reason as [_NewSermonDialog]. Pops with the
+/// entered name, or null on cancel.
+class _RenameSeriesDialog extends ConsumerStatefulWidget {
+  final String currentName;
+
+  const _RenameSeriesDialog({required this.currentName});
+
+  @override
+  ConsumerState<_RenameSeriesDialog> createState() =>
+      _RenameSeriesDialogState();
+}
+
+class _RenameSeriesDialogState extends ConsumerState<_RenameSeriesDialog> {
+  late final _nameController = TextEditingController(
+    text: widget.currentName,
+  );
+  final _nameFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _nameFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) return;
+    Navigator.pop(context, name);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Rename Series'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Renames the series on every sermon in "${widget.currentName}". '
+            'Renaming to an existing series merges them.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          SeriesAutocompleteField(
+            controller: _nameController,
+            focusNode: _nameFocusNode,
+            options: ref.watch(sermonSeriesNamesProvider),
+            decoration: const InputDecoration(labelText: 'Series name'),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(onPressed: _submit, child: const Text('Rename')),
       ],
     );
   }

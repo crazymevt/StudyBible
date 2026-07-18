@@ -160,6 +160,10 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
   String _currentContentJson() =>
       jsonEncode(_controller.document.toDelta().toJson());
 
+  /// The series field's text in stored form (trimmed, blank → null) — what a
+  /// save of the current state would persist.
+  String? get _currentSeries => normalizeSeriesName(_seriesController.text);
+
   String _formatReadingTime(Duration d) {
     final minutes = (d.inSeconds / 60).round();
     return minutes < 1 ? '< 1 min' : '~$minutes min';
@@ -198,14 +202,15 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
 
   Future<void> _saveSermonMetadata() async {
     if (_conflictDetected || _internalWrite) return;
+    // The series text is always passed (updateSermon trims it and treats
+    // blank as "clear") — mapping empty to null here would make clearing the
+    // field a silent no-op, since updateSermon takes null as "don't touch".
     final ts = await ref
         .read(sermonActionProvider)
         .updateSermon(
           widget.sermonId,
           title: _titleController.text,
-          series: _seriesController.text.isNotEmpty
-              ? _seriesController.text
-              : null,
+          series: _seriesController.text,
         );
     _loadedUpdatedAt = ts;
   }
@@ -249,10 +254,13 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       return;
     }
     if (sermon.deleted || sermon.updatedAt <= _loadedUpdatedAt) return;
+    // Series compares in stored (normalized) form: saves trim the field's
+    // text, so comparing against the raw text would misread our own save
+    // echoing back (e.g. with a trailing space in the field) as a conflict.
     final changed =
         sermon.content != _currentContentJson() ||
         sermon.title != _titleController.text ||
-        (sermon.series ?? '') != _seriesController.text;
+        sermon.series != _currentSeries;
     if (changed) {
       setState(() {
         _conflictDetected = true;
@@ -285,9 +293,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         .updateSermon(
           widget.sermonId,
           title: _titleController.text,
-          series: _seriesController.text.isNotEmpty
-              ? _seriesController.text
-              : null,
+          series: _seriesController.text,
           content: _currentContentJson(),
         );
     _loadedUpdatedAt = ts;
@@ -311,9 +317,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         .saveRevision(
           sermonId: widget.sermonId,
           title: _titleController.text,
-          series: _seriesController.text.isNotEmpty
-              ? _seriesController.text
-              : null,
+          series: _currentSeries,
           content: _currentContentJson(),
           label: 'Your version before reload',
           kind: RevisionKind.restore,
@@ -372,9 +376,7 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       context,
       sermonId: widget.sermonId,
       currentTitle: _titleController.text,
-      currentSeries: _seriesController.text.isNotEmpty
-          ? _seriesController.text
-          : null,
+      currentSeries: _currentSeries,
       currentContent: _currentContentJson(),
     );
     if (restored == null || !mounted) return;

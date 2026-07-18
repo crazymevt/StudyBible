@@ -1,10 +1,20 @@
 import 'dart:convert';
 
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:study_bible/app/achievement_service.dart';
 import 'package:study_bible/app/sermon_providers.dart';
+import 'package:study_bible/app/sync_service.dart';
+import 'package:study_bible/app/user_providers.dart';
 import 'package:study_bible/data/user_store.dart';
 import 'package:study_bible/ui/sermons/sermons_panel.dart';
+
+class _NoopAchievementService extends AchievementService {
+  _NoopAchievementService(super.ref);
+  @override
+  Future<void> evaluateAchievements() async {}
+}
 
 String _delta(String text) => jsonEncode([
   {'insert': '$text\n'},
@@ -65,6 +75,25 @@ void main() {
     });
   });
 
+  group('sortSeriesGroupsByName', () {
+    test('orders groups naturally by name, keeping No Series last', () {
+      final groups = groupSermonsBySeries([
+        _sermon('1', 'Zeal for Your House', 'Week 10'),
+        _sermon('2', 'B', null),
+        _sermon('3', 'Abide', 'Week 2'),
+        _sermon('4', 'C', 'Advent'),
+      ]);
+      expect(
+        sortSeriesGroupsByName(groups).map((g) => g.name),
+        ['Advent', 'Week 2', 'Week 10', kNoSeriesLabel],
+      );
+      expect(
+        sortSeriesGroupsByName(groups, descending: true).map((g) => g.name),
+        ['Week 10', 'Week 2', 'Advent', kNoSeriesLabel],
+      );
+    });
+  });
+
   group('sermonSeriesNamesProvider', () {
     test('dedupes case-insensitively, trims, drops blanks, sorts', () async {
       final container = ProviderContainer(
@@ -87,6 +116,108 @@ void main() {
       await container.read(allSermonsProvider.future);
 
       expect(container.read(sermonSeriesNamesProvider), ['advent', 'Romans']);
+    });
+
+    test('sorts naturally, so "Week 2" precedes "Week 10"', () async {
+      final container = ProviderContainer(
+        overrides: [
+          allSermonsProvider.overrideWith(
+            (ref) => Stream.value([
+              _sermon('1', 'A', 'Week 10'),
+              _sermon('2', 'B', 'Week 2'),
+            ]),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      container.listen(allSermonsProvider, (_, _) {});
+      await container.read(allSermonsProvider.future);
+
+      expect(container.read(sermonSeriesNamesProvider), ['Week 2', 'Week 10']);
+    });
+  });
+
+  group('SermonActionNotifier series writes', () {
+    late UserStore store;
+    late ProviderContainer container;
+
+    setUp(() {
+      store = UserStore(NativeDatabase.memory());
+      container = ProviderContainer(
+        overrides: [
+          userStoreProvider.overrideWithValue(store),
+          deviceIdProvider.overrideWith((ref) async => 'A'),
+          achievementServiceProvider.overrideWith(
+            (ref) => _NoopAchievementService(ref),
+          ),
+        ],
+      );
+    });
+
+    tearDown(() async {
+      container.dispose();
+      await store.close();
+    });
+
+    Future<Sermon> fetch(String id) => (store.select(
+      store.sermons,
+    )..where((t) => t.id.equals(id))).getSingle();
+
+    test('createSermon and updateSermon store the series trimmed', () async {
+      final actions = container.read(sermonActionProvider);
+      final sermon = await actions.createSermon('A', series: ' Grace ');
+      expect(sermon.series, 'Grace');
+
+      await actions.updateSermon(sermon.id, series: ' Hope ');
+      expect((await fetch(sermon.id)).series, 'Hope');
+    });
+
+    test('updateSermon clears the series on blank text', () async {
+      // Regression: blank used to be mapped to null by the editor, which
+      // updateSermon takes as "leave untouched" — clearing the field in the
+      // editor never persisted.
+      final actions = container.read(sermonActionProvider);
+      final sermon = await actions.createSermon('A', series: 'Grace');
+
+      await actions.updateSermon(sermon.id, series: '  ');
+      expect((await fetch(sermon.id)).series, isNull);
+
+      // And null still means "leave untouched".
+      await actions.updateSermon(sermon.id, series: 'Grace');
+      await actions.updateSermon(sermon.id, title: 'B');
+      expect((await fetch(sermon.id)).series, 'Grace');
+    });
+
+    test('renameSeries renames all spellings of the series and syncs', () async {
+      final actions = container.read(sermonActionProvider);
+      final a = await actions.createSermon('A', series: 'Advent');
+      final b = await actions.createSermon('B', series: 'advent ');
+      final c = await actions.createSermon('C', series: 'Romans');
+      final d = await actions.createSermon('D');
+
+      final count = await actions.renameSeries('Advent', ' Christmas ');
+      expect(count, 2);
+
+      final renamedA = await fetch(a.id);
+      expect(renamedA.series, 'Christmas');
+      expect((await fetch(b.id)).series, 'Christmas');
+      // updatedAt must advance so the rename wins under sync LWW (>= because
+      // both writes can land in the same millisecond).
+      expect(renamedA.updatedAt, greaterThanOrEqualTo(a.updatedAt));
+      // Other series and no-series sermons are untouched.
+      expect((await fetch(c.id)).series, 'Romans');
+      expect((await fetch(d.id)).series, isNull);
+    });
+
+    test('renameSeries ignores deleted sermons and blank input', () async {
+      final actions = container.read(sermonActionProvider);
+      final a = await actions.createSermon('A', series: 'Advent');
+      await actions.deleteSermon(a.id);
+
+      expect(await actions.renameSeries('Advent', 'Christmas'), 0);
+      expect((await fetch(a.id)).series, 'Advent');
+      expect(await actions.renameSeries('', 'Christmas'), 0);
+      expect(await actions.renameSeries('Advent', '   '), 0);
     });
   });
 }
