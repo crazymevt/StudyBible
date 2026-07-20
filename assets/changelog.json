@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.7.20+1",
+    "date": "2026-07-20",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "rename/collapse series sections, persist grouping, natural sort",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "group sermons by series with series-name autocomplete",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.16+1",
     "date": "2026-07-16",
     "features": [
