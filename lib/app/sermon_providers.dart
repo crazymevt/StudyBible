@@ -26,6 +26,28 @@ String? normalizeSeriesName(String? raw) {
   return name.isEmpty ? null : name;
 }
 
+/// Whether the stored sermon [row] holds something other than what an open
+/// editor currently shows -- the test the editor uses to tell a real remote
+/// (synced) edit apart from its own write echoing back through the stream.
+///
+/// Both series values go through [normalizeSeriesName] so the comparison is
+/// symmetric. Normalizing one side only produces false conflicts: against the
+/// raw field text, the editor's own trimming save looks like a remote edit;
+/// against the raw row, a row that predates write-normalization (stored as
+/// "Faith " or "" by an older build or an older peer) looks like a remote
+/// series edit on any unrelated update, such as a pin toggle synced from
+/// another device.
+bool sermonRowDiffersFromEditor({
+  required Sermon row,
+  required String contentJson,
+  required String titleText,
+  required String seriesText,
+}) {
+  return row.content != contentJson ||
+      row.title != titleText ||
+      normalizeSeriesName(row.series) != normalizeSeriesName(seriesText);
+}
+
 /// Distinct series names across all sermons, for autocomplete suggestions.
 /// Names are deduplicated case-insensitively (keeping the first spelling seen)
 /// and sorted naturally ("Week 2" before "Week 10").
