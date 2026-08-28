@@ -254,13 +254,12 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
       return;
     }
     if (sermon.deleted || sermon.updatedAt <= _loadedUpdatedAt) return;
-    // Series compares in stored (normalized) form: saves trim the field's
-    // text, so comparing against the raw text would misread our own save
-    // echoing back (e.g. with a trailing space in the field) as a conflict.
-    final changed =
-        sermon.content != _currentContentJson() ||
-        sermon.title != _titleController.text ||
-        sermon.series != _currentSeries;
+    final changed = sermonRowDiffersFromEditor(
+      row: sermon,
+      contentJson: _currentContentJson(),
+      titleText: _titleController.text,
+      seriesText: _seriesController.text,
+    );
     if (changed) {
       setState(() {
         _conflictDetected = true;

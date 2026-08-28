@@ -15,6 +15,14 @@ class SeriesAutocompleteField extends StatelessWidget {
   final bool readOnly;
   final InputDecoration decoration;
 
+  /// Called when the user submits the field (Enter). Runs after the
+  /// autocomplete has had its chance to commit a highlighted suggestion, so
+  /// the controller already holds the final text. Null (the default) leaves
+  /// Enter doing nothing beyond that, which is what the always-visible fields
+  /// in the editor and the new-sermon dialog want; a dialog whose whole job is
+  /// this one field passes its confirm action here.
+  final VoidCallback? onSubmitted;
+
   const SeriesAutocompleteField({
     super.key,
     required this.controller,
@@ -22,6 +30,7 @@ class SeriesAutocompleteField extends StatelessWidget {
     required this.options,
     this.readOnly = false,
     this.decoration = const InputDecoration(labelText: 'Series'),
+    this.onSubmitted,
   });
 
   @override
@@ -46,7 +55,10 @@ class SeriesAutocompleteField extends StatelessWidget {
               focusNode: fieldFocusNode,
               readOnly: readOnly,
               decoration: decoration,
-              onSubmitted: (_) => onFieldSubmitted(),
+              onSubmitted: (_) {
+                onFieldSubmitted();
+                onSubmitted?.call();
+              },
             );
           },
       optionsViewBuilder: (context, onSelected, opts) {

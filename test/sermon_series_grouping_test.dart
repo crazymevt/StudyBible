@@ -20,19 +20,24 @@ String _delta(String text) => jsonEncode([
   {'insert': '$text\n'},
 ]);
 
-Sermon _sermon(String id, String title, String? series, {int createdAt = 0}) =>
-    Sermon(
-      id: id,
-      createdAt: createdAt,
-      updatedAt: createdAt,
-      deviceId: 'A',
-      deleted: false,
-      title: title,
-      series: series,
-      content: _delta(title),
-      contentPlain: title,
-      pinned: false,
-    );
+Sermon _sermon(
+  String id,
+  String title,
+  String? series, {
+  int createdAt = 0,
+  bool pinned = false,
+}) => Sermon(
+  id: id,
+  createdAt: createdAt,
+  updatedAt: createdAt,
+  deviceId: 'A',
+  deleted: false,
+  title: title,
+  series: series,
+  content: _delta(title),
+  contentPlain: title,
+  pinned: pinned,
+);
 
 void main() {
   group('groupSermonsBySeries', () {
@@ -83,14 +88,61 @@ void main() {
         _sermon('3', 'Abide', 'Week 2'),
         _sermon('4', 'C', 'Advent'),
       ]);
-      expect(
-        sortSeriesGroupsByName(groups).map((g) => g.name),
-        ['Advent', 'Week 2', 'Week 10', kNoSeriesLabel],
-      );
+      expect(sortSeriesGroupsByName(groups).map((g) => g.name), [
+        'Advent',
+        'Week 2',
+        'Week 10',
+        kNoSeriesLabel,
+      ]);
       expect(
         sortSeriesGroupsByName(groups, descending: true).map((g) => g.name),
         ['Week 10', 'Week 2', 'Advent', kNoSeriesLabel],
       );
+    });
+
+    test('a section holding a pinned sermon sorts ahead of the rest', () {
+      // Regression: section order is the only place pinning can show in the
+      // grouped list, so sorting sections purely by name buried a pinned
+      // sermon at the bottom whenever its series sorted late.
+      final groups = groupSermonsBySeries([
+        _sermon('1', 'Beta', 'Zeal', pinned: true),
+        _sermon('2', 'Alpha', 'Advent'),
+        _sermon('3', 'Gamma', 'Romans'),
+      ]);
+      expect(sortSeriesGroupsByName(groups).map((g) => g.name), [
+        'Zeal',
+        'Advent',
+        'Romans',
+      ]);
+      // Still true sorting the other way.
+      expect(
+        sortSeriesGroupsByName(groups, descending: true).map((g) => g.name),
+        ['Zeal', 'Romans', 'Advent'],
+      );
+    });
+
+    test('pinned sections sort among themselves by name', () {
+      final groups = groupSermonsBySeries([
+        _sermon('1', 'Beta', 'Zeal', pinned: true),
+        _sermon('2', 'Alpha', 'Advent', pinned: true),
+        _sermon('3', 'Gamma', 'Romans'),
+      ]);
+      expect(sortSeriesGroupsByName(groups).map((g) => g.name), [
+        'Advent',
+        'Zeal',
+        'Romans',
+      ]);
+    });
+
+    test('a pinned sermon with no series stays in the trailing section', () {
+      final groups = groupSermonsBySeries([
+        _sermon('1', 'Beta', null, pinned: true),
+        _sermon('2', 'Alpha', 'Zeal'),
+      ]);
+      expect(sortSeriesGroupsByName(groups).map((g) => g.name), [
+        'Zeal',
+        kNoSeriesLabel,
+      ]);
     });
   });
 
@@ -188,26 +240,29 @@ void main() {
       expect((await fetch(sermon.id)).series, 'Grace');
     });
 
-    test('renameSeries renames all spellings of the series and syncs', () async {
-      final actions = container.read(sermonActionProvider);
-      final a = await actions.createSermon('A', series: 'Advent');
-      final b = await actions.createSermon('B', series: 'advent ');
-      final c = await actions.createSermon('C', series: 'Romans');
-      final d = await actions.createSermon('D');
+    test(
+      'renameSeries renames all spellings of the series and syncs',
+      () async {
+        final actions = container.read(sermonActionProvider);
+        final a = await actions.createSermon('A', series: 'Advent');
+        final b = await actions.createSermon('B', series: 'advent ');
+        final c = await actions.createSermon('C', series: 'Romans');
+        final d = await actions.createSermon('D');
 
-      final count = await actions.renameSeries('Advent', ' Christmas ');
-      expect(count, 2);
+        final count = await actions.renameSeries('Advent', ' Christmas ');
+        expect(count, 2);
 
-      final renamedA = await fetch(a.id);
-      expect(renamedA.series, 'Christmas');
-      expect((await fetch(b.id)).series, 'Christmas');
-      // updatedAt must advance so the rename wins under sync LWW (>= because
-      // both writes can land in the same millisecond).
-      expect(renamedA.updatedAt, greaterThanOrEqualTo(a.updatedAt));
-      // Other series and no-series sermons are untouched.
-      expect((await fetch(c.id)).series, 'Romans');
-      expect((await fetch(d.id)).series, isNull);
-    });
+        final renamedA = await fetch(a.id);
+        expect(renamedA.series, 'Christmas');
+        expect((await fetch(b.id)).series, 'Christmas');
+        // updatedAt must advance so the rename wins under sync LWW (>= because
+        // both writes can land in the same millisecond).
+        expect(renamedA.updatedAt, greaterThanOrEqualTo(a.updatedAt));
+        // Other series and no-series sermons are untouched.
+        expect((await fetch(c.id)).series, 'Romans');
+        expect((await fetch(d.id)).series, isNull);
+      },
+    );
 
     test('renameSeries ignores deleted sermons and blank input', () async {
       final actions = container.read(sermonActionProvider);
@@ -218,6 +273,113 @@ void main() {
       expect((await fetch(a.id)).series, 'Advent');
       expect(await actions.renameSeries('', 'Christmas'), 0);
       expect(await actions.renameSeries('Advent', '   '), 0);
+    });
+  });
+
+  group('sermonRowDiffersFromEditor', () {
+    // The editor's remote-change watcher: true means "flag a conflict".
+    test('a row matching the editor is not a conflict', () {
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', 'Advent'),
+          contentJson: _delta('A'),
+          titleText: 'A',
+          seriesText: 'Advent',
+        ),
+        isFalse,
+      );
+    });
+
+    test('an un-normalized stored series is not a conflict', () {
+      // Regression: write-normalization arrived without a backfill, so rows
+      // written by an older build (or an older peer) still hold ' Advent '
+      // or ''. Comparing those raw against the editor's normalized text made
+      // any unrelated remote update — a pin toggle, say — look like a remote
+      // series edit and raised a spurious conflict banner.
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', ' Advent '),
+          contentJson: _delta('A'),
+          titleText: 'A',
+          seriesText: ' Advent ',
+        ),
+        isFalse,
+      );
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', ''),
+          contentJson: _delta('A'),
+          titleText: 'A',
+          seriesText: '',
+        ),
+        isFalse,
+      );
+    });
+
+    test('the editor trimming its own save is not a conflict', () {
+      // The other direction: our write stored 'Advent' while the field still
+      // holds the untrimmed text the user typed.
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', 'Advent'),
+          contentJson: _delta('A'),
+          titleText: 'A',
+          seriesText: 'Advent ',
+        ),
+        isFalse,
+      );
+    });
+
+    test('a genuine series change is still a conflict', () {
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', 'Christmas'),
+          contentJson: _delta('A'),
+          titleText: 'A',
+          seriesText: 'Advent',
+        ),
+        isTrue,
+      );
+      // Clearing the series remotely, and setting one, both still register.
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', null),
+          contentJson: _delta('A'),
+          titleText: 'A',
+          seriesText: 'Advent',
+        ),
+        isTrue,
+      );
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', 'Advent'),
+          contentJson: _delta('A'),
+          titleText: 'A',
+          seriesText: '  ',
+        ),
+        isTrue,
+      );
+    });
+
+    test('content and title changes are still conflicts', () {
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', 'Advent'),
+          contentJson: _delta('rewritten'),
+          titleText: 'A',
+          seriesText: 'Advent',
+        ),
+        isTrue,
+      );
+      expect(
+        sermonRowDiffersFromEditor(
+          row: _sermon('1', 'A', 'Advent'),
+          contentJson: _delta('A'),
+          titleText: 'B',
+          seriesText: 'Advent',
+        ),
+        isTrue,
+      );
     });
   });
 }

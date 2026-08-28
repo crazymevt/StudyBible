@@ -26,6 +26,28 @@ String? normalizeSeriesName(String? raw) {
   return name.isEmpty ? null : name;
 }
 
+/// Whether the stored sermon [row] holds something other than what an open
+/// editor currently shows -- the test the editor uses to tell a real remote
+/// (synced) edit apart from its own write echoing back through the stream.
+///
+/// Both series values go through [normalizeSeriesName] so the comparison is
+/// symmetric. Normalizing one side only produces false conflicts: against the
+/// raw field text, the editor's own trimming save looks like a remote edit;
+/// against the raw row, a row that predates write-normalization (stored as
+/// "Faith " or "" by an older build or an older peer) looks like a remote
+/// series edit on any unrelated update, such as a pin toggle synced from
+/// another device.
+bool sermonRowDiffersFromEditor({
+  required Sermon row,
+  required String contentJson,
+  required String titleText,
+  required String seriesText,
+}) {
+  return row.content != contentJson ||
+      row.title != titleText ||
+      normalizeSeriesName(row.series) != normalizeSeriesName(seriesText);
+}
+
 /// Distinct series names across all sermons, for autocomplete suggestions.
 /// Names are deduplicated case-insensitively (keeping the first spelling seen)
 /// and sorted naturally ("Week 2" before "Week 10").
@@ -223,28 +245,36 @@ class SermonActionNotifier {
     final key = from.trim().toLowerCase();
     final newName = normalizeSeriesName(to);
     if (key.isEmpty || newName == null) return 0;
-    final all = await (_store.select(
-      _store.sermons,
-    )..where((t) => t.deleted.equals(false))).get();
-    final targets = [
-      for (final s in all)
-        if ((s.series ?? '').trim().toLowerCase() == key) s.id,
-    ];
-    if (targets.isEmpty) return 0;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    await _store.batch((batch) {
-      for (final id in targets) {
-        batch.update(
-          _store.sermons,
-          SermonsCompanion(
-            series: drift.Value(newName),
-            updatedAt: drift.Value(now),
-          ),
-          where: (t) => t.id.equals(id),
-        );
-      }
+    // Matching runs in Dart so it uses the very same trim as
+    // [normalizeSeriesName] and the grouped list's keys; SQL's trim() strips
+    // only spaces, and a second, subtly different normalization is exactly how
+    // one series splinters. Only id and series are read, so a rename never
+    // pulls every sermon's Delta content into memory, and the whole thing runs
+    // in one transaction so a sermon synced into the series between the scan
+    // and the write can't be skipped.
+    return _store.transaction(() async {
+      final rows =
+          await (_store.selectOnly(_store.sermons)
+                ..addColumns([_store.sermons.id, _store.sermons.series])
+                ..where(_store.sermons.deleted.equals(false)))
+              .get();
+      final targets = [
+        for (final row in rows)
+          if ((row.read(_store.sermons.series) ?? '').trim().toLowerCase() ==
+              key)
+            row.read(_store.sermons.id)!,
+      ];
+      if (targets.isEmpty) return 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      return (_store.update(
+        _store.sermons,
+      )..where((t) => t.id.isIn(targets))).write(
+        SermonsCompanion(
+          series: drift.Value(newName),
+          updatedAt: drift.Value(now),
+        ),
+      );
     });
-    return targets.length;
   }
 
   /// Pins or unpins a sermon so it sits at the top of the list regardless of
