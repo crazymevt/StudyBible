@@ -20,19 +20,24 @@ String _delta(String text) => jsonEncode([
   {'insert': '$text\n'},
 ]);
 
-Sermon _sermon(String id, String title, String? series, {int createdAt = 0}) =>
-    Sermon(
-      id: id,
-      createdAt: createdAt,
-      updatedAt: createdAt,
-      deviceId: 'A',
-      deleted: false,
-      title: title,
-      series: series,
-      content: _delta(title),
-      contentPlain: title,
-      pinned: false,
-    );
+Sermon _sermon(
+  String id,
+  String title,
+  String? series, {
+  int createdAt = 0,
+  bool pinned = false,
+}) => Sermon(
+  id: id,
+  createdAt: createdAt,
+  updatedAt: createdAt,
+  deviceId: 'A',
+  deleted: false,
+  title: title,
+  series: series,
+  content: _delta(title),
+  contentPlain: title,
+  pinned: pinned,
+);
 
 void main() {
   group('groupSermonsBySeries', () {
@@ -93,6 +98,51 @@ void main() {
         sortSeriesGroupsByName(groups, descending: true).map((g) => g.name),
         ['Week 10', 'Week 2', 'Advent', kNoSeriesLabel],
       );
+    });
+
+    test('a section holding a pinned sermon sorts ahead of the rest', () {
+      // Regression: section order is the only place pinning can show in the
+      // grouped list, so sorting sections purely by name buried a pinned
+      // sermon at the bottom whenever its series sorted late.
+      final groups = groupSermonsBySeries([
+        _sermon('1', 'Beta', 'Zeal', pinned: true),
+        _sermon('2', 'Alpha', 'Advent'),
+        _sermon('3', 'Gamma', 'Romans'),
+      ]);
+      expect(sortSeriesGroupsByName(groups).map((g) => g.name), [
+        'Zeal',
+        'Advent',
+        'Romans',
+      ]);
+      // Still true sorting the other way.
+      expect(
+        sortSeriesGroupsByName(groups, descending: true).map((g) => g.name),
+        ['Zeal', 'Romans', 'Advent'],
+      );
+    });
+
+    test('pinned sections sort among themselves by name', () {
+      final groups = groupSermonsBySeries([
+        _sermon('1', 'Beta', 'Zeal', pinned: true),
+        _sermon('2', 'Alpha', 'Advent', pinned: true),
+        _sermon('3', 'Gamma', 'Romans'),
+      ]);
+      expect(sortSeriesGroupsByName(groups).map((g) => g.name), [
+        'Advent',
+        'Zeal',
+        'Romans',
+      ]);
+    });
+
+    test('a pinned sermon with no series stays in the trailing section', () {
+      final groups = groupSermonsBySeries([
+        _sermon('1', 'Beta', null, pinned: true),
+        _sermon('2', 'Alpha', 'Zeal'),
+      ]);
+      expect(sortSeriesGroupsByName(groups).map((g) => g.name), [
+        'Zeal',
+        kNoSeriesLabel,
+      ]);
     });
   });
 

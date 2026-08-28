@@ -245,28 +245,36 @@ class SermonActionNotifier {
     final key = from.trim().toLowerCase();
     final newName = normalizeSeriesName(to);
     if (key.isEmpty || newName == null) return 0;
-    final all = await (_store.select(
-      _store.sermons,
-    )..where((t) => t.deleted.equals(false))).get();
-    final targets = [
-      for (final s in all)
-        if ((s.series ?? '').trim().toLowerCase() == key) s.id,
-    ];
-    if (targets.isEmpty) return 0;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    await _store.batch((batch) {
-      for (final id in targets) {
-        batch.update(
-          _store.sermons,
-          SermonsCompanion(
-            series: drift.Value(newName),
-            updatedAt: drift.Value(now),
-          ),
-          where: (t) => t.id.equals(id),
-        );
-      }
+    // Matching runs in Dart so it uses the very same trim as
+    // [normalizeSeriesName] and the grouped list's keys; SQL's trim() strips
+    // only spaces, and a second, subtly different normalization is exactly how
+    // one series splinters. Only id and series are read, so a rename never
+    // pulls every sermon's Delta content into memory, and the whole thing runs
+    // in one transaction so a sermon synced into the series between the scan
+    // and the write can't be skipped.
+    return _store.transaction(() async {
+      final rows =
+          await (_store.selectOnly(_store.sermons)
+                ..addColumns([_store.sermons.id, _store.sermons.series])
+                ..where(_store.sermons.deleted.equals(false)))
+              .get();
+      final targets = [
+        for (final row in rows)
+          if ((row.read(_store.sermons.series) ?? '').trim().toLowerCase() ==
+              key)
+            row.read(_store.sermons.id)!,
+      ];
+      if (targets.isEmpty) return 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      return (_store.update(
+        _store.sermons,
+      )..where((t) => t.id.isIn(targets))).write(
+        SermonsCompanion(
+          series: drift.Value(newName),
+          updatedAt: drift.Value(now),
+        ),
+      );
     });
-    return targets.length;
   }
 
   /// Pins or unpins a sermon so it sits at the top of the list regardless of

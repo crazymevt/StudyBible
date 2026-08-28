@@ -77,19 +77,30 @@ List<SeriesGroup> groupSermonsBySeries(List<Sermon> sorted) {
 /// active: there the best-ranked-sermon order from [groupSermonsBySeries]
 /// would scatter the sections (a series is placed by its first sermon's
 /// title, not its own name) instead of listing them A–Z.
+///
+/// Sections holding a pinned sermon still sort ahead of the rest. Section
+/// order is the only way pinning can show in the grouped list, and dropping
+/// it here would bury a pinned sermon at the bottom of the panel whenever its
+/// series happens to sort late — the opposite of what "Pin to top" promises.
+/// (A pinned sermon with no series stays in the trailing no-series section,
+/// as it did before grouping sorted sections at all.)
 @visibleForTesting
 List<SeriesGroup> sortSeriesGroupsByName(
   List<SeriesGroup> groups, {
   bool descending = false,
 }) {
+  int byName(SeriesGroup a, SeriesGroup b) => descending
+      ? naturalCompare(b.name, a.name)
+      : naturalCompare(a.name, b.name);
+  bool hasPinned(SeriesGroup g) => g.sermons.any((s) => s.pinned);
+
   final named = [
     for (final group in groups)
       if (group.key.isNotEmpty) group,
-  ]..sort(
-      (a, b) =>
-          descending ? naturalCompare(b.name, a.name) : naturalCompare(a.name, b.name),
-    );
-  return [...named, ...groups.where((g) => g.key.isEmpty)];
+  ];
+  final pinned = named.where(hasPinned).toList()..sort(byName);
+  final rest = named.where((g) => !hasPinned(g)).toList()..sort(byName);
+  return [...pinned, ...rest, ...groups.where((g) => g.key.isEmpty)];
 }
 
 class SermonsPanel extends ConsumerStatefulWidget {
@@ -364,8 +375,7 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
                           row,
                           collapsible: !filtering,
                           collapsed:
-                              !filtering &&
-                              _collapsedSeries.contains(row.key),
+                              !filtering && _collapsedSeries.contains(row.key),
                         );
                       }
                       final sermon = row as Sermon;
@@ -435,8 +445,10 @@ class _SermonsPanelState extends ConsumerState<SermonsPanel> {
                 tooltip: 'Series options',
                 onSelected: (action) => switch (action) {
                   _SeriesAction.rename => _renameSeries(group),
-                  _SeriesAction.export =>
-                    ExportDialog.show(context, group.sermons),
+                  _SeriesAction.export => ExportDialog.show(
+                    context,
+                    group.sermons,
+                  ),
                 },
                 itemBuilder: (context) => [
                   // The no-series section isn't a series, so there's nothing
@@ -781,9 +793,7 @@ class _RenameSeriesDialog extends ConsumerStatefulWidget {
 }
 
 class _RenameSeriesDialogState extends ConsumerState<_RenameSeriesDialog> {
-  late final _nameController = TextEditingController(
-    text: widget.currentName,
-  );
+  late final _nameController = TextEditingController(text: widget.currentName);
   final _nameFocusNode = FocusNode();
 
   @override
@@ -817,6 +827,7 @@ class _RenameSeriesDialogState extends ConsumerState<_RenameSeriesDialog> {
             focusNode: _nameFocusNode,
             options: ref.watch(sermonSeriesNamesProvider),
             decoration: const InputDecoration(labelText: 'Series name'),
+            onSubmitted: _submit,
           ),
         ],
       ),
